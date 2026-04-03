@@ -1,0 +1,3 @@
+
+# Supabase backup files (contain sensitive data)
+supabase/backup_data_*.sql

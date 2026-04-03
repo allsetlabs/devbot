@@ -1,0 +1,24 @@
+#!/bin/bash
+# Register devbot.local as an mDNS alias for this machine
+# This allows accessing the DevBot service via http://devbot.local:3100
+# from any device on the local network.
+
+PORT=${1:-3100}
+
+# Get the active network interface IP
+get_ip() {
+  ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null
+}
+
+IP=$(get_ip)
+
+if [ -z "$IP" ]; then
+  echo "Error: Could not determine local IP address"
+  exit 1
+fi
+
+echo "Registering devbot.local -> $IP (port $PORT)"
+
+# dns-sd -P registers a proxy service AND creates address records
+# for the specified hostname, making devbot.local resolvable via mDNS
+exec dns-sd -P "DevBot" _http._tcp local "$PORT" devbot.local "$IP"

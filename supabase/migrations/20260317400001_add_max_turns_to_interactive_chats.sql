@@ -1,0 +1,1 @@
+ALTER TABLE interactive_chats ADD COLUMN max_turns INTEGER DEFAULT NULL;

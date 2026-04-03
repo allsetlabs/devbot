@@ -1,0 +1,426 @@
+import type {
+  Session,
+  CreateSessionResponse,
+  TerminalType,
+  HealthResponse,
+  ScheduledTask,
+  CreateScheduledTaskRequest,
+  UpdateScheduledTaskRequest,
+  TaskRun,
+  TaskMessage,
+  InteractiveChat,
+  ChatMessage,
+  PermissionMode,
+  ClaudeModel,
+  EventTimerEntry,
+  ModulePlan,
+  CreateModulePlanRequest,
+  UpdateModulePlanRequest,
+  LogsResponse,
+  RemotionVideo,
+  CreateRemotionVideoRequest,
+  SlashCommand,
+} from '../types';
+
+const BACKEND_PORT = import.meta.env.VITE_BACKEND_PORT;
+const API_KEY = import.meta.env.VITE_API_KEY;
+
+if (!BACKEND_PORT) throw new Error('VITE_BACKEND_PORT is not set. Check your .env file.');
+if (!API_KEY) throw new Error('VITE_API_KEY is not set. Check your .env file.');
+
+const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+
+async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': API_KEY,
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Unknown error' }));
+    throw new Error(error.message || `HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export const api = {
+  health: (): Promise<HealthResponse> => {
+    return fetchApi('/health');
+  },
+
+  listSessions: (): Promise<Session[]> => {
+    return fetchApi('/api/sessions');
+  },
+
+  getSession: (id: string): Promise<Session> => {
+    return fetchApi(`/api/sessions/${id}`);
+  },
+
+  createSession: (terminalType?: TerminalType): Promise<CreateSessionResponse> => {
+    return fetchApi('/api/sessions', {
+      method: 'POST',
+      body: terminalType ? JSON.stringify({ terminalType }) : undefined,
+    });
+  },
+
+  deleteSession: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/sessions/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  renameSession: (id: string, name: string): Promise<Session> => {
+    return fetchApi(`/api/sessions/${id}/rename`, {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+  },
+
+  // Scheduler endpoints
+  listScheduledTasks: (): Promise<ScheduledTask[]> => {
+    return fetchApi('/api/schedulers');
+  },
+
+  getScheduledTask: (id: string): Promise<ScheduledTask> => {
+    return fetchApi(`/api/schedulers/${id}`);
+  },
+
+  createScheduledTask: (data: CreateScheduledTaskRequest): Promise<ScheduledTask> => {
+    return fetchApi('/api/schedulers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateScheduledTask: (id: string, data: UpdateScheduledTaskRequest): Promise<ScheduledTask> => {
+    return fetchApi(`/api/schedulers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteScheduledTask: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/schedulers/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  rerunScheduledTask: (id: string): Promise<{ success: boolean; message: string }> => {
+    return fetchApi(`/api/schedulers/${id}/rerun`, { method: 'POST' });
+  },
+
+  // Run endpoints
+  listTaskRuns: (taskId: string): Promise<TaskRun[]> => {
+    return fetchApi(`/api/schedulers/${taskId}/runs`);
+  },
+
+  getLatestRun: (taskId: string): Promise<TaskRun> => {
+    return fetchApi(`/api/schedulers/${taskId}/latest-run`);
+  },
+
+  getTaskRun: (taskId: string, runId: string): Promise<TaskRun> => {
+    return fetchApi(`/api/schedulers/${taskId}/runs/${runId}`);
+  },
+
+  getRunMessages: (taskId: string, runId: string, afterSequence = 0): Promise<TaskMessage[]> => {
+    const params = afterSequence > 0 ? `?afterSequence=${afterSequence}` : '';
+    return fetchApi(`/api/schedulers/${taskId}/runs/${runId}/messages${params}`);
+  },
+
+  // Interactive Chat endpoints
+  listChatTypes: (): Promise<string[]> => {
+    return fetchApi('/api/interactive-chats/types');
+  },
+
+  listInteractiveChats: (type?: string): Promise<InteractiveChat[]> => {
+    const params = type ? `?type=${encodeURIComponent(type)}` : '';
+    return fetchApi(`/api/interactive-chats${params}`);
+  },
+
+  getInteractiveChat: (id: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}`);
+  },
+
+  createInteractiveChat: (options?: {
+    name?: string;
+    systemPrompt?: string;
+    permissionMode?: PermissionMode;
+    model?: ClaudeModel;
+    maxTurns?: number | null;
+  }): Promise<InteractiveChat> => {
+    return fetchApi('/api/interactive-chats', {
+      method: 'POST',
+      body: options ? JSON.stringify(options) : undefined,
+    });
+  },
+
+  duplicateInteractiveChat: (id: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/duplicate`, {
+      method: 'POST',
+    });
+  },
+
+  deleteInteractiveChat: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${id}`, { method: 'DELETE' });
+  },
+
+  sendChatMessage: (chatId: string, prompt: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/send`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    });
+  },
+
+  stopChat: (chatId: string): Promise<{ success: boolean; wasStopped: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/stop`, { method: 'POST' });
+  },
+
+  getChatStatus: (chatId: string): Promise<{ isRunning: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/status`);
+  },
+
+  getChatMessages: (chatId: string, afterSequence = 0): Promise<ChatMessage[]> => {
+    const params = afterSequence > 0 ? `?afterSequence=${afterSequence}` : '';
+    return fetchApi(`/api/interactive-chats/${chatId}/messages${params}`);
+  },
+
+  renameInteractiveChat: (id: string, name: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/rename`, {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+  },
+
+  listArchivedChats: (type?: string): Promise<InteractiveChat[]> => {
+    const params = type ? `?type=${encodeURIComponent(type)}` : '';
+    return fetchApi(`/api/interactive-chats/archived${params}`);
+  },
+
+  archiveInteractiveChat: (id: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/archive`, { method: 'POST' });
+  },
+
+  unarchiveInteractiveChat: (id: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/unarchive`, { method: 'POST' });
+  },
+
+  changeChatMode: (id: string, permissionMode: PermissionMode): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/mode`, {
+      method: 'POST',
+      body: JSON.stringify({ permissionMode }),
+    });
+  },
+
+  changeChatModel: (id: string, model: ClaudeModel): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/model`, {
+      method: 'POST',
+      body: JSON.stringify({ model }),
+    });
+  },
+
+  updateChatSystemPrompt: (id: string, systemPrompt: string | null): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/system-prompt`, {
+      method: 'POST',
+      body: JSON.stringify({ systemPrompt }),
+    });
+  },
+
+  changeChatMaxTurns: (id: string, maxTurns: number | null): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/max-turns`, {
+      method: 'POST',
+      body: JSON.stringify({ maxTurns }),
+    });
+  },
+
+  exportChat: async (
+    id: string,
+    format: 'markdown' | 'json' | 'plaintext' = 'markdown'
+  ): Promise<Blob> => {
+    const response = await fetch(
+      `${BACKEND_URL}/api/interactive-chats/${id}/export?format=${format}`,
+      {
+        headers: { 'X-API-Key': API_KEY },
+      }
+    );
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Export failed' }));
+      throw new Error(error.message || `HTTP ${response.status}`);
+    }
+    return response.blob();
+  },
+
+  exportChatMarkdown: async (id: string): Promise<string> => {
+    // Keep for backwards compatibility
+    const blob = await api.exportChat(id, 'markdown');
+    return blob.text();
+  },
+
+  // Event Timer (Birth Times) endpoints
+  listEventTimerEntries: (): Promise<EventTimerEntry[]> => {
+    return fetchApi('/api/birth-times');
+  },
+
+  createEventTimerEntry: (data: {
+    recordedAt: string;
+    timezone: string;
+    latitude?: number | null;
+    longitude?: number | null;
+    locationName?: string | null;
+    city?: string | null;
+    state?: string | null;
+    country?: string | null;
+    fullAddress?: string | null;
+  }): Promise<EventTimerEntry> => {
+    return fetchApi('/api/birth-times', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateEventTimerEntry: (
+    id: string,
+    data: { name?: string | null; description?: string | null }
+  ): Promise<EventTimerEntry> => {
+    return fetchApi(`/api/birth-times/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteEventTimerEntry: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/birth-times/${id}`, { method: 'DELETE' });
+  },
+
+  // Plans endpoints
+  listPlans: (status?: string): Promise<ModulePlan[]> => {
+    const params = status ? `?status=${status}` : '';
+    return fetchApi(`/api/plans${params}`);
+  },
+
+  getPlanCount: (): Promise<{ count: number }> => {
+    return fetchApi('/api/plans/count');
+  },
+
+  getPlan: (id: string): Promise<ModulePlan> => {
+    return fetchApi(`/api/plans/${id}`);
+  },
+
+  createPlan: (data: CreateModulePlanRequest): Promise<ModulePlan> => {
+    return fetchApi('/api/plans', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updatePlan: (id: string, data: UpdateModulePlanRequest): Promise<ModulePlan> => {
+    return fetchApi(`/api/plans/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deletePlan: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/plans/${id}`, { method: 'DELETE' });
+  },
+
+  // Remotion Videos endpoints
+  listRemotionVideos: (): Promise<RemotionVideo[]> => {
+    return fetchApi('/api/remotion-videos');
+  },
+
+  createRemotionVideo: (data: CreateRemotionVideoRequest): Promise<RemotionVideo> => {
+    return fetchApi('/api/remotion-videos', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteRemotionVideo: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/remotion-videos/${id}`, { method: 'DELETE' });
+  },
+
+  getRemotionVideoStreamUrl: (id: string): string => {
+    return `${BACKEND_URL}/api/remotion-videos/${id}/stream?key=${encodeURIComponent(API_KEY)}`;
+  },
+
+  // Commands endpoints
+  listCommands: (): Promise<SlashCommand[]> => {
+    return fetchApi('/api/commands');
+  },
+
+  // Logs endpoints
+  getLogs: (source: string, lines = 200): Promise<LogsResponse> => {
+    return fetchApi(`/api/logs?source=${source}&lines=${lines}`);
+  },
+
+  clearLogs: (source: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/logs?source=${source}`, { method: 'DELETE' });
+  },
+
+  // Files endpoints
+  browseFiles: (
+    query: string,
+    offset = 0,
+    limit = 50
+  ): Promise<{ items: any[]; total: number; hasMore: boolean }> => {
+    return fetchApi(
+      `/api/files/browse?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`
+    );
+  },
+};
+
+export function getXtermWsUrl(port: number): string {
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${wsProtocol}//${window.location.hostname}:${port}`;
+}
+
+export interface UploadedFileInfo {
+  path: string;
+  filename: string;
+  originalName: string;
+}
+
+export interface UploadResponse {
+  success: boolean;
+  path: string;
+  filename: string;
+  originalName?: string;
+  files: UploadedFileInfo[];
+}
+
+export async function uploadFile(file: File): Promise<UploadResponse> {
+  return uploadFiles([file]);
+}
+
+export async function uploadFiles(files: File[], chatId?: string): Promise<UploadResponse> {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('files', file);
+  }
+  if (chatId) {
+    formData.append('chatId', chatId);
+  }
+
+  const response = await fetch(`${BACKEND_URL}/api/upload`, {
+    method: 'POST',
+    headers: {
+      'X-API-Key': API_KEY,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error(error.error || `HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+/** @deprecated Use uploadFile instead */
+export const uploadImage = uploadFile;

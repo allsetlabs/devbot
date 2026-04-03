@@ -1,0 +1,224 @@
+export type TerminalType = 'xterm' | 'mosh';
+
+export interface Session {
+  id: string;
+  terminalType: TerminalType;
+  port: number;
+  wsUrl: string;
+  name: string;
+  createdAt: string;
+  status: 'active' | 'inactive';
+}
+
+export interface CreateSessionResponse {
+  id: string;
+  terminalType: TerminalType;
+  port: number;
+  wsUrl: string;
+  createdAt: string;
+}
+
+export interface ApiError {
+  error: string;
+  message: string;
+}
+
+export interface HealthResponse {
+  status: 'ok' | 'error';
+  activeSessions: number;
+  uptime: number;
+}
+
+export interface ScheduledTask {
+  id: string;
+  prompt: string;
+  name: string | null;
+  intervalMinutes: number;
+  status: 'active' | 'paused' | 'deleted';
+  createdAt: string;
+  lastRunAt: string | null;
+  nextRunAt: string | null;
+  runCount: number;
+  maxRuns: number | null;
+  isRunning: boolean;
+  isQueued: boolean;
+}
+
+export interface CreateScheduledTaskRequest {
+  prompt: string;
+  intervalMinutes: number;
+  maxRuns?: number | null;
+}
+
+export interface UpdateScheduledTaskRequest {
+  prompt?: string;
+  intervalMinutes?: number;
+  status?: 'active' | 'paused';
+  maxRuns?: number | null;
+}
+
+export interface TaskRun {
+  id: string;
+  taskId: string;
+  runIndex: number;
+  chatId: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  status: 'running' | 'completed' | 'failed';
+  outputFile: string | null;
+  errorMessage: string | null;
+}
+
+export interface TaskMessage {
+  id: string;
+  runId: string;
+  sequence: number;
+  type: 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
+  content: ClaudeMessageContent;
+  createdAt: string;
+}
+
+// Claude JSON output content types
+export interface ClaudeMessageContent {
+  type: string;
+  subtype?: string;
+  message?: {
+    role: string;
+    content: ClaudeContentBlock[];
+  };
+  tool_name?: string;
+  tool_input?: Record<string, unknown>;
+  result?: unknown;
+  error?: string;
+  [key: string]: unknown;
+}
+
+export interface ClaudeContentBlock {
+  type: 'text' | 'tool_use' | 'tool_result' | 'thinking';
+  text?: string;
+  thinking?: string;
+  id?: string;
+  name?: string;
+  input?: Record<string, unknown>;
+  tool_use_id?: string;
+  content?: string | ClaudeContentBlock[];
+  is_error?: boolean;
+}
+
+export type PermissionMode = 'plan' | 'auto-accept' | 'dangerous';
+export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
+
+export interface InteractiveChat {
+  id: string;
+  name: string;
+  type: string;
+  claudeSessionId: string | null;
+  status: 'active' | 'completed';
+  permissionMode: PermissionMode;
+  model: ClaudeModel;
+  systemPrompt: string | null;
+  maxTurns: number | null;
+  isRunning: boolean;
+  createdAt: string;
+  updatedAt: string;
+  archivedAt: string | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  sequence: number;
+  type: 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
+  content: ClaudeMessageContent;
+  createdAt: string;
+}
+
+export interface EventTimerEntry {
+  id: string;
+  recordedAt: string;
+  timezone: string;
+  latitude: number | null;
+  longitude: number | null;
+  locationName: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  fullAddress: string | null;
+  name: string | null;
+  description: string | null;
+  note: string | null;
+  createdAt: string;
+}
+
+export interface ModulePlan {
+  id: string;
+  title: string;
+  description: string;
+  route: string;
+  source: string | null;
+  sourceUrl: string | null;
+  priority: 'low' | 'medium' | 'high';
+  status: 'pending' | 'in_progress' | 'completed' | 'dismissed';
+  steps: Record<string, unknown>[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlanStep {
+  title: string;
+  description: string;
+  completed: boolean;
+}
+
+export interface CreateModulePlanRequest {
+  title: string;
+  description: string;
+  route: string;
+  source?: string;
+  sourceUrl?: string;
+  priority?: 'low' | 'medium' | 'high';
+  steps?: PlanStep[];
+}
+
+export interface LogsResponse {
+  source: string;
+  lines: number;
+  totalLines: number;
+  content: string;
+  lastModified: string | null;
+}
+
+export interface UpdateModulePlanRequest {
+  title?: string;
+  description?: string;
+  route?: string;
+  source?: string;
+  sourceUrl?: string;
+  priority?: 'low' | 'medium' | 'high';
+  status?: 'pending' | 'in_progress' | 'completed' | 'dismissed';
+  steps?: PlanStep[];
+}
+
+// Remotion Video types
+export interface RemotionVideo {
+  id: string;
+  name: string;
+  videoPath: string;
+  chatId: string;
+  status: 'generating' | 'completed' | 'failed';
+  createdAt: string;
+}
+
+export interface CreateRemotionVideoRequest {
+  name: string;
+  videoPath: string;
+  chatId: string;
+}
+
+// Slash Command types
+export interface SlashCommand {
+  id: string;
+  name: string;
+  description: string;
+  type: 'skill' | 'builtin' | 'command';
+}

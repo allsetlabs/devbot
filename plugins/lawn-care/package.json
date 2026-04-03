@@ -1,0 +1,27 @@
+{
+  "name": "@devbot/plugin-lawn-care",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "backend/index.ts",
+  "exports": {
+    ".": "./backend/index.ts",
+    "./frontend": "./frontend/index.ts",
+    "./backend": "./backend/index.ts"
+  },
+  "peerDependencies": {
+    "@subbiah/reusable": "*",
+    "@tanstack/react-query": "*",
+    "better-sqlite3": "*",
+    "drizzle-orm": "*",
+    "express": "*",
+    "lucide-react": "*",
+    "multer": "*",
+    "react": "*",
+    "react-dom": "*",
+    "react-router-dom": "*",
+    "uuid": "*"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

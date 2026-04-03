@@ -1,0 +1,35 @@
+@import '@subbiah/reusable/styles';
+@import '@xterm/xterm/css/xterm.css';
+
+/* Root elements take full viewport */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Safe area handling for notched devices */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Terminal container - fills parent completely */
+.terminal-container {
+  height: 100%;
+  width: 100%;
+}
+
+.terminal-container .xterm {
+  height: 100%;
+  padding: 8px;
+}
+
+.terminal-container .xterm-viewport {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}

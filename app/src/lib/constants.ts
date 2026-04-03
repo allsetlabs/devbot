@@ -1,7 +1,7 @@
 /** Project working directory constants */
 export const PROJECT_CONFIG = {
   name: 'personal',
-  displayPath: '/Users/subbiahchandramouli/Documents/GitHub/personal',
+  displayPath: '/Users/subbiahchandramouli/Documents/GitHub/all_projects',
   description: 'Personal Projects Monorepo',
 } as const;
 

@@ -74,16 +74,12 @@ export function ChatListContent({
             {showFavorites && !searchQuery
               ? 'No starred chats yet. Star a chat to find it here.'
               : searchQuery
-              ? `No chats match "${searchQuery}"`
-              : 'No chats match the current filter.'}
+                ? `No chats match "${searchQuery}"`
+                : 'No chats match the current filter.'}
           </p>
         </div>
         {(showFavorites || searchQuery) && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onClearFilters}
-          >
+          <Button variant="outline" size="sm" onClick={onClearFilters}>
             Clear filters
           </Button>
         )}
@@ -100,17 +96,29 @@ export function ChatListContent({
             chat={chat}
             isFavorited={isFavorite(chat.id)}
             onSelect={() => onSelect(chat)}
-            onToggleFavorite={(e) => { e.stopPropagation(); onToggleFavorite(chat.id); }}
-            onDuplicate={(e) => { e.stopPropagation(); onDuplicate(chat.id); }}
-            onArchive={(e) => { e.stopPropagation(); onArchive(chat.id); }}
-            onDelete={(e) => { e.stopPropagation(); onDelete(chat.id); }}
+            onToggleFavorite={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(chat.id);
+            }}
+            onDuplicate={(e) => {
+              e.stopPropagation();
+              onDuplicate(chat.id);
+            }}
+            onArchive={(e) => {
+              e.stopPropagation();
+              onArchive(chat.id);
+            }}
+            onDelete={(e) => {
+              e.stopPropagation();
+              onDelete(chat.id);
+            }}
             hasCopyCommand={!!chat.claudeSessionId}
             onCopyCommand={
               chat.claudeSessionId
                 ? (e) => {
                     e.stopPropagation();
                     copyToClipboard(
-                      `cd /Users/subbiahchandramouli/Documents/GitHub/personal && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                      `cd /Users/subbiahchandramouli/Documents/GitHub/all_projects && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
                     );
                   }
                 : undefined
@@ -118,7 +126,6 @@ export function ChatListContent({
           />
         ))}
       </div>
-
     </div>
   );
 }

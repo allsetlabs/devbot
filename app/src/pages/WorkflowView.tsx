@@ -30,6 +30,7 @@ export function WorkflowView() {
         selectedStepRunId!,
         afterSequence
       );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return newMsgs.map<TaskMessage>((m: any) => ({
         id: m.id,
         runId: m.stepRunId,
@@ -117,6 +118,7 @@ export function WorkflowView() {
     if (step?.status === 'running') {
       fetchMessages(lastSequenceRef.current);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStepRunId, stepDataUpdatedAt, stepRuns, fetchMessages]);
 
   const selectedRun = runs.find((r) => r.id === selectedRunId);

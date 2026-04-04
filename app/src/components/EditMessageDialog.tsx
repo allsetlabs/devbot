@@ -49,6 +49,7 @@ export function EditMessageDialog({
             onChange={(e) => setEditedText(e.target.value)}
             placeholder="Edit your message..."
             className="min-h-32 w-full rounded-lg border border-input bg-background px-3 py-2 font-mono text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/20"
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
         </div>

@@ -4,7 +4,7 @@ import { createPlansHandlers } from './handlers/plans.js';
 import { createPhotosHandlers } from './handlers/photos.js';
 import { lawnCareDb, initializeLawnCareDatabase } from './db.js';
 
-export default function getLawnCareRouter(): Router {
+export function getLawnCareRouter(): Router {
   // Initialize this plugin's database
   initializeLawnCareDatabase();
 

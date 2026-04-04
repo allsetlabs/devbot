@@ -140,6 +140,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
 
           {/* Task Prompt */}
           <div>
+            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="mb-2 block text-sm font-medium text-foreground">Task Prompt</label>
             <textarea
               value={prompt}

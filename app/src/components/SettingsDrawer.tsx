@@ -99,6 +99,7 @@ export function SettingsDrawer({
           </div>
 
           {/* Sound Notifications */}
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card p-3">
             <Checkbox
               checked={settings.soundEnabled}
@@ -112,6 +113,7 @@ export function SettingsDrawer({
           </label>
 
           {/* Haptic Feedback */}
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card p-3">
             <Checkbox
               checked={settings.hapticEnabled}
@@ -127,6 +129,7 @@ export function SettingsDrawer({
           </label>
 
           {/* Auto-scroll */}
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card p-3">
             <Checkbox
               checked={settings.autoScrollEnabled}

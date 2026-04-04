@@ -78,6 +78,7 @@ export const MessageList = forwardRef<
     return -1;
   }, [renderedMessages]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: renderedMessages.length,
     getScrollElement: () => scrollContainerRef.current,
@@ -166,7 +167,11 @@ export const MessageList = forwardRef<
                 isPinned={pinnedIds.includes(msg.id)}
                 onTogglePin={onTogglePin}
                 searchQuery={searchQuery}
-                currentReaction={getMessageReaction ? (getMessageReaction(msg.id) as any) : null}
+                currentReaction={
+                  getMessageReaction
+                    ? (getMessageReaction(msg.id) as unknown as ReactionType | null)
+                    : null
+                }
                 onToggleReaction={
                   onToggleMessageReaction
                     ? (type) => onToggleMessageReaction(msg.id, type)

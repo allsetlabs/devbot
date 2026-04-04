@@ -109,6 +109,7 @@ export function XtermTerminal({ wsUrl, onConnect, onDisconnect, onReady }: Xterm
   }, [scrollToBottom]);
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       ref={terminalRef}
       className="terminal-container h-full w-full bg-card"

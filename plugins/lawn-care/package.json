@@ -9,7 +9,7 @@
     "./backend": "./backend/index.ts"
   },
   "peerDependencies": {
-    "@subbiah/reusable": "*",
+    "@allsetlabs/reusable": "*",
     "@tanstack/react-query": "*",
     "better-sqlite3": "*",
     "drizzle-orm": "*",

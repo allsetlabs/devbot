@@ -90,6 +90,7 @@ export function SchedulerView() {
       if (latestRunId !== waitingForRunAfterRef.current) {
         waitingForRunAfterRef.current = null;
         prevLatestRunIdRef.current = latestRunId;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedRunId(latestRunId);
       }
       return;

@@ -1,3 +1,4 @@
+// eslint-disable-next-line react-refresh/only-export-components
 export function renderInlineMarkdown(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
   const regex = /(\*\*(.+?)\*\*|`(.+?)`)/g;

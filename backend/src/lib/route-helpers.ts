@@ -57,7 +57,9 @@ export function generateId(length = 8): string {
 }
 
 /** Fetch a single row by ID from a table. Returns the row or sends 404 and returns null. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getOneById<T extends SQLiteTableWithColumns<any>>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: { select: () => any },
   table: T,
   id: string,

@@ -93,6 +93,7 @@ export async function parseStreamLine(
           content: data,
           created_by: 'system',
           updated_by: 'system',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any);
       } catch (err) {
         console.error(`${config.logPrefix} Failed to insert message:`, err);

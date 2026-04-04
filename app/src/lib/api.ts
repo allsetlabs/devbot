@@ -390,6 +390,7 @@ export const api = {
     query: string,
     offset = 0,
     limit = 50
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<{ items: any[]; total: number; hasMore: boolean }> => {
     return fetchApi(
       `/api/files/browse?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`

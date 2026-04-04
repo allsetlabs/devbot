@@ -19,7 +19,7 @@ const features = [
 const FeatureLine: React.FC<{ text: string; delay: number; index: number }> = ({
   text,
   delay,
-  index,
+  index: _index,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();

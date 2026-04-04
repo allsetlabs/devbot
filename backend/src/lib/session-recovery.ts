@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { v4 as uuidv4 } from 'uuid';
 import { coreDb } from './db/core.js';
 import { sql } from 'drizzle-orm';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
 /**

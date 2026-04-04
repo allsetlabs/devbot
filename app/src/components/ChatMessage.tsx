@@ -18,6 +18,7 @@ import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView } from './T
 import { SystemMessage } from './SystemMessage';
 
 // Re-export symbols used by other modules
+/* eslint-disable react-refresh/only-export-components */
 export {
   formatMessageTime,
   extractTextContent,
@@ -25,6 +26,7 @@ export {
 } from '../lib/chat-message-utils';
 export { formatDateSeparator, formatRelativeTime } from '../lib/chat-message-utils';
 export { formatTokens, formatDuration, formatCost, extractUsageData } from './SystemMessage';
+/* eslint-enable react-refresh/only-export-components */
 
 const MAX_VISIBLE_LINES = 10;
 

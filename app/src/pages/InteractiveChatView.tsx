@@ -211,7 +211,9 @@ export function InteractiveChatView({
   const [messagesLoading, setMessagesLoading] = useState(true);
   const lastSequenceRef = useRef(0);
 
-  const messageListRef = useRef<{ scrollToMessage: (index: number, align?: 'start' | 'center' | 'end') => void } | null>(null);
+  const messageListRef = useRef<{
+    scrollToMessage: (index: number, align?: 'start' | 'center' | 'end') => void;
+  } | null>(null);
 
   // Initialize lastSequenceRef and input history from cached messages on mount
   useEffect(() => {
@@ -336,7 +338,9 @@ export function InteractiveChatView({
           pendingTool.name !== toolName ||
           JSON.stringify(pendingTool.input) !== JSON.stringify(toolInput)
         ) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setPendingTool({ name: toolName, input: toolInput });
+
           setToolDialogOpen(true);
         }
         break;
@@ -377,6 +381,7 @@ export function InteractiveChatView({
           setHasGeneratedTitle(true); // Still mark as generated to prevent retries
         });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setHasGeneratedTitle(true);
     }
   }, [messages, chat, chatId, hasGeneratedTitle, queryClient]);
@@ -384,7 +389,9 @@ export function InteractiveChatView({
   // Search messages logic
   useEffect(() => {
     if (!searchQuery.trim()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearchMatches([]);
+
       setCurrentMatchIndex(0);
       return;
     }

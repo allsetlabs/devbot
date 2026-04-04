@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, TrendingUp, Weight, Ruler, CircleDot } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { babyLogsApi } from '../api';
 import { PercentileChart } from '../components/PercentileChart';
 import { estimatePercentile } from '../lib/who-growth-data';

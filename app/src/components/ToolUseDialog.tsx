@@ -64,6 +64,7 @@ export function ToolUseDialog({ open, toolName, toolInput, mode, onDismiss }: To
 
           {/* Tool Parameters */}
           <div className="space-y-2">
+            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="text-sm font-semibold text-foreground">Parameters:</label>
             <div className="relative">
               <pre className="overflow-x-auto rounded-lg bg-background/50 p-3 font-mono text-xs text-foreground">

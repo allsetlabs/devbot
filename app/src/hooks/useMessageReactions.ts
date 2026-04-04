@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocalStorageMap } from './useLocalStorageMap';
 
 export type ReactionType = 'thumbsup' | 'thumbsdown';
@@ -10,7 +10,7 @@ const STORAGE_KEY = 'devbot-message-reactions';
 export function useMessageReactions(chatId: string) {
   const { data, set } = useLocalStorageMap<ChatReactions>(STORAGE_KEY);
 
-  const chatReactions = data[chatId] ?? {};
+  const chatReactions = useMemo(() => data[chatId] ?? {}, [data, chatId]);
 
   const getReaction = useCallback(
     (messageId: string): ReactionType | null => chatReactions[messageId] ?? null,

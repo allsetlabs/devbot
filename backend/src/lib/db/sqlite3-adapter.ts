@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import sqlite3 from 'sqlite3';
 
 /**

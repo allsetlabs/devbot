@@ -11,6 +11,9 @@ import {
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ClaudeMessageContent } from '../types';
 
+// This file exports both utility functions and components — fast-refresh limitation is intentional
+/* eslint-disable react-refresh/only-export-components */
+
 /** Format token count to compact form (e.g., 1.2k, 15k, 1.1M) */
 export function formatTokens(count: number): string {
   if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;

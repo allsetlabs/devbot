@@ -2,14 +2,14 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '@devbot/app/hooks/useCrudMutation';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Input } from '@subbiah/reusable/components/ui/input';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Input } from '@allsetlabs/reusable/components/ui/input';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import {
   Menu,
   Camera,

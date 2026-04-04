@@ -2,21 +2,21 @@ import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '@devbot/app/hooks/useCrudMutation';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Input } from '@subbiah/reusable/components/ui/input';
-import { Textarea } from '@subbiah/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Input } from '@allsetlabs/reusable/components/ui/input';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@subbiah/reusable/components/ui/dropdown-menu';
+} from '@allsetlabs/reusable/components/ui/dropdown-menu';
 import {
   Menu,
   Leaf,
@@ -187,13 +187,13 @@ function ApplicationCard({
           <div className="border-border space-y-2 border-t px-4 py-3">
             {app.tips && (
               <div className="flex items-start gap-2">
-                <Sun className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <Sun className="text-warning mt-0.5 h-4 w-4 shrink-0" />
                 <p className="text-foreground text-sm">{app.tips}</p>
               </div>
             )}
             {app.watering && (
               <div className="flex items-start gap-2">
-                <Droplets className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                <Droplets className="text-primary mt-0.5 h-4 w-4 shrink-0" />
                 <p className="text-foreground text-sm">{app.watering}</p>
               </div>
             )}

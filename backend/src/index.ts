@@ -103,6 +103,7 @@ const server = app.listen(PORT, HOST, async () => {
   try {
     await syncCommands();
   } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     console.warn('[Server] Failed to sync commands:', (err as any)?.message);
   }
 

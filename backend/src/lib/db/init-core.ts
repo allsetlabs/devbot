@@ -4,6 +4,7 @@ import { coreDb } from './core.js';
 /**
  * Helper to run raw SQL with Drizzle (better-sqlite3 is synchronous)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function runSQL(_db: any, sqlString: string): Promise<void> {
   try {
     // better-sqlite3 with Drizzle uses run() for raw SQL

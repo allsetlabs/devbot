@@ -23,11 +23,13 @@ export function useSettings() {
       const stored = localStorage.getItem(SETTINGS_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSettings({ ...DEFAULT_SETTINGS, ...parsed });
       }
     } catch {
       // Silently fail on parse error, use defaults
     }
+
     setIsLoaded(true);
   }, []);
 

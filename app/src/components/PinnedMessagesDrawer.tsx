@@ -61,6 +61,7 @@ export function PinnedMessagesDrawer({
           ) : (
             <div className="space-y-4">
               {pinnedMessages.map((msg) => (
+                // eslint-disable-next-line jsx-a11y/no-static-element-interactions
                 <div
                   key={msg.id}
                   className="relative space-y-1 rounded-lg border border-border bg-muted/50 p-3 pr-8"

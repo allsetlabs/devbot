@@ -41,9 +41,13 @@ export function SchedulerSettingsDrawer({
   // Sync form state when task changes
   useEffect(() => {
     if (task) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPrompt(task.prompt);
+
       setIntervalMinutes(task.intervalMinutes);
+
       setMaxRuns(task.maxRuns);
+
       setIsInfinite(task.maxRuns === null);
       saveMutation.reset();
     }

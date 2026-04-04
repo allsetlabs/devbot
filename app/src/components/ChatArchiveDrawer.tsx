@@ -5,9 +5,9 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import DataFetchWrapper from '@subbiah/reusable/components/DataFetchWrapper';
+} from '@allsetlabs/reusable/components/ui/drawer';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { DataFetchWrapper } from '@allsetlabs/reusable/components/DataFetchWrapper';
 import { ArchivedChatItem } from './ArchivedChatItem';
 import type { InteractiveChat } from '../types';
 
@@ -42,10 +42,7 @@ export function ChatArchiveDrawer({
     <Drawer open={open} onOpenChange={onOpenChange}>
       <div className="border-t border-border">
         <DrawerTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex w-full items-center justify-between px-4 py-3"
-          >
+          <Button variant="ghost" className="flex w-full items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <Archive className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium text-foreground">Archived</span>

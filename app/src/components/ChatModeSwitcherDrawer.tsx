@@ -4,7 +4,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { PermissionMode } from '../types';
 

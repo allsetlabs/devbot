@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Timer, Menu, Globe } from 'lucide-react';
 import { api } from '../lib/api';
 import { SlideNav } from '../components/SlideNav';

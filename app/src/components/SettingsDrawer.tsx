@@ -4,9 +4,9 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
-import { Checkbox } from '@subbiah/reusable/components/ui/checkbox';
-import { Button } from '@subbiah/reusable/components/ui/button';
+} from '@allsetlabs/reusable/components/ui/drawer';
+import { Checkbox } from '@allsetlabs/reusable/components/ui/checkbox';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { DevBotSettings } from '../hooks/useSettings';
 
 interface SettingsDrawerProps {

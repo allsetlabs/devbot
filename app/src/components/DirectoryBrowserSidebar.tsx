@@ -5,8 +5,8 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
-import { Input } from '@subbiah/reusable/components/ui/input';
+} from '@allsetlabs/reusable/components/ui/drawer';
+import { Input } from '@allsetlabs/reusable/components/ui/input';
 import { FileText, Folder, Search, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 

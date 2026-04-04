@@ -1,5 +1,10 @@
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@subbiah/reusable/components/ui/drawer';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@allsetlabs/reusable/components/ui/drawer';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 
 export type ExportFormat = 'markdown' | 'json' | 'plaintext';
 

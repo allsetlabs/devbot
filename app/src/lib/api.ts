@@ -20,6 +20,8 @@ import type {
   RemotionVideo,
   CreateRemotionVideoRequest,
   SlashCommand,
+  WorkflowRun,
+  WorkflowStepRun,
 } from '../types';
 
 const BACKEND_PORT = import.meta.env.VITE_BACKEND_PORT;
@@ -361,6 +363,27 @@ export const api = {
   clearLogs: (source: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/logs?source=${source}`, { method: 'DELETE' });
   },
+
+  // Workflow endpoints
+  getWorkflow: async (workflowId: string): Promise<{ id: string; name: string }> =>
+    fetchApi(`/api/workflows/${workflowId}`),
+  listWorkflowRuns: async (workflowId: string): Promise<WorkflowRun[]> =>
+    fetchApi(`/api/workflows/${workflowId}/runs`),
+  listWorkflowStepRuns: async (workflowId: string, runId: string): Promise<WorkflowStepRun[]> =>
+    fetchApi(`/api/workflows/${workflowId}/runs/${runId}/steps`),
+  startWorkflowRun: async (workflowId: string): Promise<WorkflowRun> =>
+    fetchApi(`/api/workflows/${workflowId}/runs`, { method: 'POST' }),
+  cancelWorkflowRun: async (workflowId: string, runId: string): Promise<WorkflowRun> =>
+    fetchApi(`/api/workflows/${workflowId}/runs/${runId}/cancel`, { method: 'POST' }),
+  getWorkflowStepMessages: async (
+    workflowId: string,
+    runId: string,
+    stepRunId: string,
+    afterSequence: number
+  ): Promise<TaskMessage[]> =>
+    fetchApi(
+      `/api/workflows/${workflowId}/runs/${runId}/steps/${stepRunId}/messages?after=${afterSequence}`
+    ),
 
   // Files endpoints
   browseFiles: (

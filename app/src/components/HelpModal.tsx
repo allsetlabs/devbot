@@ -3,8 +3,8 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
-import { Button } from '@subbiah/reusable/components/ui/button';
+} from '@allsetlabs/reusable/components/ui/drawer';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   HelpCircle,
   Keyboard,
@@ -174,7 +174,10 @@ export function HelpModal({ open, onOpenChange, onBack }: HelpModalProps) {
             </h3>
             <div className="space-y-2">
               {STATUS_BAR_ITEMS.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-lg border border-border bg-card/50 px-3 py-2">
+                <div
+                  key={idx}
+                  className="flex items-center justify-between rounded-lg border border-border bg-card/50 px-3 py-2"
+                >
                   <span className="text-xs text-muted-foreground">{item.description}</span>
                   <code className="rounded bg-background px-2 py-1 font-mono text-xs font-medium text-foreground">
                     {item.key}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Baby, ChevronRight, Milk, Droplets } from 'lucide-react';
 import { formatRelativeTime } from '../lib/format';
 import type { BabyLog } from '@devbot/plugin-baby-logs/frontend';

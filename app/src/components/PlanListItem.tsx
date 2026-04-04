@@ -1,4 +1,4 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Trash2, Play } from 'lucide-react';
 import { formatRelativeTime } from '../lib/format';
 import type { ModulePlan } from '../types';

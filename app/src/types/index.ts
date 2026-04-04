@@ -222,3 +222,23 @@ export interface SlashCommand {
   description: string;
   type: 'skill' | 'builtin' | 'command';
 }
+
+export interface WorkflowRun {
+  id: string;
+  workflowId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+  errorMessage?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowStepRun {
+  id: string;
+  runId: string;
+  stepId: string;
+  name: string;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}

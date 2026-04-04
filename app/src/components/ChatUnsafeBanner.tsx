@@ -1,5 +1,5 @@
 import { AlertTriangle, X } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 
 interface ChatUnsafeBannerProps {
   onDismiss: () => void;
@@ -13,8 +13,8 @@ export function ChatUnsafeBanner({ onDismiss }: ChatUnsafeBannerProps) {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-destructive">Unsafe Mode Active</p>
           <p className="mt-0.5 text-xs text-destructive/80">
-            Claude can read, write, execute, and delete files without asking for permission.
-            Review its actions carefully.
+            Claude can read, write, execute, and delete files without asking for permission. Review
+            its actions carefully.
           </p>
         </div>
         <Button

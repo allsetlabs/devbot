@@ -1,5 +1,16 @@
-import { ChevronDown, Cpu, Sparkles, Rabbit, Eye, CheckCircle, Zap, Coins, Clock, Repeat } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import {
+  ChevronDown,
+  Cpu,
+  Sparkles,
+  Rabbit,
+  Eye,
+  CheckCircle,
+  Zap,
+  Coins,
+  Clock,
+  Repeat,
+} from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
 import { formatTokens, formatCost, formatDuration } from './ChatMessage';

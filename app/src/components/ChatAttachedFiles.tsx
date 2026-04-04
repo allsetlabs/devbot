@@ -1,5 +1,5 @@
 import { Loader2, FileText, X } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { AttachedFile } from './ChatInputArea';
 
 interface ChatAttachedFilesProps {

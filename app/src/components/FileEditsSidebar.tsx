@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, FileText, Pencil, Plus, Trash2, Copy } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import type { FileEdit } from '../hooks/useFileEdits';
 import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
 

@@ -1,10 +1,10 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import { ExternalLink, Play } from 'lucide-react';
 import { MarkdownContent } from '../lib/plan-markdown';
 import type { ModulePlan } from '../types';
@@ -80,17 +80,17 @@ export function PlanDetailDrawer({
 
             <div className="flex gap-2">
               {plan.status !== 'completed' && plan.status !== 'dismissed' && (
-                <Button
-                  size="sm"
-                  disabled={isExecuting}
-                  onClick={() => onExecute(plan)}
-                >
+                <Button size="sm" disabled={isExecuting} onClick={() => onExecute(plan)}>
                   <Play className="mr-1 h-3.5 w-3.5" />
                   Execute
                 </Button>
               )}
               {plan.status === 'pending' && (
-                <Button size="sm" variant="outline" onClick={() => onStatusChange(plan, 'dismissed')}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => onStatusChange(plan, 'dismissed')}
+                >
                   Dismiss
                 </Button>
               )}

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { useIncrementalMessages } from '../hooks/useIncrementalMessages';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { api } from '../lib/api';
 import { POLL_INTERVALS } from '../lib/constants';
 import { WorkflowViewHeader } from '../components/WorkflowViewHeader';
@@ -30,7 +30,7 @@ export function WorkflowView() {
         selectedStepRunId!,
         afterSequence
       );
-      return newMsgs.map<TaskMessage>((m) => ({
+      return newMsgs.map<TaskMessage>((m: any) => ({
         id: m.id,
         runId: m.stepRunId,
         sequence: m.sequence,
@@ -177,11 +177,7 @@ export function WorkflowView() {
         hasSteps={stepRuns.length > 0}
       />
 
-      <WorkflowStatusBar
-        selectedRun={selectedRun}
-        stepRuns={stepRuns}
-        isRunActive={isRunActive}
-      />
+      <WorkflowStatusBar selectedRun={selectedRun} stepRuns={stepRuns} isRunActive={isRunActive} />
     </div>
   );
 }

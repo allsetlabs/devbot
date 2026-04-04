@@ -1,4 +1,4 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ArrowLeft, GitBranch, Play, Loader2, XCircle } from 'lucide-react';
 
 interface WorkflowViewHeaderProps {

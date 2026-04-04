@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Clock, ChevronRight, Pause, Play } from 'lucide-react';
 import { formatDateTime, formatInterval } from '../lib/format';
 import type { ScheduledTask } from '../types';

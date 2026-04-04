@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { InitializeReusableChunks } from '@subbiah/reusable/initializeReusableChunks';
+import { InitializeReusableChunks } from '@allsetlabs/reusable/initializeReusableChunks';
 import { ChatList } from './pages/ChatList';
 import { ChatView } from './pages/ChatView';
 import { SchedulerList } from './pages/SchedulerList';

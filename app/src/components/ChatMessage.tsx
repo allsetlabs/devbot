@@ -13,17 +13,8 @@ import {
   extractThinkingContent,
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
-import {
-  CopyMessageButton,
-  PinMessageButton,
-  EditMessageButton,
-} from './MessageActionButtons';
-import {
-  ToolUseMessage,
-  ToolsGroup,
-  EditDiffView,
-  MultiEditDiffView,
-} from './ToolUseMessage';
+import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView } from './ToolUseMessage';
 import { SystemMessage } from './SystemMessage';
 
 // Re-export symbols used by other modules
@@ -33,12 +24,7 @@ export {
   extractThinkingContent,
 } from '../lib/chat-message-utils';
 export { formatDateSeparator, formatRelativeTime } from '../lib/chat-message-utils';
-export {
-  formatTokens,
-  formatDuration,
-  formatCost,
-  extractUsageData,
-} from './SystemMessage';
+export { formatTokens, formatDuration, formatCost, extractUsageData } from './SystemMessage';
 
 const MAX_VISIBLE_LINES = 10;
 

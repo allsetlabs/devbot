@@ -1,13 +1,13 @@
 import { Loader2 } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Input } from '@subbiah/reusable/components/ui/input';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Input } from '@allsetlabs/reusable/components/ui/input';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@subbiah/reusable/components/ui/dialog';
+} from '@allsetlabs/reusable/components/ui/dialog';
 
 interface ChatRenameDialogProps {
   open: boolean;

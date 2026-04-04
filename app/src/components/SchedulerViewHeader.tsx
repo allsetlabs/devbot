@@ -1,5 +1,5 @@
 import { ArrowLeft, Clock, Loader2, RefreshCw, RotateCcw } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { ScheduledTask } from '../types/index';
 

@@ -1,14 +1,5 @@
-import {
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  MessageCircle,
-  Pencil,
-  Pin,
-  Search,
-  Settings,
-} from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { ArrowLeft, Eye, EyeOff, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, InteractiveChat } from '../types';
 
@@ -125,12 +116,7 @@ export function ChatViewHeader({
             </span>
           )}
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={onOpenSettings}
-        >
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
           <Settings className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Leaf, ChevronRight, CalendarDays } from 'lucide-react';
 import type { LawnPlan, LawnProfile } from '@devbot/plugin-lawn-care/frontend';
 
@@ -18,13 +18,7 @@ function getNextApplication(plans: LawnPlan[]): { date: string; name: string } |
   return { date: upcoming[0].date, name: upcoming[0].name };
 }
 
-export function LawnWidget({
-  profiles,
-  plans,
-}: {
-  profiles: LawnProfile[];
-  plans: LawnPlan[];
-}) {
+export function LawnWidget({ profiles, plans }: { profiles: LawnProfile[]; plans: LawnPlan[] }) {
   const navigate = useNavigate();
   const next = getNextApplication(plans);
   const profile = profiles[0];

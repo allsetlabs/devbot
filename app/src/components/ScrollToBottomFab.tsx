@@ -1,5 +1,5 @@
 import { ArrowDown } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 
 interface ScrollToBottomFabProps {
   unreadCount: number;

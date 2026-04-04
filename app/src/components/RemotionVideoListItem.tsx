@@ -1,5 +1,5 @@
 import { Loader2, Play, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { RemotionStatusBadge } from './RemotionStatusBadge';
 import { formatRelativeTime } from '../lib/format';
 import type { RemotionVideo } from '../types';

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import { Infinity as InfinityIcon, Loader2 } from 'lucide-react';
 import type { ScheduledTask } from '../types';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';

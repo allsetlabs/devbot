@@ -10,13 +10,19 @@ NC := \033[0m
 APP_PORT := 4005
 BACKEND_PORT := 3100
 
-.PHONY: help install start stop
+.PHONY: help setup install start stop
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
 	@echo "  make install    - Install app and backend dependencies"
 	@echo "  make start      - Start app and backend in tmux session 'devbot'"
 	@echo "  make stop       - Stop all DevBot services"
+
+setup:
+	@echo "$(BLUE)Checking system dependencies...$(NC)"
+	@command -v node >/dev/null 2>&1 || { echo "Installing Node.js..."; brew install node; }
+	@command -v tmux >/dev/null 2>&1 || { echo "Installing tmux..."; brew install tmux; }
+	@echo "$(GREEN)All system dependencies ready!$(NC)"
 
 install:
 	@echo "$(BLUE)📦 Installing DevBot app...$(NC)"

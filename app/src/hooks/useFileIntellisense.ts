@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { api } from '../lib/api';
-import type { FileIntellisenseItem } from '@subbiah/reusable/components/ui/file-intellisense-picker';
+import type { FileIntellisenseItem } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
 
 export interface UseFileIntellisenseResult {
   fileIntellisenseOpen: boolean;

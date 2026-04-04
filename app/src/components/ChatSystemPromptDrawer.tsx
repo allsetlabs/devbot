@@ -1,12 +1,12 @@
 import { Loader2 } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Textarea } from '@subbiah/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 
 interface ChatSystemPromptDrawerProps {
   open: boolean;

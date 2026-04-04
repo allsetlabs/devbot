@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
 

@@ -1,7 +1,7 @@
 import { MessageCircle, Search } from 'lucide-react';
 import { EmptyState } from './EmptyState';
 import { ChatListItem } from './ChatListItem';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 import type { InteractiveChat } from '../types';
 

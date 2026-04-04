@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
 interface ScrollControlProps {

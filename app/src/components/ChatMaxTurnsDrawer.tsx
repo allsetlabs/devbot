@@ -1,12 +1,12 @@
 import { Loader2 } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Input } from '@subbiah/reusable/components/ui/input';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Input } from '@allsetlabs/reusable/components/ui/input';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 
 interface ChatMaxTurnsDrawerProps {
   open: boolean;
@@ -41,8 +41,8 @@ export function ChatMaxTurnsDrawer({
         <div className="flex flex-col gap-3 px-4 pb-6">
           <p className="text-xs text-muted-foreground">
             Limit the number of agentic turns Claude can take per message. Similar to Claude Code
-            CLI&apos;s <code className="rounded bg-muted px-1 py-0.5">--max-turns</code> flag.
-            Leave empty for unlimited.
+            CLI&apos;s <code className="rounded bg-muted px-1 py-0.5">--max-turns</code> flag. Leave
+            empty for unlimited.
           </p>
           <Input
             type="number"

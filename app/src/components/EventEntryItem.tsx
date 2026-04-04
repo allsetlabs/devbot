@@ -1,4 +1,4 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Trash2, Globe } from 'lucide-react';
 import { formatEntryTime, formatEntryMs, formatEntryDate } from '../lib/event-timer-utils';
 import type { EventTimerEntry } from '../types';

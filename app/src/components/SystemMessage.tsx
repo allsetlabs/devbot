@@ -8,7 +8,7 @@ import {
   ArrowUpFromLine,
   RotateCcw,
 } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ClaudeMessageContent } from '../types';
 
 /** Format token count to compact form (e.g., 1.2k, 15k, 1.1M) */

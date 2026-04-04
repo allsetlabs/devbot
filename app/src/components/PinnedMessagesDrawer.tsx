@@ -4,8 +4,8 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
-import { Button } from '@subbiah/reusable/components/ui/button';
+} from '@allsetlabs/reusable/components/ui/drawer';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { extractTextContent, extractThinkingContent } from './ChatMessage';
 import type { ChatMessage } from '../types';
 

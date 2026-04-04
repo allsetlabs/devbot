@@ -1,4 +1,4 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { RefreshCw, Menu } from 'lucide-react';
 import type { ReactNode } from 'react';
 

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@subbiah/reusable/components/ui/tabs';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@allsetlabs/reusable/components/ui/tabs';
 import { Menu, RefreshCw, Trash2, ArrowDown } from 'lucide-react';
 import { api } from '../lib/api';
 import { SlideNav } from '../components/SlideNav';

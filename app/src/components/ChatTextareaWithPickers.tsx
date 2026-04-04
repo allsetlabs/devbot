@@ -1,16 +1,16 @@
 import { Loader2, Send, Square, Plus } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Textarea } from '@subbiah/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
   SlashCommandPicker,
   type SlashCommandPickerHandle,
   type SlashCommandGroup,
-} from '@subbiah/reusable/components/ui/slash-command-picker';
+} from '@allsetlabs/reusable/components/ui/slash-command-picker';
 import {
   FileIntellisensePicker,
   type FileIntellisensePickerHandle,
   type FileIntellisenseItem,
-} from '@subbiah/reusable/components/ui/file-intellisense-picker';
+} from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
 import type { AttachedFile } from './ChatInputArea';
 
 interface ChatTextareaWithPickersProps {
@@ -153,10 +153,7 @@ export function ChatTextareaWithPickers({
           <Button
             onClick={onSend}
             disabled={
-              (!input.trim() && readyFiles.length === 0) ||
-              sending ||
-              anyUploading ||
-              interrupting
+              (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
             }
             size="icon"
             className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"

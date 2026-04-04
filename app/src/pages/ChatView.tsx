@@ -4,15 +4,15 @@ import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@subbiah/reusable/components/ui/dialog';
-import { Textarea } from '@subbiah/reusable/components/ui/textarea';
+} from '@allsetlabs/reusable/components/ui/dialog';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import { ArrowLeft, Trash2, Wifi, WifiOff, Upload, ImageIcon } from 'lucide-react';
 import { api, uploadImage, getXtermWsUrl } from '../lib/api';
 import { XtermTerminal, type TerminalActions } from '../components/XtermTerminal';

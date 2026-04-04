@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import { Input } from '@subbiah/reusable/components/ui/input';
-import { Textarea } from '@subbiah/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Input } from '@allsetlabs/reusable/components/ui/input';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import { formatEntryTime, formatEntryMs } from '../lib/event-timer-utils';
 import type { EventTimerEntry } from '../types';
 
@@ -49,7 +49,10 @@ export function EditEntryDrawer({ entry, isPending, onClose, onSave }: EditEntry
         </DrawerHeader>
         <div className="space-y-4 px-4 pb-6">
           <div>
-            <label htmlFor="entry-name" className="mb-1.5 block text-sm font-medium text-foreground">
+            <label
+              htmlFor="entry-name"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
               Name
             </label>
             <Input
@@ -60,7 +63,10 @@ export function EditEntryDrawer({ entry, isPending, onClose, onSave }: EditEntry
             />
           </div>
           <div>
-            <label htmlFor="entry-desc" className="mb-1.5 block text-sm font-medium text-foreground">
+            <label
+              htmlFor="entry-desc"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
               Description
             </label>
             <Textarea

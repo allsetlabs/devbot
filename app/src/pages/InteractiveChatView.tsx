@@ -7,13 +7,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { notifyTaskComplete, notifyTaskFailed, setNotificationSettings } from '../lib/notification';
-import { Button } from '@subbiah/reusable/components/ui/button';
-import {
-  ArrowLeft,
-  Loader2,
-  MessageCircle,
-  Upload,
-} from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { ArrowLeft, Loader2, MessageCircle, Upload } from 'lucide-react';
 import { api, uploadFiles } from '../lib/api';
 import { POLL_INTERVALS, PROJECT_CONFIG } from '../lib/constants';
 import { getCachedDraft, setCachedDraft, cleanupLegacyMessageCaches } from '../lib/storage';
@@ -29,10 +24,8 @@ import { HelpModal } from '../components/HelpModal';
 import {
   type SlashCommandPickerHandle,
   type SlashCommandGroup,
-} from '@subbiah/reusable/components/ui/slash-command-picker';
-import {
-  type FileIntellisensePickerHandle,
-} from '@subbiah/reusable/components/ui/file-intellisense-picker';
+} from '@allsetlabs/reusable/components/ui/slash-command-picker';
+import { type FileIntellisensePickerHandle } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
 import { useFileIntellisense } from '../hooks/useFileIntellisense';
 import { useCommands } from '../hooks/useCommands';
 import { useSettings } from '../hooks/useSettings';
@@ -177,7 +170,7 @@ export function InteractiveChatView({
   const { pinnedIds, togglePin } = usePinnedMessages(chatId);
 
   // Message reactions
-  const { getReaction, toggleReaction } = useMessageReactions(chatId);
+  const { getReaction, toggleReaction } = useMessageReactions(chatId!);
 
   // Sync settings with notification system when they change
   useEffect(() => {
@@ -218,7 +211,7 @@ export function InteractiveChatView({
   const [messagesLoading, setMessagesLoading] = useState(true);
   const lastSequenceRef = useRef(0);
 
-  const messageListRef = useRef<{ scrollToMessage: (index: number) => void } | null>(null);
+  const messageListRef = useRef<{ scrollToMessage: (index: number, align?: 'start' | 'center' | 'end') => void } | null>(null);
 
   // Initialize lastSequenceRef and input history from cached messages on mount
   useEffect(() => {
@@ -642,12 +635,12 @@ export function InteractiveChatView({
         case '/model':
           setModelDrawerOpen(true);
           return;
-        case '/info':
-          // Show session info via alert - we can extract this data from the UI state
-          const costData = extractUsageData(messages);
-          const info = `Session Info:\n\nMessages: ${messages.length}\nTokens: ${costData.totalTokens}\nCost: $${costData.totalCost.toFixed(4)}\nDuration: ${costData.totalDuration}ms\nPermission Mode: ${chat?.mode || 'N/A'}\nModel: ${chat?.model || 'N/A'}`;
+        case '/info': {
+          // Show session info via alert
+          const info = `Session Info:\n\nMessages: ${messages.length}\nModel: ${chat?.model || 'N/A'}`;
           alert(info);
           return;
+        }
         default:
           // Unknown command - just send it to Claude
           break;

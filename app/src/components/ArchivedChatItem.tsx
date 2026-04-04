@@ -1,12 +1,12 @@
 import { Archive, ArchiveRestore, Star, Copy, Trash2, MoreVertical } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@subbiah/reusable/components/ui/dropdown-menu';
+} from '@allsetlabs/reusable/components/ui/dropdown-menu';
 import { formatRelativeTime } from '../lib/format';
 import type { InteractiveChat } from '../types';
 
@@ -58,16 +58,26 @@ export function ArchivedChatItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
           title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
-          <Star className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : 'text-foreground/60'}`} />
+          <Star
+            className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : 'text-foreground/60'}`}
+          />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDuplicate(); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDuplicate();
+          }}
           title="Duplicate"
         >
           <Copy className="h-4 w-4 text-foreground/60" />
@@ -76,7 +86,11 @@ export function ArchivedChatItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onUnarchive(); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onUnarchive();
+          }}
           title="Unarchive"
         >
           <ArchiveRestore className="h-4 w-4 text-foreground/60" />
@@ -85,7 +99,11 @@ export function ArchivedChatItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-destructive/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete();
+          }}
           title="Delete"
         >
           <Trash2 className="h-4 w-4 text-destructive" />

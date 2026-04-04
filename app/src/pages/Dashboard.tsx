@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Menu } from 'lucide-react';
 import { api } from '../lib/api';
 import { lawnCareApi } from '@devbot/plugin-lawn-care/frontend';

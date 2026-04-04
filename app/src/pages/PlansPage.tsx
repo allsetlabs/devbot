@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { chatHooks } from '../hooks/useChat';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Lightbulb, Menu, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
 import { extractErrorMessage } from '../lib/format';
@@ -131,9 +131,7 @@ export function PlansPage() {
                 onSelect={setSelectedPlan}
                 onDelete={(id) => deleteMutation.mutate(id)}
                 onExecute={(p) => executeMutation.mutate(p)}
-                isExecuting={
-                  executeMutation.isPending && executeMutation.variables?.id === plan.id
-                }
+                isExecuting={executeMutation.isPending && executeMutation.variables?.id === plan.id}
               />
             ))}
           </div>

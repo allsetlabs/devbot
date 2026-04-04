@@ -28,9 +28,7 @@ export function WorkflowRunSelector({
                 : 'text-muted-foreground hover:bg-muted'
             }`}
           >
-            {run.status === 'running' && (
-              <Loader2 className="mr-1 inline h-3 w-3 animate-spin" />
-            )}
+            {run.status === 'running' && <Loader2 className="mr-1 inline h-3 w-3 animate-spin" />}
             {run.id.slice(0, 6)}
           </button>
         ))}

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Download, X } from 'lucide-react';
 import type { RemotionVideo } from '../types';
 

@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { X, ChevronUp, ChevronDown } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 
 export type MessageTypeFilter = 'all' | 'user' | 'assistant' | 'tool';
 

@@ -1,12 +1,21 @@
-import { MessageCircle, Star, Pin, Archive, Trash2, Copy, Terminal, MoreVertical } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import {
+  MessageCircle,
+  Star,
+  Pin,
+  Archive,
+  Trash2,
+  Copy,
+  Terminal,
+  MoreVertical,
+} from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@subbiah/reusable/components/ui/dropdown-menu';
+} from '@allsetlabs/reusable/components/ui/dropdown-menu';
 import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { formatRelativeTime } from '../lib/format';
 import { MODE_CONFIG } from '../lib/mode-config';
@@ -100,17 +109,27 @@ export function ChatListItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(e); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onToggleFavorite(e);
+          }}
           title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
-          <Star className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : 'text-foreground/60'}`} />
+          <Star
+            className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : 'text-foreground/60'}`}
+          />
         </Button>
         {hasCopyCommand && (
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 hover:bg-muted-foreground/20"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCopyCommand?.(e); }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCopyCommand?.(e);
+            }}
             title="Copy resume command"
           >
             <Terminal className="h-4 w-4 text-foreground/60" />
@@ -120,7 +139,11 @@ export function ChatListItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDuplicate(e); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDuplicate(e);
+          }}
           title="Duplicate"
         >
           <Copy className="h-4 w-4 text-foreground/60" />
@@ -129,7 +152,11 @@ export function ChatListItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onArchive(e); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onArchive(e);
+          }}
           title="Archive"
         >
           <Archive className="h-4 w-4 text-foreground/60" />
@@ -138,7 +165,11 @@ export function ChatListItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-destructive/20"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(e); }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete(e);
+          }}
           title="Delete"
         >
           <Trash2 className="h-4 w-4 text-destructive" />

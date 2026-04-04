@@ -1,4 +1,4 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
 import { Trash2, Pause, Play, MessageSquare, CheckCircle, Settings, RotateCcw } from 'lucide-react';
 import type { ScheduledTask } from '../types';

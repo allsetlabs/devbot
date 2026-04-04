@@ -1,5 +1,5 @@
 import { MessageCircle, ArrowUpDown, Star, RefreshCw, Plus, Check } from 'lucide-react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Menu } from 'lucide-react';
 import { SORT_OPTIONS, type SortOption } from '../lib/chat-sort';
 

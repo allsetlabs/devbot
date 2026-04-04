@@ -1,10 +1,10 @@
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@subbiah/reusable/components/ui/tooltip';
+} from '@allsetlabs/reusable/components/ui/tooltip';
 import {
   ArrowUp,
   ArrowDown,

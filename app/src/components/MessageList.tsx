@@ -1,11 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { useState, useEffect, useRef, useMemo, forwardRef, useImperativeHandle } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChatMessage, formatDateSeparator } from './ChatMessage';
 import { MessageActivityIndicator } from './MessageActivityIndicator';
@@ -13,6 +6,7 @@ import { ScrollToBottomFab } from './ScrollToBottomFab';
 import { mergeConsecutiveAssistant, filterRenderable } from '../lib/message-list-utils';
 import { useMessageListScroll } from '../lib/use-message-list-scroll';
 import type { TaskMessage } from '../types';
+import type { ReactionType } from '../hooks/useMessageReactions';
 
 interface MessageListProps {
   messages: TaskMessage[];
@@ -25,7 +19,7 @@ interface MessageListProps {
   onTogglePin?: (messageId: string) => void;
   searchQuery?: string;
   getMessageReaction?: (messageId: string) => string | null;
-  onToggleMessageReaction?: (messageId: string, type: string) => void;
+  onToggleMessageReaction?: (messageId: string, type: ReactionType) => void;
 }
 
 export const MessageList = forwardRef<
@@ -49,7 +43,8 @@ export const MessageList = forwardRef<
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [measured, setMeasured] = useState(false);
-  const virtualizerRef = useRef<ReturnType<typeof useVirtualizer> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const virtualizerRef = useRef<any>(null);
 
   const renderedMessages = useMemo(
     () => filterRenderable(mergeConsecutiveAssistant(messages)),
@@ -182,16 +177,11 @@ export const MessageList = forwardRef<
           );
         })}
         {isRunning && (
-          <MessageActivityIndicator
-            messages={messages}
-            offsetY={virtualizer.getTotalSize()}
-          />
+          <MessageActivityIndicator messages={messages} offsetY={virtualizer.getTotalSize()} />
         )}
       </div>
 
-      {!isAtBottom && (
-        <ScrollToBottomFab unreadCount={unreadCount} onClick={scrollToBottom} />
-      )}
+      {!isAtBottom && <ScrollToBottomFab unreadCount={unreadCount} onClick={scrollToBottom} />}
     </div>
   );
 });

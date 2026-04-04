@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
-import { Button } from '@subbiah/reusable/components/ui/button';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@subbiah/reusable/components/ui/dialog';
+} from '@allsetlabs/reusable/components/ui/dialog';
 
 interface EditMessageDialogProps {
   open: boolean;

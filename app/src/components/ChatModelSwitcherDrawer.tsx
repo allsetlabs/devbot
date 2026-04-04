@@ -4,7 +4,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@subbiah/reusable/components/ui/drawer';
+} from '@allsetlabs/reusable/components/ui/drawer';
 import { MODEL_CONFIG } from '../lib/model-config';
 import { formatModelPricing } from '../lib/format';
 import type { ClaudeModel } from '../types';

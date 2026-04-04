@@ -178,7 +178,10 @@ export function InteractiveChatList() {
           onCreate={handleCreate}
           onClearFilters={() => {
             setShowFavorites(false);
-            setSearchParams((p) => { p.delete('q'); return p; });
+            setSearchParams((p) => {
+              p.delete('q');
+              return p;
+            });
           }}
         />
       </main>

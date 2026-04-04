@@ -8,7 +8,7 @@ export default defineConfig(() => {
     plugins: [react()],
     resolve: {
       alias: {
-        '@subbiah/reusable': path.resolve(__dirname, '../../component/src'),
+        '@allsetlabs/reusable': path.resolve(__dirname, '../../component/src'),
         '@devbot/app': path.resolve(__dirname, 'src'),
         '@devbot/plugin-baby-logs/frontend': path.resolve(
           __dirname,

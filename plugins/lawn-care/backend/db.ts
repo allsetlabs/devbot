@@ -1,9 +1,14 @@
+import { mkdirSync } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
 import BetterSqlite3 from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import * as schema from './schema.js';
 
-const dbPath = process.env.DB_LAWN_CARE_PATH || './lawn-care.db';
+const defaultDbDir = join(homedir(), '.devbot');
+mkdirSync(defaultDbDir, { recursive: true });
+const dbPath = process.env.DB_LAWN_CARE_PATH || join(defaultDbDir, 'lawn-care.db');
 
 console.log('[DB] Initializing lawn-care database at:', dbPath);
 

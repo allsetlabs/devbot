@@ -24,11 +24,7 @@ import type {
   WorkflowStepRun,
 } from '../types';
 
-const BACKEND_PORT = import.meta.env.VITE_BACKEND_PORT;
-const API_KEY = import.meta.env.VITE_API_KEY;
-
-if (!BACKEND_PORT) throw new Error('VITE_BACKEND_PORT is not set. Check your .env file.');
-if (!API_KEY) throw new Error('VITE_API_KEY is not set. Check your .env file.');
+import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
 
 const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
 

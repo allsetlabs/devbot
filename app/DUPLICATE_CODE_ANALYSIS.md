@@ -1,7 +1,7 @@
 # DevBot Mobile - Duplicate Code Analysis Report
 
 **Status**: Analysis Complete
-**Scope**: `/Users/subbiahchandramouli/Documents/GitHub/all_projects/modules/devbot/app/src/`
+**Scope**: `modules/devbot/app/src/`
 **Files Analyzed**: 43 source files (components, pages, hooks, utilities, types)
 
 ---

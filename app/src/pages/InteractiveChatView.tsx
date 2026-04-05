@@ -10,7 +10,8 @@ import { notifyTaskComplete, notifyTaskFailed, setNotificationSettings } from '.
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ArrowLeft, Loader2, MessageCircle, Upload } from 'lucide-react';
 import { api, uploadFiles } from '../lib/api';
-import { POLL_INTERVALS, PROJECT_CONFIG } from '../lib/constants';
+import { POLL_INTERVALS } from '../lib/constants';
+import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 import { getCachedDraft, setCachedDraft, cleanupLegacyMessageCaches } from '../lib/storage';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { MessageList } from '../components/MessageList';
@@ -1213,7 +1214,7 @@ export function InteractiveChatView({
         onHelp={() => setHelpModalOpen(true)}
         hasSystemPrompt={!!chat?.systemPrompt}
         hasMessages={messages.length > 0}
-        workingDirectory={chat?.workingDir ?? PROJECT_CONFIG.displayPath}
+        workingDirectory={chat?.workingDir ?? VITE_CLAUDE_WORK_DIR}
       />
 
       {/* Pinned messages drawer */}

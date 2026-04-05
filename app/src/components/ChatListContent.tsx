@@ -3,6 +3,7 @@ import { EmptyState } from './EmptyState';
 import { ChatListItem } from './ChatListItem';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
+import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 import type { InteractiveChat } from '../types';
 
 interface ChatListContentProps {
@@ -118,7 +119,7 @@ export function ChatListContent({
                 ? (e) => {
                     e.stopPropagation();
                     copyToClipboard(
-                      `cd /Users/subbiahchandramouli/Documents/GitHub/all_projects && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                      `cd ${VITE_CLAUDE_WORK_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
                     );
                   }
                 : undefined

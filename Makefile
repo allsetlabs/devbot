@@ -54,6 +54,7 @@ start:
 	@grep -q '^BACKEND_PORT=' .env && sed -i '' 's|^BACKEND_PORT=.*|BACKEND_PORT=$(BACKEND_PORT)|' .env || echo 'BACKEND_PORT=$(BACKEND_PORT)' >> .env
 	@grep -q '^BACKEND_HOST=' .env && sed -i '' 's|^BACKEND_HOST=.*|BACKEND_HOST=0.0.0.0|' .env || echo 'BACKEND_HOST=0.0.0.0' >> .env
 	@grep -q '^VITE_BACKEND_PORT=' .env && sed -i '' 's|^VITE_BACKEND_PORT=.*|VITE_BACKEND_PORT=$(BACKEND_PORT)|' .env || echo 'VITE_BACKEND_PORT=$(BACKEND_PORT)' >> .env
+	@grep -q '^VITE_CLAUDE_WORK_DIR=' .env && sed -i '' 's|^VITE_CLAUDE_WORK_DIR=.*|VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR)|' .env || echo 'VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR)' >> .env
 	@echo "$(GREEN)Updated API keys, ports, and CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)
 	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m

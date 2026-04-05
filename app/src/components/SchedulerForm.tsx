@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
-import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS, PROJECT_CONFIG } from '../lib/constants';
+import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
+import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 
 interface SchedulerFormProps {
   isOpen: boolean;
@@ -167,7 +168,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
               type="text"
               value={workingDir}
               onChange={(e) => setWorkingDir(e.target.value)}
-              placeholder={PROJECT_CONFIG.displayPath}
+              placeholder={VITE_CLAUDE_WORK_DIR}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>

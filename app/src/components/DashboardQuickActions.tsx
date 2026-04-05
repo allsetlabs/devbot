@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Plus, Baby, Clock, Loader2, X } from 'lucide-react';
 import { chatHooks } from '../hooks/useChat';
-import { PROJECT_CONFIG } from '../lib/constants';
+import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 import type { PermissionMode, ClaudeModel } from '../types';
 
 export function DashboardQuickActions() {
@@ -68,7 +68,7 @@ export function DashboardQuickActions() {
                   type="text"
                   value={workingDir}
                   onChange={(e) => setWorkingDir(e.target.value)}
-                  placeholder={PROJECT_CONFIG.displayPath}
+                  placeholder={VITE_CLAUDE_WORK_DIR}
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <p className="mt-1 text-xs text-muted-foreground">

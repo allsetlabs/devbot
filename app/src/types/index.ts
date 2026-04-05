@@ -48,6 +48,7 @@ export interface CreateScheduledTaskRequest {
   prompt: string;
   intervalMinutes: number;
   maxRuns?: number | null;
+  workingDir?: string;
 }
 
 export interface UpdateScheduledTaskRequest {
@@ -122,6 +123,7 @@ export interface InteractiveChat {
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;
+  workingDir: string | null;
 }
 
 export interface ChatMessage {

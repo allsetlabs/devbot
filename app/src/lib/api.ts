@@ -154,6 +154,7 @@ export const api = {
     permissionMode?: PermissionMode;
     model?: ClaudeModel;
     maxTurns?: number | null;
+    workingDir?: string;
   }): Promise<InteractiveChat> => {
     return fetchApi('/api/interactive-chats', {
       method: 'POST',

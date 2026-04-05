@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { X } from 'lucide-react';
+import { PROJECT_CONFIG } from '../lib/constants';
 import { chatHooks } from '../hooks/useChat';
 import { useFavorites } from '../hooks/useFavorites';
 import { extractErrorMessage } from '../lib/format';
@@ -19,6 +22,8 @@ export function InteractiveChatList() {
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [newChatOpen, setNewChatOpen] = useState(false);
+  const [newChatWorkingDir, setNewChatWorkingDir] = useState('');
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const searchQuery = searchParams.get('q') ?? '';
@@ -100,10 +105,32 @@ export function InteractiveChatList() {
   );
 
   const handleCreate = () => {
+    setNewChatWorkingDir('');
+    setNewChatOpen(true);
+  };
+
+  const handleNewChatSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedDir = newChatWorkingDir.trim();
     createMutation.mutate(
-      { mode: 'dangerous' as PermissionMode, model: 'sonnet' as ClaudeModel },
-      { onSuccess: (chat) => navigate(`/chat/${chat.id}`) }
+      {
+        mode: 'dangerous' as PermissionMode,
+        model: 'sonnet' as ClaudeModel,
+        ...(trimmedDir ? { workingDir: trimmedDir } : {}),
+      },
+      {
+        onSuccess: (chat) => {
+          setNewChatOpen(false);
+          setNewChatWorkingDir('');
+          navigate(`/chat/${chat.id}`);
+        },
+      }
     );
+  };
+
+  const handleNewChatClose = () => {
+    setNewChatOpen(false);
+    setNewChatWorkingDir('');
   };
 
   const handleDelete = (id: string) => deleteMutation.mutate(id);
@@ -185,6 +212,56 @@ export function InteractiveChatList() {
           }}
         />
       </main>
+
+      {/* New Chat Modal */}
+      {newChatOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
+          <div className="safe-area-bottom w-full max-w-lg rounded-t-2xl bg-background p-4 shadow-xl sm:rounded-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-foreground">New Chat</h2>
+              <Button variant="ghost" size="icon" onClick={handleNewChatClose}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            {createMutation.error && (
+              <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {createMutation.error instanceof Error
+                  ? createMutation.error.message
+                  : 'Failed to create chat'}
+              </div>
+            )}
+            <form onSubmit={handleNewChatSubmit} className="space-y-4">
+              <div>
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  Working Directory
+                </label>
+                <input
+                  type="text"
+                  value={newChatWorkingDir}
+                  onChange={(e) => setNewChatWorkingDir(e.target.value)}
+                  placeholder={PROJECT_CONFIG.displayPath}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleNewChatClose}
+                  className="flex-1"
+                  disabled={createMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1" disabled={createMutation.isPending}>
+                  {createMutation.isPending ? 'Creating...' : 'Create Chat'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <ChatArchiveDrawer
         open={archiveOpen}

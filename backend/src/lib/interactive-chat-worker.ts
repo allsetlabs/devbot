@@ -12,6 +12,7 @@ import {
   type ClaudeModel,
   type PermissionMode,
 } from './claude-spawn.js';
+import { CLAUDE_WORK_DIR } from './env.js';
 
 export type { ClaudeModel, PermissionMode };
 
@@ -190,6 +191,8 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
   else if (mode === 'auto-accept') systemPrompts.push(AUTO_ACCEPT_PROMPT);
   if (chat.system_prompt) systemPrompts.push(chat.system_prompt as string);
 
+  const workingDir: string = (chat.settings as any)?.workingDir || CLAUDE_WORK_DIR;
+
   // Auto-name on first message
   if (!chat.claude_session_id && chat.name === 'New Chat') {
     generateChatName(chatId, prompt).catch((err) => {
@@ -228,6 +231,7 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
     prompt,
     model,
     systemPrompts,
+    workDir: workingDir,
     sessionId: (chat.claude_session_id as string) || undefined,
     maxTurns: (chat.max_turns as number) || undefined,
     chrome: true,

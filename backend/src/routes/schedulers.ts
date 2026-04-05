@@ -156,7 +156,7 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req, res) => {
-    const { prompt, intervalMinutes, maxRuns, name } = req.body;
+    const { prompt, intervalMinutes, maxRuns, name, workingDir } = req.body;
 
     if (!requireString(res, prompt, 'Prompt')) return;
 
@@ -182,6 +182,7 @@ router.post(
         interval_minutes: intervalMinutes,
         status: 'active',
         max_runs: maxRuns ?? null,
+        settings: workingDir && typeof workingDir === 'string' ? { workingDir: workingDir.trim() } : {},
         created_by: 'user',
         updated_by: 'user',
       })

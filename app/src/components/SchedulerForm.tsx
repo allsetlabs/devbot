@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
-import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
+import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS, PROJECT_CONFIG } from '../lib/constants';
 
 interface SchedulerFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null) => Promise<void>;
+  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null, workingDir: string) => Promise<void>;
 }
 
 export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps) {
@@ -15,14 +15,16 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
   const [intervalMinutes, setIntervalMinutes] = useState(60);
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
   const [isInfinite, setIsInfinite] = useState(false);
+  const [workingDir, setWorkingDir] = useState('');
 
   const submitMutation = useMutation({
-    mutationFn: () => onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns),
+    mutationFn: () => onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir),
     onSuccess: () => {
       setPrompt('');
       setIntervalMinutes(60);
       setMaxRuns(10);
       setIsInfinite(false);
+      setWorkingDir('');
       onClose();
     },
   });
@@ -38,6 +40,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
     setIntervalMinutes(60);
     setMaxRuns(10);
     setIsInfinite(false);
+    setWorkingDir('');
     submitMutation.reset();
     onClose();
   };
@@ -152,6 +155,21 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
             <p className="mt-1 text-xs text-muted-foreground">
               This prompt will be sent to Claude Code at the specified interval
             </p>
+          </div>
+
+          {/* Working Directory */}
+          <div>
+            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+            <label className="mb-2 block text-sm font-medium text-foreground">
+              Working Directory
+            </label>
+            <input
+              type="text"
+              value={workingDir}
+              onChange={(e) => setWorkingDir(e.target.value)}
+              placeholder={PROJECT_CONFIG.displayPath}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
           </div>
 
           {/* Actions */}

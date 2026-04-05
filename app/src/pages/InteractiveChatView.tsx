@@ -1213,7 +1213,7 @@ export function InteractiveChatView({
         onHelp={() => setHelpModalOpen(true)}
         hasSystemPrompt={!!chat?.systemPrompt}
         hasMessages={messages.length > 0}
-        workingDirectory={PROJECT_CONFIG.displayPath}
+        workingDirectory={chat?.workingDir ?? PROJECT_CONFIG.displayPath}
       />
 
       {/* Pinned messages drawer */}

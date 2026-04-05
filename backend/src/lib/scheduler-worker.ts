@@ -6,6 +6,7 @@ import { coreDb, scheduled_tasks, task_runs, interactive_chats, chat_messages } 
 import type { ScheduledTaskRow } from './db/types.js';
 import { registerChatExecution, unregisterChatExecution } from './interactive-chat-worker.js';
 import { spawnClaude, isExecuting, stopExecution } from './claude-spawn.js';
+import { CLAUDE_WORK_DIR } from './env.js';
 import type { StreamParserConfig } from './stream-parser.js';
 
 const CHECK_INTERVAL_MS = 30000;
@@ -138,6 +139,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
   console.log(`[Scheduler] Starting task ${taskId} run #${runIndex}`);
 
   const chatId = createSchedulerChat(task, runIndex);
+  const workingDir: string = (task.settings as any)?.workingDir || CLAUDE_WORK_DIR;
 
   try {
     coreDb
@@ -250,6 +252,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
       prompt: task.prompt,
       promptSuffix: SCHEDULER_PROMPT_SUFFIX,
       systemPrompts: [SCHEDULER_SYSTEM_PROMPT],
+      workDir: workingDir,
       chrome: true,
       timeoutMs: 30 * 60 * 1000,
       trackAs: taskId,

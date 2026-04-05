@@ -34,6 +34,7 @@ interface InteractiveChat {
   isRunning: boolean;
   createdAt: string;
   archivedAt: string | null;
+  workingDir: string | null;
 }
 
 interface ChatMessageResponse {
@@ -46,6 +47,7 @@ interface ChatMessageResponse {
 }
 
 function rowToChat(row: InteractiveChatRow): InteractiveChat {
+  const settings = (row.settings as Record<string, unknown>) ?? {};
   return {
     id: row.id,
     name: row.name,
@@ -59,6 +61,7 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     isRunning: row.is_executing ?? false,
     createdAt: row.created_at,
     archivedAt: row.archived_at,
+    workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
   };
 }
 
@@ -375,6 +378,11 @@ router.post(
     const chatName: string =
       req.body?.name && typeof req.body.name === 'string' ? req.body.name.trim() : 'New Chat';
 
+    const workingDir: string | null =
+      req.body?.workingDir && typeof req.body.workingDir === 'string'
+        ? req.body.workingDir.trim()
+        : null;
+
     const result = await coreDb
       .insert(interactive_chats)
       .values({
@@ -386,6 +394,7 @@ router.post(
         model,
         system_prompt: systemPrompt,
         max_turns: maxTurns,
+        settings: workingDir ? { workingDir } : {},
         created_by: 'user',
         updated_by: 'user',
       })

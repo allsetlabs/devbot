@@ -31,6 +31,7 @@ export interface CreateChatParams {
   mode?: PermissionMode;
   type?: string;
   maxTurns?: number | null;
+  workingDir?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -94,6 +95,7 @@ export function useCreateChat() {
         permissionMode: params.mode,
         model: params.model,
         maxTurns: params.maxTurns,
+        workingDir: params.workingDir,
         ...(params.type ? { type: params.type } : {}),
       });
       // Fire-and-forget: send initial prompt if provided

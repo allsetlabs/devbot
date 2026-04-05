@@ -39,11 +39,13 @@ export function SchedulerList() {
       prompt,
       intervalMinutes,
       maxRuns,
+      workingDir,
     }: {
       prompt: string;
       intervalMinutes: number;
       maxRuns: number | null;
-    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns }),
+      workingDir: string;
+    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns, workingDir }),
     [['scheduled-tasks']]
   );
 
@@ -63,9 +65,10 @@ export function SchedulerList() {
   const handleCreateTask = async (
     prompt: string,
     intervalMinutes: number,
-    maxRuns: number | null
+    maxRuns: number | null,
+    workingDir: string
   ) => {
-    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns });
+    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns, workingDir });
   };
 
   const handleDeleteTask = (id: string) => deleteMutation.mutate(id);

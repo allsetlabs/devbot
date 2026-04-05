@@ -46,7 +46,7 @@ start:
 	@mkdir -p logs
 	@# Compute dynamic values (passed as env vars, not written to .env)
 	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
-	$(eval SUPERREPO_DIR := $(realpath $(CURDIR)/../..))
+	$(eval SUPERREPO_DIR := $(realpath $(CURDIR)/../../../user-superrepo))
 	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) CLAUDE_WORK_DIR=$(SUPERREPO_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR))
 	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)

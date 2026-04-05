@@ -45,7 +45,7 @@ start:
 	@echo "$(GREEN)Creating tmux session 'devbot'...$(NC)"
 	@mkdir -p logs
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)
-	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && cd backend && npm run dev 2>&1 | tee ../logs/backend.log' C-m
+	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m
 	@sleep 2
 	@tmux new-window -t devbot -n app -c $(CURDIR)
 	@tmux send-keys -t devbot:app 'cd app && npm run dev -- --port=$(APP_PORT) 2>&1 | tee ../logs/frontend.log' C-m

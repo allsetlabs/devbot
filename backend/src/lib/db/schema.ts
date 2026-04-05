@@ -6,17 +6,12 @@ import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
  * All tables include standard columns: created_by, created_at, updated_by, updated_at, settings (JSONB)
  */
 
-// Sessions table - xterm/mosh terminal sessions
+// Sessions table - xterm terminal sessions
 export const sessions = sqliteTable('sessions', {
   id: text('id').primaryKey(),
   name: text('name').notNull().default('New Chat'),
-  terminal_type: text('terminal_type', { enum: ['xterm', 'mosh'] })
-    .notNull()
-    .default('mosh'),
   port: integer('port').notNull(),
   ws_url: text('ws_url').notNull(),
-  mosh_key: text('mosh_key'),
-  mosh_udp_port: integer('mosh_udp_port'),
   status: text('status', { enum: ['active', 'inactive'] })
     .notNull()
     .default('active'),

@@ -36,7 +36,3 @@ export const DB_LAWN_CARE_PATH = required('DB_LAWN_CARE_PATH');
 // Terminal port ranges
 export const XTERM_BASE_PORT = requiredInt('XTERM_BASE_PORT');
 export const XTERM_MAX_PORT = requiredInt('XTERM_MAX_PORT');
-export const MOSH_BASE_PORT = requiredInt('MOSH_BASE_PORT');
-export const MOSH_MAX_PORT = requiredInt('MOSH_MAX_PORT');
-export const MOSH_BRIDGE_BASE_PORT = requiredInt('MOSH_BRIDGE_BASE_PORT');
-export const MOSH_BRIDGE_MAX_PORT = requiredInt('MOSH_BRIDGE_MAX_PORT');

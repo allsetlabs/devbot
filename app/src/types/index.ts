@@ -1,8 +1,5 @@
-export type TerminalType = 'xterm' | 'mosh';
-
 export interface Session {
   id: string;
-  terminalType: TerminalType;
   port: number;
   wsUrl: string;
   name: string;
@@ -12,7 +9,6 @@ export interface Session {
 
 export interface CreateSessionResponse {
   id: string;
-  terminalType: TerminalType;
   port: number;
   wsUrl: string;
   createdAt: string;

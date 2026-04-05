@@ -44,23 +44,16 @@ start:
 	@for port in $$(seq 7750 7799); do lsof -ti:$$port 2>/dev/null | xargs kill -9 2>/dev/null || true; done
 	@echo "$(GREEN)Creating tmux session 'devbot'...$(NC)"
 	@mkdir -p logs
-	@# Generate fresh API key and set CLAUDE_WORK_DIR to superrepo root
+	@# Compute dynamic values (passed as env vars, not written to .env)
 	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
 	$(eval SUPERREPO_DIR := $(realpath $(CURDIR)/../..))
-	@# Write all dynamic values (append if missing, update if present)
-	@grep -q '^API_KEY=' .env && sed -i '' 's|^API_KEY=.*|API_KEY=$(NEW_API_KEY)|' .env || echo 'API_KEY=$(NEW_API_KEY)' >> .env
-	@grep -q '^VITE_API_KEY=' .env && sed -i '' 's|^VITE_API_KEY=.*|VITE_API_KEY=$(NEW_API_KEY)|' .env || echo 'VITE_API_KEY=$(NEW_API_KEY)' >> .env
-	@grep -q '^CLAUDE_WORK_DIR=' .env && sed -i '' 's|^CLAUDE_WORK_DIR=.*|CLAUDE_WORK_DIR=$(SUPERREPO_DIR)|' .env || echo 'CLAUDE_WORK_DIR=$(SUPERREPO_DIR)' >> .env
-	@grep -q '^BACKEND_PORT=' .env && sed -i '' 's|^BACKEND_PORT=.*|BACKEND_PORT=$(BACKEND_PORT)|' .env || echo 'BACKEND_PORT=$(BACKEND_PORT)' >> .env
-	@grep -q '^BACKEND_HOST=' .env && sed -i '' 's|^BACKEND_HOST=.*|BACKEND_HOST=0.0.0.0|' .env || echo 'BACKEND_HOST=0.0.0.0' >> .env
-	@grep -q '^VITE_BACKEND_PORT=' .env && sed -i '' 's|^VITE_BACKEND_PORT=.*|VITE_BACKEND_PORT=$(BACKEND_PORT)|' .env || echo 'VITE_BACKEND_PORT=$(BACKEND_PORT)' >> .env
-	@grep -q '^VITE_CLAUDE_WORK_DIR=' .env && sed -i '' 's|^VITE_CLAUDE_WORK_DIR=.*|VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR)|' .env || echo 'VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR)' >> .env
-	@echo "$(GREEN)Updated API keys, ports, and CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
+	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) CLAUDE_WORK_DIR=$(SUPERREPO_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR))
+	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)
-	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m
+	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && export $(DYNAMIC_ENV) && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m
 	@sleep 2
 	@tmux new-window -t devbot -n app -c $(CURDIR)
-	@tmux send-keys -t devbot:app 'cd app && npm run dev -- --port=$(APP_PORT) 2>&1 | tee ../logs/frontend.log' C-m
+	@tmux send-keys -t devbot:app 'export $(DYNAMIC_ENV) && cd app && npm run dev -- --port=$(APP_PORT) 2>&1 | tee ../logs/frontend.log' C-m
 	@echo ""
 	@echo "$(GREEN)✅ All DevBot services started!$(NC)"
 	@echo ""

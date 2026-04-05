@@ -4,8 +4,6 @@ import { coreDb } from './db/core.js';
 import { sql } from 'drizzle-orm';
 import { listTmuxSessions } from './tmux.js';
 import { startXtermWs, isPortActive } from './xterm-ws.js';
-import { startMoshServer, isMoshAvailable } from './mosh.js';
-import { startMoshBridge, isMoshBridgePortActive } from './mosh-bridge.js';
 
 export type SessionRow = any;
 
@@ -30,7 +28,6 @@ export async function recoverSessions(): Promise<void> {
     const tmuxSessions = await listTmuxSessions();
     const activeTmuxIds = new Set(tmuxSessions);
 
-    const moshAvailable = await isMoshAvailable();
     let recovered = 0;
     let markedInactive = 0;
 
@@ -40,44 +37,13 @@ export async function recoverSessions(): Promise<void> {
 
       if (hasTmux) {
         try {
-          if (row.terminal_type === 'mosh') {
-            // Recover mosh session
-            if (!isMoshBridgePortActive(row.port)) {
-              if (moshAvailable) {
-                // Start a fresh mosh-server (old one died with backend restart)
-                const moshInfo = await startMoshServer(tmuxId);
-                await startMoshBridge(row.port, moshInfo.key, moshInfo.udpPort);
-
-                // Update DB with new mosh connection info
-                await coreDb.run(
-                  sql`UPDATE sessions SET mosh_key = ${moshInfo.key}, mosh_udp_port = ${moshInfo.udpPort}, status = 'active' WHERE id = ${row.id}`
-                );
-
-                console.log(
-                  `Session recovery: Restored mosh session ${row.id} on port ${row.port}`
-                );
-                recovered++;
-              } else {
-                // Mosh not available - mark inactive
-                await coreDb.run(sql`UPDATE sessions SET status = 'inactive' WHERE id = ${row.id}`);
-                console.log(`Session recovery: Mosh unavailable, marked ${row.id} inactive`);
-                markedInactive++;
-              }
-            } else {
-              console.log(
-                `Session recovery: Mosh session ${row.id} already active on port ${row.port}`
-              );
-            }
+          if (!isPortActive(row.port)) {
+            await startXtermWs(row.port, tmuxId);
+            console.log(`Session recovery: Restored session ${row.id} on port ${row.port}`);
+            recovered++;
+            await coreDb.run(sql`UPDATE sessions SET status = 'active' WHERE id = ${row.id}`);
           } else {
-            // Recover xterm session (existing logic)
-            if (!isPortActive(row.port)) {
-              await startXtermWs(row.port, tmuxId);
-              console.log(`Session recovery: Restored xterm session ${row.id} on port ${row.port}`);
-              recovered++;
-              await coreDb.run(sql`UPDATE sessions SET status = 'active' WHERE id = ${row.id}`);
-            } else {
-              console.log(`Session recovery: Session ${row.id} already active on port ${row.port}`);
-            }
+            console.log(`Session recovery: Session ${row.id} already active on port ${row.port}`);
           }
         } catch (err) {
           console.error(`Session recovery: Failed to restore session ${row.id}:`, err);

@@ -1,7 +1,6 @@
 import type {
   Session,
   CreateSessionResponse,
-  TerminalType,
   HealthResponse,
   ScheduledTask,
   CreateScheduledTaskRequest,
@@ -59,10 +58,9 @@ export const api = {
     return fetchApi(`/api/sessions/${id}`);
   },
 
-  createSession: (terminalType?: TerminalType): Promise<CreateSessionResponse> => {
+  createSession: (): Promise<CreateSessionResponse> => {
     return fetchApi('/api/sessions', {
       method: 'POST',
-      body: terminalType ? JSON.stringify({ terminalType }) : undefined,
     });
   },
 

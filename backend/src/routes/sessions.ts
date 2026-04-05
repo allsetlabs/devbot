@@ -5,12 +5,9 @@ import { CLAUDE_WORK_DIR } from '../lib/env.js';
 import type { SessionRow } from '../lib/db/types.js';
 import { createTmuxSession, killTmuxSession, listTmuxSessions } from '../lib/tmux.js';
 import { startXtermWs, stopXtermWs, getXtermPort } from '../lib/xterm-ws.js';
-import { startMoshServer, stopMoshServer, isMoshAvailable } from '../lib/mosh.js';
-import { startMoshBridge, stopMoshBridge, getMoshBridgePort } from '../lib/mosh-bridge.js';
 import {
   asyncHandler,
   sendNotFound,
-  sendBadRequest,
   requireString,
   generateId,
   getOneById,
@@ -18,11 +15,8 @@ import {
 
 const router = Router();
 
-type TerminalType = 'xterm' | 'mosh';
-
 interface Session {
   id: string;
-  terminalType: TerminalType;
   port: number;
   wsUrl: string;
   name: string;
@@ -33,7 +27,6 @@ interface Session {
 function rowToSession(row: SessionRow): Session {
   return {
     id: row.id,
-    terminalType: row.terminal_type,
     port: row.port,
     wsUrl: row.ws_url,
     name: row.name,
@@ -82,56 +75,19 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req, res) => {
-    const requestedType = (req.body?.terminalType as TerminalType) || 'mosh';
-
-    if (requestedType !== 'xterm' && requestedType !== 'mosh') {
-      sendBadRequest(res, 'Invalid terminalType. Must be "xterm" or "mosh"');
-      return;
-    }
-
-    let terminalType = requestedType;
-    if (terminalType === 'mosh') {
-      const moshAvailable = await isMoshAvailable();
-      if (!moshAvailable) {
-        console.warn('mosh-server not found, falling back to xterm');
-        terminalType = 'xterm';
-      }
-    }
-
     const id = generateId();
     const tmuxSessionName = `devbot_${id}`;
     const workDir = CLAUDE_WORK_DIR;
 
     await createTmuxSession(tmuxSessionName, workDir);
 
-    let port: number;
-    let moshKey: string | null = null;
-    let moshUdpPort: number | null = null;
-
-    if (terminalType === 'mosh') {
-      const moshInfo = await startMoshServer(tmuxSessionName);
-      moshKey = moshInfo.key;
-      moshUdpPort = moshInfo.udpPort;
-
-      const bridgePort = await getMoshBridgePort();
-      if (!bridgePort) {
-        await stopMoshServer(tmuxSessionName);
-        await killTmuxSession(tmuxSessionName);
-        res.status(503).json({ error: 'No ports available', message: 'Maximum sessions reached' });
-        return;
-      }
-      port = bridgePort;
-      await startMoshBridge(port, moshKey, moshUdpPort);
-    } else {
-      const xtermPort = await getXtermPort();
-      if (!xtermPort) {
-        await killTmuxSession(tmuxSessionName);
-        res.status(503).json({ error: 'No ports available', message: 'Maximum sessions reached' });
-        return;
-      }
-      port = xtermPort;
-      await startXtermWs(port, tmuxSessionName);
+    const port = await getXtermPort();
+    if (!port) {
+      await killTmuxSession(tmuxSessionName);
+      res.status(503).json({ error: 'No ports available', message: 'Maximum sessions reached' });
+      return;
     }
+    await startXtermWs(port, tmuxSessionName);
 
     const wsUrl = `ws://${req.hostname}:${port}`;
     const result = await coreDb
@@ -139,11 +95,8 @@ router.post(
       .values({
         id,
         name: 'New Chat',
-        terminal_type: terminalType,
         port,
         ws_url: wsUrl,
-        mosh_key: moshKey,
-        mosh_udp_port: moshUdpPort,
         status: 'active',
         created_by: 'user',
         updated_by: 'user',
@@ -151,12 +104,7 @@ router.post(
       .returning();
 
     if (!result || result.length === 0) {
-      if (terminalType === 'mosh') {
-        await stopMoshBridge(port);
-        await stopMoshServer(tmuxSessionName);
-      } else {
-        await stopXtermWs(port);
-      }
+      await stopXtermWs(port);
       await killTmuxSession(tmuxSessionName);
       throw new Error('Failed to insert session');
     }
@@ -183,12 +131,7 @@ router.delete(
     const row = rows[0];
     const tmuxSessionName = `devbot_${req.params.id}`;
 
-    if (row.terminal_type === 'mosh') {
-      await stopMoshBridge(row.port);
-      await stopMoshServer(tmuxSessionName);
-    } else {
-      await stopXtermWs(row.port);
-    }
+    await stopXtermWs(row.port);
 
     await killTmuxSession(tmuxSessionName);
     await coreDb.delete(sessions).where(eq(sessions.id, req.params.id));

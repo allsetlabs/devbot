@@ -30,11 +30,8 @@ export async function initializeCoreDatabase() {
       CREATE TABLE IF NOT EXISTS sessions (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL DEFAULT 'New Chat',
-        terminal_type TEXT NOT NULL DEFAULT 'mosh' CHECK(terminal_type IN ('xterm', 'mosh')),
         port INTEGER NOT NULL,
         ws_url TEXT NOT NULL,
-        mosh_key TEXT,
-        mosh_udp_port INTEGER,
         status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'inactive')),
         created_by TEXT NOT NULL DEFAULT 'user',
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

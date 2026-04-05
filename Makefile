@@ -26,10 +26,10 @@ setup:
 
 install:
 	@echo "$(BLUE)📦 Installing DevBot app...$(NC)"
-	cd app && npm install
+	cd app && npm install --force
 	@echo "$(GREEN)✅ DevBot app ready!$(NC)"
 	@echo "$(BLUE)📦 Installing DevBot backend...$(NC)"
-	cd backend && npm install
+	cd backend && npm install --force
 	@echo "$(GREEN)✅ DevBot backend ready!$(NC)"
 
 start:

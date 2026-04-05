@@ -2,8 +2,10 @@ import { spawn, IPty } from 'node-pty';
 import { WebSocketServer, WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
 
-const BRIDGE_BASE_PORT = parseInt(process.env.MOSH_BRIDGE_BASE_PORT || '7850', 10);
-const BRIDGE_MAX_PORT = parseInt(process.env.MOSH_BRIDGE_MAX_PORT || '7899', 10);
+import { MOSH_BRIDGE_BASE_PORT, MOSH_BRIDGE_MAX_PORT, CLAUDE_WORK_DIR } from './env.js';
+
+const BRIDGE_BASE_PORT = MOSH_BRIDGE_BASE_PORT;
+const BRIDGE_MAX_PORT = MOSH_BRIDGE_MAX_PORT;
 
 interface MoshBridgeSession {
   wss: WebSocketServer;
@@ -42,7 +44,7 @@ function spawnMoshClient(moshKey: string, moshUdpPort: number, serverHost: strin
     name: 'xterm-256color',
     cols: 80,
     rows: 24,
-    cwd: process.env.CLAUDE_WORK_DIR || process.cwd(),
+    cwd: CLAUDE_WORK_DIR,
     env: {
       ...(process.env as Record<string, string>),
       MOSH_KEY: moshKey,

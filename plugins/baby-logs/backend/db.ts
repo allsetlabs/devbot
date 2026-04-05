@@ -1,14 +1,16 @@
 import { mkdirSync } from 'fs';
-import { homedir } from 'os';
-import { join } from 'path';
+import { dirname } from 'path';
 import BetterSqlite3 from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import * as schema from './schema.js';
 
-const defaultDbDir = join(homedir(), '.devbot');
-mkdirSync(defaultDbDir, { recursive: true });
-const dbPath = process.env.DB_BABY_LOGS_PATH || join(defaultDbDir, 'baby-logs.db');
+const dbPath = process.env.DB_BABY_LOGS_PATH;
+if (!dbPath) {
+  console.error('[ENV] Missing required environment variable: DB_BABY_LOGS_PATH');
+  process.exit(1);
+}
+mkdirSync(dirname(dbPath), { recursive: true });
 
 console.log('[DB] Initializing baby-logs database at:', dbPath);
 

@@ -114,7 +114,11 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import * as schema from './schema.js';
 
-const dbPath = process.env.DB_PLUGIN_NAME_PATH || './plugin-name.db';
+const dbPath = process.env.DB_PLUGIN_NAME_PATH;
+if (!dbPath) {
+  console.error('[ENV] Missing required environment variable: DB_PLUGIN_NAME_PATH');
+  process.exit(1);
+}
 const sqliteDb = new BetterSqlite3(dbPath);
 sqliteDb.pragma('foreign_keys = ON');
 

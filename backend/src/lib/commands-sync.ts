@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { coreDb, commands } from './db/core.js';
+import { CLAUDE_WORK_DIR } from './env.js';
 
 interface CommandRecord {
   id: string;
@@ -138,7 +139,7 @@ function readCommands(commandsDir: string): CommandRecord[] {
 }
 
 export async function syncCommands(): Promise<void> {
-  const workDir = process.env.CLAUDE_WORK_DIR || process.cwd();
+  const workDir = CLAUDE_WORK_DIR;
   const skillsDir = path.join(workDir, '.claude', 'skills');
   const commandsDir = path.join(workDir, '.claude', 'commands');
 

@@ -1,5 +1,6 @@
 import { spawn, ChildProcess } from 'child_process';
 import { parseStreamLine, type StreamParserConfig } from './stream-parser.js';
+import { CLAUDE_WORK_DIR } from './env.js';
 
 export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
 export type PermissionMode = 'plan' | 'auto-accept' | 'dangerous';
@@ -118,7 +119,7 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
     systemPrompts = [],
     sessionId,
     maxTurns,
-    workDir = process.env.CLAUDE_WORK_DIR || process.cwd(),
+    workDir = CLAUDE_WORK_DIR,
     chrome = false,
     timeoutMs = 30_000,
     promptSuffix,

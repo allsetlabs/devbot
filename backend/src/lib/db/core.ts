@@ -1,18 +1,16 @@
 import { mkdirSync } from 'fs';
-import { homedir } from 'os';
-import { join } from 'path';
+import { dirname } from 'path';
 import BetterSqlite3 from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { DB_CORE_PATH } from '../env.js';
 
-// Database paths
-const defaultDbDir = join(homedir(), '.devbot');
-mkdirSync(defaultDbDir, { recursive: true });
-const dbCorePath = process.env.DB_CORE_PATH || join(defaultDbDir, 'devbot.db');
+// Ensure parent directory exists
+mkdirSync(dirname(DB_CORE_PATH), { recursive: true });
 
-console.log('[DB] Initializing core database at:', dbCorePath);
+console.log('[DB] Initializing core database at:', DB_CORE_PATH);
 
 // Initialize better-sqlite3
-const sqliteDb = new BetterSqlite3(dbCorePath);
+const sqliteDb = new BetterSqlite3(DB_CORE_PATH);
 
 // Enable foreign keys
 sqliteDb.pragma('foreign_keys = ON');

@@ -1,14 +1,16 @@
 import { mkdirSync } from 'fs';
-import { homedir } from 'os';
-import { join } from 'path';
+import { dirname } from 'path';
 import BetterSqlite3 from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { sql } from 'drizzle-orm';
 import * as schema from './schema.js';
 
-const defaultDbDir = join(homedir(), '.devbot');
-mkdirSync(defaultDbDir, { recursive: true });
-const dbPath = process.env.DB_LAWN_CARE_PATH || join(defaultDbDir, 'lawn-care.db');
+const dbPath = process.env.DB_LAWN_CARE_PATH;
+if (!dbPath) {
+  console.error('[ENV] Missing required environment variable: DB_LAWN_CARE_PATH');
+  process.exit(1);
+}
+mkdirSync(dirname(dbPath), { recursive: true });
 
 console.log('[DB] Initializing lawn-care database at:', dbPath);
 

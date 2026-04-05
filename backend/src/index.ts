@@ -29,12 +29,10 @@ delete process.env.CLAUDECODE;
 
 const app = express();
 
-if (!process.env.BACKEND_PORT) throw new Error('BACKEND_PORT env var is required');
-if (!process.env.BACKEND_HOST) throw new Error('BACKEND_HOST env var is required');
+import { BACKEND_PORT, BACKEND_HOST, API_KEY, CLAUDE_WORK_DIR } from './lib/env.js';
 
-const PORT = parseInt(process.env.BACKEND_PORT, 10);
-const HOST = process.env.BACKEND_HOST;
-const API_KEY = process.env.API_KEY || '';
+const PORT = BACKEND_PORT;
+const HOST = BACKEND_HOST;
 
 // Middleware
 app.use(cors());
@@ -65,7 +63,7 @@ app.get('/health', (_req, res) => {
 
 // Serve uploaded files (photos, documents, etc.)
 const uploadsDir = path.join(
-  process.env.CLAUDE_WORK_DIR || process.cwd(),
+  CLAUDE_WORK_DIR,
   '.tmp',
   'devbot-uploads'
 );

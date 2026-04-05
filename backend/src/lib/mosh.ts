@@ -3,8 +3,7 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-const MOSH_BASE_PORT = parseInt(process.env.MOSH_BASE_PORT || '60001', 10);
-const MOSH_MAX_PORT = parseInt(process.env.MOSH_MAX_PORT || '60050', 10);
+import { MOSH_BASE_PORT, MOSH_MAX_PORT } from './env.js';
 
 export interface MoshServerInfo {
   key: string;

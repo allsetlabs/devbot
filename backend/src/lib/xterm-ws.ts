@@ -2,8 +2,10 @@ import { spawn, IPty } from 'node-pty';
 import { WebSocketServer, WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
 
-const BASE_PORT = parseInt(process.env.XTERM_BASE_PORT || '7750', 10);
-const MAX_PORT = parseInt(process.env.XTERM_MAX_PORT || '7799', 10);
+import { XTERM_BASE_PORT, XTERM_MAX_PORT, CLAUDE_WORK_DIR } from './env.js';
+
+const BASE_PORT = XTERM_BASE_PORT;
+const MAX_PORT = XTERM_MAX_PORT;
 
 interface XtermSession {
   wss: WebSocketServer;
@@ -48,7 +50,7 @@ export async function startXtermWs(port: number, tmuxSessionName: string): Promi
           name: 'xterm-256color',
           cols: 80,
           rows: 24,
-          cwd: process.env.CLAUDE_WORK_DIR || process.cwd(),
+          cwd: CLAUDE_WORK_DIR,
           env: process.env as Record<string, string>,
         });
 

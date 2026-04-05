@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { execSync } from 'child_process';
 import path from 'path';
+import { CLAUDE_WORK_DIR } from '../lib/env.js';
 
 export const filesRouter = Router();
 
@@ -12,7 +13,7 @@ interface FileItem {
   size?: number;
 }
 
-const PROJECT_ROOT = process.env.CLAUDE_WORK_DIR ?? path.resolve(process.cwd(), '../../..');
+const PROJECT_ROOT = CLAUDE_WORK_DIR;
 
 let cachedFiles: FileItem[] | null = null;
 let cacheTimestamp = 0;

@@ -21,6 +21,7 @@ import type {
   SlashCommand,
   WorkflowRun,
   WorkflowStepRun,
+  WorkingDirectory,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -379,6 +380,29 @@ export const api = {
     fetchApi(
       `/api/workflows/${workflowId}/runs/${runId}/steps/${stepRunId}/messages?after=${afterSequence}`
     ),
+
+  // Working directories endpoints
+  listWorkingDirectories: (): Promise<WorkingDirectory[]> => {
+    return fetchApi('/api/working-directories');
+  },
+
+  createWorkingDirectory: (path: string, label?: string): Promise<WorkingDirectory> => {
+    return fetchApi('/api/working-directories', {
+      method: 'POST',
+      body: JSON.stringify({ path, label }),
+    });
+  },
+
+  validateWorkingDirectory: (path: string): Promise<{ valid: boolean; resolvedPath: string }> => {
+    return fetchApi('/api/working-directories/validate', {
+      method: 'POST',
+      body: JSON.stringify({ path }),
+    });
+  },
+
+  deleteWorkingDirectory: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/working-directories/${id}`, { method: 'DELETE' });
+  },
 
   // Files endpoints
   browseFiles: (

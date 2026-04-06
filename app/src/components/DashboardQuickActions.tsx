@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Plus, Baby, Clock, Loader2, X } from 'lucide-react';
 import { chatHooks } from '../hooks/useChat';
-import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
+import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
 import type { PermissionMode, ClaudeModel } from '../types';
 
 export function DashboardQuickActions() {
@@ -11,20 +11,33 @@ export function DashboardQuickActions() {
   const createChatMutation = chatHooks.useCreateChat();
   const [modalOpen, setModalOpen] = useState(false);
   const [workingDir, setWorkingDir] = useState('');
+  const [validationError, setValidationError] = useState('');
+  const validateAndSaveDir = useValidateAndSaveDir();
 
   const handleOpenModal = () => {
     setWorkingDir('');
+    setValidationError('');
     setModalOpen(true);
   };
 
   const handleClose = () => {
     setModalOpen(false);
     setWorkingDir('');
+    setValidationError('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError('');
     const trimmedDir = workingDir.trim();
+
+    try {
+      await validateAndSaveDir(trimmedDir);
+    } catch (err) {
+      setValidationError(err instanceof Error ? err.message : 'Directory does not exist');
+      return;
+    }
+
     createChatMutation.mutate(
       {
         mode: 'dangerous' as PermissionMode,
@@ -40,6 +53,8 @@ export function DashboardQuickActions() {
     );
   };
 
+  const isPending = createChatMutation.isPending;
+
   return (
     <>
       {modalOpen && (
@@ -51,42 +66,32 @@ export function DashboardQuickActions() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            {createChatMutation.error && (
+            {(createChatMutation.error || validationError) && (
               <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {createChatMutation.error instanceof Error
-                  ? createChatMutation.error.message
-                  : 'Failed to create chat'}
+                {validationError ||
+                  (createChatMutation.error instanceof Error
+                    ? createChatMutation.error.message
+                    : 'Failed to create chat')}
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label className="mb-2 block text-sm font-medium text-foreground">
-                  Working Directory
-                </label>
-                <input
-                  type="text"
-                  value={workingDir}
-                  onChange={(e) => setWorkingDir(e.target.value)}
-                  placeholder={VITE_CLAUDE_WORK_DIR}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Leave blank to use the default directory
-                </p>
-              </div>
+              <WorkingDirSelector
+                value={workingDir}
+                onChange={setWorkingDir}
+                onValidationError={setValidationError}
+              />
               <div className="flex gap-2 pt-2">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleClose}
                   className="flex-1"
-                  disabled={createChatMutation.isPending}
+                  disabled={isPending}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1" disabled={createChatMutation.isPending}>
-                  {createChatMutation.isPending ? 'Creating...' : 'Create Chat'}
+                <Button type="submit" className="flex-1" disabled={isPending}>
+                  {isPending ? 'Creating...' : 'Create Chat'}
                 </Button>
               </div>
             </form>

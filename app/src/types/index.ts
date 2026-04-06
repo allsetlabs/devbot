@@ -1,3 +1,13 @@
+export interface WorkingDirectory {
+  id: string;
+  path: string;
+  label: string | null;
+  source: 'env' | 'auto' | 'user';
+  isDefault: boolean;
+  isRootDirectory: boolean;
+  createdAt: string;
+}
+
 export interface Session {
   id: string;
   port: number;

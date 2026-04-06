@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X } from 'lucide-react';
-import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 import { chatHooks } from '../hooks/useChat';
+import { WorkingDirSelector, useValidateAndSaveDir } from '../components/WorkingDirSelector';
 import { useFavorites } from '../hooks/useFavorites';
 import { extractErrorMessage } from '../lib/format';
 import { ErrorBanner } from '../components/ErrorBanner';
@@ -24,6 +24,8 @@ export function InteractiveChatList() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [newChatOpen, setNewChatOpen] = useState(false);
   const [newChatWorkingDir, setNewChatWorkingDir] = useState('');
+  const [dirValidationError, setDirValidationError] = useState('');
+  const validateAndSaveDir = useValidateAndSaveDir();
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const searchQuery = searchParams.get('q') ?? '';
@@ -109,9 +111,19 @@ export function InteractiveChatList() {
     setNewChatOpen(true);
   };
 
-  const handleNewChatSubmit = (e: React.FormEvent) => {
+  const handleNewChatSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setDirValidationError('');
     const trimmedDir = newChatWorkingDir.trim();
+
+    // Validate and save the directory first
+    try {
+      await validateAndSaveDir(trimmedDir);
+    } catch (err) {
+      setDirValidationError(err instanceof Error ? err.message : 'Directory does not exist');
+      return;
+    }
+
     createMutation.mutate(
       {
         mode: 'dangerous' as PermissionMode,
@@ -122,6 +134,7 @@ export function InteractiveChatList() {
         onSuccess: (chat) => {
           setNewChatOpen(false);
           setNewChatWorkingDir('');
+          setDirValidationError('');
           navigate(`/chat/${chat.id}`);
         },
       }
@@ -131,6 +144,7 @@ export function InteractiveChatList() {
   const handleNewChatClose = () => {
     setNewChatOpen(false);
     setNewChatWorkingDir('');
+    setDirValidationError('');
   };
 
   const handleDelete = (id: string) => deleteMutation.mutate(id);
@@ -223,27 +237,20 @@ export function InteractiveChatList() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            {createMutation.error && (
+            {(createMutation.error || dirValidationError) && (
               <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {createMutation.error instanceof Error
-                  ? createMutation.error.message
-                  : 'Failed to create chat'}
+                {dirValidationError ||
+                  (createMutation.error instanceof Error
+                    ? createMutation.error.message
+                    : 'Failed to create chat')}
               </div>
             )}
             <form onSubmit={handleNewChatSubmit} className="space-y-4">
-              <div>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label className="mb-2 block text-sm font-medium text-foreground">
-                  Working Directory
-                </label>
-                <input
-                  type="text"
-                  value={newChatWorkingDir}
-                  onChange={(e) => setNewChatWorkingDir(e.target.value)}
-                  placeholder={VITE_CLAUDE_WORK_DIR}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
+              <WorkingDirSelector
+                value={newChatWorkingDir}
+                onChange={setNewChatWorkingDir}
+                onValidationError={setDirValidationError}
+              />
               <div className="flex gap-2 pt-2">
                 <Button
                   type="button"

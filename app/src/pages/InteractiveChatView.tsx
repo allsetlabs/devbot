@@ -180,21 +180,6 @@ export function InteractiveChatView({
     }
   }, [settings, settingsLoaded]);
 
-  // Slash command picker
-  const { data: commands = [] } = useCommands();
-  const slashOpen = input.startsWith('/') && !input.includes(' ');
-  const slashFilter = slashOpen ? input.slice(1) : '';
-  const slashGroups = useMemo<SlashCommandGroup[]>(() => {
-    const skills = commands.filter((c) => c.type === 'skill');
-    const cmds = commands.filter((c) => c.type === 'command');
-    const builtins = commands.filter((c) => c.type === 'builtin');
-    const groups: SlashCommandGroup[] = [];
-    if (skills.length > 0) groups.push({ heading: 'Skills', items: skills });
-    if (cmds.length > 0) groups.push({ heading: 'Commands', items: cmds });
-    if (builtins.length > 0) groups.push({ heading: 'Default', items: builtins });
-    return groups;
-  }, [commands]);
-
   // File intellisense picker
   const {
     fileIntellisenseOpen,
@@ -247,6 +232,21 @@ export function InteractiveChatView({
     enabled: !!chatId,
     refetchInterval: () => (isRunningRef.current ? POLL_INTERVALS.chatRunning : false),
   });
+
+  // Slash command picker — must be after chat query so workingDir is available
+  const { data: commands = [] } = useCommands(chat?.workingDir);
+  const slashOpen = input.startsWith('/') && !input.includes(' ');
+  const slashFilter = slashOpen ? input.slice(1) : '';
+  const slashGroups = useMemo<SlashCommandGroup[]>(() => {
+    const skills = commands.filter((c) => c.type === 'skill');
+    const cmds = commands.filter((c) => c.type === 'command');
+    const builtins = commands.filter((c) => c.type === 'builtin');
+    const groups: SlashCommandGroup[] = [];
+    if (skills.length > 0) groups.push({ heading: 'Skills', items: skills });
+    if (cmds.length > 0) groups.push({ heading: 'Commands', items: cmds });
+    if (builtins.length > 0) groups.push({ heading: 'Default', items: builtins });
+    return groups;
+  }, [commands]);
 
   // Query: status polling — drives message fetching via dataUpdatedAt
   const { data: statusData, dataUpdatedAt } = useQuery({

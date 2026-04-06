@@ -17,7 +17,7 @@ import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './route
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
-import { syncCommands } from './lib/commands-sync.js';
+
 import {
   recoverSessions,
   recoverInteractiveChats,
@@ -101,14 +101,6 @@ const server = app.listen(PORT, HOST, async () => {
 
   // Seed default working directories
   await seedDefaultWorkingDirectories();
-
-  // Sync slash commands from skills directory to database
-  try {
-    await syncCommands();
-  } catch (err) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    console.warn('[Server] Failed to sync commands:', (err as any)?.message);
-  }
 
   // Recover existing sessions (restart WebSocket servers for active tmux sessions)
   await recoverSessions();

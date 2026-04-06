@@ -347,8 +347,9 @@ export const api = {
   },
 
   // Commands endpoints
-  listCommands: (): Promise<SlashCommand[]> => {
-    return fetchApi('/api/commands');
+  listCommands: (dir?: string): Promise<SlashCommand[]> => {
+    const params = dir ? `?dir=${encodeURIComponent(dir)}` : '';
+    return fetchApi(`/api/commands${params}`);
   },
 
   // Logs endpoints

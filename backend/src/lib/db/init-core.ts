@@ -241,6 +241,32 @@ export async function initializeCoreDatabase() {
     `
     );
 
+    // Create working_directories table
+    await runSQL(
+      coreDb,
+      `
+      CREATE TABLE IF NOT EXISTS working_directories (
+        id TEXT PRIMARY KEY,
+        path TEXT NOT NULL UNIQUE,
+        label TEXT,
+        source TEXT NOT NULL DEFAULT 'user' CHECK(source IN ('env', 'auto', 'user')),
+        is_default INTEGER NOT NULL DEFAULT 0,
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
+    // Migrate: add is_default column if missing
+    try {
+      coreDb.run(sql.raw(`ALTER TABLE working_directories ADD COLUMN is_default INTEGER NOT NULL DEFAULT 0`));
+    } catch {
+      // Column already exists
+    }
+
     // Create commands table
     await runSQL(
       coreDb,

@@ -241,6 +241,26 @@ export const remotion_videos = sqliteTable('remotion_videos', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// Working directories (saved workspace paths)
+export const working_directories = sqliteTable('working_directories', {
+  id: text('id').primaryKey(),
+  path: text('path').notNull().unique(),
+  label: text('label'),
+  source: text('source', { enum: ['env', 'auto', 'user'] })
+    .notNull()
+    .default('user'),
+  is_default: integer('is_default', { mode: 'boolean' }).notNull().default(false),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
 // Commands (synced from .claude/)
 export const commands = sqliteTable('commands', {
   id: text('id').primaryKey(),

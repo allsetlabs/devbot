@@ -11,6 +11,7 @@ import {
   ScrollText,
   Leaf,
   Video,
+  FolderOpen,
 } from 'lucide-react';
 
 interface SlideNavProps {
@@ -32,6 +33,7 @@ const navItems: NavItem[] = [
   { label: 'Baby Logs', path: '/baby-logs', icon: <Baby className="h-5 w-5" /> },
   { label: 'Videos', path: '/videos', icon: <Video className="h-5 w-5" /> },
   { label: 'Lawn Care', path: '/lawn-care', icon: <Leaf className="h-5 w-5" /> },
+  { label: 'Directories', path: '/working-directories', icon: <FolderOpen className="h-5 w-5" /> },
   { label: 'Logs', path: '/logs', icon: <ScrollText className="h-5 w-5" /> },
 ];
 

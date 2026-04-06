@@ -12,6 +12,7 @@ import { BabyLogs, BabyAnalytics, GrowthCharts } from '@devbot/plugin-baby-logs/
 import { LogsPage } from './pages/LogsPage';
 import { LawnCare, LawnPhotoJournal } from '@devbot/plugin-lawn-care/frontend';
 import { RemotionVideos } from './pages/RemotionVideos';
+import { WorkingDirectories } from './pages/WorkingDirectories';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/lawn-care" element={<LawnCare />} />
             <Route path="/lawn-care/photos" element={<LawnPhotoJournal />} />
             <Route path="/videos" element={<RemotionVideos />} />
+            <Route path="/working-directories" element={<WorkingDirectories />} />
             <Route path="/logs" element={<LogsPage />} />
             {/* Legacy CLI routes */}
             <Route path="/cli" element={<ChatList />} />

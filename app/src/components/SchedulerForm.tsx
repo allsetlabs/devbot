@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
-import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
+import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
 
 interface SchedulerFormProps {
   isOpen: boolean;
@@ -18,8 +18,13 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
   const [isInfinite, setIsInfinite] = useState(false);
   const [workingDir, setWorkingDir] = useState('');
 
+  const validateAndSaveDir = useValidateAndSaveDir();
+
   const submitMutation = useMutation({
-    mutationFn: () => onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir),
+    mutationFn: async () => {
+      await validateAndSaveDir(workingDir);
+      return onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir);
+    },
     onSuccess: () => {
       setPrompt('');
       setIntervalMinutes(60);
@@ -159,19 +164,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
           </div>
 
           {/* Working Directory */}
-          <div>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label className="mb-2 block text-sm font-medium text-foreground">
-              Working Directory
-            </label>
-            <input
-              type="text"
-              value={workingDir}
-              onChange={(e) => setWorkingDir(e.target.value)}
-              placeholder={VITE_CLAUDE_WORK_DIR}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
+          <WorkingDirSelector value={workingDir} onChange={setWorkingDir} />
 
           {/* Actions */}
           <div className="flex gap-2 pt-2">

@@ -4,11 +4,13 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
 import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
+import { ModelPicker } from './ModelPicker';
+import type { ClaudeModel } from '../types';
 
 interface SchedulerFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null, workingDir: string) => Promise<void>;
+  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null, workingDir: string, model: ClaudeModel) => Promise<void>;
 }
 
 export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps) {
@@ -17,13 +19,14 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
   const [isInfinite, setIsInfinite] = useState(false);
   const [workingDir, setWorkingDir] = useState('');
+  const [model, setModel] = useState<ClaudeModel>('sonnet');
 
   const validateAndSaveDir = useValidateAndSaveDir();
 
   const submitMutation = useMutation({
     mutationFn: async () => {
       await validateAndSaveDir(workingDir);
-      return onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir);
+      return onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir, model);
     },
     onSuccess: () => {
       setPrompt('');
@@ -31,6 +34,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
       setMaxRuns(10);
       setIsInfinite(false);
       setWorkingDir('');
+      setModel('sonnet');
       onClose();
     },
   });
@@ -47,6 +51,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
     setMaxRuns(10);
     setIsInfinite(false);
     setWorkingDir('');
+    setModel('sonnet');
     submitMutation.reset();
     onClose();
   };
@@ -162,6 +167,9 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
               This prompt will be sent to Claude Code at the specified interval
             </p>
           </div>
+
+          {/* Model */}
+          <ModelPicker value={model} onChange={setModel} />
 
           {/* Working Directory */}
           <WorkingDirSelector value={workingDir} onChange={setWorkingDir} />

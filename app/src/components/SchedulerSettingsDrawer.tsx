@@ -8,8 +8,9 @@ import {
   DrawerTitle,
 } from '@allsetlabs/reusable/components/ui/drawer';
 import { Infinity as InfinityIcon, Loader2 } from 'lucide-react';
-import type { ScheduledTask } from '../types';
+import type { ScheduledTask, ClaudeModel } from '../types';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
+import { ModelPicker } from './ModelPicker';
 
 interface SchedulerSettingsDrawerProps {
   task: ScheduledTask | null;
@@ -17,7 +18,7 @@ interface SchedulerSettingsDrawerProps {
   onClose: () => void;
   onSave: (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null }
+    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }
   ) => Promise<void>;
 }
 
@@ -32,8 +33,10 @@ export function SchedulerSettingsDrawer({
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
   const [isInfinite, setIsInfinite] = useState(false);
 
+  const [model, setModel] = useState<ClaudeModel>('sonnet');
+
   const saveMutation = useMutation({
-    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null }) =>
+    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }) =>
       onSave(task!.id, updates),
     onSuccess: () => onClose(),
   });
@@ -49,6 +52,8 @@ export function SchedulerSettingsDrawer({
       setMaxRuns(task.maxRuns);
 
       setIsInfinite(task.maxRuns === null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setModel(task.model);
       saveMutation.reset();
     }
   }, [task]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -66,11 +71,12 @@ export function SchedulerSettingsDrawer({
   const handleSave = () => {
     if (!task || !prompt.trim()) return;
 
-    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null } = {};
+    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel } = {};
     if (prompt.trim() !== task.prompt) updates.prompt = prompt.trim();
     if (intervalMinutes !== task.intervalMinutes) updates.intervalMinutes = intervalMinutes;
     const newMaxRuns = isInfinite ? null : maxRuns;
     if (newMaxRuns !== task.maxRuns) updates.maxRuns = newMaxRuns;
+    if (model !== task.model) updates.model = model;
 
     if (Object.keys(updates).length > 0) {
       saveMutation.mutate(updates);
@@ -83,7 +89,8 @@ export function SchedulerSettingsDrawer({
     task &&
     (prompt.trim() !== task.prompt ||
       intervalMinutes !== task.intervalMinutes ||
-      (isInfinite ? null : maxRuns) !== task.maxRuns);
+      (isInfinite ? null : maxRuns) !== task.maxRuns ||
+      model !== task.model);
 
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
@@ -170,6 +177,11 @@ export function SchedulerSettingsDrawer({
                   ? 'Task will run once and stop'
                   : `Task will run ${maxRuns} times and stop`}
             </p>
+          </div>
+
+          {/* Model */}
+          <div className="mb-6">
+            <ModelPicker value={model} onChange={setModel} />
           </div>
 
           {/* Actions */}

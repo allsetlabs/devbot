@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Loader2, RefreshCw, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Clock, Loader2, RefreshCw, RotateCcw, Settings } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type { ScheduledTask } from '../types/index';
@@ -8,6 +8,7 @@ interface SchedulerViewHeaderProps {
   rerunMutation: UseMutationResult<{ success: boolean; message: string }, Error, void>;
   onBack: () => void;
   onRefresh: () => void;
+  onSettings: () => void;
 }
 
 export function SchedulerViewHeader({
@@ -15,6 +16,7 @@ export function SchedulerViewHeader({
   rerunMutation,
   onBack,
   onRefresh,
+  onSettings,
 }: SchedulerViewHeaderProps) {
   return (
     <>
@@ -49,6 +51,9 @@ export function SchedulerViewHeader({
             ) : (
               <RotateCcw className="h-5 w-5" />
             )}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onSettings} title="Settings">
+            <Settings className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" onClick={onRefresh}>
             <RefreshCw className="h-5 w-5" />

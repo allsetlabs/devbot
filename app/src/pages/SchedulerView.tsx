@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ArrowLeft, Clock, Loader2 } from 'lucide-react';
@@ -9,13 +9,16 @@ import { POLL_INTERVALS } from '../lib/constants';
 import { RunSelector } from '../components/RunSelector';
 import { SchedulerViewHeader } from '../components/SchedulerViewHeader';
 import { SchedulerRunContent } from '../components/SchedulerRunContent';
-import type { TaskRun } from '../types/index';
+import { SchedulerSettingsDrawer } from '../components/SchedulerSettingsDrawer';
+import type { TaskRun, ClaudeModel } from '../types/index';
 
 export function SchedulerView() {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [runSelectorOpen, setRunSelectorOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const taskNeedsPollRef = useRef(false);
   const isRunningRef = useRef(false);
   const waitingForRunAfterRef = useRef<string | null>(null);
@@ -116,6 +119,14 @@ export function SchedulerView() {
     prevLatestRunIdRef.current = latestRunId;
   }, [runs, selectedRunId]);
 
+  const handleSaveSettings = async (
+    id: string,
+    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }
+  ) => {
+    await api.updateScheduledTask(id, data);
+    void queryClient.invalidateQueries({ queryKey: ['scheduled-task', taskId] });
+  };
+
   const handleBack = () => navigate('/scheduler');
 
   const handleRefresh = async () => {
@@ -180,6 +191,7 @@ export function SchedulerView() {
         rerunMutation={rerunMutation}
         onBack={handleBack}
         onRefresh={handleRefresh}
+        onSettings={() => setSettingsOpen(true)}
       />
 
       {/* Run selector */}
@@ -194,6 +206,13 @@ export function SchedulerView() {
       </div>
 
       <SchedulerRunContent runs={runs} selectedRun={selectedRun} />
+
+      <SchedulerSettingsDrawer
+        task={settingsOpen ? task : null}
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        onSave={handleSaveSettings}
+      />
     </div>
   );
 }

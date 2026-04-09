@@ -13,7 +13,7 @@ import { SchedulerForm } from '../components/SchedulerForm';
 import { SchedulerSettingsDrawer } from '../components/SchedulerSettingsDrawer';
 import { SlideNav } from '../components/SlideNav';
 import { ListPageHeader } from '../components/ListPageHeader';
-import type { ScheduledTask } from '../types';
+import type { ScheduledTask, ClaudeModel } from '../types';
 
 export function SchedulerList() {
   const navigate = useNavigate();
@@ -40,12 +40,14 @@ export function SchedulerList() {
       intervalMinutes,
       maxRuns,
       workingDir,
+      model,
     }: {
       prompt: string;
       intervalMinutes: number;
       maxRuns: number | null;
       workingDir: string;
-    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns, workingDir }),
+      model: ClaudeModel;
+    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns, workingDir, model }),
     [['scheduled-tasks']]
   );
 
@@ -66,9 +68,10 @@ export function SchedulerList() {
     prompt: string,
     intervalMinutes: number,
     maxRuns: number | null,
-    workingDir: string
+    workingDir: string,
+    model: ClaudeModel
   ) => {
-    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns, workingDir });
+    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns, workingDir, model });
   };
 
   const handleDeleteTask = (id: string) => deleteMutation.mutate(id);
@@ -87,7 +90,7 @@ export function SchedulerList() {
 
   const handleSaveSettings = async (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null }
+    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }
   ) => {
     await api.updateScheduledTask(taskId, data);
     void queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });

@@ -36,6 +36,7 @@ export interface ScheduledTask {
   maxRuns: number | null;
   isRunning: boolean;
   isQueued: boolean;
+  model: string;
 }
 
 export interface TaskRun {
@@ -73,6 +74,7 @@ function rowToTask(row: ScheduledTaskRow): ScheduledTask {
     maxRuns: row.max_runs,
     isRunning: isTaskExecuting(row.id),
     isQueued: isTaskQueued(row.id),
+    model: (row.settings as any)?.model || 'sonnet',
   };
 }
 
@@ -156,7 +158,7 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req, res) => {
-    const { prompt, intervalMinutes, maxRuns, name, workingDir } = req.body;
+    const { prompt, intervalMinutes, maxRuns, name, workingDir, model } = req.body;
 
     if (!requireString(res, prompt, 'Prompt')) return;
 
@@ -182,7 +184,10 @@ router.post(
         interval_minutes: intervalMinutes,
         status: 'active',
         max_runs: maxRuns ?? null,
-        settings: workingDir && typeof workingDir === 'string' ? { workingDir: workingDir.trim() } : {},
+        settings: {
+          ...(workingDir && typeof workingDir === 'string' ? { workingDir: workingDir.trim() } : {}),
+          ...(model && typeof model === 'string' ? { model } : {}),
+        },
         created_by: 'user',
         updated_by: 'user',
       })
@@ -215,7 +220,7 @@ router.post(
 router.put(
   '/:id',
   asyncHandler(async (req, res) => {
-    const { prompt, intervalMinutes, status, maxRuns, name } = req.body;
+    const { prompt, intervalMinutes, status, maxRuns, name, model } = req.body;
     const updates: Partial<typeof scheduled_tasks.$inferInsert> = { updated_by: 'user' };
 
     if (!validateOptionalString(res, prompt, 'prompt')) return;
@@ -244,6 +249,18 @@ router.put(
         return;
       }
       updates.max_runs = maxRuns;
+    }
+
+    if (model !== undefined) {
+      if (!requireEnum(res, model, ['opus', 'sonnet', 'haiku'] as const, 'model')) return;
+      // Merge model into existing settings
+      const existing = await coreDb
+        .select({ settings: scheduled_tasks.settings })
+        .from(scheduled_tasks)
+        .where(eq(scheduled_tasks.id, req.params.id))
+        .limit(1);
+      const currentSettings = (existing[0]?.settings as Record<string, unknown>) || {};
+      updates.settings = { ...currentSettings, model };
     }
 
     if (Object.keys(updates).length === 1 && updates.updated_by) {

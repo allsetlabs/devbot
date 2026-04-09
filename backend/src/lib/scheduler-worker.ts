@@ -74,7 +74,7 @@ async function processQueue(): Promise<void> {
 /**
  * Create a chat session for a scheduler run.
  */
-function createSchedulerChat(task: ScheduledTaskRow, runIndex: number): string | null {
+function createSchedulerChat(task: ScheduledTaskRow, runIndex: number, model: 'opus' | 'sonnet' | 'haiku' = 'sonnet'): string | null {
   const taskName = task.name || 'Scheduler';
   const chatId = uuidv4().slice(0, 8);
   const chatName = `${taskName} #${runIndex}`;
@@ -88,6 +88,7 @@ function createSchedulerChat(task: ScheduledTaskRow, runIndex: number): string |
         type: 'scheduler',
         status: 'active',
         permission_mode: 'dangerous',
+        model,
         is_executing: true,
         created_by: 'system',
         updated_by: 'system',
@@ -138,7 +139,8 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
 
   console.log(`[Scheduler] Starting task ${taskId} run #${runIndex}`);
 
-  const chatId = createSchedulerChat(task, runIndex);
+  const model: 'opus' | 'sonnet' | 'haiku' = (task.settings as any)?.model || 'sonnet';
+  const chatId = createSchedulerChat(task, runIndex, model);
   const workingDir: string = (task.settings as any)?.workingDir || CLAUDE_WORK_DIR;
 
   try {
@@ -253,6 +255,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
       promptSuffix: SCHEDULER_PROMPT_SUFFIX,
       systemPrompts: [SCHEDULER_SYSTEM_PROMPT],
       workDir: workingDir,
+      model,
       chrome: true,
       timeoutMs: 30 * 60 * 1000,
       trackAs: taskId,

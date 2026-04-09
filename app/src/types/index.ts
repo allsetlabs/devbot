@@ -48,6 +48,7 @@ export interface ScheduledTask {
   maxRuns: number | null;
   isRunning: boolean;
   isQueued: boolean;
+  model: ClaudeModel;
 }
 
 export interface CreateScheduledTaskRequest {
@@ -55,6 +56,7 @@ export interface CreateScheduledTaskRequest {
   intervalMinutes: number;
   maxRuns?: number | null;
   workingDir?: string;
+  model?: ClaudeModel;
 }
 
 export interface UpdateScheduledTaskRequest {
@@ -62,6 +64,7 @@ export interface UpdateScheduledTaskRequest {
   intervalMinutes?: number;
   status?: 'active' | 'paused';
   maxRuns?: number | null;
+  model?: ClaudeModel;
 }
 
 export interface TaskRun {

@@ -15,7 +15,7 @@ export interface UseFileIntellisenseResult {
 export function useFileIntellisense(input: string, workingDir?: string, cursorPosition?: number): UseFileIntellisenseResult {
   // Use text up to cursor position (not full input) so @ works mid-text
   const textToCursor = cursorPosition != null ? input.substring(0, cursorPosition) : input;
-  const fileAtMatch = textToCursor.match(/@([^@]*)$/);
+  const fileAtMatch = textToCursor.match(/@([^@\n]*)$/);
   // Close picker if captured text ends with space (file was selected)
   const fileIntellisenseOpen = !!fileAtMatch && !fileAtMatch[1].endsWith(' ');
   const fileIntellisenseFilter = fileAtMatch?.[1]?.trim() ?? '';

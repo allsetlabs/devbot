@@ -96,17 +96,32 @@ export function ChatTextareaWithPickers({
           ref={filePickerRef}
           items={fileIntellisenseFiles}
           filter={fileIntellisenseFilter}
-          open={fileIntellisenseOpen}
+          open={fileIntellisenseOpen && !fileIntellisenseLoading && fileIntellisenseFiles.length > 0}
           loading={fileIntellisenseLoading}
           loadingMore={fileIntellisenseLoadingMore}
           hasMore={fileIntellisenseHasMore}
           onLoadMore={onLoadMoreFiles}
           onSelect={(item) => {
-            const beforeAt = input.substring(0, input.lastIndexOf('@'));
-            const newValue = beforeAt + '@' + item.path + ' ';
+            // Find the @ trigger relative to current cursor position
+            const cursorPos = textareaRef.current?.selectionStart ?? input.length;
+            const textToCursor = input.substring(0, cursorPos);
+            const atIndex = textToCursor.lastIndexOf('@');
+            if (atIndex === -1) return;
+            const beforeAt = input.substring(0, atIndex);
+            const afterCursor = input.substring(cursorPos);
+            const insertion = '@' + item.path + ' ';
+            const newValue = beforeAt + insertion + afterCursor;
+            const newCursorPos = beforeAt.length + insertion.length;
             onInputChange(newValue);
-            onCursorChange?.(newValue.length);
-            textareaRef.current?.focus();
+            onCursorChange?.(newCursorPos);
+            // Restore cursor position after React re-render
+            requestAnimationFrame(() => {
+              if (textareaRef.current) {
+                textareaRef.current.selectionStart = newCursorPos;
+                textareaRef.current.selectionEnd = newCursorPos;
+                textareaRef.current.focus();
+              }
+            });
             if (!attachedFiles.some((f) => f.path === item.path)) {
               onSetAttachedFiles((prev) => [
                 ...prev,
@@ -115,8 +130,13 @@ export function ChatTextareaWithPickers({
             }
           }}
           onClose={() => {
-            const beforeAt = input.substring(0, input.lastIndexOf('@'));
-            onInputChange(beforeAt);
+            const cursorPos = textareaRef.current?.selectionStart ?? input.length;
+            const textToCursor = input.substring(0, cursorPos);
+            const atIndex = textToCursor.lastIndexOf('@');
+            if (atIndex === -1) return;
+            const beforeAt = input.substring(0, atIndex);
+            const afterCursor = input.substring(cursorPos);
+            onInputChange(beforeAt + afterCursor);
             onCursorChange?.(beforeAt.length);
           }}
         />

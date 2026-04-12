@@ -409,12 +409,13 @@ export const api = {
   browseFiles: (
     query: string,
     offset = 0,
-    limit = 50
+    limit = 50,
+    workingDir?: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<{ items: any[]; total: number; hasMore: boolean }> => {
-    return fetchApi(
-      `/api/files/browse?q=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`
-    );
+    const params = new URLSearchParams({ q: query, offset: String(offset), limit: String(limit) });
+    if (workingDir) params.set('workingDir', workingDir);
+    return fetchApi(`/api/files/browse?${params.toString()}`);
   },
 };
 

@@ -180,17 +180,6 @@ export function InteractiveChatView({
     }
   }, [settings, settingsLoaded]);
 
-  // File intellisense picker
-  const {
-    fileIntellisenseOpen,
-    fileIntellisenseFilter,
-    fileIntellisenseFiles,
-    fileIntellisenseLoading,
-    fileIntellisenseLoadingMore,
-    fileIntellisenseHasMore,
-    loadMoreFiles,
-  } = useFileIntellisense(input);
-
   // Cursor-based messages (kept in useState since incremental append doesn't fit useQuery)
   // Messages fetched from backend — no localStorage cache (avoids iOS quota issues)
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -235,6 +224,17 @@ export function InteractiveChatView({
 
   // Slash command picker — must be after chat query so workingDir is available
   const { data: commands = [] } = useCommands(chat?.workingDir);
+
+  // File intellisense picker — must be after chat query so workingDir is available
+  const {
+    fileIntellisenseOpen,
+    fileIntellisenseFilter,
+    fileIntellisenseFiles,
+    fileIntellisenseLoading,
+    fileIntellisenseLoadingMore,
+    fileIntellisenseHasMore,
+    loadMoreFiles,
+  } = useFileIntellisense(input, chat?.workingDir ?? undefined);
   const slashOpen = input.startsWith('/') && !input.includes(' ');
   const slashFilter = slashOpen ? input.slice(1) : '';
   const slashGroups = useMemo<SlashCommandGroup[]>(() => {
@@ -1252,6 +1252,7 @@ export function InteractiveChatView({
         isOpen={directoryBrowserOpen}
         onClose={() => setDirectoryBrowserOpen(false)}
         onSelectFile={handleSelectFileFromBrowser}
+        workingDir={chat?.workingDir ?? undefined}
       />
 
       {/* Help dialog for slash commands */}

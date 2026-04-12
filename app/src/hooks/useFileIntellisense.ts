@@ -12,7 +12,7 @@ export interface UseFileIntellisenseResult {
   loadMoreFiles: () => Promise<void>;
 }
 
-export function useFileIntellisense(input: string): UseFileIntellisenseResult {
+export function useFileIntellisense(input: string, workingDir?: string): UseFileIntellisenseResult {
   const fileAtMatch = input.match(/@([\w./-]*)$/);
   const fileIntellisenseOpen = !!fileAtMatch;
   const fileIntellisenseFilter = fileAtMatch?.[1] ?? '';
@@ -31,7 +31,7 @@ export function useFileIntellisense(input: string): UseFileIntellisenseResult {
       if (isFirstLoad) setFileIntellisenseLoading(true);
       fileIntellisenseOffsetRef.current = 0;
       try {
-        const result = await api.browseFiles(fileIntellisenseFilter, 0, 50);
+        const result = await api.browseFiles(fileIntellisenseFilter, 0, 50, workingDir);
         setFileIntellisenseFiles(result.items);
         setFileIntellisenseHasMore(result.hasMore);
         fileIntellisenseOffsetRef.current = result.items.length;
@@ -46,7 +46,7 @@ export function useFileIntellisense(input: string): UseFileIntellisenseResult {
 
     const timer = setTimeout(fetchFiles, 300);
     return () => clearTimeout(timer);
-  }, [fileIntellisenseOpen, fileIntellisenseFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fileIntellisenseOpen, fileIntellisenseFilter, workingDir]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMoreFiles = useCallback(async () => {
     if (fileIntellisenseLoadingMore || !fileIntellisenseHasMore) return;
@@ -55,7 +55,8 @@ export function useFileIntellisense(input: string): UseFileIntellisenseResult {
       const result = await api.browseFiles(
         fileIntellisenseFilter,
         fileIntellisenseOffsetRef.current,
-        50
+        50,
+        workingDir
       );
       setFileIntellisenseFiles((prev) => [...prev, ...result.items]);
       setFileIntellisenseHasMore(result.hasMore);

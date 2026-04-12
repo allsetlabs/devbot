@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { execSync } from 'child_process';
+import fs from 'fs';
 import path from 'path';
 import { CLAUDE_WORK_DIR } from '../lib/env.js';
 
@@ -13,21 +14,43 @@ interface FileItem {
   size?: number;
 }
 
-const PROJECT_ROOT = CLAUDE_WORK_DIR;
-
-let cachedFiles: FileItem[] | null = null;
-let cacheTimestamp = 0;
 const CACHE_TTL_MS = 10_000;
 
-function getTrackedFiles(): FileItem[] {
+const dirCache = new Map<string, { files: FileItem[]; timestamp: number }>();
+
+const SKIP_DIRS = new Set(['node_modules', '.git', '.next', 'dist', 'build', '__pycache__', '.cache']);
+
+function listFilesRecursive(baseDir: string, currentDir: string, maxDepth: number): string[] {
+  if (maxDepth <= 0) return [];
+  const results: string[] = [];
+  try {
+    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name.startsWith('.') || SKIP_DIRS.has(entry.name)) continue;
+      const fullPath = path.join(currentDir, entry.name);
+      const relativePath = path.relative(baseDir, fullPath);
+      if (entry.isFile()) {
+        results.push(relativePath);
+      } else if (entry.isDirectory()) {
+        results.push(...listFilesRecursive(baseDir, fullPath, maxDepth - 1));
+      }
+    }
+  } catch {
+    // Permission errors, etc.
+  }
+  return results;
+}
+
+function getTrackedFiles(workDir: string): FileItem[] {
   const now = Date.now();
-  if (cachedFiles && now - cacheTimestamp < CACHE_TTL_MS) {
-    return cachedFiles;
+  const cached = dirCache.get(workDir);
+  if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+    return cached.files;
   }
 
   const run = (cmd: string): string[] => {
     try {
-      return execSync(cmd, { cwd: PROJECT_ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
+      return execSync(cmd, { cwd: workDir, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] })
         .split('\n')
         .map((l) => l.trim())
         .filter(Boolean);
@@ -36,9 +59,18 @@ function getTrackedFiles(): FileItem[] {
     }
   };
 
-  const tracked = run('git ls-files');
-  const untracked = run('git ls-files --others --exclude-standard');
-  const allFilePaths = Array.from(new Set([...tracked, ...untracked]));
+  // Check if this is a git repo
+  const isGitRepo = run('git rev-parse --is-inside-work-tree')[0] === 'true';
+
+  let allFilePaths: string[];
+  if (isGitRepo) {
+    const tracked = run('git ls-files');
+    const untracked = run('git ls-files --others --exclude-standard');
+    allFilePaths = Array.from(new Set([...tracked, ...untracked]));
+  } else {
+    // Non-git directory: list files recursively (max depth 4, skip hidden/node_modules)
+    allFilePaths = listFilesRecursive(workDir, workDir, 4);
+  }
 
   const fileItems: FileItem[] = allFilePaths.map((relativePath) => ({
     id: relativePath,
@@ -63,9 +95,9 @@ function getTrackedFiles(): FileItem[] {
     type: 'directory' as const,
   }));
 
-  cachedFiles = [...fileItems, ...dirItems];
-  cacheTimestamp = now;
-  return cachedFiles;
+  const files = [...fileItems, ...dirItems];
+  dirCache.set(workDir, { files, timestamp: now });
+  return files;
 }
 
 function scoreItem(item: FileItem, segments: string[]): number {
@@ -77,14 +109,15 @@ function scoreItem(item: FileItem, segments: string[]): number {
   return exactMatches;
 }
 
-// GET /api/files/browse?q=search&offset=0&limit=50 — list git-tracked files in project directory
+// GET /api/files/browse?q=search&offset=0&limit=50&workingDir=/path — list git-tracked files in working directory
 filesRouter.get('/browse', (req, res) => {
   try {
     const query = ((req.query.q as string) || '').toLowerCase().trim();
     const offset = Math.max(0, parseInt((req.query.offset as string) || '0', 10) || 0);
     const limit = Math.max(1, parseInt((req.query.limit as string) || '50', 10) || 50);
+    const workDir = (req.query.workingDir as string) || CLAUDE_WORK_DIR;
 
-    const allFiles = getTrackedFiles();
+    const allFiles = getTrackedFiles(workDir);
 
     let results: FileItem[];
 

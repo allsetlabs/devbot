@@ -22,12 +22,14 @@ interface DirectoryBrowserSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectFile: (filePath: string) => void;
+  workingDir?: string;
 }
 
 export function DirectoryBrowserSidebar({
   isOpen,
   onClose,
   onSelectFile,
+  workingDir,
 }: DirectoryBrowserSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -39,9 +41,9 @@ export function DirectoryBrowserSidebar({
   }, [searchQuery]);
 
   const { data: files = [], isLoading } = useQuery({
-    queryKey: ['browse-files', debouncedQuery],
+    queryKey: ['browse-files', debouncedQuery, workingDir],
     queryFn: async () => {
-      const result = await api.browseFiles(debouncedQuery);
+      const result = await api.browseFiles(debouncedQuery, 0, 50, workingDir);
       return result.items as FileItem[];
     },
     enabled: isOpen,

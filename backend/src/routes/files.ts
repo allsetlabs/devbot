@@ -123,9 +123,10 @@ filesRouter.get('/browse', (req, res) => {
 
     if (query) {
       const segments = query.split('/').filter(Boolean);
+      const normalizeWs = (s: string) => s.replace(/\s+/g, ' ');
       results = allFiles.filter((f) => {
-        const lowerPath = f.path.toLowerCase();
-        return segments.every((seg) => lowerPath.includes(seg));
+        const lowerPath = normalizeWs(f.path.toLowerCase());
+        return segments.every((seg) => lowerPath.includes(normalizeWs(seg)));
       });
 
       const lowerQuery = query.toLowerCase();

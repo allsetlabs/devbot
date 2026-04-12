@@ -35,6 +35,7 @@ interface ChatTextareaWithPickersProps {
   fileIntellisenseHasMore: boolean;
   onLoadMoreFiles: () => void;
   onInputChange: (value: string) => void;
+  onCursorChange?: (position: number) => void;
   onResetNavigation: () => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSend: () => void;
@@ -65,6 +66,7 @@ export function ChatTextareaWithPickers({
   fileIntellisenseHasMore,
   onLoadMoreFiles,
   onInputChange,
+  onCursorChange,
   onResetNavigation,
   onKeyDown,
   onSend,
@@ -101,7 +103,9 @@ export function ChatTextareaWithPickers({
           onLoadMore={onLoadMoreFiles}
           onSelect={(item) => {
             const beforeAt = input.substring(0, input.lastIndexOf('@'));
-            onInputChange(beforeAt + '@' + item.path + ' ');
+            const newValue = beforeAt + '@' + item.path + ' ';
+            onInputChange(newValue);
+            onCursorChange?.(newValue.length);
             textareaRef.current?.focus();
             if (!attachedFiles.some((f) => f.path === item.path)) {
               onSetAttachedFiles((prev) => [
@@ -113,6 +117,7 @@ export function ChatTextareaWithPickers({
           onClose={() => {
             const beforeAt = input.substring(0, input.lastIndexOf('@'));
             onInputChange(beforeAt);
+            onCursorChange?.(beforeAt.length);
           }}
         />
         <Textarea
@@ -120,12 +125,15 @@ export function ChatTextareaWithPickers({
           value={input}
           onChange={(e) => {
             onInputChange(e.target.value);
+            onCursorChange?.(e.target.selectionStart ?? e.target.value.length);
             onResetNavigation();
             const el = e.target;
             el.style.height = 'auto';
             const maxH = window.innerHeight * 0.4;
             el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
           }}
+          onKeyUp={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
+          onClick={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
           onKeyDown={onKeyDown}
           placeholder={
             isRunning

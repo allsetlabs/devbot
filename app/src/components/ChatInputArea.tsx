@@ -30,6 +30,7 @@ interface ChatInputAreaProps {
   sessionStats: SessionStats;
   input: string;
   onInputChange: (value: string) => void;
+  onCursorChange?: (position: number) => void;
   attachedFiles: AttachedFile[];
   onSetAttachedFiles: React.Dispatch<React.SetStateAction<AttachedFile[]>>;
   isRunning: boolean;
@@ -65,6 +66,7 @@ export function ChatInputArea({
   sessionStats,
   input,
   onInputChange,
+  onCursorChange,
   attachedFiles,
   onSetAttachedFiles,
   isRunning,
@@ -122,6 +124,7 @@ export function ChatInputArea({
         fileIntellisenseHasMore={fileIntellisenseHasMore}
         onLoadMoreFiles={onLoadMoreFiles}
         onInputChange={onInputChange}
+        onCursorChange={onCursorChange}
         onResetNavigation={onResetNavigation}
         onKeyDown={onKeyDown}
         onSend={onSend}

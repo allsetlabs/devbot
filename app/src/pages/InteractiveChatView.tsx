@@ -111,6 +111,7 @@ export function InteractiveChatView({
   const navigate = useNavigate();
   // UI-only state — seed input from localStorage draft
   const [input, setInput] = useState(() => (chatId ? getCachedDraft(chatId) : ''));
+  const [cursorPosition, setCursorPosition] = useState(0);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [interrupting, setInterrupting] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -234,7 +235,7 @@ export function InteractiveChatView({
     fileIntellisenseLoadingMore,
     fileIntellisenseHasMore,
     loadMoreFiles,
-  } = useFileIntellisense(input, chat?.workingDir ?? undefined);
+  } = useFileIntellisense(input, chat?.workingDir ?? undefined, cursorPosition);
   const slashOpen = input.startsWith('/') && !input.includes(' ');
   const slashFilter = slashOpen ? input.slice(1) : '';
   const slashGroups = useMemo<SlashCommandGroup[]>(() => {
@@ -1298,6 +1299,7 @@ export function InteractiveChatView({
         sessionStats={sessionStats}
         input={input}
         onInputChange={setInput}
+        onCursorChange={setCursorPosition}
         attachedFiles={attachedFiles}
         onSetAttachedFiles={setAttachedFiles}
         isRunning={isRunning}

@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from '@allsetlabs/reusable/components/ui/sonner';
 import { InitializeReusableChunks } from '@allsetlabs/reusable/initializeReusableChunks';
 import { ChatList } from './pages/ChatList';
 import { ChatView } from './pages/ChatView';
@@ -13,6 +14,8 @@ import { LogsPage } from './pages/LogsPage';
 import { LawnCare, LawnPhotoJournal } from '@devbot/plugin-lawn-care/frontend';
 import { RemotionVideos } from './pages/RemotionVideos';
 import { WorkingDirectories } from './pages/WorkingDirectories';
+import { CompanyList } from './pages/CompanyList';
+import { CompanyView } from './pages/CompanyView';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 
 function App() {
@@ -35,6 +38,8 @@ function App() {
             <Route path="/videos" element={<RemotionVideos />} />
             <Route path="/working-directories" element={<WorkingDirectories />} />
             <Route path="/logs" element={<LogsPage />} />
+            <Route path="/companies" element={<CompanyList />} />
+            <Route path="/company/:companyId" element={<CompanyView />} />
             {/* Legacy CLI routes */}
             <Route path="/cli" element={<ChatList />} />
             <Route path="/cli/:sessionId" element={<ChatView />} />
@@ -44,6 +49,7 @@ function App() {
           </Routes>
         </TextSelectionProvider>
       </div>
+      <Toaster position="bottom-center" />
     </InitializeReusableChunks>
   );
 }

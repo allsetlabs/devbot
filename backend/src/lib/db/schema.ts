@@ -261,6 +261,26 @@ export const working_directories = sqliteTable('working_directories', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// Companies (AI-managed projects)
+export const companies = sqliteTable('companies', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  directory: text('directory').notNull(),
+  master_chat_id: text('master_chat_id'),
+  status: text('status', { enum: ['creating', 'active', 'archived'] })
+    .notNull()
+    .default('creating'),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
 // Commands (synced from .claude/)
 export const commands = sqliteTable('commands', {
   id: text('id').primaryKey(),

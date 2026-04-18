@@ -39,6 +39,9 @@ export type RemotionVideoInsert = typeof schema.remotion_videos.$inferInsert;
 export type CommandRow = typeof schema.commands.$inferSelect;
 export type CommandInsert = typeof schema.commands.$inferInsert;
 
+export type CompanyRow = typeof schema.companies.$inferSelect;
+export type CompanyInsert = typeof schema.companies.$inferInsert;
+
 // Type aliases for compatibility with old code
 export type PermissionMode = 'plan' | 'auto-accept' | 'dangerous';
 export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';

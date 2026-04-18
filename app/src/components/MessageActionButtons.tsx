@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Copy, Check, Pin, Edit } from 'lucide-react';
+import { copyToClipboard } from '../lib/clipboard';
 
 /** Copy-to-clipboard button for individual messages */
 export function CopyMessageButton({
@@ -13,10 +14,9 @@ export function CopyMessageButton({
 
   const handleCopy = useCallback(() => {
     if (!text || copied) return;
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
+    copyToClipboard(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   }, [text, copied]);
 
   const iconClass =

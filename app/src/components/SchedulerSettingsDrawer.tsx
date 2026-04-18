@@ -7,6 +7,12 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@allsetlabs/reusable/components/ui/drawer';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@allsetlabs/reusable/components/ui/tooltip';
 import { Infinity as InfinityIcon, Loader2 } from 'lucide-react';
 import type { ScheduledTask, ClaudeModel } from '../types';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
@@ -18,7 +24,7 @@ interface SchedulerSettingsDrawerProps {
   onClose: () => void;
   onSave: (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }
+    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel }
   ) => Promise<void>;
 }
 
@@ -28,6 +34,7 @@ export function SchedulerSettingsDrawer({
   onClose,
   onSave,
 }: SchedulerSettingsDrawerProps) {
+  const [name, setName] = useState('');
   const [prompt, setPrompt] = useState('');
   const [intervalMinutes, setIntervalMinutes] = useState(60);
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
@@ -36,7 +43,7 @@ export function SchedulerSettingsDrawer({
   const [model, setModel] = useState<ClaudeModel>('sonnet');
 
   const saveMutation = useMutation({
-    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }) =>
+    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel }) =>
       onSave(task!.id, updates),
     onSuccess: () => onClose(),
   });
@@ -44,6 +51,8 @@ export function SchedulerSettingsDrawer({
   // Sync form state when task changes
   useEffect(() => {
     if (task) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setName(task.name ?? '');
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPrompt(task.prompt);
 
@@ -71,7 +80,8 @@ export function SchedulerSettingsDrawer({
   const handleSave = () => {
     if (!task || !prompt.trim()) return;
 
-    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel } = {};
+    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel } = {};
+    if (name.trim() !== (task.name ?? '')) updates.name = name.trim();
     if (prompt.trim() !== task.prompt) updates.prompt = prompt.trim();
     if (intervalMinutes !== task.intervalMinutes) updates.intervalMinutes = intervalMinutes;
     const newMaxRuns = isInfinite ? null : maxRuns;
@@ -87,7 +97,8 @@ export function SchedulerSettingsDrawer({
 
   const hasChanges =
     task &&
-    (prompt.trim() !== task.prompt ||
+    (name.trim() !== (task.name ?? '') ||
+      prompt.trim() !== task.prompt ||
       intervalMinutes !== task.intervalMinutes ||
       (isInfinite ? null : maxRuns) !== task.maxRuns ||
       model !== task.model);
@@ -105,6 +116,19 @@ export function SchedulerSettingsDrawer({
             </div>
           )}
 
+          {/* Name */}
+          <div className="mb-4">
+            <span className="mb-2 block text-sm font-medium text-foreground">Name</span>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={task?.isSystem}
+              placeholder="Task name"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+
           {/* Prompt */}
           <div className="mb-4">
             <span className="mb-2 block text-sm font-medium text-foreground">Task Prompt</span>
@@ -112,7 +136,8 @@ export function SchedulerSettingsDrawer({
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={4}
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              disabled={task?.isSystem}
+              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
 
@@ -124,8 +149,9 @@ export function SchedulerSettingsDrawer({
                 <button
                   key={opt.value}
                   type="button"
+                  disabled={task?.isSystem}
                   onClick={() => setIntervalMinutes(opt.value)}
-                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
+                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                     intervalMinutes === opt.value
                       ? 'border-primary bg-primary/10 text-primary'
                       : 'border-border text-foreground hover:bg-muted'
@@ -146,7 +172,7 @@ export function SchedulerSettingsDrawer({
                   <button
                     key={opt.value}
                     type="button"
-                    disabled={isInfinite}
+                    disabled={isInfinite || task?.isSystem}
                     onClick={() => setMaxRuns(opt.value)}
                     className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
                       !isInfinite && maxRuns === opt.value
@@ -160,8 +186,9 @@ export function SchedulerSettingsDrawer({
               </div>
               <button
                 type="button"
+                disabled={task?.isSystem}
                 onClick={handleInfiniteToggle}
-                className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   isInfinite
                     ? 'border-primary bg-primary/10 text-primary'
                     : 'border-border text-foreground hover:bg-muted'
@@ -181,7 +208,7 @@ export function SchedulerSettingsDrawer({
 
           {/* Model */}
           <div className="mb-6">
-            <ModelPicker value={model} onChange={setModel} />
+            <ModelPicker value={model} onChange={setModel} disabled={task?.isSystem} />
           </div>
 
           {/* Actions */}
@@ -194,14 +221,25 @@ export function SchedulerSettingsDrawer({
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleSave}
-              className="flex-1"
-              disabled={saveMutation.isPending || !hasChanges || !prompt.trim()}
-            >
-              {saveMutation.isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-              {saveMutation.isPending ? 'Saving...' : 'Save'}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="flex-1">
+                    <Button
+                      onClick={handleSave}
+                      className="w-full"
+                      disabled={saveMutation.isPending || !hasChanges || !prompt.trim() || task?.isSystem}
+                    >
+                      {saveMutation.isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+                      {saveMutation.isPending ? 'Saving...' : 'Save'}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {task?.isSystem && (
+                  <TooltipContent>System schedulers cannot be modified</TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </DrawerContent>

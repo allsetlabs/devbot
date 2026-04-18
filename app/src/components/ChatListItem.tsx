@@ -31,7 +31,7 @@ interface ChatListItemProps {
   onArchive: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
   hasCopyCommand?: boolean;
-  onCopyCommand?: (e: React.MouseEvent) => void;
+  onCopyCommand?: () => void;
 }
 
 export function ChatListItem({
@@ -128,7 +128,7 @@ export function ChatListItem({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onCopyCommand?.(e);
+              onCopyCommand?.();
             }}
             title="Copy resume command"
           >
@@ -183,7 +183,10 @@ export function ChatListItem({
               variant="ghost"
               size="icon"
               className="flex-shrink-0"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
             >
               <MoreVertical className="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -194,7 +197,7 @@ export function ChatListItem({
               {isFavorited ? 'Remove from favorites' : 'Add to favorites'}
             </DropdownMenuItem>
             {hasCopyCommand && (
-              <DropdownMenuItem onClick={onCopyCommand}>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCopyCommand?.(); }}>
                 <Terminal className="h-4 w-4" />
                 Copy resume command
               </DropdownMenuItem>

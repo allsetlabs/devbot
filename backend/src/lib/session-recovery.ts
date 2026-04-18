@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { v4 as uuidv4 } from 'uuid';
 import { coreDb } from './db/core.js';
 import { sql } from 'drizzle-orm';
 import { listTmuxSessions } from './tmux.js';
 import { startXtermWs, isPortActive } from './xterm-ws.js';
+import { sendMessage } from './interactive-chat-worker.js';
 
 export type SessionRow = any;
 
@@ -68,10 +68,15 @@ export async function recoverSessions(): Promise<void> {
   }
 }
 
+const RECOVERY_PROMPT =
+  'DevBot was restarted and your previous execution was interrupted. ' +
+  'Please read the chat history above to get context on what you were doing, ' +
+  'then continue from where you left off.';
+
 /**
  * Recover interactive chats that were executing when the backend died.
- * Finds chats with is_executing=true, inserts a system message notifying
- * the user, and resets the flag.
+ * Finds chats with is_executing=true, resets the flag, and sends a
+ * recovery message so Claude resumes work automatically.
  */
 export async function recoverInteractiveChats(): Promise<void> {
   console.log('Chat recovery: Starting...');
@@ -85,35 +90,21 @@ export async function recoverInteractiveChats(): Promise<void> {
     }
 
     for (const chat of chats as any[]) {
-      // Get current max sequence for this chat
-      const maxSeqData = await coreDb.run(
-        sql`SELECT sequence FROM chat_messages WHERE chat_id = ${chat.id} ORDER BY sequence DESC LIMIT 1`
-      );
-
-      const nextSequence =
-        (Array.isArray(maxSeqData) && maxSeqData[0] ? (maxSeqData[0] as any).sequence : 0) + 1;
-
-      // Insert a system message notifying the user
-      await coreDb.run(
-        sql`INSERT INTO chat_messages (id, chat_id, sequence, type, content, created_by, created_at, updated_by, updated_at, settings) VALUES (${uuidv4().slice(0, 12)}, ${chat.id}, ${nextSequence}, 'system', ${JSON.stringify(
-          {
-            type: 'system',
-            message:
-              'Backend restarted — execution was interrupted. Send a new message to continue.',
-          }
-        )}, 'system', ${new Date().toISOString()}, 'system', ${new Date().toISOString()}, '{}')`
-      );
-
-      // Reset the flag
+      // Reset is_executing first so sendMessage can proceed
       await coreDb.run(
         sql`UPDATE interactive_chats SET is_executing = 0, updated_by = 'system', updated_at = ${new Date().toISOString()} WHERE id = ${chat.id}`
       );
 
-      console.log(`Chat recovery: Marked chat ${chat.id} as interrupted`);
+      // Send a recovery message that tells Claude to resume
+      sendMessage(chat.id, RECOVERY_PROMPT).catch((err) => {
+        console.error(`Chat recovery: Failed to resume chat ${chat.id}:`, err);
+      });
+
+      console.log(`Chat recovery: Resuming chat ${chat.id}`);
     }
 
     console.log(
-      `Chat recovery: Complete. Recovered ${(chats as any[]).length} interrupted chat(s)`
+      `Chat recovery: Complete. Resuming ${(chats as any[]).length} interrupted chat(s)`
     );
   } catch (error) {
     console.error('Chat recovery: Unexpected error:', error);

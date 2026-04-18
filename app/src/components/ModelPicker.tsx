@@ -5,6 +5,7 @@ import type { ClaudeModel } from '../types';
 interface ModelPickerProps {
   value: ClaudeModel;
   onChange: (model: ClaudeModel) => void;
+  disabled?: boolean;
 }
 
 const MODEL_ICONS: Record<ClaudeModel, React.ReactNode> = {
@@ -13,7 +14,7 @@ const MODEL_ICONS: Record<ClaudeModel, React.ReactNode> = {
   haiku: <Rabbit className="h-3.5 w-3.5" />,
 };
 
-export function ModelPicker({ value, onChange }: ModelPickerProps) {
+export function ModelPicker({ value, onChange, disabled = false }: ModelPickerProps) {
   return (
     <div>
       <span className="mb-2 block text-sm font-medium text-foreground">Model</span>
@@ -26,8 +27,9 @@ export function ModelPicker({ value, onChange }: ModelPickerProps) {
             <button
               key={model}
               type="button"
+              disabled={disabled}
               onClick={() => onChange(model)}
-              className={`flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
+              className={`flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                 isSelected
                   ? `${config.borderColor} ${config.bgColor} ${config.color}`
                   : 'border-border text-foreground hover:bg-muted'

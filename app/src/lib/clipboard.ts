@@ -1,15 +1,20 @@
-export async function copyToClipboard(text: string): Promise<void> {
+function fallbackCopy(text: string): void {
+  const input = document.createElement('input');
+  input.value = text;
+  input.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+  input.setAttribute('readonly', '');
+  document.body.appendChild(input);
+  input.focus();
+  input.setSelectionRange(0, text.length);
+  document.execCommand('copy');
+  document.body.removeChild(input);
+}
+
+export function copyToClipboard(text: string): void {
   if (navigator.clipboard) {
-    await navigator.clipboard.writeText(text);
+    // Initiate within the user-gesture tick; don't await so we don't defer past it
+    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
     return;
   }
-  // Fallback for older browsers
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.opacity = '0';
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
+  fallbackCopy(text);
 }

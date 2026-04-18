@@ -14,7 +14,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@allsetlabs/reusable/*": ["../../../component/src/*"],
+      "@allsetlabs/reusable/*": ["../../reusables/src/*"],
       "@devbot/app/*": ["../../app/src/*"]
     }
   },

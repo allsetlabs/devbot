@@ -14,6 +14,8 @@ import { weatherRouter } from './routes/weather.js';
 import { commandsRouter } from './routes/commands.js';
 import { filesRouter } from './routes/files.js';
 import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './routes/working-directories.js';
+import { companiesRouter } from './routes/companies.js';
+import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
@@ -83,6 +85,7 @@ app.use('/api/weather', weatherRouter);
 app.use('/api/commands', commandsRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/working-directories', workingDirectoriesRouter);
+app.use('/api/companies', companiesRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
@@ -101,6 +104,9 @@ const server = app.listen(PORT, HOST, async () => {
 
   // Seed default working directories
   await seedDefaultWorkingDirectories();
+
+  // Seed built-in system schedulers
+  await seedSystemSchedulers();
 
   // Recover existing sessions (restart WebSocket servers for active tmux sessions)
   await recoverSessions();

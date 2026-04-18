@@ -36,3 +36,7 @@ export const DB_LAWN_CARE_PATH = required('DB_LAWN_CARE_PATH');
 // Terminal port ranges
 export const XTERM_BASE_PORT = requiredInt('XTERM_BASE_PORT');
 export const XTERM_MAX_PORT = requiredInt('XTERM_MAX_PORT');
+
+// Superrepo root directory (for companies/modules)
+export const SUPERREPO_DIR =
+  process.env.SUPERREPO_DIR ?? '/Users/subbiahchandramouli/devbot-superrepo';

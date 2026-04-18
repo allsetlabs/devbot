@@ -1,0 +1,31 @@
+# Dependencies
+**/node_modules
+**/package-lock.json
+
+# Build outputs
+**/dist
+**/build
+**/.next
+**/.vite
+
+# Generated files
+**/.turbo
+**/.vercel
+
+# Python
+**/.venv
+**/__pycache__
+**/*.pyc
+
+# IDEs
+**/.vscode
+**/.idea
+
+# OS
+**/.DS_Store
+
+# Logs
+**/*.log
+
+# Submodules (linted separately)
+reusables

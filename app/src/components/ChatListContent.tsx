@@ -3,6 +3,7 @@ import { EmptyState } from './EmptyState';
 import { ChatListItem } from './ChatListItem';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
+import { toast } from 'sonner';
 import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 import type { InteractiveChat } from '../types';
 
@@ -116,11 +117,11 @@ export function ChatListContent({
             hasCopyCommand={!!chat.claudeSessionId}
             onCopyCommand={
               chat.claudeSessionId
-                ? (e) => {
-                    e.stopPropagation();
+                ? () => {
                     copyToClipboard(
                       `cd ${VITE_CLAUDE_WORK_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
                     );
+                    toast.success('Command copied!');
                   }
                 : undefined
             }

@@ -40,6 +40,7 @@ export function SchedulerItem({
   const isRunning = task.isRunning;
   const isQueued = task.isQueued;
   const isCompleted = task.maxRuns !== null && task.runCount >= task.maxRuns;
+  const isSystem = task.isSystem;
 
   // Format run count display
   const runCountDisplay =
@@ -135,15 +136,17 @@ export function SchedulerItem({
             <Pause className="h-4 w-4 text-muted-foreground" />
           )}
         </Button>
-        <Button
-          variant={deleteConfirm ? 'destructive' : 'ghost'}
-          size="icon"
-          onClick={handleDeleteClick}
-          className="h-8 w-8"
-          disabled={isRunning}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {!isSystem && (
+          <Button
+            variant={deleteConfirm ? 'destructive' : 'ghost'}
+            size="icon"
+            onClick={handleDeleteClick}
+            className="h-8 w-8"
+            disabled={isRunning}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

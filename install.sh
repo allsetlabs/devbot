@@ -1,29 +1,33 @@
 #!/bin/bash
-# Install devbot.local mDNS alias service
+
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Colors
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
 
-echo "Installing devbot-mdns..."
+REPO_URL="https://github.com/allsetlabs/devbot.git"
+PROJECT_DIR="devbot"
 
-# Install the script
-sudo cp "$SCRIPT_DIR/devbot-mdns" /usr/local/bin/devbot-mdns
-sudo chmod +x /usr/local/bin/devbot-mdns
+echo -e "${GREEN}=== devbot ===${NC}"
 
-# Install the LaunchDaemon
-sudo cp "$SCRIPT_DIR/local.devbot.mdns.plist" /Library/LaunchDaemons/local.devbot.mdns.plist
-sudo chown root:wheel /Library/LaunchDaemons/local.devbot.mdns.plist
-sudo chmod 644 /Library/LaunchDaemons/local.devbot.mdns.plist
+# Step 1: Clone with submodules
+echo -e "${YELLOW}Cloning into ${PROJECT_DIR}...${NC}"
+git clone --recurse-submodules "$REPO_URL" "$PROJECT_DIR"
+cd "$PROJECT_DIR"
 
-# Load and start the service
-sudo launchctl load /Library/LaunchDaemons/local.devbot.mdns.plist
+# Step 2: System setup + install dependencies
+echo -e "${YELLOW}Running make setup && make install...${NC}"
+if ! (make setup && make install); then
+  echo -e "${RED}Setup failed! Launching Claude to debug...${NC}"
+  claude --dangerously-skip-permissions --chrome -p "Running 'make setup && make install' failed in this repo. Diagnose the error, fix it, and get both commands to pass successfully. Report what you fixed."
+fi
 
-echo ""
-echo "Done! devbot.local is now registered."
-echo "Test it: ping devbot.local"
-echo "Access DevBot: http://devbot.local:3100"
-echo ""
-echo "To uninstall:"
-echo "  sudo launchctl unload /Library/LaunchDaemons/local.devbot.mdns.plist"
-echo "  sudo rm /Library/LaunchDaemons/local.devbot.mdns.plist"
-echo "  sudo rm /usr/local/bin/devbot-mdns"
+# Step 3: Start DevBot
+echo -e "${GREEN}Setup complete! Starting DevBot...${NC}"
+make start
+
+# Step 4: Open DevBot in browser
+open http://localhost:4005

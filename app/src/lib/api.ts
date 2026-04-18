@@ -22,6 +22,8 @@ import type {
   WorkflowRun,
   WorkflowStepRun,
   WorkingDirectory,
+  Company,
+  FeedbackDocument,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -403,6 +405,37 @@ export const api = {
 
   deleteWorkingDirectory: (id: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/working-directories/${id}`, { method: 'DELETE' });
+  },
+
+  // Companies endpoints
+  listCompanies: (): Promise<Company[]> => {
+    return fetchApi('/api/companies');
+  },
+
+  getCompany: (id: string): Promise<Company> => {
+    return fetchApi(`/api/companies/${id}`);
+  },
+
+  createCompany: (data: { name: string; idea: string }): Promise<Company> => {
+    return fetchApi('/api/companies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteCompany: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/companies/${id}`, { method: 'DELETE' });
+  },
+
+  getCompanyFeedback: (companyId: string, type: 'user' | 'investor'): Promise<FeedbackDocument> => {
+    return fetchApi(`/api/companies/${companyId}/feedback/${type}`);
+  },
+
+  addCompanyFeedback: (companyId: string, type: 'user' | 'investor', prompt: string): Promise<FeedbackDocument> => {
+    return fetchApi(`/api/companies/${companyId}/feedback/${type}`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    });
   },
 
   // Files endpoints

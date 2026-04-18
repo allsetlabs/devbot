@@ -49,12 +49,14 @@ export interface ScheduledTask {
   isRunning: boolean;
   isQueued: boolean;
   model: ClaudeModel;
+  isSystem: boolean;
 }
 
 export interface CreateScheduledTaskRequest {
   prompt: string;
   intervalMinutes: number;
   maxRuns?: number | null;
+  name?: string;
   workingDir?: string;
   model?: ClaudeModel;
 }
@@ -64,6 +66,7 @@ export interface UpdateScheduledTaskRequest {
   intervalMinutes?: number;
   status?: 'active' | 'paused';
   maxRuns?: number | null;
+  name?: string;
   model?: ClaudeModel;
 }
 
@@ -252,4 +255,28 @@ export interface WorkflowStepRun {
   order: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  directory: string;
+  masterChatId: string | null;
+  status: 'creating' | 'active' | 'archived';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeedbackEntry {
+  id: string;
+  prompt: string;
+  status: string;
+  ceoAction: string | null;
+  movedTo: string | null;
+  createdAt: string;
+}
+
+export interface FeedbackDocument {
+  document: string;
+  entries: FeedbackEntry[];
 }

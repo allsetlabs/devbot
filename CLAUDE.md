@@ -15,6 +15,116 @@ devbot/
 └── plugins/     # Plugin modules (baby-logs, lawn-care, etc.)
 ```
 
+## Autonomy
+
+DevBot sessions are automated — the user is often away or multitasking. **Minimize questions.** Use your best intuition, make a decision, and run. Only ask when a wrong guess would cause real damage (e.g., deleting data, picking the wrong module entirely). For ambiguous choices — file structure, naming, implementation approach — pick the best option and move forward. The user will correct you if needed.
+
+## Every Module Must Have a CLAUDE.md
+
+Every module MUST have a `CLAUDE.md` at its root. The CLAUDE.md should:
+
+- **Explain what the project is about** — what it does, who it's for, and how it works. This is the most important part. The AI agent needs to understand the project's purpose and vision to make good decisions.
+- **Document module-specific patterns** — architecture, database schemas, plugin systems, or anything unique to that module that an agent needs to know.
+- **NOT repeat information from the root CLAUDE.md** — do not duplicate standard Makefile commands (`make setup`, `make install`, `make start`), port tables, lint/test commands, or code standards. Those are defined once at the root and apply everywhere.
+- **Keep it lean** — do not add minor, non-important things. Every line in a CLAUDE.md consumes context. Only include information that changes how an agent works on the module.
+
+## Required Makefile with Three Commands
+
+Every module MUST have a `Makefile` at its root with exactly these three targets:
+
+| Target         | Purpose                                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make setup`   | Install **system-level** dependencies (e.g., Go, Python, PostgreSQL, Redis, tmux). Check if each dependency already exists before installing. |
+| `make install` | Install **project-level** dependencies (e.g., `npm install`, `pip install`, `cargo build`).                                                   |
+| `make start`   | Start **all services** the module needs (frontend, backend, DB, workers, etc.) in a single command.                                           |
+
+`make setup` should be idempotent — safe to run multiple times. It checks for the presence of each tool (e.g., `command -v python3`) and only installs what's missing. If the module requires specific skills or tools beyond standard packages, `setup` installs those too.
+
+`make install` handles language-level package managers only — `npm install`, `pip install -r requirements.txt`, `bundle install`, etc.
+
+`make start` is the single entry point to run the entire module locally. It goes into the necessary subdirectories and starts each service. Use tmux sessions for multi-service modules so everything runs in one command.
+
+## Port Hardcoding Rules
+
+Every module MUST hardcode its ports as **Makefile variables** at the top of the Makefile, and pass them to start commands via CLI flags. This keeps port assignments visible, centralized, and overridable.
+
+**Where to hardcode:**
+
+- **Frontend (Node/Vite):** In `package.json` start script or passed as `--port=XXXX` flag from the Makefile
+- **Backend (Node):** Pass as CLI argument in the start command (e.g., `node src/index.ts --port=XXXX` or via the Makefile's start target)
+- **Backend (Python):** Pass as `--port=XXXX` to uvicorn/gunicorn from the Makefile
+- **Database:** Use the standard port or define in the Makefile variable
+
+**NEVER hardcode ports in `.env` files or config files.** The Makefile is the single source of truth for ports. If someone needs to override, they change the Makefile variable — not hunt through env files.
+
+**Example Makefile pattern:**
+
+```makefile
+# === Port Configuration ===
+APP_PORT    := 4005
+BACKEND_PORT := 3100
+
+.PHONY: setup install start stop
+
+setup:
+	@echo "Checking system dependencies..."
+	@command -v node >/dev/null 2>&1 || { echo "Installing Node.js..."; brew install node; }
+	@command -v tmux >/dev/null 2>&1 || { echo "Installing tmux..."; brew install tmux; }
+
+install:
+	cd app && npm install
+	cd backend && npm install
+
+start:
+	@echo "Starting services on ports $(APP_PORT) and $(BACKEND_PORT)..."
+	# Kill existing processes on these ports
+	@lsof -ti:$(APP_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(BACKEND_PORT) | xargs kill -9 2>/dev/null || true
+	# Start in tmux
+	tmux new-session -d -s mymodule -n backend "cd backend && npm run dev -- --port=$(BACKEND_PORT)"
+	tmux new-window -t mymodule -n app "cd app && npm run dev -- --port=$(APP_PORT)"
+	tmux attach -t mymodule
+
+stop:
+	@lsof -ti:$(APP_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(BACKEND_PORT) | xargs kill -9 2>/dev/null || true
+	@tmux kill-session -t mymodule 2>/dev/null || true
+```
+
+## Shared Component Library
+
+**All frontend modules MUST use components from `reusables`.**
+
+Refer to the reusables module's own `CLAUDE.md` and documentation for usage instructions, available styles, and how to create new components.
+
+## Code Standards
+
+**All rules, forbidden patterns, detection methods, and auto-fix instructions live in the `coding-standards` skill** (`.claude/skills/coding-standards/SKILL.md`). Read that skill before writing or reviewing code.
+
+Run `/fix-coding-standards` to auto-fix violations across all modules.
+
+## After Every Change
+
+Run validation from the module's root:
+
+```bash
+npm run lint         # Fix linting errors
+npm run type-check   # Fix TypeScript errors
+```
+
+### Visual Testing in Chrome
+
+**Only when your change affects something visually testable** — a UI component, a page layout, a styling change, a new screen, or a user-facing interaction. Do NOT test for backend-only changes, config changes, schema changes, utility functions, or anything that has no visible output in a browser.
+
+When visual testing applies, use the Chrome MCP tools (`mcp__claude-in-chrome__*`) to:
+
+1. Navigate to the affected page
+2. Take a screenshot and verify the UI renders correctly
+3. Click buttons and interact with the feature
+4. Confirm the expected behavior works end-to-end
+
+This catches runtime errors, styling issues, and integration bugs that linting/type-checking miss.
+
 ## AI-Native Database Standards
 
 DevBot uses **Drizzle ORM + SQLite** for persistence with a focus on AI-native features.

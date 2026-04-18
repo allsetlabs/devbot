@@ -41,13 +41,15 @@ export function SchedulerList() {
       maxRuns,
       workingDir,
       model,
+      name,
     }: {
       prompt: string;
       intervalMinutes: number;
       maxRuns: number | null;
       workingDir: string;
       model: ClaudeModel;
-    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns, workingDir, model }),
+      name?: string;
+    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns, workingDir, model, name }),
     [['scheduled-tasks']]
   );
 
@@ -69,9 +71,10 @@ export function SchedulerList() {
     intervalMinutes: number,
     maxRuns: number | null,
     workingDir: string,
-    model: ClaudeModel
+    model: ClaudeModel,
+    name?: string
   ) => {
-    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns, workingDir, model });
+    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns, workingDir, model, name });
   };
 
   const handleDeleteTask = (id: string) => deleteMutation.mutate(id);
@@ -90,7 +93,7 @@ export function SchedulerList() {
 
   const handleSaveSettings = async (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; model?: ClaudeModel }
+    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel }
   ) => {
     await api.updateScheduledTask(taskId, data);
     void queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });

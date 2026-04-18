@@ -10,10 +10,11 @@ import type { ClaudeModel } from '../types';
 interface SchedulerFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null, workingDir: string, model: ClaudeModel) => Promise<void>;
+  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null, workingDir: string, model: ClaudeModel, name?: string) => Promise<void>;
 }
 
 export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps) {
+  const [name, setName] = useState('');
   const [prompt, setPrompt] = useState('');
   const [intervalMinutes, setIntervalMinutes] = useState(60);
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
@@ -26,9 +27,10 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
   const submitMutation = useMutation({
     mutationFn: async () => {
       await validateAndSaveDir(workingDir);
-      return onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir, model);
+      return onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir, model, name.trim() || undefined);
     },
     onSuccess: () => {
+      setName('');
       setPrompt('');
       setIntervalMinutes(60);
       setMaxRuns(10);
@@ -46,6 +48,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
   };
 
   const handleClose = () => {
+    setName('');
     setPrompt('');
     setIntervalMinutes(60);
     setMaxRuns(10);
@@ -69,9 +72,9 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
-      <div className="safe-area-bottom w-full max-w-lg rounded-t-2xl bg-background p-4 shadow-xl sm:rounded-2xl">
+      <div className="safe-area-bottom flex max-h-[70vh] w-full max-w-lg flex-col rounded-t-2xl bg-background p-4 shadow-xl sm:rounded-2xl">
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex shrink-0 items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">New Scheduled Task</h2>
           <Button variant="ghost" size="icon" onClick={handleClose}>
             <X className="h-5 w-5" />
@@ -80,7 +83,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
 
         {/* Error */}
         {submitMutation.error && (
-          <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <div className="mb-4 shrink-0 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {submitMutation.error instanceof Error
               ? submitMutation.error.message
               : 'Failed to create task'}
@@ -88,7 +91,20 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="-mr-4 flex-1 space-y-4 overflow-y-auto pr-4">
+          {/* Name (optional) */}
+          <div>
+            <span className="mb-2 block text-sm font-medium text-foreground">Name</span>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Optional — auto-generated if left empty"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+
           {/* Interval Selection */}
           <div>
             <span className="mb-2 block text-sm font-medium text-foreground">Run every</span>
@@ -173,9 +189,10 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
 
           {/* Working Directory */}
           <WorkingDirSelector value={workingDir} onChange={setWorkingDir} />
+          </div>
 
           {/* Actions */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex shrink-0 gap-2 pt-4">
             <Button
               type="button"
               variant="outline"

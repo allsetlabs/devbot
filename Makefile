@@ -10,21 +10,166 @@ NC := \033[0m
 APP_PORT := 4005
 BACKEND_PORT := 3100
 
-.PHONY: help setup install start stop
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
-	@echo "  make install    - Install app and backend dependencies"
+	@echo "  make setup      - Install ALL system dependencies (brew, git, nvm, node, tmux, claude, MCP, skills)"
+	@echo "  make install    - Sync submodules and install app/backend dependencies"
 	@echo "  make start      - Start app and backend in tmux session 'devbot'"
 	@echo "  make stop       - Stop all DevBot services"
 
 setup:
-	@echo "$(BLUE)Checking system dependencies...$(NC)"
-	@command -v node >/dev/null 2>&1 || { echo "Installing Node.js..."; brew install node; }
-	@command -v tmux >/dev/null 2>&1 || { echo "Installing tmux..."; brew install tmux; }
-	@echo "$(GREEN)All system dependencies ready!$(NC)"
+	@echo "$(BLUE)Starting DevBot system setup...$(NC)"
+	@if [ "$$(uname)" = "Darwin" ]; then $(MAKE) setup-brew; fi
+	@$(MAKE) setup-git
+	@$(MAKE) setup-nvm
+	@$(MAKE) setup-node
+	@$(MAKE) setup-tmux
+	@$(MAKE) setup-claude
+	@$(MAKE) setup-mcp
+	@$(MAKE) setup-skills
+	@echo ""
+	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
+
+setup-brew:
+	@echo "$(BLUE)Installing Homebrew...$(NC)"
+	@if command -v brew &> /dev/null; then \
+		echo "$(GREEN)Homebrew already installed: $$(brew --version | head -1)$(NC)"; \
+	else \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+		echo "$(GREEN)Homebrew installed!$(NC)"; \
+	fi
+	@if ! grep -q "HOMEBREW_CASK_OPTS" ~/.zshrc 2>/dev/null; then \
+		echo "" >> ~/.zshrc; \
+		echo "# Homebrew Cask Configuration" >> ~/.zshrc; \
+		echo 'export HOMEBREW_CASK_OPTS="--appdir=~/Applications"' >> ~/.zshrc; \
+	fi
+
+setup-git:
+	@echo "$(BLUE)Installing Git...$(NC)"
+	@if command -v git &> /dev/null; then \
+		echo "$(GREEN)Git already installed: $$(git --version)$(NC)"; \
+	else \
+		if [ "$$(uname)" = "Darwin" ]; then brew install git; \
+		elif [ "$$(uname)" = "Linux" ]; then sudo apt-get install -y git; \
+		elif [ "$$OS" = "Windows_NT" ]; then choco install git -y; \
+		fi; \
+	fi
+
+setup-nvm:
+	@echo "$(BLUE)Installing nvm...$(NC)"
+	@if [ -s "$${HOME}/.nvm/nvm.sh" ]; then \
+		echo "$(GREEN)nvm already installed$(NC)"; \
+	else \
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash; \
+	fi
+	@if ! grep -q "load-nvmrc" ~/.zshrc 2>/dev/null; then \
+		echo '' >> ~/.zshrc; \
+		echo '# Automatically switch Node versions' >> ~/.zshrc; \
+		echo 'autoload -U add-zsh-hook' >> ~/.zshrc; \
+		echo 'load-nvmrc() {' >> ~/.zshrc; \
+		echo '  local node_version="$$(nvm version)"' >> ~/.zshrc; \
+		echo '  local nvmrc_path="$$(nvm_find_nvmrc)"' >> ~/.zshrc; \
+		echo '  if [ -n "$$nvmrc_path" ]; then' >> ~/.zshrc; \
+		echo '    local nvmrc_node_version=$$(nvm version "$$(cat "$${nvmrc_path}")")' >> ~/.zshrc; \
+		echo '    if [ "$$nvmrc_node_version" = "N/A" ]; then nvm install; elif [ "$$nvmrc_node_version" != "$$node_version" ]; then nvm use; fi' >> ~/.zshrc; \
+		echo '  elif [ "$$node_version" != "$$(nvm version default)" ]; then echo "Reverting to nvm default version"; nvm use default; fi' >> ~/.zshrc; \
+		echo '}' >> ~/.zshrc; \
+		echo 'add-zsh-hook chpwd load-nvmrc' >> ~/.zshrc; \
+		echo 'load-nvmrc' >> ~/.zshrc; \
+	fi
+
+setup-node:
+	@echo "$(BLUE)Installing Node.js from .nvmrc (v$$(cat .nvmrc))...$(NC)"
+	@bash -c '\
+		export NVM_DIR="$$HOME/.nvm"; \
+		[ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh"; \
+		nvm install $$(cat .nvmrc) && \
+		nvm use $$(cat .nvmrc) && \
+		nvm alias default $$(cat .nvmrc) && \
+		nvm list'
+
+setup-tmux:
+	@echo "$(BLUE)Installing tmux...$(NC)"
+	@if command -v tmux &> /dev/null; then \
+		echo "$(GREEN)tmux already installed$(NC)"; \
+	else \
+		if [ "$$(uname)" = "Darwin" ]; then brew install tmux; \
+		elif [ "$$(uname)" = "Linux" ]; then sudo apt-get install -y tmux; \
+		elif [ "$$OS" = "Windows_NT" ]; then echo "$(YELLOW)tmux not available on Windows natively. Consider using WSL.$(NC)"; \
+		fi; \
+	fi
+	@if [ ! -f ~/.tmux.conf ]; then \
+		echo 'set -g mouse on' > ~/.tmux.conf; \
+		echo 'set -g status-position bottom' >> ~/.tmux.conf; \
+		echo 'set -g base-index 1' >> ~/.tmux.conf; \
+		echo 'setw -g pane-base-index 1' >> ~/.tmux.conf; \
+	fi
+
+setup-claude:
+	@echo "$(BLUE)Installing Claude Code...$(NC)"
+	@bash -c '\
+		export NVM_DIR="$$HOME/.nvm"; \
+		[ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh"; \
+		if command -v claude &> /dev/null; then \
+			echo "$(GREEN)Claude Code already installed: $$(claude --version)$(NC)"; \
+		else \
+			npm install -g @anthropic-ai/claude-code; \
+			echo "$(GREEN)Claude Code installed!$(NC)"; \
+		fi; \
+		echo "$(BLUE)Checking Claude Code auth...$(NC)"; \
+		if claude auth status 2>/dev/null | grep -q "\"loggedIn\": true"; then \
+			echo "$(GREEN)Claude Code already logged in$(NC)"; \
+		else \
+			echo "$(YELLOW)Claude Code not logged in. Logging in...$(NC)"; \
+			claude auth login; \
+		fi'
+	@SHELL_RC="$$HOME/.zshrc"; \
+	if [ "$$(uname)" = "Linux" ] && [ -f "$$HOME/.bashrc" ]; then SHELL_RC="$$HOME/.bashrc"; fi; \
+	if ! grep -q '\.local/bin.*PATH' "$$SHELL_RC" 2>/dev/null; then \
+		echo '' >> "$$SHELL_RC"; \
+		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> "$$SHELL_RC"; \
+	fi
+
+setup-mcp:
+	@echo "$(BLUE)Adding Claude MCP servers...$(NC)"
+	@export NVM_DIR="$$HOME/.nvm"; \
+	[ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh"; \
+	echo "$(BLUE)Adding context7...$(NC)"; \
+	claude mcp add context7 --scope user -- npx -y @upstash/context7-mcp; \
+	echo "$(BLUE)Adding shadcn...$(NC)"; \
+	claude mcp add shadcn --scope user -- npx -y @anthropic-ai/shadcn-mcp-server; \
+	echo "$(BLUE)Adding playwright...$(NC)"; \
+	claude mcp add playwright --scope user -- npx -y @anthropic-ai/mcp-server-playwright; \
+	echo "$(GREEN)MCP servers added!$(NC)"
+
+setup-skills:
+	@echo "$(BLUE)Cleaning up legacy devbot command symlink...$(NC)"
+	@rm -f ~/.claude/commands/devbot
+	@echo "$(BLUE)Symlinking AI skills from .claude/skills to ~/.claude/skills...$(NC)"
+	@mkdir -p ~/.claude/skills
+	@for d in $(CURDIR)/.claude/skills/*/; do \
+		skill=$$(basename "$$d"); \
+		rm -f ~/.claude/skills/$$skill; \
+		ln -sf "$$d" ~/.claude/skills/$$skill; \
+		echo "  ✓ ~/.claude/skills/$$skill → $$d"; \
+	done
+	@echo "$(GREEN)✅ Skills symlinked to ~/.claude/skills/$(NC)"
+	@echo "$(BLUE)Installing public skills globally via npx...$(NC)"
+	@npx -y @anthropic-ai/claude-code-skills add find-skills --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add tanstack-query-best-practices --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add tanstack-router-best-practices --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add tanstack-start-best-practices --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add tanstack-integration-best-practices --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add vercel-react-best-practices --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add vercel-react-native-skills --global 2>/dev/null || true
+	@npx -y @anthropic-ai/claude-code-skills add vercel-composition-patterns --global 2>/dev/null || true
+	@echo "$(GREEN)✅ Public skills installed globally$(NC)"
 
 install:
+	@echo "$(BLUE)🔄 Syncing git submodules (component)...$(NC)"
+	@git submodule update --init --recursive
 	@echo "$(BLUE)📦 Installing DevBot app...$(NC)"
 	cd app && npm install --force
 	@echo "$(GREEN)✅ DevBot app ready!$(NC)"

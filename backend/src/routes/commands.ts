@@ -51,7 +51,7 @@ function readSkills(skillsDir: string): CommandRecord[] {
   const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
   const skills: CommandRecord[] = [];
   for (const entry of entries) {
-    // Support symlinked skill directories (e.g. ~/.claude/skills -> .agents/skills)
+    // Support symlinked skill directories (e.g. ~/.claude/skills -> module's .claude/skills)
     const entryPath = path.join(skillsDir, entry.name);
     if (!entry.isDirectory() && !(entry.isSymbolicLink() && fs.statSync(entryPath).isDirectory())) continue;
     const skillMdPath = path.join(entryPath, 'SKILL.md');

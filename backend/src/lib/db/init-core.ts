@@ -285,6 +285,25 @@ export async function initializeCoreDatabase() {
     `
     );
 
+    // Create companies table
+    await runSQL(
+      coreDb,
+      `
+      CREATE TABLE IF NOT EXISTS companies (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        directory TEXT NOT NULL,
+        master_chat_id TEXT,
+        status TEXT NOT NULL DEFAULT 'creating' CHECK(status IN ('creating', 'active', 'archived')),
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
     console.log('[DB] Core database schema initialized successfully');
   } catch (err) {
     console.error('[DB] Failed to initialize core database:', err);

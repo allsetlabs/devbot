@@ -37,6 +37,7 @@ export interface ScheduledTask {
   isRunning: boolean;
   isQueued: boolean;
   model: string;
+  isSystem: boolean;
 }
 
 export interface TaskRun {
@@ -75,6 +76,7 @@ function rowToTask(row: ScheduledTaskRow): ScheduledTask {
     isRunning: isTaskExecuting(row.id),
     isQueued: isTaskQueued(row.id),
     model: (row.settings as any)?.model || 'sonnet',
+    isSystem: (row.settings as any)?.isSystem === true,
   };
 }
 
@@ -221,6 +223,31 @@ router.put(
   '/:id',
   asyncHandler(async (req, res) => {
     const { prompt, intervalMinutes, status, maxRuns, name, model } = req.body;
+
+    // Check if system scheduler — only allow status changes (pause/resume)
+    const existing = await coreDb
+      .select()
+      .from(scheduled_tasks)
+      .where(and(eq(scheduled_tasks.id, req.params.id), ne(scheduled_tasks.status, 'deleted')))
+      .limit(1);
+
+    if (!existing || existing.length === 0) {
+      sendNotFound(res, 'Task');
+      return;
+    }
+
+    if ((existing[0].settings as any)?.isSystem === true) {
+      const nonStatusFields = [prompt, intervalMinutes, maxRuns, name, model].some(
+        (v) => v !== undefined
+      );
+      if (nonStatusFields) {
+        res
+          .status(403)
+          .json({ error: 'Forbidden', message: 'System schedulers cannot be modified' });
+        return;
+      }
+    }
+
     const updates: Partial<typeof scheduled_tasks.$inferInsert> = { updated_by: 'user' };
 
     if (!validateOptionalString(res, prompt, 'prompt')) return;
@@ -253,12 +280,6 @@ router.put(
 
     if (model !== undefined) {
       if (!requireEnum(res, model, ['opus', 'sonnet', 'haiku'] as const, 'model')) return;
-      // Merge model into existing settings
-      const existing = await coreDb
-        .select({ settings: scheduled_tasks.settings })
-        .from(scheduled_tasks)
-        .where(eq(scheduled_tasks.id, req.params.id))
-        .limit(1);
       const currentSettings = (existing[0]?.settings as Record<string, unknown>) || {};
       updates.settings = { ...currentSettings, model };
     }
@@ -283,20 +304,30 @@ router.put(
   }, 'update task')
 );
 
-// Delete scheduled task (soft delete)
+// Delete scheduled task (soft delete — system tasks cannot be deleted)
 router.delete(
   '/:id',
   asyncHandler(async (req, res) => {
-    const result = await coreDb
-      .update(scheduled_tasks)
-      .set({ status: 'deleted', updated_by: 'user' })
+    const rows = await coreDb
+      .select()
+      .from(scheduled_tasks)
       .where(eq(scheduled_tasks.id, req.params.id))
-      .returning();
+      .limit(1);
 
-    if (!result || result.length === 0) {
+    if (!rows || rows.length === 0) {
       sendNotFound(res, 'Task');
       return;
     }
+
+    if ((rows[0].settings as any)?.isSystem === true) {
+      res.status(403).json({ error: 'Forbidden', message: 'System schedulers cannot be deleted' });
+      return;
+    }
+
+    await coreDb
+      .update(scheduled_tasks)
+      .set({ status: 'deleted', updated_by: 'user' })
+      .where(eq(scheduled_tasks.id, req.params.id));
 
     res.json({ success: true });
   }, 'delete task')

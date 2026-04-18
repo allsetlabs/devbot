@@ -210,6 +210,9 @@ start:
 	@echo "$(YELLOW)Use 'tmux attach -t devbot' to view logs$(NC)"
 	@echo "$(YELLOW)Use 'make stop' to stop all services$(NC)"
 
+claude:
+	claude --dangerously-skip-permissions --chrome
+
 stop:
 	@echo "$(YELLOW)Stopping all DevBot services...$(NC)"
 	@if tmux has-session -t devbot 2>/dev/null; then \

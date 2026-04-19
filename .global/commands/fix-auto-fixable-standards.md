@@ -21,16 +21,20 @@ Extract and internalize:
 
 ## Step 2: Discover All Workspaces
 
-```bash
-ls app backend reusables plugins/
-cat .gitmodules
-```
+Auto-discover every workspace in the project:
 
-Build a list of all workspaces/submodules to audit (`app`, `backend`, `reusables`, `plugins/baby-logs`, `plugins/lawn-care`).
+1. Read the root `package.json`. If it declares `"workspaces"`, expand those globs.
+2. Otherwise list top-level directories that contain a `package.json` / `pyproject.toml`.
+3. If `.gitmodules` exists, include git submodules too.
+
+```bash
+cat .gitmodules 2>/dev/null || true
+find . -maxdepth 3 -type f \( -name "package.json" -o -name "pyproject.toml" \) -not -path "*/node_modules/*" | xargs -I {} dirname {} | sort -u
+```
 
 ## Step 3: Audit Each Workspace
 
-For each workspace (`app`, `backend`, `reusables`, `plugins/*`):
+For each discovered workspace:
 
 ### 3a. Check CLAUDE.md Exists
 

@@ -10,6 +10,8 @@ import { notifyTaskComplete, notifyTaskFailed, setNotificationSettings } from '.
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ArrowLeft, Loader2, MessageCircle, Upload } from 'lucide-react';
 import { api, uploadFiles } from '../lib/api';
+import { copyToClipboard } from '../lib/clipboard';
+import { toast } from 'sonner';
 import { POLL_INTERVALS } from '../lib/constants';
 import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 import { getCachedDraft, setCachedDraft, cleanupLegacyMessageCaches } from '../lib/storage';
@@ -30,6 +32,8 @@ import { type FileIntellisensePickerHandle } from '@allsetlabs/reusable/componen
 import { useFileIntellisense } from '../hooks/useFileIntellisense';
 import { useCommands } from '../hooks/useCommands';
 import { useSettings } from '../hooks/useSettings';
+import { useDeleteChat, useArchiveChat } from '../hooks/useChat';
+import { useFavorites } from '../hooks/useFavorites';
 import { DirectoryBrowserSidebar } from '../components/DirectoryBrowserSidebar';
 import { ChatViewHeader } from '../components/ChatViewHeader';
 import { ChatInputArea, type AttachedFile } from '../components/ChatInputArea';
@@ -167,6 +171,13 @@ export function InteractiveChatView({
     toggleHaptic,
     toggleAutoScroll,
   } = useSettings();
+
+  // Favorites
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  // Delete/archive mutations for settings drawer
+  const deleteChatMutation = useDeleteChat();
+  const archiveChatMutation = useArchiveChat();
 
   // Pinned messages
   const { pinnedIds, togglePin } = usePinnedMessages(chatId);
@@ -1216,6 +1227,35 @@ export function InteractiveChatView({
         hasSystemPrompt={!!chat?.systemPrompt}
         hasMessages={messages.length > 0}
         workingDirectory={chat?.workingDir ?? VITE_CLAUDE_WORK_DIR}
+        hasCopyResumeCommand={!!chat?.claudeSessionId}
+        onCopyResumeCommand={
+          chat?.claudeSessionId
+            ? () => {
+                copyToClipboard(
+                  `cd ${VITE_CLAUDE_WORK_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                );
+                toast.success('Command copied!');
+              }
+            : undefined
+        }
+        isFavorite={chatId ? isFavorite(chatId) : false}
+        onToggleFavorite={chatId ? () => toggleFavorite(chatId) : undefined}
+        onArchive={
+          chatId
+            ? () => {
+                archiveChatMutation.mutate(chatId);
+                navigate(-1);
+              }
+            : undefined
+        }
+        onDelete={
+          chatId
+            ? () => {
+                deleteChatMutation.mutate(chatId);
+                navigate(-1);
+              }
+            : undefined
+        }
       />
 
       {/* Pinned messages drawer */}

@@ -2,6 +2,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
+
+const certDir = path.resolve(__dirname, '../certs');
+const certPath = path.join(certDir, 'cert.pem');
+const keyPath = path.join(certDir, 'key.pem');
+const hasCerts = fs.existsSync(certPath) && fs.existsSync(keyPath);
 
 export default defineConfig(() => {
   return {
@@ -34,7 +40,13 @@ export default defineConfig(() => {
     },
     envDir: '../',
     server: {
-      host: true, // Allow network access
+      host: true,
+      ...(hasCerts && {
+        https: {
+          cert: fs.readFileSync(certPath),
+          key: fs.readFileSync(keyPath),
+        },
+      }),
     },
     test: {
       environment: 'node',

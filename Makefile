@@ -160,15 +160,44 @@ setup-mcp:
 setup-skills:
 	@echo "$(BLUE)Cleaning up legacy devbot command symlink...$(NC)"
 	@rm -f ~/.claude/commands/devbot
-	@echo "$(BLUE)Symlinking AI skills from .claude/skills to ~/.claude/skills...$(NC)"
-	@mkdir -p ~/.claude/skills
-	@for d in $(CURDIR)/.claude/skills/*/; do \
+	@mkdir -p ~/.claude/skills ~/.claude/commands ~/.claude/agents
+	@echo "$(BLUE)Removing stale devbot skill directories from ~/.claude/skills (now local-only)...$(NC)"
+	@for skill in devbot-backend devbot-backend-crud-patterns devbot-code-review devbot-commit devbot-css-standards devbot-page-size-guard devbot-plugin-install devbot-worker-patterns; do \
+		if [ -e ~/.claude/skills/$$skill ] && [ ! -L ~/.claude/skills/$$skill ]; then \
+			rm -rf ~/.claude/skills/$$skill; \
+			echo "  ✗ removed stale dir ~/.claude/skills/$$skill"; \
+		fi; \
+	done
+	@echo "$(BLUE)Removing stale command copies in ~/.claude/commands that are now global...$(NC)"
+	@for f in $(CURDIR)/.global/commands/*.md; do \
+		name=$$(basename "$$f"); \
+		if [ -e ~/.claude/commands/$$name ] && [ ! -L ~/.claude/commands/$$name ]; then \
+			rm -f ~/.claude/commands/$$name; \
+			echo "  ✗ removed stale file ~/.claude/commands/$$name"; \
+		fi; \
+	done
+	@echo "$(BLUE)Symlinking global skills from .global/skills to ~/.claude/skills...$(NC)"
+	@for d in $(CURDIR)/.global/skills/*/; do \
 		skill=$$(basename "$$d"); \
 		rm -f ~/.claude/skills/$$skill; \
 		ln -sf "$$d" ~/.claude/skills/$$skill; \
 		echo "  ✓ ~/.claude/skills/$$skill → $$d"; \
 	done
-	@echo "$(GREEN)✅ Skills symlinked to ~/.claude/skills/$(NC)"
+	@echo "$(BLUE)Symlinking global commands from .global/commands to ~/.claude/commands...$(NC)"
+	@for f in $(CURDIR)/.global/commands/*.md; do \
+		name=$$(basename "$$f"); \
+		rm -f ~/.claude/commands/$$name; \
+		ln -sf "$$f" ~/.claude/commands/$$name; \
+		echo "  ✓ ~/.claude/commands/$$name → $$f"; \
+	done
+	@echo "$(BLUE)Symlinking global agents from .global/agents to ~/.claude/agents...$(NC)"
+	@for f in $(CURDIR)/.global/agents/*.md; do \
+		name=$$(basename "$$f"); \
+		rm -f ~/.claude/agents/$$name; \
+		ln -sf "$$f" ~/.claude/agents/$$name; \
+		echo "  ✓ ~/.claude/agents/$$name → $$f"; \
+	done
+	@echo "$(GREEN)✅ Global skills/commands/agents symlinked into ~/.claude/$(NC)"
 	@echo "$(BLUE)Installing public skills globally via npx...$(NC)"
 	@npx -y @anthropic-ai/claude-code-skills add find-skills --global 2>/dev/null || true
 	@npx -y @anthropic-ai/claude-code-skills add tanstack-query-best-practices --global 2>/dev/null || true
@@ -187,7 +216,7 @@ install:
 	npm install --force
 	@echo "$(GREEN)✅ Workspace ready!$(NC)"
 
-start:
+start: create-devbot-projects
 	@echo "$(BLUE)🚀 Starting DevBot services in tmux session 'devbot'...$(NC)"
 	@if tmux has-session -t devbot 2>/dev/null; then \
 		echo "$(YELLOW)⚠️  Tmux session 'devbot' already exists. Killing it first...$(NC)"; \
@@ -201,7 +230,7 @@ start:
 	@mkdir -p logs
 	@# Compute dynamic values (passed as env vars, not written to .env)
 	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
-	$(eval SUPERREPO_DIR := $(realpath $(DEVBOT_PROJECTS)))
+	$(eval SUPERREPO_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
 	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) CLAUDE_WORK_DIR=$(SUPERREPO_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR))
 	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)

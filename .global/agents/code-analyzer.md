@@ -14,7 +14,7 @@ model: haiku
 
 ## ⚠️ CRITICAL: Before You Start
 
-**MUST READ [CLAUDE.md](../../CLAUDE.md) FIRST** to understand monorepo structure, code standards, shared component library, and forbidden patterns.
+**MUST READ the project's root `CLAUDE.md` FIRST** (if one exists at the repo root) to understand project structure, code standards, shared component library, and forbidden patterns. Also check for project-local skills in `.claude/skills/` that may define additional conventions.
 
 ---
 

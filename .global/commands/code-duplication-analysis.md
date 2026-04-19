@@ -41,11 +41,13 @@ For each module with a frontend, scan page/component files for:
 
 ### Step 1: Discover Workspaces
 
-```bash
-ls app backend reusables plugins/
-```
+Auto-discover every workspace in the project:
 
-The devbot workspaces are `app` (frontend), `backend`, `reusables` (shared component library), and each plugin under `plugins/` (`plugins/baby-logs`, `plugins/lawn-care`). Each plugin has its own `backend/` and `frontend/` subdirs.
+1. Read the root `package.json`. If it declares `"workspaces"`, expand those globs.
+2. Otherwise list top-level directories containing a `package.json` (e.g., `app/`, `backend/`, `apps/*`, `packages/*`, `plugins/*`).
+3. For Python modules, look for `pyproject.toml` or `requirements.txt`.
+
+Classify each workspace as frontend (has `.tsx`/React deps), backend (has `express`/`fastify`/server entry), shared library (used by `workspace:*` deps), or plugin (nested under a plugins directory). Skip `node_modules/`, `dist/`, `build/`, `.git/`, `venv/`, `.next/`, `.turbo/`.
 
 ### Step 2: Scan Each Workspace
 

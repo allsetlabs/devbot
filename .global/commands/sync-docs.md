@@ -3,142 +3,98 @@ description: Sync all documentation with current codebase
 model: opus
 ---
 
-> This command was inherited from a broader monorepo. The module list below is stale and needs to be rewritten for the devbot repo structure. See /Users/subbiahchandramouli/Documents/devbot/CLAUDE.md for the current layout.
-
 # Sync Documentation Command
 
-Sync all documentation files with actual codebase structure.
+Keeps project documentation aligned with the actual codebase: prunes docs for workspaces that no longer exist, flags workspaces that are undocumented, and refreshes structural sections (directory listings, tech-stack versions, command tables) inside existing docs.
 
 ## What This Command Does
 
-1. **Update `.claude/README.md`** - Sync agents and commands list
-2. **Update `docs/`** - Sync all module documentation
-3. **Update `CLAUDE.md`** - Sync module structure and commands
-4. **Update `Makefile`** - Sync module commands with actual modules
-5. **Run `/update-component-docs resync`** - Sync component library docs
+1. **Discover workspaces** — from the root `package.json` `"workspaces"` field or top-level directories containing a `package.json` / `pyproject.toml`.
+2. **Locate the docs folder** — typically `docs/` at the repo root. If no `docs/` exists, fall back to the root `README.md` as the single doc to check.
+3. **Match docs to workspaces** — look for per-workspace docs using common patterns (`docs/<workspace>.md`, `docs/doc-<workspace>.md`, `docs/<workspace>/README.md`). Build a mapping of workspace → doc (or "missing").
+4. **Report stale docs** — any doc that references a workspace that no longer exists.
+5. **Report missing docs** — any workspace that has no matching doc.
+6. **Refresh doc structural sections** — for each doc that does have a matching workspace, compare its "Project Structure", "Tech Stack", and command sections against the actual workspace and update them in place. Leave prose alone.
+7. **Sync `.claude/` and `.global/` inventory docs** if they exist — compare the documented agents/commands list against the actual files in `.claude/agents/`, `.claude/commands/`, `.global/agents/`, `.global/commands/`, and update.
+8. **Sync the root `CLAUDE.md` workspace list and the root `Makefile` targets** — remove entries for workspaces that no longer exist; flag workspaces that exist but have no Makefile target.
 
 ## Execution
 
-### Step 1: Sync .claude/README.md
+### Step 1: Discover Workspaces
 
 ```bash
-ls .claude/agents/
-ls .claude/agents/development/
-ls .claude/commands/
+# From package.json "workspaces"
+cat package.json | jq -r '.workspaces[]?' 2>/dev/null || true
+
+# Or fall back to top-level dirs with a manifest
+find . -maxdepth 3 -type f \( -name "package.json" -o -name "pyproject.toml" \) -not -path "*/node_modules/*" | xargs -I {} dirname {} | sort -u
 ```
 
-- Read `.claude/README.md`
-- Compare agent list against actual files in `.claude/agents/`
-- Compare command list against actual files in `.claude/commands/`
-- If different, update the file
+Record the full set as `$WORKSPACES`.
 
-### Step 2: Sync docs/
-
-For each module doc file:
-
-| Doc File                      | Compare Against                                                    |
-| ----------------------------- | ------------------------------------------------------------------ |
-| `docs/doc-component.md`       | `ls modules/component/src/` + `cat modules/component/package.json` |
-| `docs/doc-portfolio.md`       | `ls modules/portfolio/src/`                                        |
-| `docs/doc-seekr-web.md`       | `ls modules/seekr/web/src/`                                        |
-| `docs/doc-seekr-extension.md` | `ls modules/seekr/extension/src/`                                  |
-| `docs/doc-seekr-desktop.md`   | `ls modules/seekr/desktop/src/`                                    |
-| `docs/doc-seekr-mobile.md`    | `ls modules/seekr/mobile/src/`                                     |
-| `docs/doc-seekr-backend.md`   | `ls modules/seekr/backend/`                                        |
-
-- Read the doc file
-- Run the comparison commands
-- If "Project Structure" section doesn't match actual directories, update it
-- If package versions differ, update "Tech Stack" section
-
-### Step 3: Sync CLAUDE.md
+### Step 2: Discover Docs
 
 ```bash
-ls modules/
-grep -E "^(install-|run-)[a-z]+:" Makefile
+ls docs/ 2>/dev/null
+find docs -maxdepth 2 -name "*.md" 2>/dev/null
 ```
 
-- Read `CLAUDE.md`
-- Compare module list against actual `modules/` directory
-- Compare Makefile commands against documented commands
-- If different, update the file
+Build `$DOCS` — every markdown file under `docs/`.
 
-### Step 4: Sync Makefile
+### Step 3: Match Docs ↔ Workspaces
+
+For each file in `$DOCS`, try to extract the workspace name it covers:
+
+- `docs/<name>.md` → workspace = `<name>`
+- `docs/doc-<name>.md` → workspace = `<name>`
+- `docs/<name>/README.md` → workspace = `<name>`
+- Otherwise, read the first heading/section and try to match against `$WORKSPACES`
+
+Produce three lists:
+
+- **Matched** — doc + workspace pair, both exist
+- **Stale docs** — doc exists, workspace does not
+- **Missing docs** — workspace exists, no doc
+
+### Step 4: Handle Stale and Missing
+
+- **Stale docs**: list them and ask whether to delete. Do not auto-delete.
+- **Missing docs**: list them. Offer to scaffold a stub doc per workspace if the user wants.
+
+### Step 5: Refresh Matched Docs
+
+For each matched doc:
+
+1. Read the doc.
+2. Re-scan the workspace directory: `ls <workspace>/src/` (or equivalent for the language).
+3. Read the workspace's `package.json` dependencies.
+4. If the doc has a "Project Structure" / "Directory Structure" section, update it to match the current tree.
+5. If the doc has a "Tech Stack" / "Dependencies" section, update versions to match `package.json`.
+6. If the doc documents Makefile targets for the workspace, compare against the actual `Makefile` and update.
+7. Leave prose, examples, and editorial content untouched.
+
+### Step 6: Sync Root `CLAUDE.md` and `Makefile`
+
+- Compare the root `CLAUDE.md` workspace list against `$WORKSPACES`. Update if different.
+- Compare the root `Makefile` targets against `$WORKSPACES`. Remove targets for deleted workspaces and flag workspaces that exist but have no Makefile target.
+
+### Step 7: Sync `.claude/` / `.global/` Inventory
+
+If the repo documents its agents/commands somewhere (e.g., `.claude/README.md`), compare:
 
 ```bash
-ls modules/
-ls modules/seekr/
-grep -E "^(install-|run-)[a-z]+:" Makefile
+ls .claude/agents/ .claude/commands/ .global/agents/ .global/commands/ 2>/dev/null
 ```
 
-**Validation Rules:**
-
-1. **Remove commands for non-existent modules:**
-   - Extract all `install-*` and `run-*` targets from Makefile
-   - Check if corresponding module directory exists in `modules/` or `modules/seekr/`
-   - If module doesn't exist, remove the install and run targets
-
-2. **Add missing run commands:**
-   - For each module that exists, verify it has a corresponding `run-*` command
-   - Module to command mapping:
-     | Module Path | Install Command | Run Command |
-     | ----------- | --------------- | ----------- |
-     | `modules/component` | `install-c` | (none - library only) |
-     | `modules/portfolio` | `install-p` | `run-p` |
-     | `modules/meme-vault` | `install-mv` | `run-mv` |
-     | `modules/seekr/web` | `install-sw` | `run-sw` |
-     | `modules/seekr/extension` | `install-se` | `run-se` |
-     | `modules/seekr/desktop` | `install-sd` | `run-sd` |
-     | `modules/seekr/mobile` | `install-sm` | `run-sm` |
-     | `modules/seekr/backend` | `install-sb` | `run-sb` |
-   - If a module exists but its run command is missing, add the target
-
-3. **Update `start` target:**
-   - Ensure the `start` tmux command includes all modules with run commands
-   - Each module should have its own tmux window
-
-4. **Update CLAUDE.md:**
-   - Ensure Install/Run command tables match the Makefile targets
-
-### Step 5: Sync Component Library Docs
-
-Run: `/update-component-docs resync`
-
-### Step 6: Sync Storybook Stories
-
-Ensure every component has a corresponding `.stories.tsx` file.
-
-```bash
-# Find UI components without stories
-ls modules/component/src/components/ui/*.tsx | xargs -n1 basename -s .tsx | grep -v stories | sort > /tmp/all.txt
-ls modules/component/src/components/ui/*.stories.tsx | xargs -n1 basename -s .stories.tsx | sort > /tmp/has.txt
-comm -23 /tmp/all.txt /tmp/has.txt
-
-# Find AI elements without stories
-ls modules/component/src/components/ai-elements/*.tsx | xargs -n1 basename -s .tsx | grep -v stories | sort > /tmp/ai_all.txt
-ls modules/component/src/components/ai-elements/*.stories.tsx 2>/dev/null | xargs -n1 basename -s .stories.tsx | sort > /tmp/ai_has.txt
-comm -23 /tmp/ai_all.txt /tmp/ai_has.txt
-```
-
-**For each component missing a story:**
-
-1. Read the component file to understand its props and variants
-2. Create a `.stories.tsx` file next to it following existing story patterns
-3. Include: Default story, key variant stories, and interactive examples
-4. Follow the existing Storybook conventions in the project
-
-**For existing stories that are outdated:**
-
-1. Compare story props against current component props
-2. Add stories for any new variants or props not covered
-3. Remove stories for deprecated/removed props
+against the documented list and update.
 
 ## Rules
 
-1. **Read first** - Always read the doc before checking codebase
-2. **Minimal changes** - Only update what actually differs
-3. **Structure only** - Update directory structures, versions, lists
-4. **Makefile consistency** - Remove orphaned commands, add missing run commands
+1. **Read first** - Always read the doc before checking the codebase.
+2. **Minimal changes** - Only update what actually differs.
+3. **Structure only** - Update directory structures, versions, lists, command tables. Leave prose alone.
+4. **Auto-discover, don't hardcode** - Never assume a specific workspace name or doc filename; discover them at runtime.
+5. **Ask before deleting** - Stale docs and Makefile targets must be confirmed before removal.
 
 ## Report
 
@@ -149,9 +105,19 @@ After completion, output:
 
 **Last synced:** [current date in YYYY-MM-DD format]
 
-### Updated
-- [file]: [what changed]
+### Workspaces
+- Total discovered: {N}
+- Documented: {N}
+- Undocumented: {N}  [list]
 
-### Already in sync
-- [file]
+### Docs
+- Matched and refreshed: {N}  [list with "updated" / "no change"]
+- Stale (no matching workspace): {N}  [list — awaiting user confirmation to delete]
+- Missing (workspace has no doc): {N}  [list]
+
+### Root CLAUDE.md
+- [what changed]
+
+### Root Makefile
+- [what changed]
 ```

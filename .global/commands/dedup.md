@@ -13,33 +13,37 @@ Analyze source files for duplicate code patterns, extract reusable utilities, an
 2. **Minimal blast radius** - Only refactor clear, proven duplicates (3+ occurrences)
 3. **No behavior changes** - Extracted utils must preserve exact behavior
 4. **Run validation after** - `npm run lint && npm run type-check` must pass
-5. **Follow project standards** - Custom colors only, no `any` types, use component library
+5. **Follow project standards** - Read the project's root `CLAUDE.md` and any project-local skills (e.g. `coding-standards`) before refactoring; apply whatever rules that project enforces (naming, colors, component library usage, etc.)
 
 ---
 
-## Phase 0: Module Selection
+## Phase 0: Workspace Selection
 
-**Determine which module to analyze.**
+**Determine which workspace to analyze.**
 
-### If module is specified in arguments:
+### If a workspace path is specified in arguments:
+
+The user may pass any workspace path relative to the repo root, e.g.:
 
 ```
-/dedup app                   -> $MODULE = "app"
-/dedup backend               -> $MODULE = "backend"
-/dedup plugins/baby-logs     -> $MODULE = "plugins/baby-logs"
-/dedup reusables             -> $MODULE = "reusables"
+/dedup app
+/dedup backend
+/dedup packages/ui
+/dedup plugins/<name>
 ```
 
-Set `$MODULE` and skip to Phase 1.
+Set `$MODULE` to that path and skip to Phase 1.
 
-### If module is NOT specified:
+### If no workspace is specified:
 
-Use AskUserQuestion: "Which module should I analyze for duplicate code?"
+Auto-discover workspaces by reading the root `package.json` `"workspaces"` field, or by listing top-level directories that contain a `package.json` / `pyproject.toml`:
 
 ```bash
 # Show available workspaces
 find . -maxdepth 3 -type f \( -name "package.json" -o -name "pyproject.toml" \) -not -path "*/node_modules/*" | xargs -I {} dirname {} | sort -u
 ```
+
+Then use AskUserQuestion: "Which workspace should I analyze for duplicate code?"
 
 ---
 

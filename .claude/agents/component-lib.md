@@ -15,7 +15,7 @@ model: sonnet
 
 ## ⚠️ CRITICAL: Before You Start
 
-**MUST READ [CLAUDE.md](../../../CLAUDE.md) FIRST** to understand monorepo structure, custom color system, forbidden patterns, and how changes affect ALL modules.
+**MUST READ [CLAUDE.md](../../CLAUDE.md) FIRST** to understand monorepo structure, custom color system, forbidden patterns, and how changes affect ALL modules.
 
 ---
 

@@ -14,11 +14,11 @@ The DevBot backend is a Node.js Express server that manages terminal sessions, s
 | ------------------ | ------------------------------------------------------ |
 | **Base URL**       | `http://0.0.0.0:3100`                                  |
 | **Auth Header**    | `X-API-Key`                                            |
-| **API Key**        | Found in `modules/devbot/.env` under `API_KEY`         |
-| **Supabase URL**   | Found in `modules/devbot/.env` under `SUPABASE_URL`    |
-| **Work Directory** | Found in `modules/devbot/.env` under `CLAUDE_WORK_DIR` |
+| **API Key**        | Found in `.env` under `API_KEY`         |
+| **Supabase URL**   | Found in `.env` under `SUPABASE_URL`    |
+| **Work Directory** | Found in `.env` under `CLAUDE_WORK_DIR` |
 
-Always read `modules/devbot/.env` for current values. Never hardcode secrets.
+Always read `.env` for current values. Never hardcode secrets.
 
 ## Apps Overview
 
@@ -629,12 +629,12 @@ Manages Remotion video records tied to interactive chats. Supports CRUD operatio
 ```bash
 # Create a video record
 curl -X POST -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" \
-  -d '{"name":"My Video","chatId":"abc12345","videoPath":"modules/devbot/intro-video/out/my-video.mp4"}' \
+  -d '{"name":"My Video","chatId":"abc12345","videoPath":"intro-video/out/my-video.mp4"}' \
   http://0.0.0.0:3100/api/remotion-videos
 
 # Update status
 curl -X PATCH -H "X-API-Key: $API_KEY" -H "Content-Type: application/json" \
-  -d '{"status":"completed","videoPath":"modules/devbot/intro-video/out/my-video.mp4"}' \
+  -d '{"status":"completed","videoPath":"intro-video/out/my-video.mp4"}' \
   http://0.0.0.0:3100/api/remotion-videos/<id>
 ```
 
@@ -774,7 +774,7 @@ curl -H "X-API-Key: $API_KEY" \
 make run-dbb
 
 # Or manually
-cd modules/devbot/backend && npx vite-node --watch src/index.ts
+cd backend && npx vite-node --watch src/index.ts
 
 # Kill and restart if port is stuck
 lsof -ti:3100 | xargs kill -9

@@ -1,13 +1,13 @@
 ---
 name: devbot-page-size-guard
-description: Enforces the 200-line limit for React components and pages in DevBot mobile. Guides extraction of oversized files into smaller, focused components. Auto-triggers when editing .tsx files in modules/devbot/app/src/pages/.
+description: Enforces the 200-line limit for React components and pages in DevBot mobile. Guides extraction of oversized files into smaller, focused components. Auto-triggers when editing .tsx files in app/src/pages/.
 ---
 
 # DevBot Page Size Guard
 
 ## When This Skill Activates
 
-Auto-trigger when editing any `.tsx` file in `modules/devbot/app/src/pages/` or `modules/devbot/app/src/components/`.
+Auto-trigger when editing any `.tsx` file in `app/src/pages/` or `app/src/components/`.
 
 ## Rule
 

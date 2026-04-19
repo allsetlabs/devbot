@@ -15,9 +15,9 @@ Then scan all modules and **auto-fix every violation found**.
 
 Read `.claude/skills/coding-standards/SKILL.md` to load all rules, detection patterns, and fix instructions.
 
-### Step 2: Scan and Fix Each Module
+### Step 2: Scan and Fix Each Workspace
 
-For each module in `modules/`:
+For each workspace (`app`, `backend`, `reusables`, `plugins/baby-logs`, `plugins/lawn-care`):
 
 1. Run all detection checks from the skill
 2. **For every violation found, fix it immediately** — edit the file, update imports, delete barrel files, pin versions, etc.

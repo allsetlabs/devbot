@@ -24,9 +24,10 @@ Analyze source files for duplicate code patterns, extract reusable utilities, an
 ### If module is specified in arguments:
 
 ```
-/dedup devbot/app        -> $MODULE = "modules/devbot/app"
-/dedup seekr/web             -> $MODULE = "modules/seekr/web"
-/dedup component             -> $MODULE = "modules/component"
+/dedup app                   -> $MODULE = "app"
+/dedup backend               -> $MODULE = "backend"
+/dedup plugins/baby-logs     -> $MODULE = "plugins/baby-logs"
+/dedup reusables             -> $MODULE = "reusables"
 ```
 
 Set `$MODULE` and skip to Phase 1.
@@ -36,8 +37,8 @@ Set `$MODULE` and skip to Phase 1.
 Use AskUserQuestion: "Which module should I analyze for duplicate code?"
 
 ```bash
-# Show available modules
-find ./modules -maxdepth 3 -type f \( -name "package.json" -o -name "pyproject.toml" \) | xargs -I {} dirname {} | sort -u
+# Show available workspaces
+find . -maxdepth 3 -type f \( -name "package.json" -o -name "pyproject.toml" \) -not -path "*/node_modules/*" | xargs -I {} dirname {} | sort -u
 ```
 
 ---
@@ -48,7 +49,7 @@ Scan the module's source directory for analyzable files.
 
 ```bash
 # Find all TypeScript/JavaScript source files (exclude node_modules, dist, tests, stories)
-Glob: "modules/$MODULE/src/**/*.{ts,tsx,js,jsx}" (exclude node_modules, dist, .test., .spec., .stories.)
+Glob: "$MODULE/src/**/*.{ts,tsx,js,jsx}" (exclude node_modules, dist, .test., .spec., .stories.)
 ```
 
 Group files by type:
@@ -247,10 +248,10 @@ For each file that contained duplicates:
 
 ```bash
 # Lint check
-cd modules/$MODULE && npm run lint 2>&1 | tail -20
+cd $MODULE && npm run lint 2>&1 | tail -20
 
 # Type check
-cd modules/$MODULE && npm run type-check 2>&1 | tail -20
+cd $MODULE && npm run type-check 2>&1 | tail -20
 ```
 
 ### 6.2 Fix Issues
@@ -307,13 +308,13 @@ Output final report:
 ## Options
 
 ```bash
-/dedup devbot/app                    # Analyze full module
-/dedup devbot/app --dry-run          # Show plan without making changes
-/dedup devbot/app --path=src/pages   # Analyze specific subdirectory only
-/dedup devbot/app --min=2            # Flag duplicates with 2+ occurrences (default: 3)
-/dedup devbot/app --types-only       # Only find duplicate type definitions
-/dedup devbot/app --hooks-only       # Only find duplicate hook patterns
-/dedup devbot/app --utils-only       # Only find duplicate utility functions
+/dedup app                    # Analyze full module
+/dedup app --dry-run          # Show plan without making changes
+/dedup app --path=src/pages   # Analyze specific subdirectory only
+/dedup app --min=2            # Flag duplicates with 2+ occurrences (default: 3)
+/dedup app --types-only       # Only find duplicate type definitions
+/dedup app --hooks-only       # Only find duplicate hook patterns
+/dedup app --utils-only       # Only find duplicate utility functions
 ```
 
 ---

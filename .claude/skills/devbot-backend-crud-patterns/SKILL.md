@@ -1,13 +1,13 @@
 ---
 name: devbot-backend-crud-patterns
-description: Enforces consistent CRUD route patterns in DevBot backend. Prevents duplicated boilerplate across route files. Auto-triggers when creating or editing route files in modules/devbot/backend/src/routes/.
+description: Enforces consistent CRUD route patterns in DevBot backend. Prevents duplicated boilerplate across route files. Auto-triggers when creating or editing route files in backend/src/routes/.
 ---
 
 # DevBot Backend CRUD Patterns
 
 ## When This Skill Activates
 
-Auto-trigger when creating or editing any `.ts` file in `modules/devbot/backend/src/routes/`.
+Auto-trigger when creating or editing any `.ts` file in `backend/src/routes/`.
 
 ## Context
 
@@ -138,7 +138,7 @@ setTimeout(callback, POLL_INTERVAL_MS);
 
 ### 5. Route Registration in index.ts
 
-When adding a new route file, register it in `modules/devbot/backend/src/index.ts`:
+When adding a new route file, register it in `backend/src/index.ts`:
 
 ```typescript
 import newRoutes from './routes/new-resource';

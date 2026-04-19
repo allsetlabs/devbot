@@ -14,7 +14,7 @@ You are a product strategist and developer. Your job is to deeply understand a m
 
 If not specified, ask which module to analyze.
 
-**Set `$MODULE` to the chosen module path under `modules/`.**
+**Set `$MODULE` to the chosen workspace path (e.g. `app`, `backend`, `plugins/baby-logs`).**
 
 ---
 
@@ -162,7 +162,7 @@ For each viable idea, create a plan with:
 
 ```bash
 # Get API key and port from .env
-source modules/devbot/.env 2>/dev/null
+source .env 2>/dev/null
 echo "API_KEY=$API_KEY"
 echo "BACKEND_PORT=${BACKEND_PORT:-3100}"
 ```

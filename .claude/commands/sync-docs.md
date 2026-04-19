@@ -3,6 +3,8 @@ description: Sync all documentation with current codebase
 model: opus
 ---
 
+> This command was inherited from a broader monorepo. The module list below is stale and needs to be rewritten for the devbot repo structure. See /Users/subbiahchandramouli/Documents/devbot/CLAUDE.md for the current layout.
+
 # Sync Documentation Command
 
 Sync all documentation files with actual codebase structure.

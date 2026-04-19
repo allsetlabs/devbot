@@ -1,13 +1,13 @@
 ---
 name: devbot-worker-patterns
-description: Enforces consistent patterns for Claude CLI worker processes in DevBot backend. Covers process spawning, stream-json parsing, message persistence, and cleanup. Auto-triggers when editing worker files in modules/devbot/backend/src/lib/.
+description: Enforces consistent patterns for Claude CLI worker processes in DevBot backend. Covers process spawning, stream-json parsing, message persistence, and cleanup. Auto-triggers when editing worker files in backend/src/lib/.
 ---
 
 # DevBot Worker Patterns
 
 ## When This Skill Activates
 
-Auto-trigger when creating or editing any `*-worker.ts` file in `modules/devbot/backend/src/lib/`.
+Auto-trigger when creating or editing any `*-worker.ts` file in `backend/src/lib/`.
 
 ## Context
 

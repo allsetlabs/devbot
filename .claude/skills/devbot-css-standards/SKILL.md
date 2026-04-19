@@ -1,13 +1,13 @@
 ---
 name: devbot-css-standards
-description: Enforces CSS and component library standards for DevBot mobile. Prevents raw HTML elements, default Tailwind colors, arbitrary color values, and dark: prefixes. Auto-triggers when editing .tsx files in modules/devbot/app/.
+description: Enforces CSS and component library standards for DevBot mobile. Prevents raw HTML elements, default Tailwind colors, arbitrary color values, and dark: prefixes. Auto-triggers when editing .tsx files in app/.
 ---
 
 # DevBot CSS & Component Standards
 
 ## When This Skill Activates
 
-Auto-trigger when editing any `.tsx` file in `modules/devbot/app/src/`.
+Auto-trigger when editing any `.tsx` file in `app/src/`.
 
 ## Rules (Non-Negotiable)
 
@@ -37,7 +37,7 @@ Auto-trigger when editing any `.tsx` file in `modules/devbot/app/src/`.
 
 ### 2. No Default Tailwind Colors
 
-**NEVER** use default Tailwind color utilities. Only use custom theme colors from `modules/component/src/styles/styles.md`.
+**NEVER** use default Tailwind color utilities. Only use custom theme colors from `reusables/src/styles/styles.md`.
 
 ```
 FORBIDDEN: bg-blue-500, text-red-600, border-gray-300, bg-slate-100, etc.
@@ -75,7 +75,7 @@ Before creating any new UI element, check if it exists in `@allsetlabs/reusable`
 - `DataFetchWrapper` - Loading/error states
 - `Tabs`, `Accordion` - Layout
 
-If a needed component or variant doesn't exist, create it first in `modules/component/`, then use it.
+If a needed component or variant doesn't exist, create it first in `reusables/`, then use it.
 
 ## Verification Checklist
 

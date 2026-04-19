@@ -39,17 +39,17 @@ For each module with a frontend, scan page/component files for:
 
 ## Execution
 
-### Step 1: Discover Modules
+### Step 1: Discover Workspaces
 
 ```bash
-ls modules/
+ls app backend reusables plugins/
 ```
 
-Identify which modules have backend and/or frontend code.
+The devbot workspaces are `app` (frontend), `backend`, `reusables` (shared component library), and each plugin under `plugins/` (`plugins/baby-logs`, `plugins/lawn-care`). Each plugin has its own `backend/` and `frontend/` subdirs.
 
-### Step 2: Scan Each Module
+### Step 2: Scan Each Workspace
 
-For each module, read all source files (skip `node_modules/`, `dist/`, `build/`, `.git/`).
+For each workspace, read all source files (skip `node_modules/`, `dist/`, `build/`, `.git/`).
 
 For backend routes:
 
@@ -127,6 +127,7 @@ Output:
 ## Rules
 
 1. **Scan only source files** — skip `node_modules/`, `dist/`, `build/`, `.git/`, `venv/`
+
 2. **Be concrete** — every recommendation must include a code example, not just a description
 3. **Acknowledge good patterns** — report established patterns that are already well-extracted
 4. **Prioritize by impact** — HIGH priority items should deliver the most value for the least effort

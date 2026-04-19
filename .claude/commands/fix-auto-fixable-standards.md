@@ -19,18 +19,18 @@ Extract and internalize:
 - **Makefile requirements** — required targets (`setup`, `install`, `start`), port hardcoding rules
 - **Port registry** — assigned ports per module
 
-## Step 2: Discover All Modules
+## Step 2: Discover All Workspaces
 
 ```bash
-ls modules/
+ls app backend reusables plugins/
 cat .gitmodules
 ```
 
-Build a list of all submodules to audit.
+Build a list of all workspaces/submodules to audit (`app`, `backend`, `reusables`, `plugins/baby-logs`, `plugins/lawn-care`).
 
-## Step 3: Audit Each Module
+## Step 3: Audit Each Workspace
 
-For each module in `modules/`:
+For each workspace (`app`, `backend`, `reusables`, `plugins/*`):
 
 ### 3a. Check CLAUDE.md Exists
 

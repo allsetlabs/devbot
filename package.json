@@ -1,0 +1,11 @@
+{
+  "name": "devbot-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "reusables",
+    "app",
+    "backend",
+    "plugins/*"
+  ]
+}

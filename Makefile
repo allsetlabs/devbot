@@ -5,12 +5,14 @@
 GREEN := \033[0;32m
 BLUE := \033[0;34m
 YELLOW := \033[1;33m
+RED := \033[0;31m
 NC := \033[0m
 
 APP_PORT := 4005
 BACKEND_PORT := 3100
+DEVBOT_PROJECTS := $(CURDIR)/../devbot-projects
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills create-devbot-projects
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -29,8 +31,19 @@ setup:
 	@$(MAKE) setup-claude
 	@$(MAKE) setup-mcp
 	@$(MAKE) setup-skills
+	@$(MAKE) create-devbot-projects
 	@echo ""
 	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
+
+create-devbot-projects:
+	@if [ -d "$(DEVBOT_PROJECTS)" ]; then \
+		echo "$(YELLOW)$(DEVBOT_PROJECTS) already exists. Skipping.$(NC)"; \
+	else \
+		echo "$(BLUE)Creating empty devbot-projects at $(DEVBOT_PROJECTS)...$(NC)"; \
+		mkdir -p "$(DEVBOT_PROJECTS)"; \
+		: > "$(DEVBOT_PROJECTS)/.gitmodules"; \
+		echo "$(GREEN)Created devbot-projects at $(DEVBOT_PROJECTS)$(NC)"; \
+	fi
 
 setup-brew:
 	@echo "$(BLUE)Installing Homebrew...$(NC)"
@@ -170,12 +183,9 @@ setup-skills:
 install:
 	@echo "$(BLUE)🔄 Syncing git submodules (component)...$(NC)"
 	@git submodule update --init --recursive
-	@echo "$(BLUE)📦 Installing DevBot app...$(NC)"
-	cd app && npm install --force
-	@echo "$(GREEN)✅ DevBot app ready!$(NC)"
-	@echo "$(BLUE)📦 Installing DevBot backend...$(NC)"
-	cd backend && npm install --force
-	@echo "$(GREEN)✅ DevBot backend ready!$(NC)"
+	@echo "$(BLUE)📦 Installing workspace (reusables, app, backend, plugins)...$(NC)"
+	npm install --force
+	@echo "$(GREEN)✅ Workspace ready!$(NC)"
 
 start:
 	@echo "$(BLUE)🚀 Starting DevBot services in tmux session 'devbot'...$(NC)"
@@ -191,7 +201,7 @@ start:
 	@mkdir -p logs
 	@# Compute dynamic values (passed as env vars, not written to .env)
 	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
-	$(eval SUPERREPO_DIR := $(realpath $(CURDIR)/../../../user-superrepo))
+	$(eval SUPERREPO_DIR := $(realpath $(DEVBOT_PROJECTS)))
 	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) CLAUDE_WORK_DIR=$(SUPERREPO_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR))
 	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)

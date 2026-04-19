@@ -1,4 +1,4 @@
-import { Settings, Share2, ScrollText, HelpCircle } from 'lucide-react';
+import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -22,6 +22,12 @@ interface SettingsDrawerProps {
   hasSystemPrompt?: boolean;
   hasMessages?: boolean;
   workingDirectory?: string;
+  onCopyResumeCommand?: () => void;
+  hasCopyResumeCommand?: boolean;
+  onArchive?: () => void;
+  onDelete?: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
 export function SettingsDrawer({
@@ -37,6 +43,12 @@ export function SettingsDrawer({
   hasSystemPrompt = false,
   hasMessages = false,
   workingDirectory,
+  onCopyResumeCommand,
+  hasCopyResumeCommand = false,
+  onArchive,
+  onDelete,
+  isFavorite = false,
+  onToggleFavorite,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -97,6 +109,67 @@ export function SettingsDrawer({
               </Button>
             )}
           </div>
+
+          {/* Session Actions */}
+          {(hasCopyResumeCommand || onToggleFavorite || onArchive || onDelete) && (
+            <div className="flex flex-wrap gap-2">
+              {hasCopyResumeCommand && onCopyResumeCommand && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onCopyResumeCommand();
+                    onOpenChange(false);
+                  }}
+                >
+                  <Terminal className="h-4 w-4" />
+                  Copy Resume
+                </Button>
+              )}
+              {onToggleFavorite && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onToggleFavorite();
+                  }}
+                >
+                  <Star className={`h-4 w-4 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                  {isFavorite ? 'Unfavorite' : 'Favorite'}
+                </Button>
+              )}
+              {onArchive && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onOpenChange(false);
+                    onArchive();
+                  }}
+                >
+                  <Archive className="h-4 w-4" />
+                  Archive
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2 text-destructive hover:text-destructive"
+                  onClick={() => {
+                    onOpenChange(false);
+                    onDelete();
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Sound Notifications */}
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}

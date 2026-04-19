@@ -17,7 +17,9 @@ import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './route
 import { companiesRouter } from './routes/companies.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs';
-import { getLawnCareRouter } from '@devbot/plugin-lawn-care';
+import { getLawnCareRouter, type LawnProfile } from '@devbot/plugin-lawn-care';
+import { spawnClaudeStructured } from './lib/claude-spawn.js';
+import type { LawnPlanData } from '@devbot/plugin-lawn-care';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
 
 import {
@@ -89,7 +91,69 @@ app.use('/api/companies', companiesRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
-app.use('/api/plugins/lawn-care', getLawnCareRouter());
+app.use('/api/plugins/lawn-care', getLawnCareRouter({
+  generatePlan: async (_planId: string, profile: LawnProfile) => {
+    const addressParts = [profile.address, profile.city, profile.state, profile.zipCode].filter(Boolean);
+    const prompt = `You are a lawn care expert. Create a detailed annual lawn care plan for this property:
+
+Address: ${addressParts.join(', ')}
+Grass Type: ${profile.grassType}
+${profile.sqft ? `Lawn Size: ${profile.sqft} sq ft` : ''}
+${profile.applicationMethod ? `Application Method: ${profile.applicationMethod}` : ''}
+${profile.equipmentModel ? `Equipment: ${profile.equipmentModel}` : ''}
+${profile.sunExposure ? `Sun Exposure: ${profile.sunExposure.replace(/_/g, ' ')}` : ''}
+${profile.notes ? `Special Notes: ${profile.notes}` : ''}
+
+Research the USDA climate zone for this zip code. Create a seasonal plan with 3-5 applications per year. For each application, recommend specific products available at Home Depot or Lowe's with real prices. Include spreader/sprayer settings specific to their equipment model. Calculate the per-application cost (product price divided by number of applications the bag covers for their lawn size).`;
+
+    const schema = {
+      name: 'lawn_care_plan',
+      schema: {
+        type: 'object',
+        required: ['summary', 'totalCost', 'store', 'applications'],
+        properties: {
+          summary: { type: 'string', description: 'Brief 1-2 sentence plan summary' },
+          totalCost: { type: 'number', description: 'Total annual cost' },
+          store: { type: 'string', description: 'Primary store for products' },
+          applications: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['order', 'date', 'name', 'description', 'product', 'amount', 'howToApply', 'applicationCost'],
+              properties: {
+                order: { type: 'number' },
+                date: { type: 'string', description: 'Date range like "Feb 28 – Mar 15"' },
+                name: { type: 'string', description: 'Short name like "Pre-Emergent + Fertilizer"' },
+                description: { type: 'string', description: 'Purpose of this application' },
+                product: { type: 'string', description: 'Specific product name' },
+                productUrl: { type: 'string', description: 'URL to product page' },
+                store: { type: 'string', description: 'Store name' },
+                productCovers: { type: 'number', description: 'Number of applications one bag covers for this lawn size' },
+                productPrice: { type: 'number', description: 'Full bag price' },
+                applicationCost: { type: 'number', description: 'Cost per application' },
+                howToApply: { type: 'string', description: 'Spreader/sprayer setting' },
+                walkingPace: { type: 'string' },
+                overlap: { type: 'string' },
+                amount: { type: 'string', description: 'Amount to apply' },
+                tips: { type: 'string' },
+                watering: { type: 'string', description: 'Watering instructions after application' },
+                warnings: { type: 'string', description: 'Important warnings' },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    return spawnClaudeStructured<LawnPlanData>({
+      prompt,
+      model: 'sonnet',
+      outputSchema: schema,
+      timeoutMs: 120_000,
+      maxTurns: 3,
+    });
+  },
+}));
 
 // Start server
 const server = app.listen(PORT, HOST, async () => {

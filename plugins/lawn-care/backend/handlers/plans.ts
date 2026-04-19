@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
-import { lawnPlansTable, lawnProfilesTable, type LawnPlan } from '../schema.js';
+import { lawnPlansTable, lawnProfilesTable, type LawnPlan, type LawnProfile } from '../schema.js';
 import { LawnPlanAPI, LawnPlanData } from '../types.js';
 import { type PluginsDb, pluginAsyncHandler, pluginNotFound, pluginBadRequest } from '../types.js';
+import type { GeneratePlanFn } from '../routes.js';
 
-export function createPlansHandlers(db: PluginsDb): Router {
+export function createPlansHandlers(db: PluginsDb, generatePlanFn?: GeneratePlanFn): Router {
   const router = Router();
 
   function transformPlanData(raw: Record<string, unknown> | null): LawnPlanData | null {
@@ -125,7 +126,7 @@ export function createPlansHandlers(db: PluginsDb): Router {
       }
 
       const profiles = await db
-        .select({ id: lawnProfilesTable.id })
+        .select()
         .from(lawnProfilesTable)
         .where(eq(lawnProfilesTable.id, profileId));
 
@@ -134,6 +135,7 @@ export function createPlansHandlers(db: PluginsDb): Router {
         return;
       }
 
+      const profile = profiles[0] as LawnProfile;
       const id = uuidv4().slice(0, 12);
       const newPlan = await db
         .insert(lawnPlansTable)
@@ -145,6 +147,35 @@ export function createPlansHandlers(db: PluginsDb): Router {
         .returning();
 
       res.status(201).json(rowToPlan(newPlan[0]));
+
+      if (generatePlanFn) {
+        generatePlanFn(id, profile)
+          .then((planData) => {
+            db.update(lawnPlansTable)
+              .set({
+                status: 'completed',
+                planData: planData as unknown as Record<string, unknown>,
+                generatedAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                updatedBy: 'AI',
+              })
+              .where(eq(lawnPlansTable.id, id))
+              .run();
+            console.log(`[LawnCare] Plan ${id} generated successfully`);
+          })
+          .catch((err) => {
+            console.error(`[LawnCare] Plan ${id} generation failed:`, err);
+            db.update(lawnPlansTable)
+              .set({
+                status: 'failed',
+                errorMessage: err instanceof Error ? err.message : 'Unknown error',
+                updatedAt: new Date().toISOString(),
+                updatedBy: 'system',
+              })
+              .where(eq(lawnPlansTable.id, id))
+              .run();
+          });
+      }
     }, 'generate lawn plan')
   );
 

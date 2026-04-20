@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { notifyTaskComplete, notifyTaskFailed, setNotificationSettings } from '../lib/notification';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { ArrowLeft, Loader2, MessageCircle, Upload } from 'lucide-react';
+import { ArrowLeft, Loader2, MessageCircle, Upload, GitBranch } from 'lucide-react';
 import { api, uploadFiles } from '../lib/api';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
@@ -202,6 +202,10 @@ export function InteractiveChatView({
     }
   }, [settings, settingsLoaded]);
 
+  // Branch state
+  const [currentBranch, setCurrentBranch] = useState('main');
+  const [branches, setBranches] = useState<string[]>(['main']);
+
   // Cursor-based messages (kept in useState since incremental append doesn't fit useQuery)
   // Messages fetched from backend — no localStorage cache (avoids iOS quota issues)
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -307,7 +311,7 @@ export function InteractiveChatView({
     async (afterSequence = 0) => {
       if (!chatId) return;
       try {
-        const newMessages = await api.getChatMessages(chatId, afterSequence);
+        const newMessages = await api.getChatMessages(chatId, afterSequence, currentBranch);
         if (newMessages.length > 0) {
           if (afterSequence === 0) {
             setMessages(newMessages);
@@ -326,8 +330,22 @@ export function InteractiveChatView({
         if (afterSequence === 0) setMessagesLoading(false);
       }
     },
-    [chatId]
+    [chatId, currentBranch]
   );
+
+  // Fetch branches
+  useEffect(() => {
+    if (!chatId) return;
+    api.getChatBranches(chatId).then(setBranches).catch(() => {});
+  }, [chatId]);
+
+  // Reset messages when switching branches
+  useEffect(() => {
+    setMessages([]);
+    lastSequenceRef.current = 0;
+    setMessagesLoading(true);
+    fetchMessages(0);
+  }, [currentBranch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clean up legacy message caches that bloat localStorage on iOS
   useEffect(() => cleanupLegacyMessageCaches(), []);
@@ -471,7 +489,7 @@ export function InteractiveChatView({
 
   // Send message mutation
   const sendMutation = useCrudMutation(
-    (prompt: string) => api.sendChatMessage(chatId!, prompt),
+    (prompt: string) => api.sendChatMessage(chatId!, prompt, currentBranch),
     [
       ['chat-status', chatId],
       ['interactive-chat', chatId],
@@ -635,6 +653,23 @@ export function InteractiveChatView({
     [handleFilesUpload]
   );
   const { isDragging } = useDragAndDrop(onDropFiles);
+
+  // Branch from a message
+  const handleBranch = useCallback(
+    async (messageId: string) => {
+      if (!chatId) return;
+      const msg = messages.find((m) => m.id === messageId);
+      if (!msg) return;
+      try {
+        const result = await api.createChatBranch(chatId, msg.sequence, undefined, currentBranch);
+        setBranches((prev) => [...prev, result.branchId]);
+        setCurrentBranch(result.branchId);
+      } catch (err) {
+        console.error('Failed to create branch:', err);
+      }
+    },
+    [chatId, messages, currentBranch]
+  );
 
   // Send message
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
@@ -1123,6 +1158,27 @@ export function InteractiveChatView({
         />
       )}
 
+      {/* Branch selector */}
+      {branches.length > 1 && (
+        <div className="flex items-center gap-2 border-b px-3 py-1.5">
+          <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
+          <select
+            value={currentBranch}
+            onChange={(e) => setCurrentBranch(e.target.value)}
+            className="rounded border bg-background px-2 py-0.5 text-xs text-foreground"
+          >
+            {branches.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+          <span className="text-[10px] text-muted-foreground">
+            {branches.length} {branches.length === 1 ? 'branch' : 'branches'}
+          </span>
+        </div>
+      )}
+
       {/* Messages */}
       {renderedMessages.length === 0 ? (
         <ChatWelcomeScreen
@@ -1141,6 +1197,7 @@ export function InteractiveChatView({
           onRetry={handleRetry}
           onRegenerate={handleRegenerate}
           onEdit={handleEditMessage}
+          onBranch={handleBranch}
           autoScroll={settings.autoScrollEnabled}
           pinnedIds={pinnedIds}
           onTogglePin={togglePin}

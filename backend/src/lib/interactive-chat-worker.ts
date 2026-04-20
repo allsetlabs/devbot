@@ -141,7 +141,7 @@ function markChatNotExecuting(chatId: string): void {
  * Send a message in an interactive chat session.
  * Uses the unified spawnClaude API.
  */
-export async function sendMessage(chatId: string, prompt: string): Promise<void> {
+export async function sendMessage(chatId: string, prompt: string, branchId: string = 'main'): Promise<void> {
   const chat = coreDb
     .select()
     .from(interactive_chats)
@@ -152,11 +152,11 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
     throw new Error('Chat not found');
   }
 
-  // Get current max sequence for this chat
+  // Get current max sequence for this chat on this branch
   const maxSeqRow = coreDb
     .select({ sequence: chat_messages.sequence })
     .from(chat_messages)
-    .where(eq(chat_messages.chat_id, chatId))
+    .where(and(eq(chat_messages.chat_id, chatId), eq(chat_messages.branch_id, branchId)))
     .orderBy(sql`sequence DESC`)
     .limit(1)
     .get();
@@ -170,6 +170,7 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
     .values({
       id: userMessageId,
       chat_id: chatId,
+      branch_id: branchId,
       sequence: currentMaxSequence + 1,
       type: 'user',
       content: {
@@ -219,6 +220,7 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
     foreignKeyValue: chatId,
     logPrefix: '[InteractiveChat]',
     skipUserMessages: true,
+    branchId: branchId,
     initialSequence: currentMaxSequence + 1,
     onMessage: (messageType, data) => {
       if (messageType === 'assistant') {

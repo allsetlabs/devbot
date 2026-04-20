@@ -149,6 +149,7 @@ export interface InteractiveChat {
 export interface ChatMessage {
   id: string;
   chatId: string;
+  branchId: string;
   sequence: number;
   type: 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
   content: ClaudeMessageContent;

@@ -45,6 +45,8 @@ export interface StreamParserConfig {
   logPrefix: string;
   /** Skip inserting user messages (set true when they are pre-inserted) */
   skipUserMessages?: boolean;
+  /** Branch ID for chat messages (defaults to 'main') */
+  branchId?: string;
   /** Callback after a message is inserted */
   onMessage?: (messageType: StreamMessageType, data: Record<string, unknown>) => void;
 }
@@ -89,6 +91,7 @@ export async function parseStreamLine(
           content: data,
           created_by: 'system',
           updated_by: 'system',
+          ...(config.tableName === 'chat_messages' && config.branchId ? { branch_id: config.branchId } : {}),
         } as ChatMessageInsert | TaskMessageInsert;
         if (config.tableName === 'chat_messages') {
           await coreDb.insert(chat_messages).values(values as ChatMessageInsert);

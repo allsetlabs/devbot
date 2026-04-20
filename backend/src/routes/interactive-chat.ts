@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import fs from 'fs';
-import { eq, desc, gt, isNull, isNotNull, and } from 'drizzle-orm';
+import { eq, desc, gt, isNull, isNotNull, and, lte } from 'drizzle-orm';
 import { coreDb, interactive_chats, chat_messages, chat_uploads } from '../lib/db/core.js';
 import type {
   InteractiveChatRow,
@@ -40,6 +40,7 @@ interface InteractiveChat {
 interface ChatMessageResponse {
   id: string;
   chatId: string;
+  branchId: string;
   sequence: number;
   type: 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
   content: Record<string, unknown>;
@@ -69,6 +70,7 @@ function rowToMessage(row: ChatMessageRow): ChatMessageResponse {
   return {
     id: row.id,
     chatId: row.chat_id,
+    branchId: row.branch_id,
     sequence: row.sequence,
     type: row.type,
     content: row.content,
@@ -479,18 +481,19 @@ router.delete(
 router.post(
   '/:id/send',
   asyncHandler(async (req, res) => {
-    const { prompt } = req.body;
+    const { prompt, branch } = req.body;
 
     if (!requireString(res, prompt, 'Prompt')) return;
 
     const chatId = req.params.id;
+    const branchId = (branch as string) || 'main';
 
     if (isChatExecuting(chatId)) {
       stopChatExecution(chatId);
       await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
-    sendMessage(chatId, prompt.trim()).catch((err) => {
+    sendMessage(chatId, prompt.trim(), branchId).catch((err) => {
       console.error(`[InteractiveChat] Error sending message for chat ${chatId}:`, err);
     });
 
@@ -526,17 +529,22 @@ router.get(
   }, 'get status')
 );
 
-// Get messages for a chat
+// Get messages for a chat (optionally filtered by branch)
 router.get(
   '/:id/messages',
   asyncHandler(async (req, res) => {
     const afterSequence = parseInt(req.query.afterSequence as string) || 0;
+    const branch = (req.query.branch as string) || 'main';
 
     const rows = await coreDb
       .select()
       .from(chat_messages)
       .where(
-        and(eq(chat_messages.chat_id, req.params.id), gt(chat_messages.sequence, afterSequence))
+        and(
+          eq(chat_messages.chat_id, req.params.id),
+          eq(chat_messages.branch_id, branch),
+          gt(chat_messages.sequence, afterSequence)
+        )
       )
       .orderBy(chat_messages.sequence);
 
@@ -671,6 +679,82 @@ router.post(
   asyncHandler(async (req, res) => {
     await updateChatField(req.params.id, { archived_at: null }, res);
   }, 'unarchive chat')
+);
+
+// List branches for a chat
+router.get(
+  '/:id/branches',
+  asyncHandler(async (req, res) => {
+    const rows = await coreDb
+      .select({ branch_id: chat_messages.branch_id })
+      .from(chat_messages)
+      .where(eq(chat_messages.chat_id, req.params.id))
+      .groupBy(chat_messages.branch_id)
+      .orderBy(chat_messages.branch_id);
+
+    const branches = rows.map((r) => r.branch_id);
+    res.json(branches);
+  }, 'list branches')
+);
+
+// Create a branch from a specific message sequence
+router.post(
+  '/:id/branch',
+  asyncHandler(async (req, res) => {
+    const { fromSequence, branchName } = req.body;
+    const chatId = req.params.id;
+    const sourceBranch = (req.body.sourceBranch as string) || 'main';
+
+    if (typeof fromSequence !== 'number' || fromSequence < 1) {
+      sendBadRequest(res, 'fromSequence must be a positive number');
+      return;
+    }
+
+    const name = branchName || `branch-${Date.now().toString(36)}`;
+
+    // Check branch doesn't already exist
+    const existing = await coreDb
+      .select({ branch_id: chat_messages.branch_id })
+      .from(chat_messages)
+      .where(and(eq(chat_messages.chat_id, chatId), eq(chat_messages.branch_id, name)))
+      .limit(1);
+
+    if (existing.length > 0) {
+      sendBadRequest(res, `Branch "${name}" already exists`);
+      return;
+    }
+
+    // Copy messages up to (and including) fromSequence into the new branch
+    const messagesToCopy = await coreDb
+      .select()
+      .from(chat_messages)
+      .where(
+        and(
+          eq(chat_messages.chat_id, chatId),
+          eq(chat_messages.branch_id, sourceBranch),
+          lte(chat_messages.sequence, fromSequence)
+        )
+      )
+      .orderBy(chat_messages.sequence);
+
+    for (const msg of messagesToCopy) {
+      coreDb
+        .insert(chat_messages)
+        .values({
+          id: generateId(),
+          chat_id: chatId,
+          branch_id: name,
+          sequence: msg.sequence,
+          type: msg.type,
+          content: msg.content,
+          created_by: msg.created_by,
+          updated_by: 'system',
+        })
+        .run();
+    }
+
+    res.json({ branchId: name, messagesCopied: messagesToCopy.length });
+  }, 'create branch')
 );
 
 export { router as interactiveChatRouter };

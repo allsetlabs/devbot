@@ -175,10 +175,10 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${id}`, { method: 'DELETE' });
   },
 
-  sendChatMessage: (chatId: string, prompt: string): Promise<{ success: boolean }> => {
+  sendChatMessage: (chatId: string, prompt: string, branch?: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/send`, {
       method: 'POST',
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt, branch }),
     });
   },
 
@@ -190,9 +190,23 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/status`);
   },
 
-  getChatMessages: (chatId: string, afterSequence = 0): Promise<ChatMessage[]> => {
-    const params = afterSequence > 0 ? `?afterSequence=${afterSequence}` : '';
-    return fetchApi(`/api/interactive-chats/${chatId}/messages${params}`);
+  getChatMessages: (chatId: string, afterSequence = 0, branch = 'main'): Promise<ChatMessage[]> => {
+    const params = new URLSearchParams();
+    if (afterSequence > 0) params.set('afterSequence', String(afterSequence));
+    if (branch !== 'main') params.set('branch', branch);
+    const qs = params.toString();
+    return fetchApi(`/api/interactive-chats/${chatId}/messages${qs ? `?${qs}` : ''}`);
+  },
+
+  getChatBranches: (chatId: string): Promise<string[]> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/branches`);
+  },
+
+  createChatBranch: (chatId: string, fromSequence: number, branchName?: string, sourceBranch = 'main'): Promise<{ branchId: string; messagesCopied: number }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/branch`, {
+      method: 'POST',
+      body: JSON.stringify({ fromSequence, branchName, sourceBranch }),
+    });
   },
 
   renameInteractiveChat: (id: string, name: string): Promise<InteractiveChat> => {

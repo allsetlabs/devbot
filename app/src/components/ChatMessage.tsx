@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, XCircle, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, XCircle, CheckCircle, GitBranch } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 import { MessageReactions } from './MessageReactions';
@@ -39,6 +39,7 @@ interface ChatMessageProps {
   isPinned?: boolean;
   onTogglePin?: (messageId: string) => void;
   onEdit?: (messageId: string, text: string) => void;
+  onBranch?: () => void;
   searchQuery?: string;
   currentReaction?: ReactionType | null;
   onToggleReaction?: (type: ReactionType) => void;
@@ -89,6 +90,7 @@ export function ChatMessage({
   isPinned = false,
   onTogglePin,
   onEdit,
+  onBranch,
   searchQuery = '',
   currentReaction = null,
   onToggleReaction,
@@ -138,6 +140,17 @@ export function ChatMessage({
                 />
               )}
               <CopyMessageButton text={text} variant="assistant" />
+              {onBranch && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onBranch}
+                  className="h-6 w-6"
+                  title="Branch from here"
+                >
+                  <GitBranch className="h-3 w-3" />
+                </Button>
+              )}
               {onToggleReaction && (
                 <MessageReactions
                   messageId={message.id}

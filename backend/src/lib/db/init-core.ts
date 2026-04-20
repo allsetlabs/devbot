@@ -134,6 +134,7 @@ export async function initializeCoreDatabase() {
       CREATE TABLE IF NOT EXISTS chat_messages (
         id TEXT PRIMARY KEY,
         chat_id TEXT NOT NULL,
+        branch_id TEXT NOT NULL DEFAULT 'main',
         sequence INTEGER NOT NULL,
         type TEXT NOT NULL CHECK(type IN ('user', 'assistant', 'tool_use', 'tool_result', 'system')),
         content TEXT NOT NULL,
@@ -142,7 +143,7 @@ export async function initializeCoreDatabase() {
         updated_by TEXT NOT NULL DEFAULT 'user',
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         settings TEXT DEFAULT '{}',
-        UNIQUE(chat_id, sequence)
+        UNIQUE(chat_id, branch_id, sequence)
       )
     `
     );
@@ -253,6 +254,26 @@ export async function initializeCoreDatabase() {
       coreDb.run(sql.raw(`ALTER TABLE working_directories ADD COLUMN is_default INTEGER NOT NULL DEFAULT 0`));
     } catch {
       // Column already exists
+    }
+
+    // Migrate: add branch_id column and update unique constraint
+    try {
+      coreDb.run(sql.raw(`ALTER TABLE chat_messages ADD COLUMN branch_id TEXT NOT NULL DEFAULT 'main'`));
+      // Recreate table with updated unique constraint (chat_id, branch_id, sequence)
+      coreDb.run(sql.raw(`CREATE TABLE IF NOT EXISTS chat_messages_new (
+        id TEXT PRIMARY KEY, chat_id TEXT NOT NULL, branch_id TEXT NOT NULL DEFAULT 'main',
+        sequence INTEGER NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('user', 'assistant', 'tool_use', 'tool_result', 'system')),
+        content TEXT NOT NULL, created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, settings TEXT DEFAULT '{}',
+        UNIQUE(chat_id, branch_id, sequence)
+      )`));
+      coreDb.run(sql.raw(`INSERT INTO chat_messages_new SELECT id, chat_id, branch_id, sequence, type, content, created_by, created_at, updated_by, updated_at, settings FROM chat_messages`));
+      coreDb.run(sql.raw(`DROP TABLE chat_messages`));
+      coreDb.run(sql.raw(`ALTER TABLE chat_messages_new RENAME TO chat_messages`));
+    } catch {
+      // Column already exists or migration already applied
     }
 
     // Create commands table

@@ -24,6 +24,7 @@ import { SettingsDrawer } from '../components/SettingsDrawer';
 import { McpServersDrawer } from '../components/McpServersDrawer';
 import { HooksDrawer } from '../components/HooksDrawer';
 import { MemoryViewerDrawer } from '../components/MemoryViewerDrawer';
+import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolUseDialog } from '../components/ToolUseDialog';
 import { EditMessageDialog } from '../components/EditMessageDialog';
@@ -135,6 +136,7 @@ export function InteractiveChatView({
   const [mcpServersOpen, setMcpServersOpen] = useState(false);
   const [hooksOpen, setHooksOpen] = useState(false);
   const [memoriesOpen, setMemoriesOpen] = useState(false);
+  const [claudeMdOpen, setClaudeMdOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1265,11 +1267,13 @@ export function InteractiveChatView({
         onMcpServers={() => setMcpServersOpen(true)}
         onHooks={() => setHooksOpen(true)}
         onMemories={() => setMemoriesOpen(true)}
+        onClaudeMd={() => setClaudeMdOpen(true)}
       />
 
       <McpServersDrawer open={mcpServersOpen} onOpenChange={setMcpServersOpen} />
       <HooksDrawer open={hooksOpen} onOpenChange={setHooksOpen} />
       <MemoryViewerDrawer open={memoriesOpen} onOpenChange={setMemoriesOpen} />
+      <ClaudeMdDrawer open={claudeMdOpen} onOpenChange={setClaudeMdOpen} workingDirectory={chat?.workingDir ?? undefined} />
 
       {/* Pinned messages drawer */}
       <PinnedMessagesDrawer

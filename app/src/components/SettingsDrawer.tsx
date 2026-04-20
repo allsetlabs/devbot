@@ -1,4 +1,4 @@
-import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook, Brain } from 'lucide-react';
+import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook, Brain, FileText } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -31,6 +31,7 @@ interface SettingsDrawerProps {
   onMcpServers?: () => void;
   onHooks?: () => void;
   onMemories?: () => void;
+  onClaudeMd?: () => void;
 }
 
 export function SettingsDrawer({
@@ -55,6 +56,7 @@ export function SettingsDrawer({
   onMcpServers,
   onHooks,
   onMemories,
+  onClaudeMd,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -116,8 +118,8 @@ export function SettingsDrawer({
             )}
           </div>
 
-          {/* MCP Servers, Hooks & Memories */}
-          {(onMcpServers || onHooks || onMemories) && (
+          {/* MCP Servers, Hooks, Memories & CLAUDE.md */}
+          {(onMcpServers || onHooks || onMemories || onClaudeMd) && (
             <div className="flex flex-wrap gap-2">
               {onMcpServers && (
                 <Button
@@ -159,6 +161,20 @@ export function SettingsDrawer({
                 >
                   <Brain className="h-4 w-4" />
                   Memories
+                </Button>
+              )}
+              {onClaudeMd && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onOpenChange(false);
+                    setTimeout(() => onClaudeMd(), 300);
+                  }}
+                >
+                  <FileText className="h-4 w-4" />
+                  CLAUDE.md
                 </Button>
               )}
             </div>

@@ -22,6 +22,7 @@ import { mcpServersRouter } from './routes/mcp-servers.js';
 import { hooksRouter } from './routes/hooks.js';
 import { gitStatusRouter } from './routes/git-status.js';
 import { memoriesRouter } from './routes/memories.js';
+import { claudeMdRouter } from './routes/claude-md.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -100,6 +101,7 @@ app.use('/api/mcp-servers', mcpServersRouter);
 app.use('/api/hooks', hooksRouter);
 app.use('/api/git-status', gitStatusRouter);
 app.use('/api/memories', memoriesRouter);
+app.use('/api/claude-md', claudeMdRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

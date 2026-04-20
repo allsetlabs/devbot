@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20T21:50:00Z
-Last implementation run: 2026-04-20T22:30:00Z
+Last implementation run: 2026-04-21T00:15:00Z
 
 ---
 
 ## Pending
-- Add CLAUDE.md project documentation editor — inline editor to view and edit CLAUDE.md files for each working directory; currently only referenced in a tooltip
 - Add conversation branching/forking — allow users to branch from any message in a conversation to explore alternative response paths; no UI or backend support exists
 - Add compact/dense UI mode toggle — setting to reduce vertical spacing in chat messages for power users; currently only font size options exist
 - Add tool approval/rejection history view — show a log of past tool permission decisions (approvals/rejections) within a chat session; currently only shows immediate tool dialogs
@@ -24,6 +23,7 @@ Last implementation run: 2026-04-20T22:30:00Z
 
 ## Completed
 
+- [2026-04-20] Add CLAUDE.md project documentation editor — ClaudeMdDrawer component accessible from SettingsDrawer; backend /api/claude-md route reads/writes CLAUDE.md per working directory; supports create and edit
 - [2026-04-20] Add memory viewer/editor UI — MemoryViewerDrawer component accessible from SettingsDrawer; backend /api/memories route reads/writes/deletes memory files from ~/.claude/projects/*/memory/; supports expand, edit (full file with frontmatter), and delete; grouped by project with type badges
 - [2026-04-20] Add git working tree status widget to interactive chat — backend /api/git-status endpoint returns branch, dirty count, ahead/behind; ChatViewHeader shows GitBranch icon badge with branch name and dirty count; useGitStatus hook polls every 30s
 

@@ -508,6 +508,18 @@ export const api = {
     });
   },
 
+  // CLAUDE.md endpoints
+  getClaudeMd: (dir: string): Promise<{ content: string | null; path: string; exists: boolean }> => {
+    return fetchApi(`/api/claude-md?dir=${encodeURIComponent(dir)}`);
+  },
+
+  saveClaudeMd: (dir: string, content: string): Promise<{ success: boolean; path: string }> => {
+    return fetchApi('/api/claude-md', {
+      method: 'PUT',
+      body: JSON.stringify({ dir, content }),
+    });
+  },
+
   // Files endpoints
   browseFiles: (
     query: string,

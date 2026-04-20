@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import http from 'http';
+import https from 'https';
+import { loadDevCert } from './lib/https-cert.js';
 import { initializeCoreDatabase } from './lib/db/init-core.js';
 import { sessionsRouter } from './routes/sessions.js';
 import { uploadRouter } from './routes/upload.js';
@@ -16,10 +19,11 @@ import { filesRouter } from './routes/files.js';
 import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './routes/working-directories.js';
 import { companiesRouter } from './routes/companies.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
-import { getBabyLogsRouter } from '@devbot/plugin-baby-logs';
-import { getLawnCareRouter, type LawnProfile } from '@devbot/plugin-lawn-care';
+import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
+import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
+import type { LawnProfile } from '@devbot/plugin-lawn-care/backend/schema.js';
 import { spawnClaudeStructured } from './lib/claude-spawn.js';
-import type { LawnPlanData } from '@devbot/plugin-lawn-care';
+import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
 
 import {
@@ -155,10 +159,16 @@ Research the USDA climate zone for this zip code. Create a seasonal plan with 3-
   },
 }));
 
-// Start server
-const server = app.listen(PORT, HOST, async () => {
-  console.log(`DevBot backend running at http://${HOST}:${PORT}`);
-  console.log(`Health check: http://${HOST}:${PORT}/health`);
+// Start server (HTTPS if dev cert is present, otherwise plain HTTP)
+const devCert = loadDevCert();
+const httpServer = devCert
+  ? https.createServer(devCert, app)
+  : http.createServer(app);
+const scheme = devCert ? 'https' : 'http';
+
+const server = httpServer.listen(PORT, HOST, async () => {
+  console.log(`DevBot backend running at ${scheme}://${HOST}:${PORT}`);
+  console.log(`Health check: ${scheme}://${HOST}:${PORT}/health`);
   if (!API_KEY) {
     console.warn('Warning: No API_KEY set. API authentication is disabled.');
   }

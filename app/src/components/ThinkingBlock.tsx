@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Brain, ChevronDown, ChevronRight } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
 
 /** Collapsible thinking/reasoning block for assistant messages */
@@ -9,7 +10,8 @@ export function ThinkingBlock({ thinking }: { thinking: string }) {
 
   return (
     <div className="mb-2 rounded-lg border border-border/50 bg-muted/20">
-      <button
+      <Button
+        variant="ghost"
         onClick={(e) => {
           const target = e.currentTarget;
           setExpanded((v) => {
@@ -29,7 +31,7 @@ export function ThinkingBlock({ thinking }: { thinking: string }) {
         {!expanded && (
           <span className="text-[10px] text-muted-foreground">({wordCount} words)</span>
         )}
-      </button>
+      </Button>
       {expanded && (
         <div className="border-t border-border/50 px-3 py-2">
           <p className="whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">

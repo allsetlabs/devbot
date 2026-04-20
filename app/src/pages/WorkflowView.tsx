@@ -30,12 +30,11 @@ export function WorkflowView() {
         selectedStepRunId!,
         afterSequence
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return newMsgs.map<TaskMessage>((m: any) => ({
+      return newMsgs.map<TaskMessage>((m) => ({
         id: m.id,
-        runId: m.stepRunId,
+        runId: (m as unknown as { stepRunId: string }).stepRunId,
         sequence: m.sequence,
-        type: m.type as TaskMessage['type'],
+        type: m.type,
         content: m.content,
         createdAt: m.createdAt,
       }));

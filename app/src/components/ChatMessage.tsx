@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, XCircle, CheckCircle } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 import { MessageReactions } from './MessageReactions';
 import type { TaskMessage, ClaudeContentBlock, ClaudeMessageContent } from '../types';
@@ -52,7 +53,8 @@ function ToolResultMessage({ content }: { content: ClaudeMessageContent }) {
     <div
       className={`rounded-lg border ${isError ? 'border-destructive/50 bg-destructive/10' : 'border-success/50 bg-success/10'}`}
     >
-      <button
+      <Button
+        variant="ghost"
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center gap-2 px-3 py-2 text-left"
       >
@@ -67,7 +69,7 @@ function ToolResultMessage({ content }: { content: ClaudeMessageContent }) {
           <CheckCircle className="h-4 w-4 text-success" />
         )}
         <span className="text-sm font-medium text-foreground">{isError ? 'Error' : 'Result'}</span>
-      </button>
+      </Button>
       {expanded && (
         <div className="border-t border-border px-3 py-2">
           <pre className="overflow-x-auto whitespace-pre-wrap text-xs text-muted-foreground">
@@ -110,12 +112,13 @@ export function ChatMessage({
               : renderTextWithLinks(displayText)}
           </p>
           {isTruncated && !isLast && (
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setExpanded(!expanded)}
               className="mt-1 text-xs font-medium text-primary-foreground/70 hover:text-primary-foreground"
             >
               {expanded ? 'Show less' : 'Show more'}
-            </button>
+            </Button>
           )}
         </div>
         <div className="flex items-center gap-1 px-1">
@@ -175,12 +178,13 @@ export function ChatMessage({
           {thinking && <ThinkingBlock thinking={thinking} />}
           {text && <MarkdownRenderer content={displayText} />}
           {isTruncated && !isLast && (
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setExpanded(!expanded)}
               className="mt-1 text-xs font-medium text-primary hover:text-primary/80"
             >
               {expanded ? 'Show less' : 'Show more'}
-            </button>
+            </Button>
           )}
           {toolUseBlocks.length > 0 && (
             <div className={`flex flex-col gap-2 ${text ? 'mt-2' : ''}`}>

@@ -22,9 +22,15 @@ interface WorkingDirectory {
   createdAt: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function rowToWorkingDir(row: any): WorkingDirectory {
-  const settings = typeof row.settings === 'object' && row.settings ? row.settings : {};
+type WorkingDirectoryRow = typeof working_directories.$inferSelect;
+
+interface WorkingDirectorySettings {
+  isRootDirectory?: boolean;
+}
+
+function rowToWorkingDir(row: WorkingDirectoryRow): WorkingDirectory {
+  const settings: WorkingDirectorySettings =
+    typeof row.settings === 'object' && row.settings ? (row.settings as WorkingDirectorySettings) : {};
   return {
     id: row.id,
     path: row.path,
@@ -139,7 +145,11 @@ router.delete(
  */
 function resolvePath(p: string): string {
   if (p.startsWith('~')) {
-    p = path.join(process.env.HOME || '', p.slice(1));
+    const home = process.env.HOME;
+    if (!home) {
+      throw new Error('HOME environment variable is not set; cannot resolve ~ paths');
+    }
+    p = path.join(home, p.slice(1));
   }
   return path.resolve(p);
 }
@@ -152,10 +162,10 @@ export async function seedDefaultWorkingDirectories(): Promise<void> {
   // 1. From .env CLAUDE_WORK_DIR
   await upsertDefault(CLAUDE_WORK_DIR, 'Default (env)', 'env', {});
 
-  // 2. Two directories above backend CWD (the superrepo root)
-  const autoDir = path.resolve(process.cwd(), '..', '..', '..');
+  // 2. One directory above backend CWD (the devbot repo root — where `make start` runs)
+  const autoDir = path.resolve(process.cwd(), '..');
   if (fs.existsSync(autoDir) && fs.statSync(autoDir).isDirectory()) {
-    await upsertDefault(autoDir, 'Auto-detected', 'auto', { isRootDirectory: true });
+    await upsertDefault(autoDir, 'Root', 'auto', { isRootDirectory: true });
   }
 }
 
@@ -163,8 +173,7 @@ async function upsertDefault(
   dirPath: string,
   label: string,
   source: 'env' | 'auto',
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  settings: Record<string, any>
+  settings: WorkingDirectorySettings
 ): Promise<void> {
   const resolved = path.resolve(dirPath);
   if (!fs.existsSync(resolved)) return;

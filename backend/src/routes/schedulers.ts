@@ -7,7 +7,12 @@ import {
   task_messages,
   chat_messages,
 } from '../lib/db/core.js';
-import type { ScheduledTaskRow, TaskRunRow, TaskMessageRow } from '../lib/db/types.js';
+import type {
+  ScheduledTaskRow,
+  TaskRunRow,
+  TaskMessageRow,
+  SchedulerSettings,
+} from '../lib/db/types.js';
 import { isTaskExecuting, isTaskQueued, enqueueTask } from '../lib/scheduler-worker.js';
 import {
   asyncHandler,
@@ -75,8 +80,8 @@ function rowToTask(row: ScheduledTaskRow): ScheduledTask {
     maxRuns: row.max_runs,
     isRunning: isTaskExecuting(row.id),
     isQueued: isTaskQueued(row.id),
-    model: (row.settings as any)?.model || 'sonnet',
-    isSystem: (row.settings as any)?.isSystem === true,
+    model: (row.settings as SchedulerSettings | null | undefined)?.model || 'sonnet',
+    isSystem: (row.settings as SchedulerSettings | null | undefined)?.isSystem === true,
   };
 }
 
@@ -236,7 +241,7 @@ router.put(
       return;
     }
 
-    if ((existing[0].settings as any)?.isSystem === true) {
+    if ((existing[0].settings as SchedulerSettings | null | undefined)?.isSystem === true) {
       const nonStatusFields = [prompt, intervalMinutes, maxRuns, name, model].some(
         (v) => v !== undefined
       );
@@ -319,7 +324,7 @@ router.delete(
       return;
     }
 
-    if ((rows[0].settings as any)?.isSystem === true) {
+    if ((rows[0].settings as SchedulerSettings | null | undefined)?.isSystem === true) {
       res.status(403).json({ error: 'Forbidden', message: 'System schedulers cannot be deleted' });
       return;
     }

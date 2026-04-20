@@ -12,7 +12,7 @@ APP_PORT := 4005
 BACKEND_PORT := 3100
 DEVBOT_PROJECTS := $(CURDIR)/../devbot-projects
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills setup-certs create-devbot-projects
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills create-devbot-projects
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -31,31 +31,9 @@ setup:
 	@$(MAKE) setup-claude
 	@$(MAKE) setup-mcp
 	@$(MAKE) setup-skills
-	@$(MAKE) setup-certs
 	@$(MAKE) create-devbot-projects
 	@echo ""
 	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
-
-setup-certs:
-	@echo "$(BLUE)Setting up HTTPS certs with mkcert...$(NC)"
-	@if ! command -v mkcert &> /dev/null; then \
-		if [ "$$(uname)" = "Darwin" ]; then brew install mkcert; \
-		elif [ "$$(uname)" = "Linux" ]; then sudo apt-get install -y libnss3-tools && curl -Lo mkcert https://github.com/FiloSottile/mkcert/releases/latest/download/mkcert-v1.4.4-linux-amd64 && chmod +x mkcert && sudo mv mkcert /usr/local/bin/; \
-		fi; \
-	else \
-		echo "$(GREEN)mkcert already installed$(NC)"; \
-	fi
-	@mkcert -install
-	@mkdir -p $(CURDIR)/certs
-	@TAILSCALE_IP=$$(tailscale ip -4 2>/dev/null || echo ""); \
-	if [ -n "$$TAILSCALE_IP" ]; then \
-		mkcert -cert-file $(CURDIR)/certs/cert.pem -key-file $(CURDIR)/certs/key.pem localhost 127.0.0.1 $$TAILSCALE_IP; \
-		echo "$(GREEN)✅ Certs generated for localhost, 127.0.0.1, $$TAILSCALE_IP$(NC)"; \
-	else \
-		mkcert -cert-file $(CURDIR)/certs/cert.pem -key-file $(CURDIR)/certs/key.pem localhost 127.0.0.1; \
-		echo "$(GREEN)✅ Certs generated for localhost, 127.0.0.1$(NC)"; \
-		echo "$(YELLOW)⚠️  Tailscale not running — re-run 'make setup-certs' after connecting Tailscale to include your LAN IP$(NC)"; \
-	fi
 
 create-devbot-projects:
 	@if [ -d "$(DEVBOT_PROJECTS)" ]; then \
@@ -252,9 +230,9 @@ start: create-devbot-projects
 	@mkdir -p logs
 	@# Compute dynamic values (passed as env vars, not written to .env)
 	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
-	$(eval SUPERREPO_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
-	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) CLAUDE_WORK_DIR=$(SUPERREPO_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_CLAUDE_WORK_DIR=$(SUPERREPO_DIR))
-	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, CLAUDE_WORK_DIR=$(SUPERREPO_DIR)$(NC)"
+	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
+	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) CLAUDE_WORK_DIR=$(WORK_DIR) SUPERREPO_DIR=$(WORK_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_CLAUDE_WORK_DIR=$(WORK_DIR))
+	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, CLAUDE_WORK_DIR=$(WORK_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)
 	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && export $(DYNAMIC_ENV) && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m
 	@sleep 2
@@ -266,7 +244,7 @@ start: create-devbot-projects
 	@TAILSCALE_IP=$$(tailscale ip -4 2>/dev/null || echo "0.0.0.0"); \
 	echo "$(BLUE)Services:$(NC)"; \
 	echo "  ✓ Backend:   http://$$TAILSCALE_IP:$(BACKEND_PORT)"; \
-	echo "  ✓ App:       http://$$TAILSCALE_IP:$(APP_PORT)"
+	echo "  ✓ App:       https://$$TAILSCALE_IP:$(APP_PORT)"
 	@echo ""
 	@echo "$(YELLOW)Use 'tmux attach -t devbot' to view logs$(NC)"
 	@echo "$(YELLOW)Use 'make stop' to stop all services$(NC)"

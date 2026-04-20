@@ -77,7 +77,8 @@ function ApplicationCard({
   return (
     <div className="border-border bg-card overflow-hidden rounded-xl border">
       {/* Header - always visible, clickable */}
-      <button
+      <Button
+        variant="ghost"
         onClick={onToggle}
         className="bg-primary/5 flex w-full items-center gap-3 px-4 py-3 text-left"
       >
@@ -95,7 +96,7 @@ function ApplicationCard({
         <ChevronDown
           className={`text-muted-foreground h-5 w-5 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
         />
-      </button>
+      </Button>
 
       {/* Collapsible details */}
       {expanded && (

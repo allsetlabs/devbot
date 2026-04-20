@@ -4,8 +4,7 @@ import { coreDb } from './core.js';
 /**
  * Helper to run raw SQL with Drizzle (better-sqlite3 is synchronous)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function runSQL(_db: any, sqlString: string): Promise<void> {
+async function runSQL(sqlString: string): Promise<void> {
   try {
     // better-sqlite3 with Drizzle uses run() for raw SQL
     coreDb.run(sql.raw(sqlString));
@@ -25,7 +24,6 @@ export async function initializeCoreDatabase() {
 
     // Create sessions table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS sessions (
         id TEXT PRIMARY KEY,
@@ -44,7 +42,6 @@ export async function initializeCoreDatabase() {
 
     // Create scheduled_tasks table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS scheduled_tasks (
         id TEXT PRIMARY KEY,
@@ -67,7 +64,6 @@ export async function initializeCoreDatabase() {
 
     // Create task_runs table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS task_runs (
         id TEXT PRIMARY KEY,
@@ -91,7 +87,6 @@ export async function initializeCoreDatabase() {
 
     // Create task_messages table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS task_messages (
         id TEXT PRIMARY KEY,
@@ -111,7 +106,6 @@ export async function initializeCoreDatabase() {
 
     // Create interactive_chats table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS interactive_chats (
         id TEXT PRIMARY KEY,
@@ -136,7 +130,6 @@ export async function initializeCoreDatabase() {
 
     // Create chat_messages table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS chat_messages (
         id TEXT PRIMARY KEY,
@@ -156,7 +149,6 @@ export async function initializeCoreDatabase() {
 
     // Create chat_uploads table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS chat_uploads (
         id TEXT PRIMARY KEY,
@@ -174,7 +166,6 @@ export async function initializeCoreDatabase() {
 
     // Create birth_time_entries table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS birth_time_entries (
         id TEXT PRIMARY KEY,
@@ -201,7 +192,6 @@ export async function initializeCoreDatabase() {
 
     // Create module_plans table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS module_plans (
         id TEXT PRIMARY KEY,
@@ -224,7 +214,6 @@ export async function initializeCoreDatabase() {
 
     // Create remotion_videos table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS remotion_videos (
         id TEXT PRIMARY KEY,
@@ -243,7 +232,6 @@ export async function initializeCoreDatabase() {
 
     // Create working_directories table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS working_directories (
         id TEXT PRIMARY KEY,
@@ -269,7 +257,6 @@ export async function initializeCoreDatabase() {
 
     // Create commands table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS commands (
         id TEXT PRIMARY KEY,
@@ -287,7 +274,6 @@ export async function initializeCoreDatabase() {
 
     // Create companies table
     await runSQL(
-      coreDb,
       `
       CREATE TABLE IF NOT EXISTS companies (
         id TEXT PRIMARY KEY,

@@ -12,6 +12,7 @@ import {
   Wrench,
   Lightbulb,
 } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
 import type { PermissionMode, ClaudeModel } from '../types';
@@ -113,14 +114,15 @@ export function ChatWelcomeScreen({ permissionMode, model, onSendPrompt }: ChatW
         {SUGGESTED_PROMPTS.map((item) => {
           const Icon = item.icon;
           return (
-            <button
+            <Button
               key={item.label}
+              variant="outline"
               className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3 text-left transition-colors active:bg-muted/50"
               onClick={() => onSendPrompt(item.prompt)}
             >
               <Icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
               <span className="text-xs leading-snug text-foreground">{item.label}</span>
-            </button>
+            </Button>
           );
         })}
       </div>

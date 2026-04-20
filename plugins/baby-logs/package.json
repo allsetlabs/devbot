@@ -2,11 +2,9 @@
   "name": "@devbot/plugin-baby-logs",
   "version": "1.0.0",
   "type": "module",
-  "main": "backend/index.ts",
   "exports": {
-    ".": "./backend/index.ts",
-    "./frontend": "./frontend/index.ts",
-    "./backend": "./backend/index.ts"
+    "./frontend/*": "./frontend/*",
+    "./backend/*": "./backend/*"
   },
   "peerDependencies": {
     "@allsetlabs/reusable": "*",

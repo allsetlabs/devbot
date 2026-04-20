@@ -1,4 +1,5 @@
 import { Sparkles, Cpu, Rabbit } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODEL_CONFIG } from '../lib/model-config';
 import type { ClaudeModel } from '../types';
 
@@ -24,8 +25,9 @@ export function ModelPicker({ value, onChange, disabled = false }: ModelPickerPr
           const isSelected = value === model;
 
           return (
-            <button
+            <Button
               key={model}
+              variant="outline"
               type="button"
               disabled={disabled}
               onClick={() => onChange(model)}
@@ -37,7 +39,7 @@ export function ModelPicker({ value, onChange, disabled = false }: ModelPickerPr
             >
               {MODEL_ICONS[model]}
               {config.shortLabel}
-            </button>
+            </Button>
           );
         })}
       </div>

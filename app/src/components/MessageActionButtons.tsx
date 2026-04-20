@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Copy, Check, Pin, Edit } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 
 /** Copy-to-clipboard button for individual messages */
@@ -25,13 +26,15 @@ export function CopyMessageButton({
       : 'text-muted-foreground/50 hover:text-muted-foreground active:text-foreground';
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon-sm"
       onClick={handleCopy}
       className={`inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors ${iconClass}`}
       title={copied ? 'Copied!' : 'Copy message'}
     >
       {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-    </button>
+    </Button>
   );
 }
 
@@ -51,25 +54,29 @@ export function PinMessageButton({
       : 'text-muted-foreground/50 hover:text-muted-foreground active:text-foreground';
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon-sm"
       onClick={onToggle}
       className={`inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors ${iconClass} ${isPinned ? (variant === 'user' ? 'text-primary-foreground' : 'text-foreground') : ''}`}
       title={isPinned ? 'Unpin message' : 'Pin message'}
     >
       <Pin className={`h-3.5 w-3.5 ${isPinned ? 'fill-current' : ''}`} />
-    </button>
+    </Button>
   );
 }
 
 /** Edit message button for user messages */
 export function EditMessageButton({ onEdit }: { onEdit: () => void }) {
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon-sm"
       onClick={onEdit}
       className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded text-muted-foreground/50 transition-colors hover:text-muted-foreground active:text-foreground"
       title="Edit message"
     >
       <Edit className="h-3.5 w-3.5" />
-    </button>
+    </Button>
   );
 }

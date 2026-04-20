@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -44,7 +45,7 @@ export function EditMessageDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          <textarea
+          <Textarea
             value={editedText}
             onChange={(e) => setEditedText(e.target.value)}
             placeholder="Edit your message..."

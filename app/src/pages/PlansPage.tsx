@@ -91,8 +91,9 @@ export function PlansPage() {
 
       <div className="flex gap-2 overflow-x-auto border-b border-border px-4 py-2">
         {STATUS_FILTERS.map((filter) => (
-          <button
+          <Button
             key={filter}
+            variant="ghost"
             onClick={() => setActiveFilter(filter)}
             className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               activeFilter === filter
@@ -103,7 +104,7 @@ export function PlansPage() {
             {filter === 'in_progress'
               ? 'In Progress'
               : filter.charAt(0).toUpperCase() + filter.slice(1)}
-          </button>
+          </Button>
         ))}
       </div>
 

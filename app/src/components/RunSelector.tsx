@@ -1,4 +1,5 @@
 import { ChevronDown, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { TaskRun } from '../types';
 import { formatDateTime } from '../lib/format';
 
@@ -40,7 +41,8 @@ export function RunSelector({
 
   return (
     <div className="relative">
-      <button
+      <Button
+        variant="outline"
         onClick={onToggle}
         className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-left transition-colors hover:bg-muted/50"
       >
@@ -58,13 +60,14 @@ export function RunSelector({
         <ChevronDown
           className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
-      </button>
+      </Button>
 
       {isOpen && (
         <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-60 overflow-y-auto rounded-lg border border-border bg-background shadow-lg">
           {runs.map((run) => (
-            <button
+            <Button
               key={run.id}
+              variant="ghost"
               onClick={() => {
                 onSelectRun(run.id);
                 onToggle();
@@ -85,7 +88,7 @@ export function RunSelector({
                   {run.errorMessage}
                 </span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       )}

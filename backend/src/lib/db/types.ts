@@ -45,3 +45,16 @@ export type CompanyInsert = typeof schema.companies.$inferInsert;
 // Type aliases for compatibility with old code
 export type PermissionMode = 'plan' | 'auto-accept' | 'dangerous';
 export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
+
+// Shape of the JSONB `settings` column on scheduled_tasks
+export interface SchedulerSettings {
+  workingDir?: string;
+  model?: ClaudeModel;
+  isSystem?: boolean;
+}
+
+// Shape of the JSONB `settings` column on interactive_chats
+export interface ChatSettings {
+  workingDir?: string;
+  task_id?: string;
+}

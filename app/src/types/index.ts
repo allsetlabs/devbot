@@ -280,3 +280,11 @@ export interface FeedbackDocument {
   document: string;
   entries: FeedbackEntry[];
 }
+
+export interface FileBrowseItem {
+  id: string;
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  size?: number;
+}

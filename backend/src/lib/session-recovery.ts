@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { coreDb } from './db/core.js';
-import { sql } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
+import { coreDb, sessions, interactive_chats, task_runs, scheduled_tasks } from './db/core.js';
 import { listTmuxSessions } from './tmux.js';
 import { startXtermWs, isPortActive } from './xterm-ws.js';
 import { sendMessage } from './interactive-chat-worker.js';
-
-export type SessionRow = any;
 
 /**
  * Recover existing sessions on backend startup.
@@ -17,9 +14,9 @@ export async function recoverSessions(): Promise<void> {
 
   try {
     // Get all sessions from database
-    const rows = await coreDb.run(sql`SELECT * FROM sessions ORDER BY created_at ASC`);
+    const rows = await coreDb.select().from(sessions).orderBy(sessions.created_at).all();
 
-    if (!rows || !Array.isArray(rows) || rows.length === 0) {
+    if (!rows || rows.length === 0) {
       console.log('Session recovery: No sessions to recover');
       return;
     }
@@ -31,7 +28,7 @@ export async function recoverSessions(): Promise<void> {
     let recovered = 0;
     let markedInactive = 0;
 
-    for (const row of rows as SessionRow[]) {
+    for (const row of rows) {
       const tmuxId = `devbot_${row.id}`;
       const hasTmux = activeTmuxIds.has(tmuxId);
 
@@ -41,19 +38,28 @@ export async function recoverSessions(): Promise<void> {
             await startXtermWs(row.port, tmuxId);
             console.log(`Session recovery: Restored session ${row.id} on port ${row.port}`);
             recovered++;
-            await coreDb.run(sql`UPDATE sessions SET status = 'active' WHERE id = ${row.id}`);
+            await coreDb
+              .update(sessions)
+              .set({ status: 'active', updated_by: 'system' })
+              .where(eq(sessions.id, row.id));
           } else {
             console.log(`Session recovery: Session ${row.id} already active on port ${row.port}`);
           }
         } catch (err) {
           console.error(`Session recovery: Failed to restore session ${row.id}:`, err);
-          await coreDb.run(sql`UPDATE sessions SET status = 'inactive' WHERE id = ${row.id}`);
+          await coreDb
+            .update(sessions)
+            .set({ status: 'inactive', updated_by: 'system' })
+            .where(eq(sessions.id, row.id));
           markedInactive++;
         }
       } else {
         // tmux session doesn't exist - mark as inactive
         if (row.status === 'active') {
-          await coreDb.run(sql`UPDATE sessions SET status = 'inactive' WHERE id = ${row.id}`);
+          await coreDb
+            .update(sessions)
+            .set({ status: 'inactive', updated_by: 'system' })
+            .where(eq(sessions.id, row.id));
           console.log(`Session recovery: Marked session ${row.id} as inactive (tmux not found)`);
           markedInactive++;
         }
@@ -82,18 +88,27 @@ export async function recoverInteractiveChats(): Promise<void> {
   console.log('Chat recovery: Starting...');
 
   try {
-    const chats = await coreDb.run(sql`SELECT id FROM interactive_chats WHERE is_executing = 1`);
+    const chats = await coreDb
+      .select({ id: interactive_chats.id })
+      .from(interactive_chats)
+      .where(eq(interactive_chats.is_executing, true))
+      .all();
 
-    if (!chats || !Array.isArray(chats) || chats.length === 0) {
+    if (!chats || chats.length === 0) {
       console.log('Chat recovery: No interrupted chats');
       return;
     }
 
-    for (const chat of chats as any[]) {
+    for (const chat of chats) {
       // Reset is_executing first so sendMessage can proceed
-      await coreDb.run(
-        sql`UPDATE interactive_chats SET is_executing = 0, updated_by = 'system', updated_at = ${new Date().toISOString()} WHERE id = ${chat.id}`
-      );
+      await coreDb
+        .update(interactive_chats)
+        .set({
+          is_executing: false,
+          updated_by: 'system',
+          updated_at: new Date().toISOString(),
+        })
+        .where(eq(interactive_chats.id, chat.id));
 
       // Send a recovery message that tells Claude to resume
       sendMessage(chat.id, RECOVERY_PROMPT).catch((err) => {
@@ -103,9 +118,7 @@ export async function recoverInteractiveChats(): Promise<void> {
       console.log(`Chat recovery: Resuming chat ${chat.id}`);
     }
 
-    console.log(
-      `Chat recovery: Complete. Resuming ${(chats as any[]).length} interrupted chat(s)`
-    );
+    console.log(`Chat recovery: Complete. Resuming ${chats.length} interrupted chat(s)`);
   } catch (error) {
     console.error('Chat recovery: Unexpected error:', error);
   }
@@ -119,45 +132,67 @@ export async function recoverTaskRuns(): Promise<void> {
   console.log('Task run recovery: Starting...');
 
   try {
-    const runs = await coreDb.run(sql`SELECT id, task_id FROM task_runs WHERE status = 'running'`);
+    const runs = await coreDb
+      .select({ id: task_runs.id, task_id: task_runs.task_id })
+      .from(task_runs)
+      .where(eq(task_runs.status, 'running'))
+      .all();
 
-    if (!runs || !Array.isArray(runs) || runs.length === 0) {
+    if (!runs || runs.length === 0) {
       console.log('Task run recovery: No orphaned task runs');
       return;
     }
 
     const now = new Date().toISOString();
-    await coreDb.run(
-      sql`UPDATE task_runs SET status = 'failed', error_message = 'Interrupted by backend restart', completed_at = ${now}, updated_by = 'system', updated_at = ${now} WHERE status = 'running'`
-    );
+    await coreDb
+      .update(task_runs)
+      .set({
+        status: 'failed',
+        error_message: 'Interrupted by backend restart',
+        completed_at: now,
+        updated_by: 'system',
+        updated_at: now,
+      })
+      .where(eq(task_runs.status, 'running'));
 
     // Sync run_count on affected tasks so next run gets the correct index.
     // Also set last_run_at=now and next_run_at=now+interval so the scheduler
     // doesn't immediately re-fire on startup (which creates duplicate chats).
-    const affectedTaskIds = [...new Set((runs as any[]).map((r) => r.task_id))];
+    const affectedTaskIds = [...new Set(runs.map((r) => r.task_id))];
     for (const taskId of affectedTaskIds) {
-      const maxRun = await coreDb.run(
-        sql`SELECT run_index FROM task_runs WHERE task_id = ${taskId} ORDER BY run_index DESC LIMIT 1`
-      );
+      const maxRunRows = await coreDb
+        .select({ run_index: task_runs.run_index })
+        .from(task_runs)
+        .where(eq(task_runs.task_id, taskId))
+        .orderBy(desc(task_runs.run_index))
+        .limit(1)
+        .all();
 
-      const task = await coreDb.run(
-        sql`SELECT interval_minutes FROM scheduled_tasks WHERE id = ${taskId} LIMIT 1`
-      );
+      const taskRows = await coreDb
+        .select({ interval_minutes: scheduled_tasks.interval_minutes })
+        .from(scheduled_tasks)
+        .where(eq(scheduled_tasks.id, taskId))
+        .limit(1)
+        .all();
 
-      const intervalMinutes =
-        Array.isArray(task) && task[0] ? (task[0] as any).interval_minutes : 60;
+      const intervalMinutes = taskRows[0]?.interval_minutes ?? 60;
       const nextRunAt = new Date(Date.now() + intervalMinutes * 60 * 1000).toISOString();
 
-      if (Array.isArray(maxRun) && maxRun[0]) {
-        await coreDb.run(
-          sql`UPDATE scheduled_tasks SET run_count = ${(maxRun[0] as any).run_index}, last_run_at = ${now}, next_run_at = ${nextRunAt}, updated_by = 'system', updated_at = ${now} WHERE id = ${taskId}`
-        );
+      if (maxRunRows[0]) {
+        await coreDb
+          .update(scheduled_tasks)
+          .set({
+            run_count: maxRunRows[0].run_index,
+            last_run_at: now,
+            next_run_at: nextRunAt,
+            updated_by: 'system',
+            updated_at: now,
+          })
+          .where(eq(scheduled_tasks.id, taskId));
       }
     }
 
-    console.log(
-      `Task run recovery: Complete. Marked ${(runs as any[]).length} orphaned run(s) as failed`
-    );
+    console.log(`Task run recovery: Complete. Marked ${runs.length} orphaned run(s) as failed`);
   } catch (error) {
     console.error('Task run recovery: Unexpected error:', error);
   }

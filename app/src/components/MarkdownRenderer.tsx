@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Check, Copy } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
 
@@ -20,12 +21,14 @@ function CopyButton({ text }: { text: string }) {
   };
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon-sm"
       onClick={handleCopy}
       className="absolute right-2 top-2 z-10 rounded bg-muted/80 p-1.5 text-muted-foreground hover:text-foreground"
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-    </button>
+    </Button>
   );
 }
 

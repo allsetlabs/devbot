@@ -1300,7 +1300,8 @@ export function BabyLogs() {
                     {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
                     <div className="fixed inset-0 z-30" onClick={() => setExportOpen(false)} />
                     <div className="border-border bg-card absolute right-0 top-10 z-40 min-w-40 overflow-hidden rounded-lg border shadow-lg">
-                      <button
+                      <Button
+                        variant="ghost"
                         className="text-foreground hover:bg-muted/50 active:bg-muted flex w-full items-center gap-2.5 px-4 py-3 text-sm"
                         onClick={() => {
                           exportTableCsv(logs);
@@ -1309,9 +1310,10 @@ export function BabyLogs() {
                       >
                         <Table className="text-primary h-4 w-4" />
                         Table (CSV)
-                      </button>
+                      </Button>
                       <div className="bg-border h-px" />
-                      <button
+                      <Button
+                        variant="ghost"
                         className="text-foreground hover:bg-muted/50 active:bg-muted flex w-full items-center gap-2.5 px-4 py-3 text-sm"
                         onClick={() => {
                           exportText(logs);
@@ -1320,7 +1322,7 @@ export function BabyLogs() {
                       >
                         <FileText className="text-primary h-4 w-4" />
                         Text
-                      </button>
+                      </Button>
                     </div>
                   </>
                 )}

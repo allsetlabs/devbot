@@ -24,6 +24,7 @@ import type {
   WorkingDirectory,
   Company,
   FeedbackDocument,
+  FileBrowseItem,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -444,8 +445,7 @@ export const api = {
     offset = 0,
     limit = 50,
     workingDir?: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<{ items: any[]; total: number; hasMore: boolean }> => {
+  ): Promise<{ items: FileBrowseItem[]; total: number; hasMore: boolean }> => {
     const params = new URLSearchParams({ q: query, offset: String(offset), limit: String(limit) });
     if (workingDir) params.set('workingDir', workingDir);
     return fetchApi(`/api/files/browse?${params.toString()}`);

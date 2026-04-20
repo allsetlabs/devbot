@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, AlertTriangle, Shield } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { useWorkingDirectories, useCreateWorkingDirectory } from '../hooks/useWorkingDirectories';
 import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
 
@@ -53,25 +54,28 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
           placeholder={VITE_CLAUDE_WORK_DIR}
           className={`w-full rounded-lg border px-3 py-2 pr-8 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 ${
             isRootSelected
-              ? 'border-orange-500 bg-background focus:border-orange-500 focus:ring-orange-500'
+              ? 'border-warning bg-background focus:border-warning focus:ring-warning'
               : 'border-border bg-background focus:border-primary focus:ring-primary'
           }`}
         />
         {savedDirs.length > 0 && (
-          <button
+          <Button
+            variant="ghost"
+            size="icon-sm"
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
             <ChevronDown className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
       {dropdownOpen && savedDirs.length > 0 && (
         <div className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-border bg-background shadow-lg">
           {savedDirs.map((dir) => (
-            <button
+            <Button
               key={dir.id}
+              variant="ghost"
               type="button"
               onClick={() => handleSelectDir(dir.path)}
               className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-muted"
@@ -81,17 +85,17 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
                 {dir.label && <span className="text-xs text-muted-foreground">{dir.label}</span>}
               </div>
               {dir.isDefault && <Shield className="h-3.5 w-3.5 shrink-0 text-primary" />}
-              {dir.isRootDirectory && <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-orange-500" />}
-            </button>
+              {dir.isRootDirectory && <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warning" />}
+            </Button>
           ))}
         </div>
       )}
       {isRootSelected ? (
-        <div className="mt-2 flex items-start gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-2">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-orange-500" />
+        <div className="mt-2 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
           <div>
-            <p className="text-sm font-medium text-orange-500">Danger: Root Directory</p>
-            <p className="text-xs text-orange-400">
+            <p className="text-sm font-medium text-warning">Danger: Root Directory</p>
+            <p className="text-xs text-warning/80">
               This is DevBot&apos;s own source code directory. Changes made here will modify the code
               that DevBot is currently running. Proceed with extreme caution.
             </p>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
   Drawer,
   DrawerContent,
@@ -132,7 +133,7 @@ export function SchedulerSettingsDrawer({
           {/* Prompt */}
           <div className="mb-4">
             <span className="mb-2 block text-sm font-medium text-foreground">Task Prompt</span>
-            <textarea
+            <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows={4}
@@ -146,8 +147,9 @@ export function SchedulerSettingsDrawer({
             <span className="mb-2 block text-sm font-medium text-foreground">Run every</span>
             <div className="grid grid-cols-4 gap-2" role="group" aria-label="Run interval">
               {INTERVAL_OPTIONS.map((opt) => (
-                <button
+                <Button
                   key={opt.value}
+                  variant="outline"
                   type="button"
                   disabled={task?.isSystem}
                   onClick={() => setIntervalMinutes(opt.value)}
@@ -158,7 +160,7 @@ export function SchedulerSettingsDrawer({
                   }`}
                 >
                   {opt.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -169,8 +171,9 @@ export function SchedulerSettingsDrawer({
             <div className="flex items-center gap-2" role="group" aria-label="Maximum runs">
               <div className="grid flex-1 grid-cols-4 gap-2">
                 {MAX_RUNS_PRESETS.map((opt) => (
-                  <button
+                  <Button
                     key={opt.value}
+                    variant="outline"
                     type="button"
                     disabled={isInfinite || task?.isSystem}
                     onClick={() => setMaxRuns(opt.value)}
@@ -181,10 +184,11 @@ export function SchedulerSettingsDrawer({
                     }`}
                   >
                     {opt.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
-              <button
+              <Button
+                variant="outline"
                 type="button"
                 disabled={task?.isSystem}
                 onClick={handleInfiniteToggle}
@@ -195,7 +199,7 @@ export function SchedulerSettingsDrawer({
                 }`}
               >
                 <InfinityIcon className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               {isInfinite

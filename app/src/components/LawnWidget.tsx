@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Leaf, ChevronRight, CalendarDays } from 'lucide-react';
-import type { LawnPlan, LawnProfile } from '@devbot/plugin-lawn-care/frontend';
+import type { LawnPlan, LawnProfile } from '@devbot/plugin-lawn-care/frontend/types';
 
 function getNextApplication(plans: LawnPlan[]): { date: string; name: string } | null {
   const completedPlan = plans.find((p) => p.status === 'completed' && p.planData);

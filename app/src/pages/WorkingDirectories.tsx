@@ -126,7 +126,7 @@ export function WorkingDirectories() {
                       </span>
                     )}
                     {dir.isRootDirectory && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-xs font-medium text-orange-500">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">
                         <AlertTriangle className="h-3 w-3" />
                         Root
                       </span>

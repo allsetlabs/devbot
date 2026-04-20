@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Code, Pencil } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
 import type { ClaudeMessageContent } from '../types';
 
@@ -86,7 +87,8 @@ export function EditDiffView({ toolInput }: { toolInput: Record<string, unknown>
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
-      <button
+      <Button
+        variant="ghost"
         onClick={(e) => {
           const target = e.currentTarget;
           setExpanded((v) => {
@@ -115,7 +117,7 @@ export function EditDiffView({ toolInput }: { toolInput: Record<string, unknown>
           {removedCount > 0 && addedCount > 0 && <span className="text-muted-foreground"> </span>}
           {addedCount > 0 && <span className="text-success">+{addedCount}</span>}
         </span>
-      </button>
+      </Button>
       {expanded && (
         <div className="border-t border-border">
           <div className="truncate border-b border-border/50 bg-muted/50 px-3 py-1 font-mono text-[11px] text-muted-foreground">
@@ -146,7 +148,8 @@ export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unk
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
-      <button
+      <Button
+        variant="ghost"
         onClick={(e) => {
           const target = e.currentTarget;
           setExpanded((v) => {
@@ -173,7 +176,7 @@ export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unk
           {totalRemoved > 0 && totalAdded > 0 && <span className="text-muted-foreground"> </span>}
           {totalAdded > 0 && <span className="text-success">+{totalAdded}</span>}
         </span>
-      </button>
+      </Button>
       {expanded && (
         <div className="border-t border-border">
           <div className="truncate border-b border-border/50 bg-muted/50 px-3 py-1 font-mono text-[11px] text-muted-foreground">
@@ -213,7 +216,8 @@ export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
 
   return (
     <div className="rounded-lg border border-border bg-muted/30">
-      <button
+      <Button
+        variant="ghost"
         onClick={(e) => {
           const target = e.currentTarget;
           setExpanded((v) => {
@@ -230,7 +234,7 @@ export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
         )}
         <Code className="h-4 w-4 text-primary" />
         <span className="text-sm font-medium text-foreground">{toolName}</span>
-      </button>
+      </Button>
       {preview && (
         <p className="line-clamp-2 px-3 pb-2 text-[11px] leading-4 text-muted-foreground/70">
           {preview}
@@ -251,7 +255,8 @@ export function ToolsGroup({ children, count }: { children: React.ReactNode; cou
   const [open, setOpen] = useState(false);
   return (
     <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/20">
-      <button
+      <Button
+        variant="ghost"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-2 px-3 py-2 text-left"
       >
@@ -263,7 +268,7 @@ export function ToolsGroup({ children, count }: { children: React.ReactNode; cou
         <Code className="h-3.5 w-3.5 text-primary" />
         <span className="text-xs font-medium text-foreground">Tools</span>
         <span className="ml-auto text-[10px] text-muted-foreground">{count} calls</span>
-      </button>
+      </Button>
       {open && (
         <div className="flex flex-col gap-1.5 border-t border-border/40 p-2">{children}</div>
       )}

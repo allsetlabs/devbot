@@ -1,4 +1,5 @@
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 
 interface MessageReactionsProps {
@@ -14,8 +15,10 @@ export function MessageReactions({
 }: MessageReactionsProps) {
   return (
     <>
-      <button
-        className={`inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors ${
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className={`h-6 w-6 flex-shrink-0 rounded transition-colors ${
           currentReaction === 'thumbsup'
             ? 'text-foreground'
             : 'text-muted-foreground/50 hover:text-muted-foreground active:text-foreground'
@@ -26,9 +29,11 @@ export function MessageReactions({
         <ThumbsUp
           className={`h-3.5 w-3.5 ${currentReaction === 'thumbsup' ? 'fill-current stroke-none' : ''}`}
         />
-      </button>
-      <button
-        className={`inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors ${
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className={`h-6 w-6 flex-shrink-0 rounded transition-colors ${
           currentReaction === 'thumbsdown'
             ? 'text-foreground'
             : 'text-muted-foreground/50 hover:text-muted-foreground active:text-foreground'
@@ -39,7 +44,7 @@ export function MessageReactions({
         <ThumbsDown
           className={`h-3.5 w-3.5 ${currentReaction === 'thumbsdown' ? 'fill-current stroke-none' : ''}`}
         />
-      </button>
+      </Button>
     </>
   );
 }

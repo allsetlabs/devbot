@@ -101,8 +101,9 @@ export function SlideNav({ isOpen, onClose }: SlideNavProps) {
                     : location.pathname === item.path ||
                       location.pathname.startsWith(item.path + '/');
               return (
-                <button
+                <Button
                   key={item.path}
+                  variant="ghost"
                   onClick={() => handleNavClick(item.path)}
                   className={`mb-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
                     isActive ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'
@@ -110,7 +111,7 @@ export function SlideNav({ isOpen, onClose }: SlideNavProps) {
                 >
                   {item.icon}
                   <span className="font-medium">{item.label}</span>
-                </button>
+                </Button>
               );
             })}
           </nav>

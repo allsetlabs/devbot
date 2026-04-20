@@ -20,10 +20,10 @@
     "paths": {
       "@allsetlabs/reusable/*": ["../reusables/src/*"],
       "@devbot/app/*": ["./src/*"],
-      "@devbot/plugin-baby-logs/frontend": ["../plugins/baby-logs/frontend/index.ts"],
-      "@devbot/plugin-baby-logs": ["../plugins/baby-logs/backend/index.ts"],
-      "@devbot/plugin-lawn-care/frontend": ["../plugins/lawn-care/frontend/index.ts"],
-      "@devbot/plugin-lawn-care": ["../plugins/lawn-care/backend/index.ts"]
+      "@devbot/plugin-baby-logs/frontend/*": ["../plugins/baby-logs/frontend/*"],
+      "@devbot/plugin-baby-logs/backend/*": ["../plugins/baby-logs/backend/*"],
+      "@devbot/plugin-lawn-care/frontend/*": ["../plugins/lawn-care/frontend/*"],
+      "@devbot/plugin-lawn-care/backend/*": ["../plugins/lawn-care/backend/*"]
     }
   },
   "include": ["src"],

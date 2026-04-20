@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { coreDb, interactive_chats, chat_messages, remotion_videos } from './db/core.js';
 import { sql, eq, and } from 'drizzle-orm';
 import type { StreamParserConfig } from './stream-parser.js';
+import type { ChatSettings } from './db/types.js';
 import { generateName } from './generate-name.js';
 import {
   spawnClaude,
@@ -191,7 +192,8 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
   else if (mode === 'auto-accept') systemPrompts.push(AUTO_ACCEPT_PROMPT);
   if (chat.system_prompt) systemPrompts.push(chat.system_prompt as string);
 
-  const workingDir: string = (chat.settings as any)?.workingDir || CLAUDE_WORK_DIR;
+  const workingDir: string =
+    (chat.settings as ChatSettings | null | undefined)?.workingDir || CLAUDE_WORK_DIR;
 
   // Auto-name on first message
   if (!chat.claude_session_id && chat.name === 'New Chat') {

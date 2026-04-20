@@ -1,4 +1,5 @@
 import { Eye, CheckCircle, Zap } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Drawer,
   DrawerContent,
@@ -37,8 +38,9 @@ export function ChatModeSwitcherDrawer({
               const isDisabled = mode === 'dangerous' && currentPermissionMode !== 'dangerous';
 
               return (
-                <button
+                <Button
                   key={mode}
+                  variant="ghost"
                   className={`flex items-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : ''} ${isDisabled ? 'cursor-not-allowed opacity-40' : 'active:bg-muted/50'}`}
                   onClick={() => {
                     if (!isDisabled && !isCurrentMode) {
@@ -69,7 +71,7 @@ export function ChatModeSwitcherDrawer({
                       </p>
                     )}
                   </div>
-                </button>
+                </Button>
               );
             }
           )}

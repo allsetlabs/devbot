@@ -7,6 +7,7 @@ import {
   DrawerTitle,
 } from '@allsetlabs/reusable/components/ui/drawer';
 import { Input } from '@allsetlabs/reusable/components/ui/input';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { FileText, Folder, Search, Loader2 } from 'lucide-react';
 import { api } from '../lib/api';
 
@@ -96,8 +97,9 @@ export function DirectoryBrowserSidebar({
             ) : (
               <div className="divide-y divide-border">
                 {sortedFiles.map((file) => (
-                  <button
+                  <Button
                     key={file.id}
+                    variant="ghost"
                     onClick={() => {
                       if (file.type === 'file') {
                         handleSelectFile(file.path);
@@ -122,7 +124,7 @@ export function DirectoryBrowserSidebar({
                         {(file.size / 1024).toFixed(1)}KB
                       </div>
                     )}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

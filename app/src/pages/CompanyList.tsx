@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import { Plus, Building2, X } from 'lucide-react';
 import { companyHooks } from '../hooks/useCompany';
 import { extractErrorMessage } from '../lib/format';
@@ -86,8 +87,9 @@ export function CompanyList() {
         ) : (
           <div className="divide-y divide-border">
             {companies.map((company) => (
-              <button
+              <Button
                 key={company.id}
+                variant="ghost"
                 onClick={() => navigate(`/company/${company.id}`)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
               >
@@ -99,15 +101,15 @@ export function CompanyList() {
                 <span
                   className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                     company.status === 'active'
-                      ? 'bg-green-500/10 text-green-500'
+                      ? 'bg-success/10 text-success'
                       : company.status === 'creating'
-                        ? 'bg-yellow-500/10 text-yellow-500'
+                        ? 'bg-warning/10 text-warning'
                         : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {company.status}
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -147,7 +149,7 @@ export function CompanyList() {
                 <label className="mb-1 block text-sm font-medium text-foreground">
                   Project Idea <span className="text-destructive">*</span>
                 </label>
-                <textarea
+                <Textarea
                   value={companyIdea}
                   onChange={(e) => setCompanyIdea(e.target.value)}
                   placeholder="Describe your project idea..."

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
 import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
@@ -110,8 +111,9 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
             <span className="mb-2 block text-sm font-medium text-foreground">Run every</span>
             <div className="grid grid-cols-4 gap-2" role="group" aria-label="Run interval">
               {INTERVAL_OPTIONS.map((opt) => (
-                <button
+                <Button
                   key={opt.value}
+                  variant="outline"
                   type="button"
                   onClick={() => setIntervalMinutes(opt.value)}
                   className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
@@ -121,7 +123,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
                   }`}
                 >
                   {opt.label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -132,8 +134,9 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
             <div className="flex items-center gap-2" role="group" aria-label="Maximum runs">
               <div className="grid flex-1 grid-cols-4 gap-2">
                 {MAX_RUNS_PRESETS.map((opt) => (
-                  <button
+                  <Button
                     key={opt.value}
+                    variant="outline"
                     type="button"
                     disabled={isInfinite}
                     onClick={() => setMaxRuns(opt.value)}
@@ -144,10 +147,11 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
                     }`}
                   >
                     {opt.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
-              <button
+              <Button
+                variant="outline"
                 type="button"
                 onClick={handleInfiniteToggle}
                 className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
@@ -157,7 +161,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
                 }`}
               >
                 <InfinityIcon className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               {isInfinite
@@ -172,7 +176,7 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
           <div>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="mb-2 block text-sm font-medium text-foreground">Task Prompt</label>
-            <textarea
+            <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Enter the task for Claude to execute..."

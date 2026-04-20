@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { coreDb, chat_messages, task_messages } from './db/core.js';
+import type { ChatMessageInsert, TaskMessageInsert } from './db/types.js';
 
 /** Message types supported by Claude stream-json output */
 export type StreamMessageType = 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
@@ -30,15 +31,12 @@ export function mapClaudeTypeToMessageType(
   }
 }
 
-/** Table name to Drizzle table mapping */
-const tableMap = {
-  chat_messages,
-  task_messages,
-} as const;
+/** Supported target table names for stream parser inserts */
+export type StreamParserTableName = 'chat_messages' | 'task_messages';
 
 export interface StreamParserConfig {
   /** Table name to insert messages into */
-  tableName: keyof typeof tableMap;
+  tableName: StreamParserTableName;
   /** Foreign key column name (e.g., 'run_id' or 'chat_id') */
   foreignKeyColumn: string;
   /** Foreign key value */
@@ -82,10 +80,8 @@ export async function parseStreamLine(
       const messageId = uuidv4().slice(0, 12);
       sequenceRef.value++;
 
-      const table = tableMap[config.tableName];
-
       try {
-        await coreDb.insert(table).values({
+        const values: ChatMessageInsert | TaskMessageInsert = {
           id: messageId,
           [config.foreignKeyColumn]: config.foreignKeyValue,
           sequence: sequenceRef.value,
@@ -93,8 +89,12 @@ export async function parseStreamLine(
           content: data,
           created_by: 'system',
           updated_by: 'system',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any);
+        } as ChatMessageInsert | TaskMessageInsert;
+        if (config.tableName === 'chat_messages') {
+          await coreDb.insert(chat_messages).values(values as ChatMessageInsert);
+        } else {
+          await coreDb.insert(task_messages).values(values as TaskMessageInsert);
+        }
       } catch (err) {
         console.error(`${config.logPrefix} Failed to insert message:`, err);
       }

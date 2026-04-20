@@ -136,7 +136,7 @@ export function SettingsDrawer({
                     onToggleFavorite();
                   }}
                 >
-                  <Star className={`h-4 w-4 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                  <Star className={`h-4 w-4 ${isFavorite ? 'fill-warning text-warning' : ''}`} />
                   {isFavorite ? 'Unfavorite' : 'Favorite'}
                 </Button>
               )}

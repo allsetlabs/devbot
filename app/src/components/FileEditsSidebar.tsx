@@ -90,7 +90,8 @@ export function FileEditsSidebar({ fileEdits, onScrollToEdit }: FileEditsSidebar
                   return (
                     <div key={`${edit.filePath}-${edit.messageIndex}`}>
                       {/* File item header */}
-                      <button
+                      <Button
+                        variant="outline"
                         onClick={() => {
                           setExpandedIndex(isExpanded ? null : index);
                         }}
@@ -123,7 +124,7 @@ export function FileEditsSidebar({ fileEdits, onScrollToEdit }: FileEditsSidebar
                             )}
                           </div>
                         </div>
-                      </button>
+                      </Button>
 
                       {/* Expanded details */}
                       {isExpanded && (

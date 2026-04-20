@@ -3,7 +3,7 @@ import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { eq, sql } from 'drizzle-orm';
 import { coreDb, scheduled_tasks, task_runs, interactive_chats, chat_messages } from './db/core.js';
-import type { ScheduledTaskRow } from './db/types.js';
+import type { ScheduledTaskRow, SchedulerSettings } from './db/types.js';
 import { registerChatExecution, unregisterChatExecution } from './interactive-chat-worker.js';
 import { spawnClaude, isExecuting, stopExecution } from './claude-spawn.js';
 import { CLAUDE_WORK_DIR } from './env.js';
@@ -139,9 +139,10 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
 
   console.log(`[Scheduler] Starting task ${taskId} run #${runIndex}`);
 
-  const model: 'opus' | 'sonnet' | 'haiku' = (task.settings as any)?.model || 'sonnet';
+  const settings = task.settings as SchedulerSettings | null | undefined;
+  const model: 'opus' | 'sonnet' | 'haiku' = settings?.model || 'sonnet';
   const chatId = createSchedulerChat(task, runIndex, model);
-  const workingDir: string = (task.settings as any)?.workingDir || CLAUDE_WORK_DIR;
+  const workingDir: string = settings?.workingDir || CLAUDE_WORK_DIR;
 
   try {
     coreDb

@@ -10,6 +10,7 @@ The app supports a plugin system where each plugin (baby-logs, lawn-care, etc.) 
 devbot/
 ├── app/         # Web app (Vite + React + xterm.js)
 ├── backend/     # Node.js session manager (xterm-ws + tmux)
+├── reusables/   # Shared component library (@allsetlabs/reusable)
 ├── supabase/    # Local Supabase (session persistence + migrations)
 ├── intro-video/ # Remotion intro video project
 └── plugins/     # Plugin modules (baby-logs, lawn-care, etc.)
@@ -228,7 +229,7 @@ export default function getBabyLogsRouter(db: DrizzleInstance): Router {
 Plugin registration in backend `index.ts`:
 
 ```ts
-import { getBabyLogsRouter } from '@devbot/plugin-baby-logs';
+import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
 ```

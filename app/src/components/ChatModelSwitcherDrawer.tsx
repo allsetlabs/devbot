@@ -1,4 +1,5 @@
 import { Sparkles, Cpu, Rabbit, Coins } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Drawer,
   DrawerContent,
@@ -40,8 +41,9 @@ export function ChatModelSwitcherDrawer({
               const isCurrentModel = currentModel === model;
 
               return (
-                <button
+                <Button
                   key={model}
+                  variant="ghost"
                   className={`flex items-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentModel ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'}`}
                   onClick={() => {
                     if (!isCurrentModel) {
@@ -70,7 +72,7 @@ export function ChatModelSwitcherDrawer({
                       {formatModelPricing(config.inputPrice, config.outputPrice)}
                     </p>
                   </div>
-                </button>
+                </Button>
               );
             }
           )}

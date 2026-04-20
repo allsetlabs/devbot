@@ -15,8 +15,8 @@ import {
   XCircle,
   MapPin,
 } from 'lucide-react';
-import { lawnCareApi } from '@devbot/plugin-lawn-care/frontend';
-import type { WeatherData, WeatherTreatment } from '@devbot/plugin-lawn-care/frontend';
+import { lawnCareApi } from '@devbot/plugin-lawn-care/frontend/api';
+import type { WeatherData, WeatherTreatment } from '@devbot/plugin-lawn-care/frontend/types';
 
 function getWeatherDescription(code: number): string {
   if (code === 0) return 'Clear';

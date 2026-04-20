@@ -48,7 +48,8 @@ function PhotoCard({
     : null;
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={compareMode ? onSelect : onEdit}
       className={`relative w-full overflow-hidden rounded-xl border text-left transition-all ${
         selected ? 'border-primary ring-primary/30 ring-2' : 'border-border hover:border-primary/40'
@@ -91,7 +92,7 @@ function PhotoCard({
           </div>
         )}
       </div>
-    </button>
+    </Button>
   );
 }
 

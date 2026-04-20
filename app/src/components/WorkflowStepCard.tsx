@@ -1,4 +1,5 @@
 import { Loader2, CheckCircle2, XCircle, Clock, SkipForward } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { WorkflowStepRun } from '../types';
 
 interface WorkflowStepCardProps {
@@ -20,7 +21,8 @@ export function WorkflowStepCard({ stepRun, isSelected, onSelect }: WorkflowStep
   const Icon = config.icon;
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onSelect}
       className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
         isSelected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'
@@ -30,6 +32,6 @@ export function WorkflowStepCard({ stepRun, isSelected, onSelect }: WorkflowStep
         className={`h-4 w-4 shrink-0 ${config.color} ${'animate' in config && config.animate ? 'animate-spin' : ''}`}
       />
       <span className="truncate">{stepRun.name || `Step ${stepRun.order + 1}`}</span>
-    </button>
+    </Button>
   );
 }

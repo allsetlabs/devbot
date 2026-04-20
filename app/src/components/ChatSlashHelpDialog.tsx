@@ -6,19 +6,12 @@ import {
   DialogFooter,
 } from '@allsetlabs/reusable/components/ui/dialog';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { SLASH_COMMANDS } from '../lib/slash-commands';
 
 interface ChatSlashHelpDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const SLASH_COMMANDS = [
-  { command: '/help', description: 'Show this help message' },
-  { command: '/clear', description: 'Clear all messages from this chat' },
-  { command: '/mode', description: 'Change permission mode (Plan, Accept, Dangerous)' },
-  { command: '/model', description: 'Switch Claude model (Opus, Sonnet, Haiku)' },
-  { command: '/info', description: 'Show session information and statistics' },
-];
 
 export function ChatSlashHelpDialog({ open, onOpenChange }: ChatSlashHelpDialogProps) {
   return (

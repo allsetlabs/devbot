@@ -25,28 +25,7 @@ export const KEYBOARD_SHORTCUTS = [
   },
 ];
 
-export const SLASH_COMMANDS = [
-  {
-    command: '/help',
-    description: 'Show help (this dialog)',
-  },
-  {
-    command: '/clear',
-    description: 'Clear all messages with confirmation',
-  },
-  {
-    command: '/mode',
-    description: 'Open mode selector drawer',
-  },
-  {
-    command: '/model',
-    description: 'Open model selector drawer',
-  },
-  {
-    command: '/info',
-    description: 'Display session statistics',
-  },
-];
+export { SLASH_COMMANDS } from './slash-commands';
 
 export const INPUT_FEATURES = [
   {

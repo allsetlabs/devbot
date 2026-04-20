@@ -13,6 +13,7 @@ import { api, uploadFiles } from '../lib/api';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
 import { POLL_INTERVALS } from '../lib/constants';
+import { SLASH_COMMANDS } from '../lib/slash-commands';
 import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 import { getCachedDraft, setCachedDraft, cleanupLegacyMessageCaches } from '../lib/storage';
 import { ErrorBanner } from '../components/ErrorBanner';
@@ -646,29 +647,23 @@ export function InteractiveChatView({
       }
       if (chatId) setCachedDraft(chatId, '');
 
-      switch (command) {
-        case '/help':
-          setHelpOpen(true);
-          return;
-        case '/clear':
-          setClearConfirmOpen(true);
-          return;
-        case '/mode':
-          setModeDrawerOpen(true);
-          return;
-        case '/model':
-          setModelDrawerOpen(true);
-          return;
-        case '/info': {
-          // Show session info via alert
+      const slashActions: Record<string, () => void> = {
+        openHelp: () => setHelpOpen(true),
+        openClearConfirm: () => setClearConfirmOpen(true),
+        openModeDrawer: () => setModeDrawerOpen(true),
+        openModelDrawer: () => setModelDrawerOpen(true),
+        showInfo: () => {
           const info = `Session Info:\n\nMessages: ${messages.length}\nModel: ${chat?.model || 'N/A'}`;
           alert(info);
-          return;
-        }
-        default:
-          // Unknown command - just send it to Claude
-          break;
+        },
+      };
+
+      const matched = SLASH_COMMANDS.find((c) => c.command === command);
+      if (matched && slashActions[matched.action]) {
+        slashActions[matched.action]();
+        return;
       }
+      if (matched) return;
     }
 
     // Build prompt: user text + file path tags (skip files already @-mentioned in the text)

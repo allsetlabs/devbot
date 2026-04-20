@@ -28,6 +28,7 @@ import type {
   McpServerConfig,
   McpServersResponse,
   HooksResponse,
+  GitStatus,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -409,6 +410,10 @@ export const api = {
 
   deleteWorkingDirectory: (id: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/working-directories/${id}`, { method: 'DELETE' });
+  },
+
+  getGitStatus: (dir: string): Promise<GitStatus> => {
+    return fetchApi(`/api/git-status?dir=${encodeURIComponent(dir)}`);
   },
 
   // Companies endpoints

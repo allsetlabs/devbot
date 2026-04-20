@@ -3,18 +3,19 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20
-Last implementation run: 2026-04-20
+Last implementation run: 2026-04-20T20:59:00Z
 
 ---
 
 ## Pending
-- Add git working tree status widget to interactive chat — Claude Code integrates git awareness; when a session has a working directory, show a compact git status badge (branch name + dirty file count) in the InteractiveChatView header using a `/api/working-directories/:path/git-status` endpoint
 
 ## In Progress
 
 <!-- Items currently being worked on -->
 
 ## Completed
+
+- [2026-04-20] Add git working tree status widget to interactive chat — backend /api/git-status endpoint returns branch, dirty count, ahead/behind; ChatViewHeader shows GitBranch icon badge with branch name and dirty count; useGitStatus hook polls every 30s
 
 - [2026-04-20] Improve ThinkingBlock to show reasoning summary — already implemented: extractSummary heuristic shows first sentence (truncated to 80 chars) as italic text when collapsed, alongside word count
 

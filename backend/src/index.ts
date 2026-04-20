@@ -20,6 +20,7 @@ import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './route
 import { companiesRouter } from './routes/companies.js';
 import { mcpServersRouter } from './routes/mcp-servers.js';
 import { hooksRouter } from './routes/hooks.js';
+import { gitStatusRouter } from './routes/git-status.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -96,6 +97,7 @@ app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
 app.use('/api/mcp-servers', mcpServersRouter);
 app.use('/api/hooks', hooksRouter);
+app.use('/api/git-status', gitStatusRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
@@ -209,3 +211,4 @@ const shutdown = () => {
 };
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
+

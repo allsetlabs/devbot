@@ -56,7 +56,7 @@ function ToolResultMessage({ content }: { content: ClaudeMessageContent }) {
       <Button
         variant="ghost"
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left"
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
       >
         {expanded ? (
           <ChevronDown className="h-4 w-4 text-muted-foreground" />

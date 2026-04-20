@@ -72,7 +72,7 @@ export function RunSelector({
                 onSelectRun(run.id);
                 onToggle();
               }}
-              className={`flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-muted/50 ${
+              className={`flex w-full items-center justify-start gap-2 px-3 py-2 text-left transition-colors hover:bg-muted/50 ${
                 run.id === selectedRunId ? 'bg-muted' : ''
               }`}
             >

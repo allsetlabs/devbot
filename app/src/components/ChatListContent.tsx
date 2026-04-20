@@ -4,7 +4,7 @@ import { ChatListItem } from './ChatListItem';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
-import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
+import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 import type { InteractiveChat } from '../types';
 
 interface ChatListContentProps {
@@ -119,7 +119,7 @@ export function ChatListContent({
               chat.claudeSessionId
                 ? () => {
                     copyToClipboard(
-                      `cd ${VITE_CLAUDE_WORK_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                      `cd ${VITE_DEVBOT_PROJECTS_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
                     );
                     toast.success('Command copied!');
                   }

@@ -24,7 +24,7 @@ export function WorkflowStepCard({ stepRun, isSelected, onSelect }: WorkflowStep
     <Button
       variant="ghost"
       onClick={onSelect}
-      className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
+      className={`flex w-full items-center justify-start gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
         isSelected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'
       }`}
     >

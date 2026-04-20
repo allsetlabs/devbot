@@ -96,7 +96,7 @@ export function EditDiffView({ toolInput }: { toolInput: Record<string, unknown>
             return !v;
           });
         }}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left"
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
       >
         {expanded ? (
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -157,7 +157,7 @@ export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unk
             return !v;
           });
         }}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left"
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
       >
         {expanded ? (
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -225,7 +225,7 @@ export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
             return !v;
           });
         }}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left"
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
       >
         {expanded ? (
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -258,7 +258,7 @@ export function ToolsGroup({ children, count }: { children: React.ReactNode; cou
       <Button
         variant="ghost"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left"
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
       >
         {open ? (
           <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />

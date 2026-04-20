@@ -13,7 +13,7 @@ import {
   type ClaudeModel,
   type PermissionMode,
 } from './claude-spawn.js';
-import { CLAUDE_WORK_DIR } from './env.js';
+import { DEVBOT_PROJECTS_DIR } from './env.js';
 
 export type { ClaudeModel, PermissionMode };
 
@@ -193,7 +193,7 @@ export async function sendMessage(chatId: string, prompt: string): Promise<void>
   if (chat.system_prompt) systemPrompts.push(chat.system_prompt as string);
 
   const workingDir: string =
-    (chat.settings as ChatSettings | null | undefined)?.workingDir || CLAUDE_WORK_DIR;
+    (chat.settings as ChatSettings | null | undefined)?.workingDir || DEVBOT_PROJECTS_DIR;
 
   // Auto-name on first message
   if (!chat.claude_session_id && chat.name === 'New Chat') {

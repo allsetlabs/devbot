@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, AlertTriangle, Shield } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { useWorkingDirectories, useCreateWorkingDirectory } from '../hooks/useWorkingDirectories';
-import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
+import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 
 interface WorkingDirSelectorProps {
   value: string;
@@ -51,7 +51,7 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
             onValidationError?.('');
           }}
           onFocus={() => savedDirs.length > 0 && setDropdownOpen(true)}
-          placeholder={VITE_CLAUDE_WORK_DIR}
+          placeholder={VITE_DEVBOT_PROJECTS_DIR}
           className={`w-full rounded-lg border px-3 py-2 pr-8 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 ${
             isRootSelected
               ? 'border-warning bg-background focus:border-warning focus:ring-warning'
@@ -78,7 +78,7 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
               variant="ghost"
               type="button"
               onClick={() => handleSelectDir(dir.path)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-muted"
+              className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left hover:bg-muted"
             >
               <div className="flex-1 min-w-0">
                 <span className="truncate text-sm text-foreground block">{dir.path}</span>

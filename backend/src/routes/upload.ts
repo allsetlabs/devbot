@@ -4,13 +4,13 @@ import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { coreDb, chat_uploads } from '../lib/db/core.js';
-import { CLAUDE_WORK_DIR } from '../lib/env.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 const router = Router();
 
 // Create uploads directory scoped by chatId
 const getUploadDir = (chatId?: string) => {
-  const workDir = CLAUDE_WORK_DIR;
+  const workDir = DEVBOT_PROJECTS_DIR;
   const uploadDir = chatId
     ? path.join(workDir, '.tmp', 'devbot-uploads', chatId)
     : path.join(workDir, '.tmp', 'devbot-uploads', 'unsorted');

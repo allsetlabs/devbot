@@ -1,14 +1,18 @@
 import { spawn, IPty } from 'node-pty';
 import { WebSocketServer, WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
+import http from 'http';
+import https from 'https';
 
-import { XTERM_BASE_PORT, XTERM_MAX_PORT, CLAUDE_WORK_DIR } from './env.js';
+import { XTERM_BASE_PORT, XTERM_MAX_PORT, DEVBOT_PROJECTS_DIR } from './env.js';
+import { loadDevCert } from './https-cert.js';
 
 const BASE_PORT = XTERM_BASE_PORT;
 const MAX_PORT = XTERM_MAX_PORT;
 
 interface XtermSession {
   wss: WebSocketServer;
+  httpServer: http.Server | https.Server;
   pty: IPty | null;
   port: number;
 }
@@ -34,10 +38,15 @@ export async function getXtermPort(): Promise<number | null> {
 export async function startXtermWs(port: number, tmuxSessionName: string): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
-      const wss = new WebSocketServer({ port, host: '0.0.0.0' });
+      const devCert = loadDevCert();
+      const httpServer = devCert
+        ? https.createServer(devCert)
+        : http.createServer();
+      const wss = new WebSocketServer({ server: httpServer });
 
       const session: XtermSession = {
         wss,
+        httpServer,
         pty: null,
         port,
       };
@@ -50,7 +59,7 @@ export async function startXtermWs(port: number, tmuxSessionName: string): Promi
           name: 'xterm-256color',
           cols: 80,
           rows: 24,
-          cwd: CLAUDE_WORK_DIR,
+          cwd: DEVBOT_PROJECTS_DIR,
           env: process.env as Record<string, string>,
         });
 
@@ -100,16 +109,18 @@ export async function startXtermWs(port: number, tmuxSessionName: string): Promi
         });
       });
 
-      wss.on('listening', () => {
-        console.log(`xterm-ws[${port}]: Listening on port ${port}`);
+      httpServer.on('listening', () => {
+        console.log(`xterm-ws[${port}]: Listening on port ${port} (${devCert ? 'wss' : 'ws'})`);
         xtermSessions.set(port, session);
         resolve();
       });
 
-      wss.on('error', (error: Error) => {
+      httpServer.on('error', (error: Error) => {
         console.error(`xterm-ws[${port}]: Server error:`, error);
         reject(error);
       });
+
+      httpServer.listen(port, '0.0.0.0');
     } catch (error) {
       reject(error);
     }
@@ -126,6 +137,7 @@ export async function stopXtermWs(port: number): Promise<void> {
       session.pty.kill();
     }
     session.wss.close();
+    session.httpServer.close();
     xtermSessions.delete(port);
     console.log(`xterm-ws[${port}]: Stopped`);
   }

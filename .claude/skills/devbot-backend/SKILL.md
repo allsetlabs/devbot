@@ -16,7 +16,7 @@ The DevBot backend is a Node.js Express server that manages terminal sessions, s
 | **Auth Header**    | `X-API-Key`                                            |
 | **API Key**        | Found in `.env` under `API_KEY`         |
 | **Supabase URL**   | Found in `.env` under `SUPABASE_URL`    |
-| **Work Directory** | Found in `.env` under `CLAUDE_WORK_DIR` |
+| **Work Directory** | Found in `.env` under `DEVBOT_PROJECTS_DIR` |
 
 Always read `.env` for current values. Never hardcode secrets.
 

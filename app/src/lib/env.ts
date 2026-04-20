@@ -13,4 +13,4 @@ function required(name: string): string {
 
 export const VITE_BACKEND_PORT = required('VITE_BACKEND_PORT');
 export const VITE_API_KEY = required('VITE_API_KEY');
-export const VITE_CLAUDE_WORK_DIR = required('VITE_CLAUDE_WORK_DIR');
+export const VITE_DEVBOT_PROJECTS_DIR = required('VITE_DEVBOT_PROJECTS_DIR');

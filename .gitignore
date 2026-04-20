@@ -4,4 +4,6 @@ supabase/backup_data_*.sql
 node_modules
 dist
 *.log
-package-lock.jsoncerts/
+package-lock.json
+certs/
+

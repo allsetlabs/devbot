@@ -6,7 +6,7 @@ import { coreDb, scheduled_tasks, task_runs, interactive_chats, chat_messages } 
 import type { ScheduledTaskRow, SchedulerSettings } from './db/types.js';
 import { registerChatExecution, unregisterChatExecution } from './interactive-chat-worker.js';
 import { spawnClaude, isExecuting, stopExecution } from './claude-spawn.js';
-import { CLAUDE_WORK_DIR } from './env.js';
+import { DEVBOT_PROJECTS_DIR } from './env.js';
 import type { StreamParserConfig } from './stream-parser.js';
 
 const CHECK_INTERVAL_MS = 30000;
@@ -142,7 +142,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
   const settings = task.settings as SchedulerSettings | null | undefined;
   const model: 'opus' | 'sonnet' | 'haiku' = settings?.model || 'sonnet';
   const chatId = createSchedulerChat(task, runIndex, model);
-  const workingDir: string = settings?.workingDir || CLAUDE_WORK_DIR;
+  const workingDir: string = settings?.workingDir || DEVBOT_PROJECTS_DIR;
 
   try {
     coreDb

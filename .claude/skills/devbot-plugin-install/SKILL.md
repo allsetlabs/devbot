@@ -55,7 +55,7 @@ export default {
 2. **Add as git submodule** pointing to the user's fork:
 
    ```bash
-   cd $CLAUDE_WORK_DIR
+   cd $DEVBOT_PROJECTS_DIR
    git submodule add https://github.com/<user-github>/<forked-repo>.git plugins/<plugin-name>
    ```
 

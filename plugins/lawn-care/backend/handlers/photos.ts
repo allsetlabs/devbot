@@ -12,9 +12,9 @@ export function createPhotosHandlers(db: PluginsDb): Router {
   const router = Router();
 
   function getUploadDir(): string {
-    const workDir = process.env.CLAUDE_WORK_DIR;
+    const workDir = process.env.DEVBOT_PROJECTS_DIR;
     if (!workDir) {
-      console.error('[ENV] Missing required environment variable: CLAUDE_WORK_DIR');
+      console.error('[ENV] Missing required environment variable: DEVBOT_PROJECTS_DIR');
       process.exit(1);
     }
     const uploadDir = path.join(workDir, '.tmp', 'devbot-uploads', 'lawn-care');

@@ -32,7 +32,7 @@ const claudeProcess = spawn(
   'claude',
   ['-p', prompt, '--output-format', 'stream-json', '--verbose', '--dangerously-skip-permissions'],
   {
-    cwd: CLAUDE_WORK_DIR,
+    cwd: DEVBOT_PROJECTS_DIR,
     env: { ...process.env },
   }
 );

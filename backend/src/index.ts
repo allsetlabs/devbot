@@ -38,7 +38,7 @@ delete process.env.CLAUDECODE;
 
 const app = express();
 
-import { BACKEND_PORT, BACKEND_HOST, API_KEY, CLAUDE_WORK_DIR } from './lib/env.js';
+import { BACKEND_PORT, BACKEND_HOST, API_KEY, DEVBOT_PROJECTS_DIR } from './lib/env.js';
 
 const PORT = BACKEND_PORT;
 const HOST = BACKEND_HOST;
@@ -72,7 +72,7 @@ app.get('/health', (_req, res) => {
 
 // Serve uploaded files (photos, documents, etc.)
 const uploadsDir = path.join(
-  CLAUDE_WORK_DIR,
+  DEVBOT_PROJECTS_DIR,
   '.tmp',
   'devbot-uploads'
 );

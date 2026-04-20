@@ -338,7 +338,7 @@ TTYD_MAX_PORT=7700
 TTYD_CREDENTIAL=user:strongpassword
 TTYD_SSL_CERT=/path/to/cert.pem
 TTYD_SSL_KEY=/path/to/key.pem
-CLAUDE_WORK_DIR=/home/user/personal
+DEVBOT_PROJECTS_DIR=/home/user/personal
 SERVER_PORT=3100
 ```
 

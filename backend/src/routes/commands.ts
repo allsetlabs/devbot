@@ -2,7 +2,7 @@ import { Router } from 'express';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { CLAUDE_WORK_DIR } from '../lib/env.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 export const commandsRouter = Router();
 
@@ -145,11 +145,11 @@ commandsRouter.get('/', (req, res) => {
   try {
     const dir = typeof req.query.dir === 'string' && req.query.dir.trim()
       ? req.query.dir.trim()
-      : CLAUDE_WORK_DIR;
+      : DEVBOT_PROJECTS_DIR;
 
     // Validate directory exists
     if (!fs.existsSync(dir)) {
-      res.json(scanCommands(CLAUDE_WORK_DIR));
+      res.json(scanCommands(DEVBOT_PROJECTS_DIR));
       return;
     }
 

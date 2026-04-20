@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { eq, desc } from 'drizzle-orm';
 import { coreDb, sessions } from '../lib/db/core.js';
-import { CLAUDE_WORK_DIR } from '../lib/env.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 import type { SessionRow } from '../lib/db/types.js';
 import { createTmuxSession, killTmuxSession, listTmuxSessions } from '../lib/tmux.js';
 import { startXtermWs, stopXtermWs, getXtermPort } from '../lib/xterm-ws.js';
@@ -77,7 +77,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const id = generateId();
     const tmuxSessionName = `devbot_${id}`;
-    const workDir = CLAUDE_WORK_DIR;
+    const workDir = DEVBOT_PROJECTS_DIR;
 
     await createTmuxSession(tmuxSessionName, workDir);
 

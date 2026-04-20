@@ -91,7 +91,7 @@ export function CompanyList() {
                 key={company.id}
                 variant="ghost"
                 onClick={() => navigate(`/company/${company.id}`)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
+                className="flex w-full items-center justify-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted"
               >
                 <Building2 className="h-5 w-5 shrink-0 text-primary" />
                 <div className="min-w-0 flex-1">

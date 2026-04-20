@@ -21,7 +21,7 @@ export function BabyWidget({ logs }: { logs: BabyLog[] }) {
     <Button
       variant="ghost"
       onClick={() => navigate('/baby-logs')}
-      className="h-auto flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 text-left active:bg-muted"
+      className="h-auto flex-col items-start justify-start gap-2 rounded-xl border border-border bg-card p-4 text-left active:bg-muted"
     >
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-2">

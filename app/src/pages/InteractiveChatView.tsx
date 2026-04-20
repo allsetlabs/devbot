@@ -13,7 +13,7 @@ import { api, uploadFiles } from '../lib/api';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
 import { POLL_INTERVALS } from '../lib/constants';
-import { VITE_CLAUDE_WORK_DIR } from '../lib/env';
+import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 import { getCachedDraft, setCachedDraft, cleanupLegacyMessageCaches } from '../lib/storage';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { MessageList } from '../components/MessageList';
@@ -1226,13 +1226,13 @@ export function InteractiveChatView({
         onHelp={() => setHelpModalOpen(true)}
         hasSystemPrompt={!!chat?.systemPrompt}
         hasMessages={messages.length > 0}
-        workingDirectory={chat?.workingDir ?? VITE_CLAUDE_WORK_DIR}
+        workingDirectory={chat?.workingDir ?? VITE_DEVBOT_PROJECTS_DIR}
         hasCopyResumeCommand={!!chat?.claudeSessionId}
         onCopyResumeCommand={
           chat?.claudeSessionId
             ? () => {
                 copyToClipboard(
-                  `cd ${VITE_CLAUDE_WORK_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                  `cd ${VITE_DEVBOT_PROJECTS_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
                 );
                 toast.success('Command copied!');
               }

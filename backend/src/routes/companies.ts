@@ -13,7 +13,7 @@ import {
   generateId,
   getOneById,
 } from '../lib/route-helpers.js';
-import { CLAUDE_WORK_DIR } from '../lib/env.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 const router = Router();
 
@@ -110,7 +110,7 @@ router.post(
       return;
     }
 
-    const directory = path.join(CLAUDE_WORK_DIR, 'modules', slug);
+    const directory = path.join(DEVBOT_PROJECTS_DIR, 'modules', slug);
     const companyId = generateId();
 
     // Insert company row with status 'creating'
@@ -144,7 +144,7 @@ router.post(
         model: 'sonnet',
         system_prompt: null,
         max_turns: null,
-        settings: { workingDir: CLAUDE_WORK_DIR },
+        settings: { workingDir: DEVBOT_PROJECTS_DIR },
         created_by: 'user',
         updated_by: 'user',
       })

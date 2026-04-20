@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { CLAUDE_WORK_DIR } from '../lib/env.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 export const filesRouter = Router();
 
@@ -115,7 +115,7 @@ filesRouter.get('/browse', (req, res) => {
     const query = ((req.query.q as string) || '').toLowerCase().trim();
     const offset = Math.max(0, parseInt((req.query.offset as string) || '0', 10) || 0);
     const limit = Math.max(1, parseInt((req.query.limit as string) || '50', 10) || 50);
-    const workDir = (req.query.workingDir as string) || CLAUDE_WORK_DIR;
+    const workDir = (req.query.workingDir as string) || DEVBOT_PROJECTS_DIR;
 
     const allFiles = getTrackedFiles(workDir);
 

@@ -23,7 +23,7 @@ function requiredInt(name: string): number {
 }
 
 // Core
-export const CLAUDE_WORK_DIR = required('CLAUDE_WORK_DIR');
+export const DEVBOT_PROJECTS_DIR = required('DEVBOT_PROJECTS_DIR');
 export const BACKEND_PORT = requiredInt('BACKEND_PORT');
 export const BACKEND_HOST = required('BACKEND_HOST');
 export const API_KEY: string | undefined = process.env.API_KEY;

@@ -14,7 +14,7 @@ This directory contains isolated plugin modules that extend DevBot functionality
 
 ### Baby Logs
 
-Location: `modules/devbot/plugins/baby-logs/`
+Location: `plugins/baby-logs/`
 Database: `baby-logs.db` (env: `DB_BABY_LOGS_PATH`)
 
 **Tables:**
@@ -37,7 +37,7 @@ import { getBabyLogsRouter, babyLogsTable, babyProfilesTable } from '@devbot/bab
 
 ### Lawn Care
 
-Location: `modules/devbot/plugins/lawn-care/`
+Location: `plugins/lawn-care/`
 Database: `lawn-care.db` (env: `DB_LAWN_CARE_PATH`)
 
 **Tables:**
@@ -88,7 +88,7 @@ plugin-name/
 
 ## Creating a New Plugin
 
-1. Create plugin directory: `modules/devbot/plugins/plugin-name/`
+1. Create plugin directory: `plugins/plugin-name/`
 
 2. Create `package.json`:
 
@@ -202,7 +202,7 @@ All plugin tables should include these standard columns:
 make install
 
 # Run backend with plugins
-make run-dbb
+make start
 
 # Test plugin API (requires API_KEY header)
 curl -H "X-API-Key: your-key" http://localhost:3100/api/plugins/baby-logs/logs

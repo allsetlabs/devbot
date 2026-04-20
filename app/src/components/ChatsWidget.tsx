@@ -13,7 +13,7 @@ export function ChatsWidget({ chats }: { chats: InteractiveChat[] }) {
     <Button
       variant="ghost"
       onClick={() => navigate('/chats')}
-      className="h-auto flex-col items-start gap-2 rounded-xl border border-border bg-card p-4 text-left active:bg-muted"
+      className="h-auto flex-col items-start justify-start gap-2 rounded-xl border border-border bg-card p-4 text-left active:bg-muted"
     >
       <div className="flex w-full items-center justify-between">
         <div className="flex items-center gap-2">

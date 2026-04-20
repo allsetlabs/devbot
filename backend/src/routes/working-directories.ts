@@ -8,7 +8,7 @@ import {
   sendBadRequest,
   generateId,
 } from '../lib/route-helpers.js';
-import { CLAUDE_WORK_DIR } from '../lib/env.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 const router = Router();
 
@@ -159,8 +159,8 @@ function resolvePath(p: string): string {
  * Called once from index.ts after DB init.
  */
 export async function seedDefaultWorkingDirectories(): Promise<void> {
-  // 1. From .env CLAUDE_WORK_DIR
-  await upsertDefault(CLAUDE_WORK_DIR, 'Default (env)', 'env', {});
+  // 1. From .env DEVBOT_PROJECTS_DIR
+  await upsertDefault(DEVBOT_PROJECTS_DIR, 'Default (env)', 'env', {});
 
   // 2. One directory above backend CWD (the devbot repo root — where `make start` runs)
   const autoDir = path.resolve(process.cwd(), '..');

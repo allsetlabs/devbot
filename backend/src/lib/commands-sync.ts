@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { coreDb, commands } from './db/core.js';
-import { CLAUDE_WORK_DIR } from './env.js';
+import { DEVBOT_PROJECTS_DIR } from './env.js';
 
 interface CommandRecord {
   id: string;
@@ -139,7 +139,7 @@ function readCommands(commandsDir: string): CommandRecord[] {
 }
 
 export async function syncCommands(): Promise<void> {
-  const workDir = CLAUDE_WORK_DIR;
+  const workDir = DEVBOT_PROJECTS_DIR;
   const skillsDir = path.join(workDir, '.claude', 'skills');
   const commandsDir = path.join(workDir, '.claude', 'commands');
 

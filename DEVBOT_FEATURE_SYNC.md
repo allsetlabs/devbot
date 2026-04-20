@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20T21:50:00Z
-Last implementation run: 2026-04-20T20:59:00Z
+Last implementation run: 2026-04-20T22:30:00Z
 
 ---
 
 ## Pending
-
-- Add memory viewer/editor UI — dedicated page or drawer to view, edit, and delete Claude's persistent memory files (~/.claude/projects/*/memory/); currently no way to manage memories from DevBot
 - Add CLAUDE.md project documentation editor — inline editor to view and edit CLAUDE.md files for each working directory; currently only referenced in a tooltip
 - Add conversation branching/forking — allow users to branch from any message in a conversation to explore alternative response paths; no UI or backend support exists
 - Add compact/dense UI mode toggle — setting to reduce vertical spacing in chat messages for power users; currently only font size options exist
@@ -26,6 +24,7 @@ Last implementation run: 2026-04-20T20:59:00Z
 
 ## Completed
 
+- [2026-04-20] Add memory viewer/editor UI — MemoryViewerDrawer component accessible from SettingsDrawer; backend /api/memories route reads/writes/deletes memory files from ~/.claude/projects/*/memory/; supports expand, edit (full file with frontmatter), and delete; grouped by project with type badges
 - [2026-04-20] Add git working tree status widget to interactive chat — backend /api/git-status endpoint returns branch, dirty count, ahead/behind; ChatViewHeader shows GitBranch icon badge with branch name and dirty count; useGitStatus hook polls every 30s
 
 - [2026-04-20] Improve ThinkingBlock to show reasoning summary — already implemented: extractSummary heuristic shows first sentence (truncated to 80 chars) as italic text when collapsed, alongside word count

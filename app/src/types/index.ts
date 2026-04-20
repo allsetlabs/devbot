@@ -323,3 +323,17 @@ export interface HooksResponse {
   hooks: Record<string, HookMatcher[]>;
   settingsPath: string;
 }
+
+export interface MemoryFile {
+  project: string;
+  filename: string;
+  name: string;
+  description: string;
+  type: string;
+  content: string;
+}
+
+export interface MemoriesResponse {
+  memories: MemoryFile[];
+  basePath: string;
+}

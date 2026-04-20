@@ -21,6 +21,7 @@ import { companiesRouter } from './routes/companies.js';
 import { mcpServersRouter } from './routes/mcp-servers.js';
 import { hooksRouter } from './routes/hooks.js';
 import { gitStatusRouter } from './routes/git-status.js';
+import { memoriesRouter } from './routes/memories.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -98,6 +99,7 @@ app.use('/api/companies', companiesRouter);
 app.use('/api/mcp-servers', mcpServersRouter);
 app.use('/api/hooks', hooksRouter);
 app.use('/api/git-status', gitStatusRouter);
+app.use('/api/memories', memoriesRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
@@ -203,11 +205,26 @@ const server = httpServer.listen(PORT, HOST, async () => {
 
 // Graceful shutdown — required for vite-node --watch hot reload.
 // Without this, the old process holds port 3100 when vite-node restarts
-// on file changes, causing the new instance to fail silently.
+// on file changes, causing the new instance to fail with EADDRINUSE.
+// server.close() alone waits for in-flight connections to drain, but xterm
+// WebSockets and long-lived Claude workers never close on their own, so we
+// must forcibly drop connections and hard-exit on a timeout.
+let shuttingDown = false;
 const shutdown = () => {
+  if (shuttingDown) return;
+  shuttingDown = true;
+
+  const forceExit = setTimeout(() => {
+    console.warn('[shutdown] forcing exit after 3s timeout');
+    process.exit(1);
+  }, 3000);
+  forceExit.unref();
+
   server.close(() => {
+    clearTimeout(forceExit);
     process.exit(0);
   });
+  server.closeAllConnections?.();
 };
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);

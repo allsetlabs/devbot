@@ -28,6 +28,7 @@ import type {
   McpServerConfig,
   McpServersResponse,
   HooksResponse,
+  MemoriesResponse,
   GitStatus,
 } from '../types';
 
@@ -487,6 +488,24 @@ export const api = {
 
   deleteHook: (event: string, index: number): Promise<{ success: boolean }> => {
     return fetchApi(`/api/hooks/${encodeURIComponent(event)}/${index}`, { method: 'DELETE' });
+  },
+
+  // Memories endpoints
+  listMemories: (): Promise<MemoriesResponse> => {
+    return fetchApi('/api/memories');
+  },
+
+  updateMemory: (project: string, filename: string, content: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content }),
+    });
+  },
+
+  deleteMemory: (project: string, filename: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+    });
   },
 
   // Files endpoints

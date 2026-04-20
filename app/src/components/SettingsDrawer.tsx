@@ -1,4 +1,4 @@
-import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook } from 'lucide-react';
+import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook, Brain } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -30,6 +30,7 @@ interface SettingsDrawerProps {
   onToggleFavorite?: () => void;
   onMcpServers?: () => void;
   onHooks?: () => void;
+  onMemories?: () => void;
 }
 
 export function SettingsDrawer({
@@ -53,6 +54,7 @@ export function SettingsDrawer({
   onToggleFavorite,
   onMcpServers,
   onHooks,
+  onMemories,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -114,9 +116,9 @@ export function SettingsDrawer({
             )}
           </div>
 
-          {/* MCP Servers & Hooks */}
-          {(onMcpServers || onHooks) && (
-            <div className="flex gap-2">
+          {/* MCP Servers, Hooks & Memories */}
+          {(onMcpServers || onHooks || onMemories) && (
+            <div className="flex flex-wrap gap-2">
               {onMcpServers && (
                 <Button
                   variant="outline"
@@ -143,6 +145,20 @@ export function SettingsDrawer({
                 >
                   <Webhook className="h-4 w-4" />
                   Hooks
+                </Button>
+              )}
+              {onMemories && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onOpenChange(false);
+                    setTimeout(() => onMemories(), 300);
+                  }}
+                >
+                  <Brain className="h-4 w-4" />
+                  Memories
                 </Button>
               )}
             </div>

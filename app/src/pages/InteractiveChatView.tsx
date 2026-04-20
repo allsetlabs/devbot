@@ -26,6 +26,7 @@ import { HooksDrawer } from '../components/HooksDrawer';
 import { MemoryViewerDrawer } from '../components/MemoryViewerDrawer';
 import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
+import { ToolHistoryDrawer } from '../components/ToolHistoryDrawer';
 import { ToolUseDialog } from '../components/ToolUseDialog';
 import { EditMessageDialog } from '../components/EditMessageDialog';
 import { HelpModal } from '../components/HelpModal';
@@ -138,6 +139,7 @@ export function InteractiveChatView({
   const [memoriesOpen, setMemoriesOpen] = useState(false);
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
+  const [toolHistoryOpen, setToolHistoryOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMatches, setSearchMatches] = useState<number[]>([]);
@@ -1111,6 +1113,7 @@ export function InteractiveChatView({
           onToggleToolResults={handleToggleToolResults}
           pinnedIds={pinnedIds}
           onOpenPinnedMessages={() => setPinnedMessagesOpen(true)}
+          onOpenToolHistory={() => setToolHistoryOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenRename={() => {
             setRenameValue(chat?.name || '');
@@ -1342,6 +1345,20 @@ export function InteractiveChatView({
         onTogglePin={togglePin}
         onNavigateToMessage={(messageId) => {
           // Delay scroll to allow drawer close animation to complete
+          setTimeout(() => {
+            const renderedIdx = renderedMessages.findIndex((m) => m.id === messageId);
+            if (renderedIdx >= 0) {
+              messageListRef.current?.scrollToMessage(renderedIdx, 'start');
+            }
+          }, 400);
+        }}
+      />
+
+      <ToolHistoryDrawer
+        open={toolHistoryOpen}
+        onOpenChange={setToolHistoryOpen}
+        messages={messages}
+        onNavigateToMessage={(messageId) => {
           setTimeout(() => {
             const renderedIdx = renderedMessages.findIndex((m) => m.id === messageId);
             if (renderedIdx >= 0) {

@@ -1,4 +1,4 @@
-import { ArrowLeft, Eye, EyeOff, GitBranch, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, GitStatus, InteractiveChat } from '../types';
@@ -19,6 +19,7 @@ interface ChatViewHeaderProps {
   onOpenPinnedMessages: () => void;
   onOpenSettings: () => void;
   onOpenRename: () => void;
+  onOpenToolHistory: () => void;
 }
 
 export function ChatViewHeader({
@@ -35,16 +36,17 @@ export function ChatViewHeader({
   onOpenPinnedMessages,
   onOpenSettings,
   onOpenRename,
+  onOpenToolHistory,
 }: ChatViewHeaderProps) {
-  const toolResultCount = messages.filter((m) => {
-    if (m.type === 'tool_use' || m.type === 'tool_result') return true;
+  const toolResultCount = messages.reduce((count, m) => {
+    if (m.type === 'tool_use' || m.type === 'tool_result') return count + 1;
     if (m.type === 'assistant' && Array.isArray(m.content?.message?.content)) {
-      return m.content.message.content.every(
+      return count + m.content.message.content.filter(
         (b: { type: string }) => b.type === 'tool_use' || b.type === 'tool_result'
-      );
+      ).length;
     }
-    return false;
-  }).length;
+    return count;
+  }, 0);
 
   return (
     <header className="relative flex items-center justify-between border-b border-border px-4 py-3">
@@ -121,6 +123,21 @@ export function ChatViewHeader({
           )}
           {hideToolResults && toolResultCount > 0 && (
             <span className="text-warning-foreground absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-warning text-[10px] font-semibold">
+              {toolResultCount > 9 ? '9+' : toolResultCount}
+            </span>
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-7 w-7"
+          onClick={onOpenToolHistory}
+          title="Tool history"
+          disabled={toolResultCount === 0}
+        >
+          <History className="h-4 w-4 text-muted-foreground" />
+          {toolResultCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">
               {toolResultCount > 9 ? '9+' : toolResultCount}
             </span>
           )}

@@ -8,7 +8,6 @@ Last implementation run: 2026-04-20
 ---
 
 ## Pending
-- Improve ThinkingBlock to show reasoning summary — ThinkingBlock.tsx (line 1-42) only shows word count and collapse; add a one-line AI-generated or heuristic summary of the thinking content visible even when collapsed, to help users decide whether to expand
 - Add git working tree status widget to interactive chat — Claude Code integrates git awareness; when a session has a working directory, show a compact git status badge (branch name + dirty file count) in the InteractiveChatView header using a `/api/working-directories/:path/git-status` endpoint
 
 ## In Progress
@@ -16,6 +15,8 @@ Last implementation run: 2026-04-20
 <!-- Items currently being worked on -->
 
 ## Completed
+
+- [2026-04-20] Improve ThinkingBlock to show reasoning summary — already implemented: extractSummary heuristic shows first sentence (truncated to 80 chars) as italic text when collapsed, alongside word count
 
 - [2026-04-20] Add dedicated Settings page/route (/settings) — full page with sections: General (model, permission mode), Appearance (theme, font size), Notifications (sound, haptic, auto-scroll), Working Directory defaults; added to SlideNav and router
 - [2026-04-20] Extend slash command system to be data-driven — created shared slash-commands.ts config; ChatSlashHelpDialog and InteractiveChatView both consume it; help-modal-data.ts re-exports from shared config

@@ -21,6 +21,7 @@ interface MessageListProps {
   searchQuery?: string;
   getMessageReaction?: (messageId: string) => string | null;
   onToggleMessageReaction?: (messageId: string, type: ReactionType) => void;
+  compactMode?: boolean;
 }
 
 export const MessageList = forwardRef<
@@ -40,6 +41,7 @@ export const MessageList = forwardRef<
     searchQuery = '',
     getMessageReaction,
     onToggleMessageReaction,
+    compactMode = false,
   },
   ref
 ) {
@@ -84,7 +86,7 @@ export const MessageList = forwardRef<
   const virtualizer = useVirtualizer({
     count: renderedMessages.length,
     getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 96,
+    estimateSize: () => (compactMode ? 64 : 96),
     overscan: measured ? 5 : renderedMessages.length,
   });
 
@@ -146,7 +148,7 @@ export const MessageList = forwardRef<
               key={msg.id}
               ref={virtualizer.measureElement}
               data-index={virtualItem.index}
-              className="absolute left-0 w-full px-4 py-1.5"
+              className={`absolute left-0 w-full px-4 ${compactMode ? 'py-0.5' : 'py-1.5'}`}
               style={{ transform: `translateY(${virtualItem.start}px)` }}
             >
               {dateSeparator && (
@@ -180,6 +182,7 @@ export const MessageList = forwardRef<
                     : undefined
                 }
                 onBranch={onBranch ? () => onBranch(msg.id) : undefined}
+                compactMode={compactMode}
               />
             </div>
           );

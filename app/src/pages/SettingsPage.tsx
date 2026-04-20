@@ -149,6 +149,12 @@ export function SettingsPage() {
             options={FONT_SIZE_OPTIONS}
             onChange={(v) => updateSettings({ fontSize: v })}
           />
+          <ToggleField
+            label="Compact Mode"
+            description="Reduce spacing between messages for denser chat view"
+            checked={settings.compactMode}
+            onChange={() => updateSettings({ compactMode: !settings.compactMode })}
+          />
         </div>
 
         <SectionHeader title="Notifications" />

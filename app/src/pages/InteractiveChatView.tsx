@@ -1204,6 +1204,7 @@ export function InteractiveChatView({
           searchQuery={searchQuery}
           getMessageReaction={getReaction}
           onToggleMessageReaction={toggleReaction}
+          compactMode={settings.compactMode}
         />
       )}
 

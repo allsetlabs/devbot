@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20T21:50:00Z
-Last implementation run: 2026-04-21T02:30:00Z
+Last implementation run: 2026-04-20T23:00:00Z
 
 ---
 
 ## Pending
-- Add compact/dense UI mode toggle — setting to reduce vertical spacing in chat messages for power users; currently only font size options exist
 - Add tool approval/rejection history view — show a log of past tool permission decisions (approvals/rejections) within a chat session; currently only shows immediate tool dialogs
 - Add inline file editor in chat view — allow viewing and editing files directly within the conversation UI, similar to Claude Code's integrated file editing; DirectoryBrowserSidebar exists but has no edit capability
 - Add worktree management UI — visual interface to create, list, and switch between git worktrees for isolated working directories; Claude Code has EnterWorktree/ExitWorktree but DevBot has no corresponding UI
@@ -22,6 +21,7 @@ Last implementation run: 2026-04-21T02:30:00Z
 
 ## Completed
 
+- [2026-04-20] Add compact/dense UI mode toggle — compactMode boolean in useSettings; toggle in SettingsPage Appearance section; reduces message bubble padding (px-3 py-1) and inter-message spacing (py-0.5) in MessageList/ChatMessage
 - [2026-04-20] Add conversation branching/forking — branch_id column on chat_messages with UNIQUE(chat_id, branch_id, sequence); backend endpoints for branch creation and listing; branch-aware message fetching and sending; UI branch selector bar and GitBranch action button on user messages
 - [2026-04-20] Add CLAUDE.md project documentation editor — ClaudeMdDrawer component accessible from SettingsDrawer; backend /api/claude-md route reads/writes CLAUDE.md per working directory; supports create and edit
 - [2026-04-20] Add memory viewer/editor UI — MemoryViewerDrawer component accessible from SettingsDrawer; backend /api/memories route reads/writes/deletes memory files from ~/.claude/projects/*/memory/; supports expand, edit (full file with frontmatter), and delete; grouped by project with type badges

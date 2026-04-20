@@ -8,6 +8,7 @@ export interface DevBotSettings {
   defaultPermissionMode: string;
   theme: string;
   fontSize: string;
+  compactMode: boolean;
   defaultWorkingDirectory: string;
 }
 
@@ -20,6 +21,7 @@ const DEFAULT_SETTINGS: DevBotSettings = {
   defaultPermissionMode: 'normal',
   theme: 'system',
   fontSize: 'medium',
+  compactMode: false,
   defaultWorkingDirectory: '',
 };
 

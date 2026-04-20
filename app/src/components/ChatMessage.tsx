@@ -43,6 +43,7 @@ interface ChatMessageProps {
   searchQuery?: string;
   currentReaction?: ReactionType | null;
   onToggleReaction?: (type: ReactionType) => void;
+  compactMode?: boolean;
 }
 
 function ToolResultMessage({ content }: { content: ClaudeMessageContent }) {
@@ -94,6 +95,7 @@ export function ChatMessage({
   searchQuery = '',
   currentReaction = null,
   onToggleReaction,
+  compactMode = false,
 }: ChatMessageProps) {
   const { type, content } = message;
   const [expanded, setExpanded] = useState(false);
@@ -104,9 +106,9 @@ export function ChatMessage({
     const displayText = expanded || isLast ? text : truncated;
     const isSearchMatch = searchQuery && text.toLowerCase().includes(searchQuery.toLowerCase());
     return (
-      <div className="group flex flex-col items-end gap-0.5">
+      <div className={`group flex flex-col items-end ${compactMode ? 'gap-0' : 'gap-0.5'}`}>
         <div
-          className={`max-w-[85%] overflow-hidden rounded-2xl rounded-br-md bg-primary px-4 py-2 ${isSearchMatch ? 'ring-2 ring-warning/50' : ''}`}
+          className={`max-w-[85%] overflow-hidden rounded-2xl rounded-br-md bg-primary ${compactMode ? 'px-3 py-1' : 'px-4 py-2'} ${isSearchMatch ? 'ring-2 ring-warning/50' : ''}`}
         >
           <p className="whitespace-pre-wrap break-words text-sm text-primary-foreground">
             {searchQuery
@@ -184,9 +186,9 @@ export function ChatMessage({
     const isSearchMatch = searchQuery && text.toLowerCase().includes(searchQuery.toLowerCase());
 
     return (
-      <div className="group flex flex-col items-start gap-0.5">
+      <div className={`group flex flex-col items-start ${compactMode ? 'gap-0' : 'gap-0.5'}`}>
         <div
-          className={`max-w-[85%] overflow-hidden rounded-2xl rounded-bl-md bg-muted px-4 py-2 text-sm text-foreground ${isSearchMatch ? 'ring-2 ring-warning/50' : ''}`}
+          className={`max-w-[85%] overflow-hidden rounded-2xl rounded-bl-md bg-muted ${compactMode ? 'px-3 py-1' : 'px-4 py-2'} text-sm text-foreground ${isSearchMatch ? 'ring-2 ring-warning/50' : ''}`}
         >
           {thinking && <ThinkingBlock thinking={thinking} />}
           {text && <MarkdownRenderer content={displayText} />}

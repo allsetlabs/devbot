@@ -51,6 +51,7 @@ export interface SchedulerSettings {
   workingDir?: string;
   model?: ClaudeModel;
   isSystem?: boolean;
+  maxRetries?: number;
 }
 
 // Shape of the JSONB `settings` column on interactive_chats

@@ -1,4 +1,4 @@
-import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star } from 'lucide-react';
+import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -28,6 +28,7 @@ interface SettingsDrawerProps {
   onDelete?: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  onMcpServers?: () => void;
 }
 
 export function SettingsDrawer({
@@ -49,6 +50,7 @@ export function SettingsDrawer({
   onDelete,
   isFavorite = false,
   onToggleFavorite,
+  onMcpServers,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -109,6 +111,22 @@ export function SettingsDrawer({
               </Button>
             )}
           </div>
+
+          {/* MCP Servers */}
+          {onMcpServers && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2"
+              onClick={() => {
+                onOpenChange(false);
+                setTimeout(() => onMcpServers(), 300);
+              }}
+            >
+              <Server className="h-4 w-4" />
+              MCP Servers
+            </Button>
+          )}
 
           {/* Session Actions */}
           {(hasCopyResumeCommand || onToggleFavorite || onArchive || onDelete) && (

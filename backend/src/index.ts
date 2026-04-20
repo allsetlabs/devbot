@@ -18,6 +18,7 @@ import { commandsRouter } from './routes/commands.js';
 import { filesRouter } from './routes/files.js';
 import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './routes/working-directories.js';
 import { companiesRouter } from './routes/companies.js';
+import { mcpServersRouter } from './routes/mcp-servers.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -92,6 +93,7 @@ app.use('/api/commands', commandsRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
+app.use('/api/mcp-servers', mcpServersRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

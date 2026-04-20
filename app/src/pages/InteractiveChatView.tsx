@@ -20,6 +20,7 @@ import { MessageList } from '../components/MessageList';
 import { ChatWelcomeScreen } from '../components/ChatWelcomeScreen';
 import { ChatSearchBar } from '../components/ChatSearchBar';
 import { SettingsDrawer } from '../components/SettingsDrawer';
+import { McpServersDrawer } from '../components/McpServersDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolUseDialog } from '../components/ToolUseDialog';
 import { EditMessageDialog } from '../components/EditMessageDialog';
@@ -127,6 +128,7 @@ export function InteractiveChatView({
   const [maxTurnsOpen, setMaxTurnsOpen] = useState(false);
   const [maxTurnsValue, setMaxTurnsValue] = useState('');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mcpServersOpen, setMcpServersOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1060,6 +1062,7 @@ export function InteractiveChatView({
           isRunning={isRunning}
           chat={chat}
           messages={messages}
+          totalTokens={sessionStats.totalTokens}
           onToggleSearch={() => {
             setSearchOpen(!searchOpen);
             if (searchOpen) setSearchQuery('');
@@ -1256,7 +1259,10 @@ export function InteractiveChatView({
               }
             : undefined
         }
+        onMcpServers={() => setMcpServersOpen(true)}
       />
+
+      <McpServersDrawer open={mcpServersOpen} onOpenChange={setMcpServersOpen} />
 
       {/* Pinned messages drawer */}
       <PinnedMessagesDrawer
@@ -1364,6 +1370,7 @@ export function InteractiveChatView({
         onKeyDown={handleKeyDown}
         onResetNavigation={resetNavigation}
         onFileInputChange={handleFileInputChange}
+        onPasteFiles={handleFilesUpload}
         onOpenModeDrawer={() => setModeDrawerOpen(true)}
         onOpenModelDrawer={() => setModelDrawerOpen(true)}
         onOpenMaxTurns={(maxTurns) => {

@@ -55,6 +55,7 @@ interface ChatInputAreaProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onResetNavigation: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onPasteFiles?: (files: File[]) => void;
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
   onOpenMaxTurns: (currentMaxTurns?: number | null) => void;
@@ -91,6 +92,7 @@ export function ChatInputArea({
   onKeyDown,
   onResetNavigation,
   onFileInputChange,
+  onPasteFiles,
   onOpenModeDrawer,
   onOpenModelDrawer,
   onOpenMaxTurns,
@@ -130,6 +132,7 @@ export function ChatInputArea({
         onSend={onSend}
         onStop={onStop}
         onFileInputChange={onFileInputChange}
+        onPasteFiles={onPasteFiles}
         acceptedExtensions={acceptedExtensions}
       />
 

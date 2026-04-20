@@ -25,6 +25,8 @@ import type {
   Company,
   FeedbackDocument,
   FileBrowseItem,
+  McpServerConfig,
+  McpServersResponse,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -437,6 +439,28 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ prompt }),
     });
+  },
+
+  // MCP servers endpoints
+  listMcpServers: (): Promise<McpServersResponse> => {
+    return fetchApi('/api/mcp-servers');
+  },
+
+  addMcpServer: (
+    name: string,
+    command: string,
+    args?: string[],
+    env?: Record<string, string>,
+    cwd?: string
+  ): Promise<{ success: boolean; name: string; config: McpServerConfig }> => {
+    return fetchApi('/api/mcp-servers', {
+      method: 'POST',
+      body: JSON.stringify({ name, command, args, env, cwd }),
+    });
+  },
+
+  deleteMcpServer: (name: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/mcp-servers/${encodeURIComponent(name)}`, { method: 'DELETE' });
   },
 
   // Files endpoints

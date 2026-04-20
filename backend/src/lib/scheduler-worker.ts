@@ -11,6 +11,8 @@ import type { StreamParserConfig } from './stream-parser.js';
 
 const CHECK_INTERVAL_MS = 30000;
 const OUTPUT_DIR = '/tmp/devbot/scheduler';
+const DEFAULT_MAX_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 5000;
 
 const SCHEDULER_SYSTEM_PROMPT =
   'You are running as an autonomous scheduled task. Complete the task directly without asking clarifying questions. Make reasonable assumptions if needed. The user will not interact with you during this execution.';
@@ -56,16 +58,32 @@ async function processQueue(): Promise<void> {
 
   while (executionQueue.length > 0) {
     const entry = executionQueue.shift()!;
+    const settings = entry.task.settings as SchedulerSettings | null | undefined;
+    const maxRetries = settings?.maxRetries ?? DEFAULT_MAX_RETRIES;
     console.log(
       `[Scheduler] Dequeuing task ${entry.task.id} (${executionQueue.length} remaining in queue)`
     );
-    try {
-      const success = await executeTask(entry.task);
-      entry.resolve(success);
-    } catch (error) {
-      console.error(`[Scheduler] Queue execution error for ${entry.task.id}:`, error);
-      entry.resolve(false);
+
+    let success = false;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        success = await executeTask(entry.task);
+        if (success) break;
+        if (attempt < maxRetries) {
+          const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+          console.log(`[Scheduler] Task ${entry.task.id} failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          const freshTask = coreDb.select().from(scheduled_tasks).where(eq(scheduled_tasks.id, entry.task.id)).get();
+          if (freshTask) entry.task = freshTask;
+        }
+      } catch (error) {
+        console.error(`[Scheduler] Queue execution error for ${entry.task.id} (attempt ${attempt + 1}):`, error);
+        if (attempt >= maxRetries) break;
+        const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
     }
+    entry.resolve(success);
   }
 
   isProcessingQueue = false;

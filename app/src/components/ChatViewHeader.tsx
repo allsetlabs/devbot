@@ -3,11 +3,14 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, InteractiveChat } from '../types';
 
+const MAX_CONTEXT_TOKENS = 200000;
+
 interface ChatViewHeaderProps {
   onBack: () => void;
   isRunning: boolean;
   chat: InteractiveChat | undefined;
   messages: ChatMessageType[];
+  totalTokens?: number;
   onToggleSearch: () => void;
   hideToolResults: boolean;
   onToggleToolResults: () => void;
@@ -22,6 +25,7 @@ export function ChatViewHeader({
   isRunning,
   chat,
   messages,
+  totalTokens = 0,
   onToggleSearch,
   hideToolResults,
   onToggleToolResults,
@@ -41,7 +45,7 @@ export function ChatViewHeader({
   }).length;
 
   return (
-    <header className="flex items-center justify-between border-b border-border px-4 py-3">
+    <header className="relative flex items-center justify-between border-b border-border px-4 py-3">
       <div className="flex min-w-0 items-center gap-3">
         <Button variant="ghost" size="icon" className="flex-shrink-0" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
@@ -120,6 +124,13 @@ export function ChatViewHeader({
           <Settings className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
+      {totalTokens > 0 && (
+        <div
+          className="absolute bottom-0 left-0 h-0.5 bg-primary/60 transition-all duration-300"
+          style={{ width: `${Math.min((totalTokens / MAX_CONTEXT_TOKENS) * 100, 100)}%` }}
+          title={`${Math.round(totalTokens / 1000)}k / ${MAX_CONTEXT_TOKENS / 1000}k tokens (${Math.round((totalTokens / MAX_CONTEXT_TOKENS) * 100)}%)`}
+        />
+      )}
     </header>
   );
 }

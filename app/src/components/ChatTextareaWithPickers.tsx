@@ -41,6 +41,7 @@ interface ChatTextareaWithPickersProps {
   onSend: () => void;
   onStop: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onPasteFiles?: (files: File[]) => void;
   acceptedExtensions: string;
 }
 
@@ -72,6 +73,7 @@ export function ChatTextareaWithPickers({
   onSend,
   onStop,
   onFileInputChange,
+  onPasteFiles,
   acceptedExtensions,
 }: ChatTextareaWithPickersProps) {
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
@@ -154,6 +156,21 @@ export function ChatTextareaWithPickers({
           }}
           onKeyUp={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
           onClick={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
+          onPaste={(e) => {
+            const items = e.clipboardData?.items;
+            if (!items || !onPasteFiles) return;
+            const files: File[] = [];
+            for (const item of items) {
+              if (item.kind === 'file' && item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                if (file) files.push(file);
+              }
+            }
+            if (files.length > 0) {
+              e.preventDefault();
+              onPasteFiles(files);
+            }
+          }}
           onKeyDown={onKeyDown}
           placeholder={
             isRunning

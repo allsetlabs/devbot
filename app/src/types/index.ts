@@ -288,3 +288,15 @@ export interface FileBrowseItem {
   type: 'file' | 'directory';
   size?: number;
 }
+
+export interface McpServerConfig {
+  command: string;
+  args?: string[];
+  env?: Record<string, string>;
+  cwd?: string;
+}
+
+export interface McpServersResponse {
+  servers: Record<string, McpServerConfig>;
+  settingsPath: string;
+}

@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20
-Last implementation run: 2026-04-20T18:20:00Z
+Last implementation run: 2026-04-20T21:00:00Z
 
 ---
 
 ## Pending
-- Add hooks configuration UI — Claude Code supports pre/post tool call hooks; DevBot has no UI to configure hooks; add a Hooks section in SettingsDrawer to view and edit hooks stored in project .claude/settings.json
 - Extend slash command system to be data-driven — ChatSlashHelpDialog.tsx hardcodes 5 commands (/help, /clear, /mode, /model, /info); refactor so commands are declared in a single config array and the dialog auto-generates from it, making it easy to add new commands
 - Add image paste support to interactive chat input — Claude Code supports pasting screenshots/images directly into the chat; DevBot's chat input (InteractiveChatPage) has no paste handler for images; add onPaste to the textarea to detect image clipboard data and attach it as a file upload
 - Add context window usage progress bar to interactive chat — Claude Code shows context window usage (tokens used / max); add a thin progress bar or percentage badge near the chat header using token data from extractUsageData()
@@ -25,6 +24,7 @@ Last implementation run: 2026-04-20T18:20:00Z
 - [2026-04-20] Add MCP server configuration UI — McpServersDrawer component accessible from SettingsDrawer; backend route reads/writes mcpServers in ~/.claude/settings.json; supports add/delete servers
 - [2026-04-20] Add scheduler retry logic — already implemented: DEFAULT_MAX_RETRIES=3, exponential backoff (RETRY_BASE_DELAY_MS=5000), configurable via settings.maxRetries in processQueue loop
 - [2026-04-20] Add token/cost usage display to InteractiveChatView — already implemented: sessionStats (tokens, cost, duration, turns) rendered in ChatInputToolbar; context progress bar in ChatViewHeader
+- [2026-04-20] Add hooks configuration UI — HooksDrawer component accessible from SettingsDrawer; backend route reads/writes hooks in ~/.claude/settings.json; supports add/delete hooks with event type, matcher, and command
 
 ## Failed
 

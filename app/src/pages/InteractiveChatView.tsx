@@ -21,6 +21,7 @@ import { ChatWelcomeScreen } from '../components/ChatWelcomeScreen';
 import { ChatSearchBar } from '../components/ChatSearchBar';
 import { SettingsDrawer } from '../components/SettingsDrawer';
 import { McpServersDrawer } from '../components/McpServersDrawer';
+import { HooksDrawer } from '../components/HooksDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolUseDialog } from '../components/ToolUseDialog';
 import { EditMessageDialog } from '../components/EditMessageDialog';
@@ -129,6 +130,7 @@ export function InteractiveChatView({
   const [maxTurnsValue, setMaxTurnsValue] = useState('');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mcpServersOpen, setMcpServersOpen] = useState(false);
+  const [hooksOpen, setHooksOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1260,9 +1262,11 @@ export function InteractiveChatView({
             : undefined
         }
         onMcpServers={() => setMcpServersOpen(true)}
+        onHooks={() => setHooksOpen(true)}
       />
 
       <McpServersDrawer open={mcpServersOpen} onOpenChange={setMcpServersOpen} />
+      <HooksDrawer open={hooksOpen} onOpenChange={setHooksOpen} />
 
       {/* Pinned messages drawer */}
       <PinnedMessagesDrawer

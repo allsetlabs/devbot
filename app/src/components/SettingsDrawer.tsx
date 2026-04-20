@@ -1,4 +1,4 @@
-import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server } from 'lucide-react';
+import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -29,6 +29,7 @@ interface SettingsDrawerProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onMcpServers?: () => void;
+  onHooks?: () => void;
 }
 
 export function SettingsDrawer({
@@ -51,6 +52,7 @@ export function SettingsDrawer({
   isFavorite = false,
   onToggleFavorite,
   onMcpServers,
+  onHooks,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -112,20 +114,38 @@ export function SettingsDrawer({
             )}
           </div>
 
-          {/* MCP Servers */}
-          {onMcpServers && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full gap-2"
-              onClick={() => {
-                onOpenChange(false);
-                setTimeout(() => onMcpServers(), 300);
-              }}
-            >
-              <Server className="h-4 w-4" />
-              MCP Servers
-            </Button>
+          {/* MCP Servers & Hooks */}
+          {(onMcpServers || onHooks) && (
+            <div className="flex gap-2">
+              {onMcpServers && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onOpenChange(false);
+                    setTimeout(() => onMcpServers(), 300);
+                  }}
+                >
+                  <Server className="h-4 w-4" />
+                  MCP Servers
+                </Button>
+              )}
+              {onHooks && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onOpenChange(false);
+                    setTimeout(() => onHooks(), 300);
+                  }}
+                >
+                  <Webhook className="h-4 w-4" />
+                  Hooks
+                </Button>
+              )}
+            </div>
           )}
 
           {/* Session Actions */}

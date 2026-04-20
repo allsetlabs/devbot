@@ -27,6 +27,7 @@ import type {
   FileBrowseItem,
   McpServerConfig,
   McpServersResponse,
+  HooksResponse,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -461,6 +462,26 @@ export const api = {
 
   deleteMcpServer: (name: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/mcp-servers/${encodeURIComponent(name)}`, { method: 'DELETE' });
+  },
+
+  // Hooks endpoints
+  listHooks: (): Promise<HooksResponse> => {
+    return fetchApi('/api/hooks');
+  },
+
+  addHook: (
+    event: string,
+    matcher: string,
+    command: string
+  ): Promise<{ success: boolean }> => {
+    return fetchApi('/api/hooks', {
+      method: 'POST',
+      body: JSON.stringify({ event, matcher, command }),
+    });
+  },
+
+  deleteHook: (event: string, index: number): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/hooks/${encodeURIComponent(event)}/${index}`, { method: 'DELETE' });
   },
 
   // Files endpoints

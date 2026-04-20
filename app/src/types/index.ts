@@ -300,3 +300,18 @@ export interface McpServersResponse {
   servers: Record<string, McpServerConfig>;
   settingsPath: string;
 }
+
+export interface HookEntry {
+  type: 'command';
+  command: string;
+}
+
+export interface HookMatcher {
+  matcher: string;
+  hooks: HookEntry[];
+}
+
+export interface HooksResponse {
+  hooks: Record<string, HookMatcher[]>;
+  settingsPath: string;
+}

@@ -2,7 +2,7 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-20T21:30:00Z
+Last discovery run: 2026-04-20T21:50:00Z
 Last implementation run: 2026-04-20T20:59:00Z
 
 ---
@@ -17,6 +17,8 @@ Last implementation run: 2026-04-20T20:59:00Z
 - Add inline file editor in chat view — allow viewing and editing files directly within the conversation UI, similar to Claude Code's integrated file editing; DirectoryBrowserSidebar exists but has no edit capability
 - Add worktree management UI — visual interface to create, list, and switch between git worktrees for isolated working directories; Claude Code has EnterWorktree/ExitWorktree but DevBot has no corresponding UI
 - Add granular notification preferences — extend notification settings beyond sound/haptic/auto-scroll to include per-event-type controls, browser/desktop notification channels, and DND mode
+- Add keyboard shortcuts viewer/editor — dedicated UI showing all available keybindings with ability to customize them; Claude Code has keybindings.json support but DevBot has no corresponding viewer
+- Wire up Dashboard page route — Dashboard.tsx exists with widgets (ChatsWidget, SchedulerWidget, HealthWidget, etc.) but /dashboard is not in the router; it falls through to the /chats catch-all redirect
 
 ## In Progress
 

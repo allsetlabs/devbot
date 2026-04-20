@@ -2,12 +2,21 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-20
+Last discovery run: 2026-04-20T21:30:00Z
 Last implementation run: 2026-04-20T20:59:00Z
 
 ---
 
 ## Pending
+
+- Add memory viewer/editor UI — dedicated page or drawer to view, edit, and delete Claude's persistent memory files (~/.claude/projects/*/memory/); currently no way to manage memories from DevBot
+- Add CLAUDE.md project documentation editor — inline editor to view and edit CLAUDE.md files for each working directory; currently only referenced in a tooltip
+- Add conversation branching/forking — allow users to branch from any message in a conversation to explore alternative response paths; no UI or backend support exists
+- Add compact/dense UI mode toggle — setting to reduce vertical spacing in chat messages for power users; currently only font size options exist
+- Add tool approval/rejection history view — show a log of past tool permission decisions (approvals/rejections) within a chat session; currently only shows immediate tool dialogs
+- Add inline file editor in chat view — allow viewing and editing files directly within the conversation UI, similar to Claude Code's integrated file editing; DirectoryBrowserSidebar exists but has no edit capability
+- Add worktree management UI — visual interface to create, list, and switch between git worktrees for isolated working directories; Claude Code has EnterWorktree/ExitWorktree but DevBot has no corresponding UI
+- Add granular notification preferences — extend notification settings beyond sound/haptic/auto-scroll to include per-event-type controls, browser/desktop notification channels, and DND mode
 
 ## In Progress
 

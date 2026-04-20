@@ -4,6 +4,11 @@ export interface DevBotSettings {
   soundEnabled: boolean;
   hapticEnabled: boolean;
   autoScrollEnabled: boolean;
+  defaultModel: string;
+  defaultPermissionMode: string;
+  theme: string;
+  fontSize: string;
+  defaultWorkingDirectory: string;
 }
 
 const SETTINGS_KEY = 'devbot-settings';
@@ -11,6 +16,11 @@ const DEFAULT_SETTINGS: DevBotSettings = {
   soundEnabled: true,
   hapticEnabled: true,
   autoScrollEnabled: true,
+  defaultModel: 'claude-sonnet-4-6',
+  defaultPermissionMode: 'normal',
+  theme: 'system',
+  fontSize: 'medium',
+  defaultWorkingDirectory: '',
 };
 
 export function useSettings() {

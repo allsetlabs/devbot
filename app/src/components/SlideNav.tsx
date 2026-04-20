@@ -13,6 +13,7 @@ import {
   Video,
   FolderOpen,
   Building2,
+  Settings,
 } from 'lucide-react';
 
 interface SlideNavProps {
@@ -37,6 +38,7 @@ const navItems: NavItem[] = [
   { label: 'Directories', path: '/working-directories', icon: <FolderOpen className="h-5 w-5" /> },
   { label: 'Companies', path: '/companies', icon: <Building2 className="h-5 w-5" /> },
   { label: 'Logs', path: '/logs', icon: <ScrollText className="h-5 w-5" /> },
+  { label: 'Settings', path: '/settings', icon: <Settings className="h-5 w-5" /> },
 ];
 
 export function SlideNav({ isOpen, onClose }: SlideNavProps) {

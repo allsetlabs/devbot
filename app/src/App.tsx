@@ -19,6 +19,7 @@ import { RemotionVideos } from './pages/RemotionVideos';
 import { WorkingDirectories } from './pages/WorkingDirectories';
 import { CompanyList } from './pages/CompanyList';
 import { CompanyView } from './pages/CompanyView';
+import { SettingsPage } from './pages/SettingsPage';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
             <Route path="/videos" element={<RemotionVideos />} />
             <Route path="/working-directories" element={<WorkingDirectories />} />
             <Route path="/logs" element={<LogsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/companies" element={<CompanyList />} />
             <Route path="/company/:companyId" element={<CompanyView />} />
             {/* Legacy CLI routes */}

@@ -20,6 +20,7 @@ import { WorkingDirectories } from './pages/WorkingDirectories';
 import { CompanyList } from './pages/CompanyList';
 import { CompanyView } from './pages/CompanyView';
 import { SettingsPage } from './pages/SettingsPage';
+import { Dashboard } from './pages/Dashboard';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
       <div className="flex h-dvh flex-col overflow-hidden bg-background">
         <TextSelectionProvider>
           <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/chats" element={<InteractiveChatList />} />
             <Route path="/chat/:chatId" element={<InteractiveChatView />} />
             <Route path="/scheduler" element={<SchedulerList />} />

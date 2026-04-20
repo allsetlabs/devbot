@@ -14,6 +14,7 @@ import {
   FolderOpen,
   Building2,
   Settings,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface SlideNavProps {
@@ -28,6 +29,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: 'Chat', path: '/chats', icon: <MessageCircle className="h-5 w-5" /> },
   { label: 'Scheduler', path: '/scheduler', icon: <Clock className="h-5 w-5" /> },
   { label: 'Events Timer', path: '/events-timer', icon: <Timer className="h-5 w-5" /> },

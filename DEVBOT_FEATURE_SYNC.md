@@ -3,7 +3,7 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20T21:50:00Z
-Last implementation run: 2026-04-21T00:00:00Z
+Last implementation run: 2026-04-20T23:35:00Z
 
 ---
 
@@ -12,7 +12,6 @@ Last implementation run: 2026-04-21T00:00:00Z
 - Add worktree management UI — visual interface to create, list, and switch between git worktrees for isolated working directories; Claude Code has EnterWorktree/ExitWorktree but DevBot has no corresponding UI
 - Add granular notification preferences — extend notification settings beyond sound/haptic/auto-scroll to include per-event-type controls, browser/desktop notification channels, and DND mode
 - Add keyboard shortcuts viewer/editor — dedicated UI showing all available keybindings with ability to customize them; Claude Code has keybindings.json support but DevBot has no corresponding viewer
-- Wire up Dashboard page route — Dashboard.tsx exists with widgets (ChatsWidget, SchedulerWidget, HealthWidget, etc.) but /dashboard is not in the router; it falls through to the /chats catch-all redirect
 
 ## In Progress
 
@@ -20,6 +19,7 @@ Last implementation run: 2026-04-21T00:00:00Z
 
 ## Completed
 
+- [2026-04-20] Wire up Dashboard page route — added /dashboard route in App.tsx and Dashboard entry in SlideNav with LayoutDashboard icon
 - [2026-04-20] Add tool approval/rejection history view — ToolHistoryDrawer component accessible from ChatViewHeader clock icon; extracts tool_use blocks from assistant messages; shows tool name, preview, and timestamp; clickable entries navigate to the source message
 - [2026-04-20] Add compact/dense UI mode toggle — compactMode boolean in useSettings; toggle in SettingsPage Appearance section; reduces message bubble padding (px-3 py-1) and inter-message spacing (py-0.5) in MessageList/ChatMessage
 - [2026-04-20] Add conversation branching/forking — branch_id column on chat_messages with UNIQUE(chat_id, branch_id, sequence); backend endpoints for branch creation and listing; branch-aware message fetching and sending; UI branch selector bar and GitBranch action button on user messages

@@ -8,7 +8,6 @@ Last implementation run: 2026-04-20
 ---
 
 ## Pending
-- Add scheduler retry logic — when a scheduled task fails, the scheduler-worker.ts has no retry or backoff; add configurable retry attempts (default 3) with exponential backoff before marking a run as failed
 - Add MCP server configuration UI — Claude Code supports MCP servers (configured in claude_desktop_config.json); DevBot has no page or drawer to add/remove/view MCP servers; add an MCP servers settings section accessible from SettingsDrawer
 - Add hooks configuration UI — Claude Code supports pre/post tool call hooks; DevBot has no UI to configure hooks; add a Hooks section in SettingsDrawer to view and edit hooks stored in project .claude/settings.json
 - Extend slash command system to be data-driven — ChatSlashHelpDialog.tsx hardcodes 5 commands (/help, /clear, /mode, /model, /info); refactor so commands are declared in a single config array and the dialog auto-generates from it, making it easy to add new commands
@@ -24,6 +23,7 @@ Last implementation run: 2026-04-20
 
 ## Completed
 
+- [2026-04-20] Add scheduler retry logic — already implemented: DEFAULT_MAX_RETRIES=3, exponential backoff (RETRY_BASE_DELAY_MS=5000), configurable via settings.maxRetries in processQueue loop
 - [2026-04-20] Add token/cost usage display to InteractiveChatView — already implemented: sessionStats (tokens, cost, duration, turns) rendered in ChatInputToolbar; context progress bar in ChatViewHeader
 
 ## Failed

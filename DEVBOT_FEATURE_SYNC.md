@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20
-Last implementation run: never
+Last implementation run: 2026-04-20
 
 ---
 
 ## Pending
-
-- Add token/cost usage display to InteractiveChatView — `extractUsageData()` is called (InteractiveChatView.tsx:56) but the data is never rendered; show input/output token counts and estimated cost per session
 - Add scheduler retry logic — when a scheduled task fails, the scheduler-worker.ts has no retry or backoff; add configurable retry attempts (default 3) with exponential backoff before marking a run as failed
 - Add MCP server configuration UI — Claude Code supports MCP servers (configured in claude_desktop_config.json); DevBot has no page or drawer to add/remove/view MCP servers; add an MCP servers settings section accessible from SettingsDrawer
 - Add hooks configuration UI — Claude Code supports pre/post tool call hooks; DevBot has no UI to configure hooks; add a Hooks section in SettingsDrawer to view and edit hooks stored in project .claude/settings.json
@@ -26,7 +24,7 @@ Last implementation run: never
 
 ## Completed
 
-<!-- Items successfully implemented -->
+- [2026-04-20] Add token/cost usage display to InteractiveChatView — already implemented: sessionStats (tokens, cost, duration, turns) rendered in ChatInputToolbar; context progress bar in ChatViewHeader
 
 ## Failed
 

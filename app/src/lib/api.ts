@@ -504,6 +504,22 @@ export const api = {
     return fetchApi(`/api/hooks/${encodeURIComponent(event)}/${index}`, { method: 'DELETE' });
   },
 
+  // Keybindings endpoints
+  listKeybindings: (): Promise<{ keybindings: Array<{ key: string; command: string; when?: string }>; path: string }> => {
+    return fetchApi('/api/keybindings');
+  },
+
+  addKeybinding: (key: string, command: string, when?: string): Promise<{ success: boolean }> => {
+    return fetchApi('/api/keybindings', {
+      method: 'POST',
+      body: JSON.stringify({ key, command, when }),
+    });
+  },
+
+  deleteKeybinding: (index: number): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/keybindings/${index}`, { method: 'DELETE' });
+  },
+
   // Memories endpoints
   listMemories: (): Promise<MemoriesResponse> => {
     return fetchApi('/api/memories');

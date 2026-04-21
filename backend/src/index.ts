@@ -20,6 +20,7 @@ import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './route
 import { companiesRouter } from './routes/companies.js';
 import { mcpServersRouter } from './routes/mcp-servers.js';
 import { hooksRouter } from './routes/hooks.js';
+import { keybindingsRouter } from './routes/keybindings.js';
 import { gitStatusRouter } from './routes/git-status.js';
 import { memoriesRouter } from './routes/memories.js';
 import { claudeMdRouter } from './routes/claude-md.js';
@@ -100,6 +101,7 @@ app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
 app.use('/api/mcp-servers', mcpServersRouter);
 app.use('/api/hooks', hooksRouter);
+app.use('/api/keybindings', keybindingsRouter);
 app.use('/api/git-status', gitStatusRouter);
 app.use('/api/memories', memoriesRouter);
 app.use('/api/claude-md', claudeMdRouter);

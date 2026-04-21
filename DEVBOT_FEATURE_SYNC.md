@@ -2,12 +2,18 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-21T05:00:00Z
+Last discovery run: 2026-04-21T16:15:00Z
 Last implementation run: 2026-04-21T23:00:00Z
 
 ---
 
 ## Pending
+
+- Add /compact slash command — Claude Code supports context compaction via /compact; add this as a slash command that triggers the backend to send a compaction request to Claude
+- Add thinking budget control UI — Claude Code allows configuring extended thinking budget (e.g. max tokens for thinking); add a ThinkingBudgetDrawer or setting in the chat header to let users control this
+- Add session resume button in chat list — backend already supports --resume via sessionId but there is no UI button to resume/continue a previous session from the chat list or chat view
+- Fix Dashboard System card showing "sessions" with no count — the System status bar on Dashboard shows "Online Uptime: Xh Xm sessions" but the session count number is missing before "sessions"
+- Add copy-message-as-markdown button to assistant message action bar — Claude Code lets you copy responses as formatted markdown; add a clipboard-copy icon to the message action bar that copies the raw markdown source
 
 ## In Progress
 

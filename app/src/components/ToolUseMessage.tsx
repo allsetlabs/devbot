@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
-import type { ClaudeMessageContent, PermissionMode } from '../types';
+import type { ClaudeMessageContent, ClaudeContentBlock, PermissionMode } from '../types';
 
 function ToolApprovalBadge({ mode }: { mode: PermissionMode }) {
   if (mode === 'dangerous') {
@@ -346,6 +346,146 @@ export function AgentSubagentView({ toolInput, permissionMode, hasResult }: { to
           <pre className="max-h-60 overflow-auto whitespace-pre-wrap text-xs text-muted-foreground">
             {prompt}
           </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface GrepMatch {
+  lineNum: number;
+  content: string;
+}
+
+interface GrepFile {
+  path: string;
+  matches: GrepMatch[];
+}
+
+function parseGrepOutput(text: string): GrepFile[] {
+  const files: GrepFile[] = [];
+  const grepLineRegex = /^(.+?):(\d+):(.*)$/;
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue;
+    const match = line.match(grepLineRegex);
+    if (match) {
+      const [, filePath, lineNumStr, matchContent] = match;
+      const lineNum = parseInt(lineNumStr, 10);
+      let file = files.find((f) => f.path === filePath);
+      if (!file) {
+        file = { path: filePath, matches: [] };
+        files.push(file);
+      }
+      file.matches.push({ lineNum, content: matchContent });
+    }
+  }
+  return files;
+}
+
+function highlightInText(text: string, pattern: string): React.ReactNode {
+  if (!pattern) return text;
+  try {
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
+    const parts = text.split(regex);
+    return (
+      <>
+        {parts.map((part, i) =>
+          i % 2 === 1 ? (
+            <mark key={i} className="rounded-sm bg-warning/40 px-0.5 text-foreground">
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        )}
+      </>
+    );
+  } catch {
+    return text;
+  }
+}
+
+/** Specialized renderer for Grep tool results — shows matched lines grouped by file with pattern highlighting */
+export function GrepResultView({
+  content,
+  pattern,
+}: {
+  content?: string | ClaudeContentBlock[];
+  pattern?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const text =
+    typeof content === 'string'
+      ? content
+      : Array.isArray(content)
+        ? content
+            .filter((b) => b.type === 'text')
+            .map((b) => b.text || '')
+            .join('')
+        : '';
+
+  const files = useMemo(() => parseGrepOutput(text), [text]);
+  const totalMatches = files.reduce((sum, f) => sum + f.matches.length, 0);
+  const summaryLabel =
+    files.length === 0
+      ? 'No matches'
+      : totalMatches > 0
+        ? `${totalMatches} match${totalMatches !== 1 ? 'es' : ''} · ${files.length} file${files.length !== 1 ? 's' : ''}`
+        : `${files.length} file${files.length !== 1 ? 's' : ''}`;
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <Button
+        variant="ghost"
+        onClick={(e) => {
+          const target = e.currentTarget;
+          setExpanded((v) => {
+            if (!v) scrollHeaderToTop(target);
+            return !v;
+          });
+        }}
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+        <Search className="h-3.5 w-3.5 text-warning" />
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">
+          {pattern ? `"${pattern}"` : 'Grep'}
+        </span>
+        <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {summaryLabel}
+        </span>
+      </Button>
+      {expanded && (
+        <div className="border-t border-border">
+          {files.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-muted-foreground">No matches found</p>
+          ) : (
+            <div className="max-h-96 overflow-auto font-mono text-xs">
+              {files.map((file, fi) => (
+                <div key={fi} className={fi > 0 ? 'border-t border-border/40' : ''}>
+                  <div className="sticky top-0 z-10 bg-muted/80 px-3 py-1 text-[11px] font-medium text-primary backdrop-blur-sm">
+                    {file.path}
+                  </div>
+                  {file.matches.map((match, mi) => (
+                    <div key={mi} className="flex">
+                      <span className="w-10 flex-shrink-0 select-none pr-2 text-right text-[11px] leading-5 text-muted-foreground/50">
+                        {match.lineNum}
+                      </span>
+                      <pre className="min-w-0 flex-1 whitespace-pre-wrap break-all px-1 leading-5 text-foreground/90">
+                        {pattern ? highlightInText(match.content, pattern) : match.content}
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

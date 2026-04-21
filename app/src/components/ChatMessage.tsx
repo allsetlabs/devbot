@@ -15,7 +15,7 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView } from './ToolUseMessage';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView } from './ToolUseMessage';
 import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
@@ -48,6 +48,7 @@ interface ChatMessageProps {
   compactMode?: boolean;
   permissionMode?: PermissionMode;
   onStopChat?: () => void;
+  toolUseMap?: Map<string, { name: string; input: Record<string, unknown> }>;
 }
 
 function ToolResultMessage({ content }: { content: ClaudeMessageContent }) {
@@ -102,12 +103,36 @@ export function ChatMessage({
   compactMode = false,
   permissionMode = 'dangerous',
   onStopChat,
+  toolUseMap,
 }: ChatMessageProps) {
   const { type, content } = message;
   const [expanded, setExpanded] = useState(false);
 
   if (type === 'user') {
     const text = extractTextContent(content);
+    const blocks = (content?.message?.content || []) as ClaudeContentBlock[];
+    const toolResultBlocks = blocks.filter((b) => b.type === 'tool_result');
+
+    if (!text && toolResultBlocks.length > 0) {
+      return (
+        <div className="flex flex-col gap-1.5">
+          {toolResultBlocks.map((block, idx) => {
+            const toolInfo = toolUseMap?.get(block.tool_use_id || '');
+            if (toolInfo?.name === 'Grep') {
+              return (
+                <GrepResultView
+                  key={idx}
+                  content={block.content}
+                  pattern={toolInfo.input.pattern as string | undefined}
+                />
+              );
+            }
+            return null;
+          })}
+        </div>
+      );
+    }
+
     const { truncated, isTruncated } = truncateToLines(text, MAX_VISIBLE_LINES);
     const displayText = expanded || isLast ? text : truncated;
     const isSearchMatch = searchQuery && text.toLowerCase().includes(searchQuery.toLowerCase());

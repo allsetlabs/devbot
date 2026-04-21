@@ -3,7 +3,7 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T12:18:00Z
-Last implementation run: 2026-04-22T06:30:00Z
+Last implementation run: 2026-04-22T08:45:00Z
 
 ---
 
@@ -17,9 +17,10 @@ Last implementation run: 2026-04-22T06:30:00Z
 - Global cross-chat message search — add a "Search all messages" toggle/mode to the chat list search bar; when enabled, searches message content across all conversations using backend full-text query; results show message preview with chat name, timestamp, and click-to-navigate
 
 ## In Progress
-- Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
 
 ## Completed
+
+- [2026-04-22] Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
 
 - [2026-04-22] Desktop persistent sidebar navigation — on lg+ viewports, SlideNav renders as a persistent left sidebar (fixed, always visible) with border-right; content area shifts right via lg:ml-64; hamburger menu hidden on lg+ via lg:hidden; mobile overlay behavior preserved; centralized via AppLayout wrapper + NavContext; removed per-page SlideNav state from 12 pages; PersistentSidebar and mobile SlideNav rendered once in AppLayout
 

@@ -59,6 +59,24 @@ export const MessageList = forwardRef<
     [messages]
   );
 
+  const toolUseMap = useMemo(() => {
+    const map = new Map<string, { name: string; input: Record<string, unknown> }>();
+    for (const msg of messages) {
+      const blocks = (msg.content?.message?.content || []) as Array<{
+        type?: string;
+        id?: string;
+        name?: string;
+        input?: Record<string, unknown>;
+      }>;
+      for (const block of blocks) {
+        if (block.type === 'tool_use' && block.id && block.name) {
+          map.set(block.id, { name: block.name, input: block.input || {} });
+        }
+      }
+    }
+    return map;
+  }, [messages]);
+
   const dateSeparatorMap = useMemo(() => {
     const map = new Map<number, string>();
     for (let i = 0; i < renderedMessages.length; i++) {
@@ -198,6 +216,7 @@ export const MessageList = forwardRef<
                 compactMode={compactMode}
                 permissionMode={permissionMode}
                 onStopChat={onStopChat}
+                toolUseMap={toolUseMap}
               />
             </div>
           );

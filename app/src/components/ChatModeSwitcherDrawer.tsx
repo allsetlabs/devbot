@@ -41,7 +41,7 @@ export function ChatModeSwitcherDrawer({
                 <Button
                   key={mode}
                   variant="ghost"
-                  className={`flex items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'} ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
+                  className={`h-auto flex items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'} ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
                   onClick={() => {
                     if (isCurrentMode) {
                       onOpenChange(false);

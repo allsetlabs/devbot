@@ -10,7 +10,7 @@ import {
   Coins,
   Clock,
   Repeat,
-  Wrench,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
@@ -91,16 +91,15 @@ export function ChatInputToolbar({
           {chat?.effort ? chat.effort.charAt(0).toUpperCase() + chat.effort.slice(1) : 'High'}
           <ChevronDown className="h-3 w-3" />
         </Button>
-        {/* Allowed tools selector */}
+        {/* Settings — opens allowed tools drawer */}
         <Button
-          variant="outline"
-          size="sm"
-          className="flex h-auto flex-shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors active:opacity-70"
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 text-muted-foreground transition-colors hover:text-foreground active:opacity-70"
           onClick={onOpenAllowedTools}
+          title="Settings"
         >
-          <Wrench className="h-3 w-3" />
-          {chat?.allowedTools ? `${chat.allowedTools.length} Tools` : 'All Tools'}
-          <ChevronDown className="h-3 w-3" />
+          <Settings className="h-3.5 w-3.5" />
         </Button>
         {input.length > 0 && (
           <span className="text-[11px] text-muted-foreground">

@@ -90,109 +90,111 @@ export function ChatTextareaWithPickers({
 
   return (
     <>
-      <div className="relative">
-        <SlashCommandPicker
-          ref={slashPickerRef}
-          groups={slashGroups}
-          filter={slashFilter}
-          open={slashOpen}
-          onSelect={(item) => {
-            onInputChange(item.id + ' ');
-            textareaRef.current?.focus();
-          }}
-          onClose={() => onInputChange('')}
-        />
-        <FileIntellisensePicker
-          ref={filePickerRef}
-          items={fileIntellisenseFiles}
-          filter={fileIntellisenseFilter}
-          open={fileIntellisenseOpen && !fileIntellisenseLoading && fileIntellisenseFiles.length > 0}
-          loading={fileIntellisenseLoading}
-          loadingMore={fileIntellisenseLoadingMore}
-          hasMore={fileIntellisenseHasMore}
-          onLoadMore={onLoadMoreFiles}
-          onSelect={(item) => {
-            // Find the @ trigger relative to current cursor position
-            const cursorPos = textareaRef.current?.selectionStart ?? input.length;
-            const textToCursor = input.substring(0, cursorPos);
-            const atIndex = textToCursor.lastIndexOf('@');
-            if (atIndex === -1) return;
-            const beforeAt = input.substring(0, atIndex);
-            const afterCursor = input.substring(cursorPos);
-            const insertion = '@' + item.path + ' ';
-            const newValue = beforeAt + insertion + afterCursor;
-            const newCursorPos = beforeAt.length + insertion.length;
-            onInputChange(newValue);
-            onCursorChange?.(newCursorPos);
-            // Restore cursor position after React re-render
-            requestAnimationFrame(() => {
-              if (textareaRef.current) {
-                textareaRef.current.selectionStart = newCursorPos;
-                textareaRef.current.selectionEnd = newCursorPos;
-                textareaRef.current.focus();
+      <div className="flex items-end gap-2">
+        {/* Textarea with pickers */}
+        <div className="relative min-w-0 flex-1">
+          <SlashCommandPicker
+            ref={slashPickerRef}
+            groups={slashGroups}
+            filter={slashFilter}
+            open={slashOpen}
+            onSelect={(item) => {
+              onInputChange(item.id + ' ');
+              textareaRef.current?.focus();
+            }}
+            onClose={() => onInputChange('')}
+          />
+          <FileIntellisensePicker
+            ref={filePickerRef}
+            items={fileIntellisenseFiles}
+            filter={fileIntellisenseFilter}
+            open={fileIntellisenseOpen && !fileIntellisenseLoading && fileIntellisenseFiles.length > 0}
+            loading={fileIntellisenseLoading}
+            loadingMore={fileIntellisenseLoadingMore}
+            hasMore={fileIntellisenseHasMore}
+            onLoadMore={onLoadMoreFiles}
+            onSelect={(item) => {
+              const cursorPos = textareaRef.current?.selectionStart ?? input.length;
+              const textToCursor = input.substring(0, cursorPos);
+              const atIndex = textToCursor.lastIndexOf('@');
+              if (atIndex === -1) return;
+              const beforeAt = input.substring(0, atIndex);
+              const afterCursor = input.substring(cursorPos);
+              const insertion = '@' + item.path + ' ';
+              const newValue = beforeAt + insertion + afterCursor;
+              const newCursorPos = beforeAt.length + insertion.length;
+              onInputChange(newValue);
+              onCursorChange?.(newCursorPos);
+              requestAnimationFrame(() => {
+                if (textareaRef.current) {
+                  textareaRef.current.selectionStart = newCursorPos;
+                  textareaRef.current.selectionEnd = newCursorPos;
+                  textareaRef.current.focus();
+                }
+              });
+              if (!attachedFiles.some((f) => f.path === item.path)) {
+                onSetAttachedFiles((prev) => [
+                  ...prev,
+                  { id: item.id, name: item.name, path: item.path, uploading: false },
+                ]);
               }
-            });
-            if (!attachedFiles.some((f) => f.path === item.path)) {
-              onSetAttachedFiles((prev) => [
-                ...prev,
-                { id: item.id, name: item.name, path: item.path, uploading: false },
-              ]);
-            }
-          }}
-          onClose={() => {
-            const cursorPos = textareaRef.current?.selectionStart ?? input.length;
-            const textToCursor = input.substring(0, cursorPos);
-            const atIndex = textToCursor.lastIndexOf('@');
-            if (atIndex === -1) return;
-            const beforeAt = input.substring(0, atIndex);
-            const afterCursor = input.substring(cursorPos);
-            onInputChange(beforeAt + afterCursor);
-            onCursorChange?.(beforeAt.length);
-          }}
-        />
-        <Textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => {
-            onInputChange(e.target.value);
-            onCursorChange?.(e.target.selectionStart ?? e.target.value.length);
-            onResetNavigation();
-            const el = e.target;
-            el.style.height = 'auto';
-            const maxH = window.innerHeight * 0.4;
-            el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
-          }}
-          onKeyUp={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
-          onClick={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
-          onPaste={(e) => {
-            const items = e.clipboardData?.items;
-            if (!items || !onPasteFiles) return;
-            const files: File[] = [];
-            for (const item of items) {
-              if (item.kind === 'file' && item.type.startsWith('image/')) {
-                const file = item.getAsFile();
-                if (file) files.push(file);
+            }}
+            onClose={() => {
+              const cursorPos = textareaRef.current?.selectionStart ?? input.length;
+              const textToCursor = input.substring(0, cursorPos);
+              const atIndex = textToCursor.lastIndexOf('@');
+              if (atIndex === -1) return;
+              const beforeAt = input.substring(0, atIndex);
+              const afterCursor = input.substring(cursorPos);
+              onInputChange(beforeAt + afterCursor);
+              onCursorChange?.(beforeAt.length);
+            }}
+          />
+          <Textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => {
+              onInputChange(e.target.value);
+              onCursorChange?.(e.target.selectionStart ?? e.target.value.length);
+              onResetNavigation();
+              const el = e.target;
+              el.style.height = 'auto';
+              const maxH = window.innerHeight * 0.4;
+              el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
+            }}
+            onKeyUp={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
+            onClick={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
+            onPaste={(e) => {
+              const items = e.clipboardData?.items;
+              if (!items || !onPasteFiles) return;
+              const files: File[] = [];
+              for (const item of items) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                  const file = item.getAsFile();
+                  if (file) files.push(file);
+                }
               }
+              if (files.length > 0) {
+                e.preventDefault();
+                onPasteFiles(files);
+              }
+            }}
+            onKeyDown={onKeyDown}
+            placeholder={
+              isRunning
+                ? 'Type to interrupt & send...'
+                : isTouchDevice
+                  ? 'Type a message...'
+                  : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
             }
-            if (files.length > 0) {
-              e.preventDefault();
-              onPasteFiles(files);
-            }
-          }}
-          onKeyDown={onKeyDown}
-          placeholder={
-            isRunning
-              ? 'Type to interrupt & send...'
-              : isTouchDevice
-                ? 'Type a message...'
-                : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
-          }
-          rows={2}
-          className={`w-full resize-none border-input bg-background pr-12 ${isRunning ? 'pb-28' : 'pb-20'}`}
-          style={{ maxHeight: '40vh', overflow: 'auto' }}
-        />
-        {/* Buttons inside textarea — right side, top to bottom: stop, send, + */}
-        <div className="absolute bottom-2 right-2 flex flex-col items-center gap-1">
+            rows={2}
+            className="w-full resize-none border-input bg-background"
+            style={{ maxHeight: '40vh', overflow: 'auto' }}
+          />
+        </div>
+
+        {/* Action buttons — vertical column beside the textarea */}
+        <div className="flex flex-shrink-0 flex-col items-center gap-1 pb-0.5">
           {isRunning && (
             <>
               <Button

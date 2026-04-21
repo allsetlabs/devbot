@@ -685,6 +685,11 @@ export function InteractiveChatView({
           const info = `Session Info:\n\nMessages: ${messages.length}\nModel: ${chat?.model || 'N/A'}`;
           alert(info);
         },
+        sendCompact: () => {
+          if (!chatId) return;
+          toast.info('Compacting conversation…');
+          sendMutation.mutate('/compact');
+        },
       };
 
       const matched = SLASH_COMMANDS.find((c) => c.command === command);

@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T16:15:00Z
-Last implementation run: 2026-04-21T23:00:00Z
+Last implementation run: 2026-04-22T00:00:00Z
 
 ---
 
 ## Pending
-
-- Add /compact slash command — Claude Code supports context compaction via /compact; add this as a slash command that triggers the backend to send a compaction request to Claude
 - Add thinking budget control UI — Claude Code allows configuring extended thinking budget (e.g. max tokens for thinking); add a ThinkingBudgetDrawer or setting in the chat header to let users control this
 - Add session resume button in chat list — backend already supports --resume via sessionId but there is no UI button to resume/continue a previous session from the chat list or chat view
 - Fix Dashboard System card showing "sessions" with no count — the System status bar on Dashboard shows "Online Uptime: Xh Xm sessions" but the session count number is missing before "sessions"
@@ -21,6 +19,7 @@ Last implementation run: 2026-04-21T23:00:00Z
 
 ## Completed
 
+- [2026-04-21] Add /compact slash command — added to SLASH_COMMANDS config with sendCompact action; sends `/compact` as prompt to Claude CLI which handles context compaction natively; toast notification on trigger
 - [2026-04-21] Fix hidden-tools count badge style inconsistency — changed eye icon badge from bg-warning/text-warning-foreground to bg-muted/text-muted-foreground to match the history icon badge style
 - [2026-04-21] Fix permission mode drawer "Current" badge overlap — added flex-shrink-0, bg-muted pill styling, and truncate on label to prevent badge clipping into title text
 - [2026-04-21] Add session cost summary drawer — SessionCostDrawer component with total cost, tokens, duration, turns overview cards; token breakdown (input/output/cache read/cache creation); cache hit rate progress bar; per-turn usage list; Coins button in ChatViewHeader; clickable context progress bar opens drawer

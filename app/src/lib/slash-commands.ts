@@ -10,4 +10,5 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { command: '/mode', description: 'Open permission mode selector', action: 'openModeDrawer' },
   { command: '/model', description: 'Open model selector', action: 'openModelDrawer' },
   { command: '/info', description: 'Display session statistics', action: 'showInfo' },
+  { command: '/compact', description: 'Compact conversation to save context', action: 'sendCompact' },
 ];

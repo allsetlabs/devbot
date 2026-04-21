@@ -48,6 +48,8 @@ export interface ClaudeSpawnOptions {
   sessionId?: string;
   /** Max agentic turns */
   maxTurns?: number;
+  /** Effort level for thinking budget */
+  effort?: string;
   /** Working directory (defaults to DEVBOT_PROJECTS_DIR || cwd) */
   workDir?: string;
   /** Enable --chrome flag (default: false) */
@@ -119,6 +121,7 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
     systemPrompts = [],
     sessionId,
     maxTurns,
+    effort,
     workDir = DEVBOT_PROJECTS_DIR,
     chrome = false,
     timeoutMs = 30_000,
@@ -153,6 +156,7 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
     '--dangerously-skip-permissions',
   ];
 
+  if (effort) args.push('--effort', effort);
   if (chrome) args.push('--chrome');
   if (sessionId) args.push('--resume', sessionId);
   if (maxTurns && maxTurns > 0) args.push('--max-turns', String(maxTurns));

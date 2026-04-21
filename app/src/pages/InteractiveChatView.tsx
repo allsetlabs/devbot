@@ -50,6 +50,7 @@ import { ChatModeSwitcherDrawer } from '../components/ChatModeSwitcherDrawer';
 import { ChatModelSwitcherDrawer } from '../components/ChatModelSwitcherDrawer';
 import { ChatSystemPromptDrawer } from '../components/ChatSystemPromptDrawer';
 import { ChatMaxTurnsDrawer } from '../components/ChatMaxTurnsDrawer';
+import { ChatThinkingBudgetDrawer, type EffortLevel } from '../components/ChatThinkingBudgetDrawer';
 import { ChatExportDrawer, type ExportFormat } from '../components/ChatExportDrawer';
 import { ChatSlashHelpDialog } from '../components/ChatSlashHelpDialog';
 import { ChatClearConfirmDialog } from '../components/ChatClearConfirmDialog';
@@ -136,6 +137,7 @@ export function InteractiveChatView({
   const [systemPromptValue, setSystemPromptValue] = useState('');
   const [maxTurnsOpen, setMaxTurnsOpen] = useState(false);
   const [maxTurnsValue, setMaxTurnsValue] = useState('');
+  const [effortDrawerOpen, setEffortDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mcpServersOpen, setMcpServersOpen] = useState(false);
   const [hooksOpen, setHooksOpen] = useState(false);
@@ -518,6 +520,13 @@ export function InteractiveChatView({
     (maxTurns: number | null) => api.changeChatMaxTurns(chatId!, maxTurns),
     [['interactive-chat', chatId]],
     { onSuccess: () => setMaxTurnsOpen(false) }
+  );
+
+  // Change effort level mutation
+  const effortMutation = useCrudMutation(
+    (effort: string | null) => api.changeChatEffort(chatId!, effort),
+    [['interactive-chat', chatId]],
+    { onSuccess: () => setEffortDrawerOpen(false) }
   );
 
   // File upload mutation
@@ -1282,6 +1291,15 @@ export function InteractiveChatView({
         onSave={(maxTurns) => maxTurnsMutation.mutate(maxTurns)}
       />
 
+      {/* Thinking budget drawer */}
+      <ChatThinkingBudgetDrawer
+        open={effortDrawerOpen}
+        onOpenChange={setEffortDrawerOpen}
+        currentEffort={(chat?.effort as EffortLevel) ?? null}
+        isPending={effortMutation.isPending}
+        onSave={(effort) => effortMutation.mutate(effort)}
+      />
+
       {/* Settings drawer */}
       <SettingsDrawer
         open={settingsOpen}
@@ -1476,6 +1494,7 @@ export function InteractiveChatView({
           setMaxTurnsValue(maxTurns?.toString() || '');
           setMaxTurnsOpen(true);
         }}
+        onOpenEffort={() => setEffortDrawerOpen(true)}
         acceptedExtensions={ACCEPTED_EXTENSIONS}
       />
     </div>

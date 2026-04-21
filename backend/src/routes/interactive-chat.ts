@@ -31,6 +31,7 @@ interface InteractiveChat {
   model: ClaudeModel;
   systemPrompt: string | null;
   maxTurns: number | null;
+  effort: string | null;
   isRunning: boolean;
   createdAt: string;
   archivedAt: string | null;
@@ -63,6 +64,7 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     createdAt: row.created_at,
     archivedAt: row.archived_at,
     workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
+    effort: typeof settings.effort === 'string' ? settings.effort : null,
   };
 }
 
@@ -662,6 +664,40 @@ router.post(
 
     await updateChatField(req.params.id, { max_turns: value }, res);
   }, 'change max turns')
+);
+
+// Change effort level
+router.post(
+  '/:id/effort',
+  asyncHandler(async (req, res) => {
+    const { effort } = req.body;
+    const validLevels = ['low', 'medium', 'high', 'xhigh', 'max'];
+
+    if (effort !== null && !validLevels.includes(effort)) {
+      sendBadRequest(res, `effort must be one of: ${validLevels.join(', ')} or null`);
+      return;
+    }
+
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    const newSettings = { ...existingSettings };
+    if (effort === null) {
+      delete newSettings.effort;
+    } else {
+      newSettings.effort = effort;
+    }
+
+    await updateChatField(req.params.id, { settings: newSettings }, res);
+  }, 'change effort level')
 );
 
 // Archive a chat

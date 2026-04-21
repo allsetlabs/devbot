@@ -257,6 +257,13 @@ export const api = {
     });
   },
 
+  changeChatEffort: (id: string, effort: string | null): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/effort`, {
+      method: 'POST',
+      body: JSON.stringify({ effort }),
+    });
+  },
+
   exportChat: async (
     id: string,
     format: 'markdown' | 'json' | 'plaintext' = 'markdown'

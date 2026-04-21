@@ -60,6 +60,7 @@ interface ChatInputAreaProps {
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
   onOpenMaxTurns: (currentMaxTurns?: number | null) => void;
+  onOpenEffort: () => void;
   acceptedExtensions: string;
 }
 
@@ -98,6 +99,7 @@ export function ChatInputArea({
   onOpenModeDrawer,
   onOpenModelDrawer,
   onOpenMaxTurns,
+  onOpenEffort,
   acceptedExtensions,
 }: ChatInputAreaProps) {
   return (
@@ -147,6 +149,7 @@ export function ChatInputArea({
         onOpenModeDrawer={onOpenModeDrawer}
         onOpenModelDrawer={onOpenModelDrawer}
         onOpenMaxTurns={onOpenMaxTurns}
+        onOpenEffort={onOpenEffort}
       />
     </div>
   );

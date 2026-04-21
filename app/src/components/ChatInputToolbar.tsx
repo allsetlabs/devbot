@@ -1,4 +1,5 @@
 import {
+  Brain,
   ChevronDown,
   Cpu,
   Sparkles,
@@ -31,6 +32,7 @@ interface ChatInputToolbarProps {
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
   onOpenMaxTurns: (currentMaxTurns?: number | null) => void;
+  onOpenEffort: () => void;
 }
 
 export function ChatInputToolbar({
@@ -40,6 +42,7 @@ export function ChatInputToolbar({
   onOpenModeDrawer,
   onOpenModelDrawer,
   onOpenMaxTurns,
+  onOpenEffort,
 }: ChatInputToolbarProps) {
   return (
     <div className="flex items-center justify-between">
@@ -74,6 +77,17 @@ export function ChatInputToolbar({
             <ChevronDown className="h-3 w-3" />
           </Button>
         )}
+        {/* Effort selector */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex h-auto flex-shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors active:opacity-70"
+          onClick={onOpenEffort}
+        >
+          <Brain className="h-3 w-3" />
+          {chat?.effort ? chat.effort.charAt(0).toUpperCase() + chat.effort.slice(1) : 'High'}
+          <ChevronDown className="h-3 w-3" />
+        </Button>
         {input.length > 0 && (
           <span className="text-[11px] text-muted-foreground">
             {input.length >= 1000 ? `${(input.length / 1000).toFixed(1)}k` : input.length}c/

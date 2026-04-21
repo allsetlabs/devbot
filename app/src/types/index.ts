@@ -139,6 +139,7 @@ export interface InteractiveChat {
   model: ClaudeModel;
   systemPrompt: string | null;
   maxTurns: number | null;
+  effort: string | null;
   isRunning: boolean;
   createdAt: string;
   updatedAt: string;

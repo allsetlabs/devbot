@@ -3,13 +3,12 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T09:28:00Z
-Last implementation run: 2026-04-21T18:00:00Z
+Last implementation run: 2026-04-21T21:00:00Z
 
 ---
 
 ## Pending
 
-- Add /memory slash command to open memory viewer — Claude Code has `/memory` to view and manage memories; add to SLASH_COMMANDS and open MemoryViewerDrawer when triggered
 - Add chat message edit and re-run — Claude Code allows editing a previously sent user message and re-running from that point; add an Edit icon to user message action bar that opens EditMessageDialog, truncates messages after the edited one, and re-sends
 - Add subagent/background task progress indicators — Claude Code shows when it spawns Agent subagents with descriptions; parse agent tool_use blocks and show a nested "Agent: description" card with spinner/status in the message stream
 - Settings page Default Working Directory shows placeholder "/path/to/projects" instead of actual configured value — the input field shows a generic placeholder that doesn't reflect the real default working directory from the backend
@@ -19,6 +18,7 @@ Last implementation run: 2026-04-21T18:00:00Z
 
 ## Completed
 
+- [2026-04-21] Add /memory slash command to open memory viewer — added /memory to SLASH_COMMANDS with openMemoryDrawer action; opens existing MemoryViewerDrawer showing persistent memory files grouped by project with type badges, edit, and delete support
 - [2026-04-21] Add /cost slash command to show session cost inline — added /cost to SLASH_COMMANDS with openCostDrawer action; opens existing SessionCostDrawer showing total cost, tokens, duration, turns, token breakdown, cache hit rate, and per-turn usage
 
 - [2026-04-21] Add /config slash command to open settings — added /config to SLASH_COMMANDS with openConfig action; navigates to /settings page using react-router navigate()

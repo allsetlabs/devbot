@@ -726,6 +726,7 @@ export function InteractiveChatView({
         },
         openConfig: () => navigate('/settings'),
         openCostDrawer: () => setCostDrawerOpen(true),
+        openMemoryDrawer: () => setMemoriesOpen(true),
         toggleFastMode: () => {
           if (!chatId) return;
           api.toggleChatFastMode(chatId).then((updated) => {

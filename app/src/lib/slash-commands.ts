@@ -14,4 +14,5 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { command: '/fast', description: 'Toggle fast output mode', action: 'toggleFastMode' },
   { command: '/config', description: 'Open settings page', action: 'openConfig' },
   { command: '/cost', description: 'Show session cost and token usage', action: 'openCostDrawer' },
+  { command: '/memory', description: 'View and manage memories', action: 'openMemoryDrawer' },
 ];

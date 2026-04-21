@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T05:00:00Z
-Last implementation run: 2026-04-21T17:30:00Z
+Last implementation run: 2026-04-21T22:00:00Z
 
 ---
 
 ## Pending
-- Fix permission mode drawer "Current" badge overlap — ChatModeSwitcherDrawer "Full Auto" row has "Current" badge overlapping the label text; needs spacing/layout fix so badge doesn't clip into the title
 - Fix hidden-tools count badge style inconsistency — the eye (hide tools) icon in ChatViewHeader uses an orange/yellow badge for its count while the tools-used icon uses a gray badge; make the eye icon badge match the gray style used by the tools-used count
 
 ## In Progress
@@ -17,6 +16,7 @@ Last implementation run: 2026-04-21T17:30:00Z
 
 ## Completed
 
+- [2026-04-21] Fix permission mode drawer "Current" badge overlap — added flex-shrink-0, bg-muted pill styling, and truncate on label to prevent badge clipping into title text
 - [2026-04-21] Add session cost summary drawer — SessionCostDrawer component with total cost, tokens, duration, turns overview cards; token breakdown (input/output/cache read/cache creation); cache hit rate progress bar; per-turn usage list; Coins button in ChatViewHeader; clickable context progress bar opens drawer
 - [2026-04-21] Add permission prompt inline UI — replaced popup ToolUseDialog with inline approval badges on every tool call; shows "Auto" (green) for dangerous mode, "OK" (blue) for auto-accept, "Allowed"/"Read-only" for plan mode; badges appear on both standalone tool_use messages and embedded tool blocks (Edit/Write/Bash/Grep etc.); Stop button available in non-dangerous modes to halt execution; removed disruptive modal popup
 - [2026-04-21] Fix model selector drawer text overlap — added h-auto and whitespace-normal to Button className to override base button styles that caused text truncation and overlap

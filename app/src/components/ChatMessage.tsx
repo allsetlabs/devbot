@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, XCircle, CheckCircle, GitBranch } from 'lucide-react';
+import { ChevronDown, ChevronRight, XCircle, CheckCircle, GitBranch, RotateCcw } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 import { MessageReactions } from './MessageReactions';
@@ -262,6 +262,17 @@ export function ChatMessage({
                 />
               )}
               <CopyMessageButton text={text} variant="assistant" />
+              {isLast && onRetry && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={onRetry}
+                  className="h-6 w-6 text-muted-foreground/50 hover:text-muted-foreground"
+                  title="Retry"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </Button>
+              )}
               {onToggleReaction && (
                 <MessageReactions
                   messageId={message.id}

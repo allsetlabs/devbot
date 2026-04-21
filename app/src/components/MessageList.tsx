@@ -82,6 +82,15 @@ export const MessageList = forwardRef<
     return -1;
   }, [renderedMessages]);
 
+  const lastAssistantIndex = useMemo(() => {
+    for (let i = renderedMessages.length - 1; i >= 0; i--) {
+      if (renderedMessages[i].type === 'assistant') {
+        return i;
+      }
+    }
+    return -1;
+  }, [renderedMessages]);
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: renderedMessages.length,
@@ -163,9 +172,9 @@ export const MessageList = forwardRef<
               <ChatMessage
                 message={msg}
                 isLast={virtualItem.index === lastContentIndex}
-                onRetry={virtualItem.index === renderedMessages.length - 1 ? onRetry : undefined}
+                onRetry={virtualItem.index === lastAssistantIndex ? onRetry : undefined}
                 onRegenerate={
-                  virtualItem.index === renderedMessages.length - 1 ? onRegenerate : undefined
+                  virtualItem.index === lastAssistantIndex ? onRegenerate : undefined
                 }
                 onEdit={onEdit}
                 isPinned={pinnedIds.includes(msg.id)}

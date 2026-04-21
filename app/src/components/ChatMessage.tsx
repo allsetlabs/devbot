@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight, XCircle, CheckCircle, GitBranch, RotateCcw }
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 import { MessageReactions } from './MessageReactions';
-import type { TaskMessage, ClaudeContentBlock, ClaudeMessageContent } from '../types';
+import type { TaskMessage, ClaudeContentBlock, ClaudeMessageContent, PermissionMode } from '../types';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import {
   formatMessageTime,
@@ -16,6 +16,7 @@ import {
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
 import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView } from './ToolUseMessage';
+import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
 // Re-export symbols used by other modules
@@ -44,6 +45,8 @@ interface ChatMessageProps {
   currentReaction?: ReactionType | null;
   onToggleReaction?: (type: ReactionType) => void;
   compactMode?: boolean;
+  permissionMode?: PermissionMode;
+  onStopChat?: () => void;
 }
 
 function ToolResultMessage({ content }: { content: ClaudeMessageContent }) {
@@ -96,6 +99,8 @@ export function ChatMessage({
   currentReaction = null,
   onToggleReaction,
   compactMode = false,
+  permissionMode = 'dangerous',
+  onStopChat,
 }: ChatMessageProps) {
   const { type, content } = message;
   const [expanded, setExpanded] = useState(false);
@@ -208,17 +213,18 @@ export function ChatMessage({
                   const block = toolUseBlocks[0];
                   const toolInput = block.input || {};
                   if (block.name === 'Edit')
-                    return <EditDiffView key={block.id || block.name} toolInput={toolInput} />;
+                    return <EditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
                   if (block.name === 'MultiEdit')
-                    return <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} />;
+                    return <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
                   if (block.name === 'Write')
-                    return <WriteContentView key={block.id || block.name} toolInput={toolInput} />;
+                    return <WriteContentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
                   return (
                     <ToolUseMessage
                       key={block.id || block.name}
                       content={
                         { tool_name: block.name, tool_input: toolInput } as ClaudeMessageContent
                       }
+                      permissionMode={permissionMode}
                     />
                   );
                 })()
@@ -227,16 +233,16 @@ export function ChatMessage({
                   {toolUseBlocks.map((block) => {
                     const toolInput = block.input || {};
                     if (block.name === 'Edit') {
-                      return <EditDiffView key={block.id || block.name} toolInput={toolInput} />;
+                      return <EditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
                     }
                     if (block.name === 'MultiEdit') {
                       return (
-                        <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} />
+                        <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />
                       );
                     }
                     if (block.name === 'Write') {
                       return (
-                        <WriteContentView key={block.id || block.name} toolInput={toolInput} />
+                        <WriteContentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />
                       );
                     }
                     return (
@@ -245,6 +251,7 @@ export function ChatMessage({
                         content={
                           { tool_name: block.name, tool_input: toolInput } as ClaudeMessageContent
                         }
+                        permissionMode={permissionMode}
                       />
                     );
                   })}
@@ -295,7 +302,13 @@ export function ChatMessage({
   }
 
   if (type === 'tool_use') {
-    return <ToolUseMessage content={content} />;
+    return (
+      <ToolApprovalInline
+        content={content}
+        permissionMode={permissionMode}
+        onDeny={onStopChat}
+      />
+    );
   }
 
   if (type === 'tool_result') {

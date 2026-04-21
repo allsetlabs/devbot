@@ -1,8 +1,25 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
-import type { ClaudeMessageContent } from '../types';
+import type { ClaudeMessageContent, PermissionMode } from '../types';
+
+function ToolApprovalBadge({ mode }: { mode: PermissionMode }) {
+  if (mode === 'dangerous') {
+    return (
+      <span className="inline-flex items-center gap-0.5 rounded-full bg-success/15 px-1.5 py-0.5 text-[9px] font-medium text-success">
+        <ShieldOff className="h-2.5 w-2.5" />
+        Auto
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-medium text-primary">
+      <ShieldCheck className="h-2.5 w-2.5" />
+      OK
+    </span>
+  );
+}
 
 function formatToolInput(input: Record<string, unknown>): string {
   return JSON.stringify(input, null, 2);
@@ -74,7 +91,7 @@ function DiffHunk({ oldString, newString }: { oldString: string; newString: stri
 }
 
 /** Colorized diff view for Edit tool calls, matching Claude Code CLI's diff output */
-export function EditDiffView({ toolInput }: { toolInput: Record<string, unknown> }) {
+export function EditDiffView({ toolInput, permissionMode }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const filePath = (toolInput.file_path as string) || '';
   const oldString = (toolInput.old_string as string) || '';
@@ -117,6 +134,7 @@ export function EditDiffView({ toolInput }: { toolInput: Record<string, unknown>
           {removedCount > 0 && addedCount > 0 && <span className="text-muted-foreground"> </span>}
           {addedCount > 0 && <span className="text-success">+{addedCount}</span>}
         </span>
+        {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
       </Button>
       {expanded && (
         <div className="border-t border-border">
@@ -133,7 +151,7 @@ export function EditDiffView({ toolInput }: { toolInput: Record<string, unknown>
 }
 
 /** Colorized diff view for MultiEdit tool calls with multiple edit hunks */
-export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unknown> }) {
+export function MultiEditDiffView({ toolInput, permissionMode }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const filePath = (toolInput.file_path as string) || '';
   const edits = (toolInput.edits as Array<{ old_string?: string; new_string?: string }>) || [];
@@ -176,6 +194,7 @@ export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unk
           {totalRemoved > 0 && totalAdded > 0 && <span className="text-muted-foreground"> </span>}
           {totalAdded > 0 && <span className="text-success">+{totalAdded}</span>}
         </span>
+        {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
       </Button>
       {expanded && (
         <div className="border-t border-border">
@@ -201,7 +220,7 @@ export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unk
 }
 
 /** Content view for Write tool calls — shows all lines as additions */
-export function WriteContentView({ toolInput }: { toolInput: Record<string, unknown> }) {
+export function WriteContentView({ toolInput, permissionMode }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const filePath = (toolInput.file_path as string) || '';
   const content = (toolInput.content as string) || '';
@@ -232,6 +251,7 @@ export function WriteContentView({ toolInput }: { toolInput: Record<string, unkn
           {fileName}
         </span>
         <span className="flex-shrink-0 text-xs text-success">+{lineCount}</span>
+        {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
       </Button>
       {expanded && (
         <div className="border-t border-border">
@@ -256,22 +276,22 @@ export function WriteContentView({ toolInput }: { toolInput: Record<string, unkn
   );
 }
 
-export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
+export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMessageContent; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const toolName = content.tool_name || 'Unknown Tool';
   const toolInput = content.tool_input || {};
   const preview = getToolPreview(toolName, toolInput);
 
   if (toolName === 'Edit') {
-    return <EditDiffView toolInput={toolInput} />;
+    return <EditDiffView toolInput={toolInput} permissionMode={permissionMode} />;
   }
 
   if (toolName === 'MultiEdit') {
-    return <MultiEditDiffView toolInput={toolInput} />;
+    return <MultiEditDiffView toolInput={toolInput} permissionMode={permissionMode} />;
   }
 
   if (toolName === 'Write') {
-    return <WriteContentView toolInput={toolInput} />;
+    return <WriteContentView toolInput={toolInput} permissionMode={permissionMode} />;
   }
 
   return (
@@ -293,7 +313,8 @@ export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
         <Code className="h-4 w-4 text-primary" />
-        <span className="text-sm font-medium text-foreground">{toolName}</span>
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{toolName}</span>
+        {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
       </Button>
       {preview && (
         <p className="line-clamp-2 px-3 pb-2 text-[11px] leading-4 text-muted-foreground/70">

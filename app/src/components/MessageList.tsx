@@ -5,7 +5,7 @@ import { MessageActivityIndicator } from './MessageActivityIndicator';
 import { ScrollToBottomFab } from './ScrollToBottomFab';
 import { mergeConsecutiveAssistant, filterRenderable } from '../lib/message-list-utils';
 import { useMessageListScroll } from '../lib/use-message-list-scroll';
-import type { TaskMessage } from '../types';
+import type { TaskMessage, PermissionMode } from '../types';
 import type { ReactionType } from '../hooks/useMessageReactions';
 
 interface MessageListProps {
@@ -22,6 +22,8 @@ interface MessageListProps {
   getMessageReaction?: (messageId: string) => string | null;
   onToggleMessageReaction?: (messageId: string, type: ReactionType) => void;
   compactMode?: boolean;
+  permissionMode?: PermissionMode;
+  onStopChat?: () => void;
 }
 
 export const MessageList = forwardRef<
@@ -42,6 +44,8 @@ export const MessageList = forwardRef<
     getMessageReaction,
     onToggleMessageReaction,
     compactMode = false,
+    permissionMode = 'dangerous',
+    onStopChat,
   },
   ref
 ) {
@@ -192,6 +196,8 @@ export const MessageList = forwardRef<
                 }
                 onBranch={onBranch ? () => onBranch(msg.id) : undefined}
                 compactMode={compactMode}
+                permissionMode={permissionMode}
+                onStopChat={onStopChat}
               />
             </div>
           );

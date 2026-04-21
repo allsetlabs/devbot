@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T05:00:00Z
-Last implementation run: 2026-04-21T18:00:00Z
+Last implementation run: 2026-04-21T06:15:00Z
 
 ---
 
 ## Pending
-- Add permission prompt inline UI for interactive chats — when Claude requests tool approval, show an inline approve/deny prompt in the chat stream instead of auto-approving everything
 - Add session cost summary drawer — show cumulative API cost breakdown (input/output/cache tokens, total cost) accessible from the chat header, beyond the current inline token count
 - Fix permission mode drawer "Current" badge overlap — ChatModeSwitcherDrawer "Full Auto" row has "Current" badge overlapping the label text; needs spacing/layout fix so badge doesn't clip into the title
 - Fix hidden-tools count badge style inconsistency — the eye (hide tools) icon in ChatViewHeader uses an orange/yellow badge for its count while the tools-used icon uses a gray badge; make the eye icon badge match the gray style used by the tools-used count
@@ -19,6 +18,7 @@ Last implementation run: 2026-04-21T18:00:00Z
 
 ## Completed
 
+- [2026-04-21] Add permission prompt inline UI — replaced popup ToolUseDialog with inline approval badges on every tool call; shows "Auto" (green) for dangerous mode, "OK" (blue) for auto-accept, "Allowed"/"Read-only" for plan mode; badges appear on both standalone tool_use messages and embedded tool blocks (Edit/Write/Bash/Grep etc.); Stop button available in non-dangerous modes to halt execution; removed disruptive modal popup
 - [2026-04-21] Fix model selector drawer text overlap — added h-auto and whitespace-normal to Button className to override base button styles that caused text truncation and overlap
 - [2026-04-21] Add chat message search within a conversation — already implemented: ChatSearchBar with query input, match count (N/M), prev/next navigation, type filters (All/User/Assistant/Tool), and text highlighting; Search icon in ChatViewHeader
 - [2026-04-21] Add inline diff viewer for Edit/Write tool calls — WriteContentView component shows file content with line numbers and green highlighting; Edit/MultiEdit already had diff views; Write tool now renders with FilePlus icon, filename, line count instead of raw JSON

@@ -29,7 +29,6 @@ import { WorktreeDrawer } from '../components/WorktreeDrawer';
 import { KeybindingsDrawer } from '../components/KeybindingsDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolHistoryDrawer } from '../components/ToolHistoryDrawer';
-import { ToolUseDialog } from '../components/ToolUseDialog';
 import { EditMessageDialog } from '../components/EditMessageDialog';
 import { HelpModal } from '../components/HelpModal';
 import {
@@ -155,11 +154,6 @@ export function InteractiveChatView({
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
-  const [toolDialogOpen, setToolDialogOpen] = useState(false);
-  const [pendingTool, setPendingTool] = useState<{
-    name: string;
-    input: Record<string, unknown>;
-  } | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
   const [hasGeneratedTitle, setHasGeneratedTitle] = useState(false);
@@ -371,33 +365,6 @@ export function InteractiveChatView({
       fetchMessages(lastSequenceRef.current);
     }
   }, [chatId, dataUpdatedAt, fetchMessages]);
-
-  // Auto-show tool use dialog for latest tool_use message
-  useEffect(() => {
-    if (messages.length === 0) return;
-
-    // Find the most recent tool_use message that hasn't been shown yet
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const msg = messages[i];
-      if (msg.type === 'tool_use') {
-        const toolName = (msg.content?.tool_name as string) || 'Unknown Tool';
-        const toolInput = (msg.content?.tool_input as Record<string, unknown>) || {};
-
-        // Check if this is a new tool_use we haven't shown yet
-        if (
-          !pendingTool ||
-          pendingTool.name !== toolName ||
-          JSON.stringify(pendingTool.input) !== JSON.stringify(toolInput)
-        ) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setPendingTool({ name: toolName, input: toolInput });
-
-          setToolDialogOpen(true);
-        }
-        break;
-      }
-    }
-  }, [messages, pendingTool]);
 
   // Auto-generate chat title from first user message
   const queryClient = useQueryClient();
@@ -1224,6 +1191,8 @@ export function InteractiveChatView({
           getMessageReaction={getReaction}
           onToggleMessageReaction={toggleReaction}
           compactMode={settings.compactMode}
+          permissionMode={chat?.permissionMode || 'dangerous'}
+          onStopChat={() => stopMutation.mutate(undefined)}
         />
       )}
 
@@ -1421,17 +1390,6 @@ export function InteractiveChatView({
           setClearConfirmOpen(false);
         }}
       />
-
-      {/* Tool use details dialog */}
-      {pendingTool && chat && (
-        <ToolUseDialog
-          open={toolDialogOpen}
-          toolName={pendingTool.name}
-          toolInput={pendingTool.input}
-          mode={chat.permissionMode}
-          onDismiss={() => setToolDialogOpen(false)}
-        />
-      )}
 
       {/* Edit message dialog */}
       {editingMessage && (

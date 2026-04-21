@@ -24,7 +24,7 @@ export function ChatWorkingDirDrawer({
 }: ChatWorkingDirDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="mx-auto max-w-lg">
+      <DrawerContent>
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <FolderRoot className="h-5 w-5" />

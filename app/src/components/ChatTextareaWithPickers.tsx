@@ -150,104 +150,113 @@ export function ChatTextareaWithPickers({
               onCursorChange?.(beforeAt.length);
             }}
           />
-          <Textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => {
-              onInputChange(e.target.value);
-              onCursorChange?.(e.target.selectionStart ?? e.target.value.length);
-              onResetNavigation();
-              const el = e.target;
-              el.style.height = 'auto';
-              const maxH = window.innerHeight * 0.4;
-              el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
-            }}
-            onKeyUp={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
-            onClick={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
-            onPaste={(e) => {
-              const items = e.clipboardData?.items;
-              if (!items || !onPasteFiles) return;
-              const files: File[] = [];
-              for (const item of items) {
-                if (item.kind === 'file' && item.type.startsWith('image/')) {
-                  const file = item.getAsFile();
-                  if (file) files.push(file);
+          {/* Bordered container: text on top, buttons pinned below — no overlap possible */}
+          <div className="flex flex-col overflow-hidden rounded-md border border-input bg-background focus-within:ring-1 focus-within:ring-ring">
+            <Textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => {
+                onInputChange(e.target.value);
+                onCursorChange?.(e.target.selectionStart ?? e.target.value.length);
+                onResetNavigation();
+                const el = e.target;
+                el.style.height = 'auto';
+                const maxH = window.innerHeight * 0.4 - 52;
+                el.style.height = `${Math.min(el.scrollHeight, maxH)}px`;
+              }}
+              onKeyUp={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
+              onClick={(e) => onCursorChange?.(e.currentTarget.selectionStart ?? 0)}
+              onPaste={(e) => {
+                const items = e.clipboardData?.items;
+                if (!items || !onPasteFiles) return;
+                const files: File[] = [];
+                for (const item of items) {
+                  if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    if (file) files.push(file);
+                  }
                 }
+                if (files.length > 0) {
+                  e.preventDefault();
+                  onPasteFiles(files);
+                }
+              }}
+              onKeyDown={onKeyDown}
+              placeholder={
+                isRunning
+                  ? 'Type to interrupt & send...'
+                  : isTouchDevice
+                    ? 'Type a message...'
+                    : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
               }
-              if (files.length > 0) {
-                e.preventDefault();
-                onPasteFiles(files);
-              }
-            }}
-            onKeyDown={onKeyDown}
-            placeholder={
-              isRunning
-                ? 'Type to interrupt & send...'
-                : isTouchDevice
-                  ? 'Type a message...'
-                  : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
-            }
-            rows={2}
-            className="w-full resize-none border-input bg-background pr-12 min-h-[116px]"
-            style={{ maxHeight: '40vh', overflow: 'auto' }}
-          />
-
-          {/* Action buttons — vertical column inside the textarea at bottom-right */}
-          <div className="absolute bottom-2 right-2 flex flex-col items-center gap-1">
-            {isRunning && (
-              <>
+              rows={2}
+              className="w-full resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:outline-none"
+              style={{ overflow: 'auto' }}
+            />
+            {/* Button row — always below text, never overlaps */}
+            <div className="flex items-center justify-between px-2 pb-2 pt-1">
+              {/* Left: attach + browse */}
+              <div className="flex items-center gap-1">
                 <Button
-                  onClick={isPaused ? onResume : onPause}
-                  disabled={interrupting}
+                  variant="outline"
                   size="icon"
-                  className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-warning text-warning-foreground hover:bg-warning/90'}`}
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={anyUploading}
+                  title="Attach file"
                 >
-                  {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                  <Plus className="h-5 w-5" />
                 </Button>
+                {onBrowseFiles && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    onClick={onBrowseFiles}
+                    title="Browse & edit files"
+                  >
+                    <FolderOpen className="h-5 w-5" />
+                  </Button>
+                )}
+              </div>
+              {/* Right: pause/stop/send */}
+              <div className="flex items-center gap-1">
+                {isRunning && (
+                  <>
+                    <Button
+                      onClick={isPaused ? onResume : onPause}
+                      disabled={interrupting}
+                      size="icon"
+                      className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-warning text-warning-foreground hover:bg-warning/90'}`}
+                    >
+                      {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      onClick={onStop}
+                      disabled={interrupting}
+                      size="icon"
+                      className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      <Square className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
                 <Button
-                  onClick={onStop}
-                  disabled={interrupting}
+                  onClick={onSend}
+                  disabled={
+                    (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
+                  }
                   size="icon"
-                  className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
                 >
-                  <Square className="h-4 w-4" />
+                  {sending || interrupting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
-              </>
-            )}
-            <Button
-              onClick={onSend}
-              disabled={
-                (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
-              }
-              size="icon"
-              className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
-            >
-              {sending || interrupting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={anyUploading}
-            >
-              <Plus className="h-5 w-5" />
-            </Button>
-            {onBrowseFiles && (
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={onBrowseFiles}
-                title="Browse & edit files"
-              >
-                <FolderOpen className="h-5 w-5" />
-              </Button>
-            )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

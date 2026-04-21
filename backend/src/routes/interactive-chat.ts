@@ -548,6 +548,32 @@ router.post(
   }, 'send message')
 );
 
+// Truncate messages after a given sequence (for edit-and-rerun)
+router.post(
+  '/:id/truncate-after',
+  asyncHandler(async (req, res) => {
+    const { sequence, branch } = req.body;
+    if (typeof sequence !== 'number') {
+      res.status(400).json({ error: 'sequence is required (number)' });
+      return;
+    }
+    const chatId = req.params.id;
+    const branchId = (branch as string) || 'main';
+
+    const deleted = await coreDb
+      .delete(chat_messages)
+      .where(
+        and(
+          eq(chat_messages.chat_id, chatId),
+          eq(chat_messages.branch_id, branchId),
+          gt(chat_messages.sequence, sequence)
+        )
+      );
+
+    res.json({ success: true, deletedCount: deleted.changes ?? 0 });
+  }, 'truncate messages after sequence')
+);
+
 // Stop chat execution
 router.post(
   '/:id/stop',

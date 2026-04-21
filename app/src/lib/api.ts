@@ -189,6 +189,13 @@ export const api = {
     });
   },
 
+  truncateMessagesAfter: (chatId: string, sequence: number, branch?: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/truncate-after`, {
+      method: 'POST',
+      body: JSON.stringify({ sequence, branch }),
+    });
+  },
+
   stopChat: (chatId: string): Promise<{ success: boolean; wasStopped: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/stop`, { method: 'POST' });
   },

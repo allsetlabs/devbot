@@ -163,7 +163,7 @@ export function InteractiveChatView({
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
+  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string; sequence: number } | null>(null);
   const [hasGeneratedTitle, setHasGeneratedTitle] = useState(false);
   const [, setExporting] = useState(false);
   const [exportFormatOpen, setExportFormatOpen] = useState(false);
@@ -1051,18 +1051,30 @@ export function InteractiveChatView({
 
   // Edit message: open dialog to edit a user message
   const handleEditMessage = useCallback((messageId: string, text: string) => {
-    setEditingMessage({ id: messageId, text });
+    const msg = messages.find((m) => m.id === messageId);
+    const sequence = msg?.sequence ?? -1;
+    setEditingMessage({ id: messageId, text, sequence });
     setEditDialogOpen(true);
-  }, []);
+  }, [messages]);
 
-  // Confirm edit: resend the edited message
+  // Confirm edit: truncate messages after the edited one, then resend
   const handleEditConfirm = useCallback(
-    (editedText: string) => {
-      if (!chatId || isRunning || sending) return;
+    async (editedText: string) => {
+      if (!chatId || isRunning || sending || !editingMessage) return;
       setEditDialogOpen(false);
+
+      const seq = editingMessage.sequence;
+      if (seq >= 0) {
+        // Remove the edited message and everything after from local state
+        setMessages((prev) => prev.filter((m) => m.sequence < seq));
+        // Truncate on backend (includes the edited message itself)
+        await api.truncateMessagesAfter(chatId, seq - 1, currentBranch).catch(() => {});
+      }
+
       sendMutation.mutate(editedText);
+      setEditingMessage(null);
     },
-    [chatId, isRunning, sending, sendMutation]
+    [chatId, isRunning, sending, sendMutation, editingMessage, currentBranch]
   );
 
   // Cancel edit: close the dialog

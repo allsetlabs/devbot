@@ -1,5 +1,12 @@
-import { ArrowLeft, Coins, Eye, EyeOff, FolderRoot, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
+import { ArrowLeft, Coins, Ellipsis, Eye, EyeOff, FolderRoot, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@allsetlabs/reusable/components/ui/dropdown-menu';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, GitStatus, InteractiveChat } from '../types';
 
@@ -84,7 +91,7 @@ export function ChatViewHeader({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 flex-shrink-0"
+              className="hidden h-6 w-6 flex-shrink-0 lg:inline-flex"
               onClick={onOpenRename}
             >
               <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
@@ -109,7 +116,8 @@ export function ChatViewHeader({
           )}
         </div>
       </div>
-      <div className="flex flex-shrink-0 items-center gap-2">
+      {/* Desktop: all icon buttons visible */}
+      <div className="hidden flex-shrink-0 items-center gap-2 lg:flex">
         <Button
           variant="ghost"
           size="icon"
@@ -186,6 +194,70 @@ export function ChatViewHeader({
         >
           <FolderRoot className="h-4 w-4 text-muted-foreground" />
         </Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
+          <Settings className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </div>
+      {/* Mobile: search + overflow menu + settings */}
+      <div className="flex flex-shrink-0 items-center gap-1 lg:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={onToggleSearch}
+          disabled={messages.length === 0}
+        >
+          <Search className="h-4 w-4 text-muted-foreground" />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-7 w-7">
+              <Ellipsis className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onToggleToolResults}>
+              {hideToolResults ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+              {hideToolResults ? 'Show tool results' : 'Hide tool results'}
+              {hideToolResults && toolResultCount > 0 && (
+                <span className="ml-auto text-xs text-muted-foreground">{toolResultCount}</span>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onOpenToolHistory} disabled={toolResultCount === 0}>
+              <History className="h-4 w-4" />
+              Tool history
+              {toolResultCount > 0 && (
+                <span className="ml-auto text-xs text-muted-foreground">{toolResultCount}</span>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onOpenPinnedMessages} disabled={pinnedIds.length === 0}>
+              <Pin className="h-4 w-4" />
+              Pinned messages
+              {pinnedIds.length > 0 && (
+                <span className="ml-auto text-xs text-muted-foreground">{pinnedIds.length}</span>
+              )}
+            </DropdownMenuItem>
+            {totalTokens > 0 && (
+              <DropdownMenuItem onClick={onOpenCostDrawer}>
+                <Coins className="h-4 w-4" />
+                Session cost
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onClick={onOpenWorkingDir}>
+              <FolderRoot className="h-4 w-4" />
+              {workingDir ? 'Working directory' : 'Set working directory'}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onOpenRename}>
+              <Pencil className="h-4 w-4" />
+              Rename chat
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
           <Settings className="h-4 w-4 text-muted-foreground" />
         </Button>

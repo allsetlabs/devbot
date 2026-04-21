@@ -4,6 +4,7 @@ import { Settings, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../hooks/useSettings';
 import { SlideNav } from '../components/SlideNav';
+import { requestBrowserNotificationPermission, getBrowserNotificationPermission } from '../lib/notification';
 
 const MODEL_OPTIONS = [
   { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
@@ -160,22 +161,89 @@ export function SettingsPage() {
         <SectionHeader title="Notifications" />
         <div className="divide-y divide-border">
           <ToggleField
-            label="Sound Notifications"
-            description="Play sound when tasks complete"
+            label="Do Not Disturb"
+            description="Silence all notifications during scheduled hours"
+            checked={settings.dndEnabled}
+            onChange={() => updateSettings({ dndEnabled: !settings.dndEnabled })}
+          />
+          {settings.dndEnabled && (
+            <div className="flex items-center gap-2 py-3">
+              <span className="text-sm text-muted-foreground">From</span>
+              <input
+                type="time"
+                value={settings.dndStartTime}
+                onChange={(e) => updateSettings({ dndStartTime: e.target.value })}
+                className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+              />
+              <span className="text-sm text-muted-foreground">to</span>
+              <input
+                type="time"
+                value={settings.dndEndTime}
+                onChange={(e) => updateSettings({ dndEndTime: e.target.value })}
+                className="rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground"
+              />
+            </div>
+          )}
+        </div>
+
+        <SectionHeader title="Channels" />
+        <div className="divide-y divide-border">
+          <ToggleField
+            label="Sound"
+            description="Play audio tones for notifications"
             checked={settings.soundEnabled}
             onChange={toggleSound}
           />
           <ToggleField
             label="Haptic Feedback"
-            description="Vibrate device when tasks complete"
+            description="Vibrate device for notifications"
             checked={settings.hapticEnabled}
             onChange={toggleHaptic}
+          />
+          <ToggleField
+            label="Browser Notifications"
+            description="Show desktop/browser push notifications"
+            checked={settings.browserNotificationsEnabled}
+            onChange={() => {
+              const enabling = !settings.browserNotificationsEnabled;
+              if (enabling && getBrowserNotificationPermission() !== 'granted') {
+                requestBrowserNotificationPermission().then((perm) => {
+                  if (perm === 'granted') {
+                    updateSettings({ browserNotificationsEnabled: true });
+                  }
+                });
+              } else {
+                updateSettings({ browserNotificationsEnabled: enabling });
+              }
+            }}
           />
           <ToggleField
             label="Auto-scroll"
             description="Automatically scroll to new messages"
             checked={settings.autoScrollEnabled}
             onChange={toggleAutoScroll}
+          />
+        </div>
+
+        <SectionHeader title="Events" />
+        <div className="divide-y divide-border">
+          <ToggleField
+            label="Task Complete"
+            description="Notify when a task finishes successfully"
+            checked={settings.notifyOnTaskComplete}
+            onChange={() => updateSettings({ notifyOnTaskComplete: !settings.notifyOnTaskComplete })}
+          />
+          <ToggleField
+            label="Task Failed"
+            description="Notify when a task encounters an error"
+            checked={settings.notifyOnTaskFailed}
+            onChange={() => updateSettings({ notifyOnTaskFailed: !settings.notifyOnTaskFailed })}
+          />
+          <ToggleField
+            label="New Message"
+            description="Notify on each new assistant message"
+            checked={settings.notifyOnNewMessage}
+            onChange={() => updateSettings({ notifyOnNewMessage: !settings.notifyOnNewMessage })}
           />
         </div>
 

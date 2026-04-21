@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-20T21:50:00Z
-Last implementation run: 2026-04-21T03:30:00Z
+Last implementation run: 2026-04-21T01:00:00Z
 
 ---
 
 ## Pending
-- Add granular notification preferences — extend notification settings beyond sound/haptic/auto-scroll to include per-event-type controls, browser/desktop notification channels, and DND mode
 - Add keyboard shortcuts viewer/editor — dedicated UI showing all available keybindings with ability to customize them; Claude Code has keybindings.json support but DevBot has no corresponding viewer
 
 ## In Progress
@@ -17,6 +16,7 @@ Last implementation run: 2026-04-21T03:30:00Z
 
 ## Completed
 
+- [2026-04-21] Add granular notification preferences — per-event-type controls (task complete, task failed, new message), browser/desktop notification channel, and DND mode with scheduled hours; reorganized Settings page into Notifications, Channels, and Events sections
 - [2026-04-21] Add worktree management UI — WorktreeDrawer component accessible from SettingsDrawer; backend /api/worktrees route with GET (list), POST (create), DELETE (remove); shows branch, path, HEAD; supports creating worktrees with new or existing branches
 - [2026-04-21] Add inline file editor in chat view — InlineFileEditor component with syntax highlighting, edit/save/copy/close; backend GET /api/files/read and PUT /api/files/write endpoints; FolderOpen button in ChatTextareaWithPickers opens DirectoryBrowserSidebar with edit pencil icons; opens editor panel between messages and input area
 - [2026-04-20] Wire up Dashboard page route — added /dashboard route in App.tsx and Dashboard entry in SlideNav with LayoutDashboard icon

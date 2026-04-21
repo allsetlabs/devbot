@@ -10,6 +10,13 @@ export interface DevBotSettings {
   fontSize: string;
   compactMode: boolean;
   defaultWorkingDirectory: string;
+  notifyOnTaskComplete: boolean;
+  notifyOnTaskFailed: boolean;
+  notifyOnNewMessage: boolean;
+  browserNotificationsEnabled: boolean;
+  dndEnabled: boolean;
+  dndStartTime: string;
+  dndEndTime: string;
 }
 
 const SETTINGS_KEY = 'devbot-settings';
@@ -23,6 +30,13 @@ const DEFAULT_SETTINGS: DevBotSettings = {
   fontSize: 'medium',
   compactMode: false,
   defaultWorkingDirectory: '',
+  notifyOnTaskComplete: true,
+  notifyOnTaskFailed: true,
+  notifyOnNewMessage: false,
+  browserNotificationsEnabled: false,
+  dndEnabled: false,
+  dndStartTime: '22:00',
+  dndEndTime: '08:00',
 };
 
 export function useSettings() {

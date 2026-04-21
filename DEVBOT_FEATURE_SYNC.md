@@ -2,12 +2,18 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-21T16:45:00Z
+Last discovery run: 2026-04-21T22:00:00Z
 Last implementation run: 2026-04-22T06:30:00Z
 
 ---
 
 ## Pending
+
+- Add chat starter/template prompts — show quick-action cards in empty chat view (e.g. "Review code", "Fix a bug", "Explain this file", "Refactor") that pre-fill the input with a structured prompt; similar to ChatGPT/Claude.ai starter prompts
+- Add working directory switcher inside active chat view — allow changing the working directory mid-conversation via a button in ChatViewHeader or input toolbar; backend already supports workingDir per-message
+- Add allowed tools configuration per chat — UI to select which tools (Read, Edit, Bash, Grep, etc.) a chat session is allowed to use, matching Claude Code's --allowedTools flag; drawer accessible from chat settings
+- Add cross-chat pinned messages view — a page or drawer that aggregates all pinned messages across all chats, with links back to the source chat; accessible from the nav or chats list page
+- Add notification sound picker — replace hardcoded Web Audio tones with selectable notification sounds (chime, ding, pop, silent) in Settings > Notifications
 
 ## In Progress
 

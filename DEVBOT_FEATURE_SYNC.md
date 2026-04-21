@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T05:00:00Z
-Last implementation run: 2026-04-21T02:30:00Z
+Last implementation run: 2026-04-20T17:10:00Z
 
 ---
 
 ## Pending
-
-- Fix Dashboard "NaNd ago" bug — formatRelativeTime in app/src/lib/format.ts doesn't handle null/undefined/invalid date strings, causing "NaNd ago" on the Chats card when a chat has no updatedAt
 - Add message retry/regenerate button — Claude Code allows retrying the last assistant response; DevBot should add a retry icon on the last assistant message that re-sends the previous user message
 - Add inline diff viewer for Edit tool calls — when ToolUseMessage renders an Edit/Write tool result, show a syntax-highlighted unified diff instead of raw JSON
 - Add chat message search within a conversation — Claude Code has Cmd+F / search icon to find text within the current chat; DevBot has search on the chat list but not within a conversation
@@ -25,6 +23,7 @@ Last implementation run: 2026-04-21T02:30:00Z
 
 ## Completed
 
+- [2026-04-20] Fix Dashboard "NaNd ago" bug — formatRelativeTime now guards against null/undefined/invalid date strings
 - [2026-04-21] Add keyboard shortcuts viewer/editor — KeybindingsDrawer component accessible from SettingsDrawer; backend /api/keybindings route with GET (list), POST (add), DELETE (remove); reads/writes ~/.claude/keybindings.json; shows key combo with kbd styling, command name, optional when condition; supports add and delete
 - [2026-04-21] Add granular notification preferences — per-event-type controls (task complete, task failed, new message), browser/desktop notification channel, and DND mode with scheduled hours; reorganized Settings page into Notifications, Channels, and Events sections
 - [2026-04-21] Add worktree management UI — WorktreeDrawer component accessible from SettingsDrawer; backend /api/worktrees route with GET (list), POST (create), DELETE (remove); shows branch, path, HEAD; supports creating worktrees with new or existing branches

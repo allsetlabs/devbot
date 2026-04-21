@@ -10,8 +10,10 @@ export function formatDateTime(dateStr: string | null): string {
 }
 
 /** Format a date string as relative time (e.g., "5m ago", "2h ago", "3d ago") */
-export function formatRelativeTime(dateStr: string): string {
+export function formatRelativeTime(dateStr: string | null | undefined): string {
+  if (!dateStr) return '';
   const diff = Date.now() - new Date(dateStr).getTime();
+  if (Number.isNaN(diff)) return '';
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'Just now';
   if (mins < 60) return `${mins}m ago`;

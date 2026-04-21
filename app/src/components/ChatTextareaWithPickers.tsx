@@ -91,7 +91,7 @@ export function ChatTextareaWithPickers({
   return (
     <>
       <div className="flex items-end gap-2">
-        {/* Textarea with pickers */}
+        {/* Textarea with pickers and action buttons inside */}
         <div className="relative min-w-0 flex-1">
           <SlashCommandPicker
             ref={slashPickerRef}
@@ -188,67 +188,67 @@ export function ChatTextareaWithPickers({
                   : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
             }
             rows={2}
-            className="w-full resize-none border-input bg-background"
+            className="w-full resize-none border-input bg-background pr-12 min-h-[116px]"
             style={{ maxHeight: '40vh', overflow: 'auto' }}
           />
-        </div>
 
-        {/* Action buttons — vertical column beside the textarea */}
-        <div className="flex flex-shrink-0 flex-col items-center gap-1 pb-0.5">
-          {isRunning && (
-            <>
-              <Button
-                onClick={isPaused ? onResume : onPause}
-                disabled={interrupting}
-                size="icon"
-                className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-warning text-warning-foreground hover:bg-warning/90'}`}
-              >
-                {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-              </Button>
-              <Button
-                onClick={onStop}
-                disabled={interrupting}
-                size="icon"
-                className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                <Square className="h-4 w-4" />
-              </Button>
-            </>
-          )}
-          <Button
-            onClick={onSend}
-            disabled={
-              (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
-            }
-            size="icon"
-            className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
-          >
-            {sending || interrupting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
+          {/* Action buttons — vertical column inside the textarea at bottom-right */}
+          <div className="absolute bottom-2 right-2 flex flex-col items-center gap-1">
+            {isRunning && (
+              <>
+                <Button
+                  onClick={isPaused ? onResume : onPause}
+                  disabled={interrupting}
+                  size="icon"
+                  className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-warning text-warning-foreground hover:bg-warning/90'}`}
+                >
+                  {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                </Button>
+                <Button
+                  onClick={onStop}
+                  disabled={interrupting}
+                  size="icon"
+                  className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              </>
             )}
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={anyUploading}
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
-          {onBrowseFiles && (
+            <Button
+              onClick={onSend}
+              disabled={
+                (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
+              }
+              size="icon"
+              className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
+            >
+              {sending || interrupting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
             <Button
               variant="outline"
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              onClick={onBrowseFiles}
-              title="Browse & edit files"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={anyUploading}
             >
-              <FolderOpen className="h-5 w-5" />
+              <Plus className="h-5 w-5" />
             </Button>
-          )}
+            {onBrowseFiles && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={onBrowseFiles}
+                title="Browse & edit files"
+              >
+                <FolderOpen className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

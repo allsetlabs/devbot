@@ -724,6 +724,7 @@ export function InteractiveChatView({
           toast.info('Compacting conversation…');
           sendMutation.mutate('/compact');
         },
+        openConfig: () => navigate('/settings'),
         toggleFastMode: () => {
           if (!chatId) return;
           api.toggleChatFastMode(chatId).then((updated) => {

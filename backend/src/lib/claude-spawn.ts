@@ -28,9 +28,36 @@ export function stopExecution(key: string): boolean {
   if (proc && !proc.killed) {
     proc.kill('SIGTERM');
     runningExecutions.delete(key);
+    pausedExecutions.delete(key);
     return true;
   }
   return false;
+}
+
+const pausedExecutions = new Set<string>();
+
+export function pauseExecution(key: string): boolean {
+  const proc = runningExecutions.get(key);
+  if (proc && !proc.killed && !pausedExecutions.has(key)) {
+    proc.kill('SIGTSTP');
+    pausedExecutions.add(key);
+    return true;
+  }
+  return false;
+}
+
+export function resumeExecution(key: string): boolean {
+  const proc = runningExecutions.get(key);
+  if (proc && !proc.killed && pausedExecutions.has(key)) {
+    proc.kill('SIGCONT');
+    pausedExecutions.delete(key);
+    return true;
+  }
+  return false;
+}
+
+export function isPaused(key: string): boolean {
+  return pausedExecutions.has(key);
 }
 
 export function registerExecution(key: string, proc: ChildProcess): void {

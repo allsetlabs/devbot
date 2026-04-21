@@ -186,7 +186,15 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/stop`, { method: 'POST' });
   },
 
-  getChatStatus: (chatId: string): Promise<{ isRunning: boolean }> => {
+  pauseChat: (chatId: string): Promise<{ success: boolean; wasPaused: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/pause`, { method: 'POST' });
+  },
+
+  resumeChat: (chatId: string): Promise<{ success: boolean; wasResumed: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/resume`, { method: 'POST' });
+  },
+
+  getChatStatus: (chatId: string): Promise<{ isRunning: boolean; isPaused: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/status`);
   },
 

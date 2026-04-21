@@ -8,6 +8,9 @@ import {
   spawnClaude,
   isExecuting,
   stopExecution,
+  pauseExecution,
+  resumeExecution,
+  isPaused,
   registerExecution,
   unregisterExecution,
   type ClaudeModel,
@@ -272,6 +275,26 @@ export function stopChatExecution(chatId: string): boolean {
     console.log(`[InteractiveChat] Stopped execution for chat ${chatId}`);
   }
   return stopped;
+}
+
+export function pauseChatExecution(chatId: string): boolean {
+  const paused = pauseExecution(chatId);
+  if (paused) {
+    console.log(`[InteractiveChat] Paused execution for chat ${chatId}`);
+  }
+  return paused;
+}
+
+export function resumeChatExecution(chatId: string): boolean {
+  const resumed = resumeExecution(chatId);
+  if (resumed) {
+    console.log(`[InteractiveChat] Resumed execution for chat ${chatId}`);
+  }
+  return resumed;
+}
+
+export function isChatPaused(chatId: string): boolean {
+  return isPaused(chatId);
 }
 
 /**

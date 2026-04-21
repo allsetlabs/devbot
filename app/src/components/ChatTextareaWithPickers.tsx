@@ -1,4 +1,4 @@
-import { Loader2, Send, Square, Plus, FolderOpen } from 'lucide-react';
+import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
@@ -40,6 +40,9 @@ interface ChatTextareaWithPickersProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSend: () => void;
   onStop: () => void;
+  isPaused: boolean;
+  onPause: () => void;
+  onResume: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasteFiles?: (files: File[]) => void;
   onBrowseFiles?: () => void;
@@ -73,6 +76,9 @@ export function ChatTextareaWithPickers({
   onKeyDown,
   onSend,
   onStop,
+  isPaused,
+  onPause,
+  onResume,
   onFileInputChange,
   onPasteFiles,
   onBrowseFiles,
@@ -188,14 +194,24 @@ export function ChatTextareaWithPickers({
         {/* Buttons inside textarea — right side, top to bottom: stop, send, + */}
         <div className="absolute bottom-2 right-2 flex flex-col items-center gap-1">
           {isRunning && (
-            <Button
-              onClick={onStop}
-              disabled={interrupting}
-              size="icon"
-              className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              <Square className="h-4 w-4" />
-            </Button>
+            <>
+              <Button
+                onClick={isPaused ? onResume : onPause}
+                disabled={interrupting}
+                size="icon"
+                className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-warning text-warning-foreground hover:bg-warning/90'}`}
+              >
+                {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+              </Button>
+              <Button
+                onClick={onStop}
+                disabled={interrupting}
+                size="icon"
+                className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                <Square className="h-4 w-4" />
+              </Button>
+            </>
           )}
           <Button
             onClick={onSend}

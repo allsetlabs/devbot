@@ -8,7 +8,7 @@ import type {
   PermissionMode,
   ClaudeModel,
 } from '../lib/db/types.js';
-import { sendMessage, stopChatExecution, isChatExecuting } from '../lib/interactive-chat-worker.js';
+import { sendMessage, stopChatExecution, pauseChatExecution, resumeChatExecution, isChatPaused, isChatExecuting } from '../lib/interactive-chat-worker.js';
 import {
   asyncHandler,
   sendNotFound,
@@ -527,8 +527,26 @@ router.get(
       return;
     }
 
-    res.json({ isRunning: rows[0].is_executing ?? false });
+    res.json({ isRunning: rows[0].is_executing ?? false, isPaused: isChatPaused(req.params.id) });
   }, 'get status')
+);
+
+// Pause chat execution
+router.post(
+  '/:id/pause',
+  asyncHandler(async (req, res) => {
+    const paused = pauseChatExecution(req.params.id);
+    res.json({ success: true, wasPaused: paused });
+  }, 'pause chat')
+);
+
+// Resume chat execution
+router.post(
+  '/:id/resume',
+  asyncHandler(async (req, res) => {
+    const resumed = resumeChatExecution(req.params.id);
+    res.json({ success: true, wasResumed: resumed });
+  }, 'resume chat')
 );
 
 // Get messages for a chat (optionally filtered by branch)

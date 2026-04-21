@@ -292,6 +292,7 @@ export function InteractiveChatView({
   });
 
   const isRunning = statusData?.isRunning ?? initialIsRunning;
+  const isPaused = statusData?.isPaused ?? false;
 
   // Keep ref in sync so refetchInterval reads the latest value
   const prevIsRunningRef = useRef(false);
@@ -486,6 +487,12 @@ export function InteractiveChatView({
       isRunningRef.current = false;
     },
   });
+
+  // Pause chat mutation
+  const pauseMutation = useCrudMutation(() => api.pauseChat(chatId!), [['chat-status', chatId]]);
+
+  // Resume chat mutation
+  const resumeMutation = useCrudMutation(() => api.resumeChat(chatId!), [['chat-status', chatId]]);
 
   // Rename chat mutation
   const renameMutation = useCrudMutation(
@@ -763,6 +770,16 @@ export function InteractiveChatView({
     if (!chatId) return;
     stopMutation.mutate();
   }, [chatId, stopMutation]);
+
+  const handlePause = useCallback(() => {
+    if (!chatId) return;
+    pauseMutation.mutate();
+  }, [chatId, pauseMutation]);
+
+  const handleResume = useCallback(() => {
+    if (!chatId) return;
+    resumeMutation.mutate();
+  }, [chatId, resumeMutation]);
 
   // Keyboard: Enter to send (or interrupt+send), Escape to stop, Up/Down for history
   // On touch devices (mobile), Enter always inserts a newline — user taps the send button instead
@@ -1110,6 +1127,7 @@ export function InteractiveChatView({
         <ChatViewHeader
           onBack={handleBack}
           isRunning={isRunning}
+          isPaused={isPaused}
           chat={chat}
           messages={messages}
           totalTokens={sessionStats.totalTokens}
@@ -1483,6 +1501,9 @@ export function InteractiveChatView({
         onLoadMoreFiles={loadMoreFiles}
         onSend={handleSend}
         onStop={handleStop}
+        isPaused={isPaused}
+        onPause={handlePause}
+        onResume={handleResume}
         onKeyDown={handleKeyDown}
         onResetNavigation={resetNavigation}
         onFileInputChange={handleFileInputChange}

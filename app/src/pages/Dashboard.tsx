@@ -65,7 +65,7 @@ export function Dashboard() {
 
       {/* Widget Grid */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
           <ChatsWidget chats={chats} />
           <SchedulerWidget tasks={tasks} />
           <BabyWidget logs={babyLogs} />

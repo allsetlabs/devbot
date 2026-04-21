@@ -196,7 +196,7 @@ export function InteractiveChatList() {
 
       <ErrorBanner error={error} />
 
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-hidden">
         <ChatListContent
           chats={chats}
           filteredChats={filteredChats}

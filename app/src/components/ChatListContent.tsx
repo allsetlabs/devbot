@@ -1,3 +1,6 @@
+import { useRef } from 'react';
+// eslint-disable-next-line react-hooks/incompatible-library
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { MessageCircle, Search } from 'lucide-react';
 import { EmptyState } from './EmptyState';
 import { ChatListItem } from './ChatListItem';
@@ -47,6 +50,16 @@ export function ChatListContent({
   onClearFilters,
   onResumeSession,
 }: ChatListContentProps) {
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const virtualizer = useVirtualizer({
+    count: filteredChats.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 72,
+    overscan: 5,
+  });
+
   if (isLoading && chats.length === 0) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -92,45 +105,69 @@ export function ChatListContent({
   }
 
   return (
-    <div>
-      <div className="divide-y divide-border">
-        {filteredChats.map((chat) => (
-          <ChatListItem
-            key={chat.id}
-            chat={chat}
-            isFavorited={isFavorite(chat.id)}
-            onSelect={() => onSelect(chat)}
-            onToggleFavorite={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(chat.id);
-            }}
-            onDuplicate={(e) => {
-              e.stopPropagation();
-              onDuplicate(chat.id);
-            }}
-            onArchive={(e) => {
-              e.stopPropagation();
-              onArchive(chat.id);
-            }}
-            onDelete={(e) => {
-              e.stopPropagation();
-              onDelete(chat.id);
-            }}
-            hasResumeSession={!!chat.claudeSessionId && !chat.isRunning}
-            onResumeSession={() => onResumeSession(chat)}
-            hasCopyCommand={!!chat.claudeSessionId}
-            onCopyCommand={
-              chat.claudeSessionId
-                ? () => {
-                    copyToClipboard(
-                      `cd ${VITE_DEVBOT_PROJECTS_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
-                    );
-                    toast.success('Command copied!');
-                  }
-                : undefined
-            }
-          />
-        ))}
+    <div ref={parentRef} className="h-full overflow-y-auto">
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {virtualizer.getVirtualItems().map((virtualItem) => {
+          const chat = filteredChats[virtualItem.index];
+          return (
+            <div
+              key={chat.id}
+              ref={virtualizer.measureElement}
+              data-index={virtualItem.index}
+              className={
+                virtualItem.index < filteredChats.length - 1 ? 'border-b border-border' : ''
+              }
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+            >
+              <ChatListItem
+                chat={chat}
+                isFavorited={isFavorite(chat.id)}
+                onSelect={() => onSelect(chat)}
+                onToggleFavorite={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite(chat.id);
+                }}
+                onDuplicate={(e) => {
+                  e.stopPropagation();
+                  onDuplicate(chat.id);
+                }}
+                onArchive={(e) => {
+                  e.stopPropagation();
+                  onArchive(chat.id);
+                }}
+                onDelete={(e) => {
+                  e.stopPropagation();
+                  onDelete(chat.id);
+                }}
+                hasResumeSession={!!chat.claudeSessionId && !chat.isRunning}
+                onResumeSession={() => onResumeSession(chat)}
+                hasCopyCommand={!!chat.claudeSessionId}
+                onCopyCommand={
+                  chat.claudeSessionId
+                    ? () => {
+                        copyToClipboard(
+                          `cd ${VITE_DEVBOT_PROJECTS_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                        );
+                        toast.success('Command copied!');
+                      }
+                    : undefined
+                }
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

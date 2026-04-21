@@ -4,7 +4,8 @@ import { Settings, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../hooks/useSettings';
 import { SlideNav } from '../components/SlideNav';
-import { requestBrowserNotificationPermission, getBrowserNotificationPermission } from '../lib/notification';
+import { requestBrowserNotificationPermission, getBrowserNotificationPermission, previewNotificationSound } from '../lib/notification';
+import type { DevBotSettings } from '../hooks/useSettings';
 
 const MODEL_OPTIONS = [
   { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
@@ -29,6 +30,14 @@ const FONT_SIZE_OPTIONS = [
   { value: 'small', label: 'Small' },
   { value: 'medium', label: 'Medium' },
   { value: 'large', label: 'Large' },
+];
+
+const SOUND_OPTIONS: { value: DevBotSettings['notificationSound']; label: string }[] = [
+  { value: 'chime', label: 'Chime' },
+  { value: 'ding', label: 'Ding' },
+  { value: 'pop', label: 'Pop' },
+  { value: 'classic', label: 'Classic' },
+  { value: 'silent', label: 'Silent' },
 ];
 
 function SelectField({
@@ -194,6 +203,36 @@ export function SettingsPage() {
             checked={settings.soundEnabled}
             onChange={toggleSound}
           />
+          {settings.soundEnabled && (
+            <div className="flex items-center justify-between py-3">
+              <span className="text-sm font-medium text-foreground">Notification Sound</span>
+              <div className="flex items-center gap-2">
+                <select
+                  value={settings.notificationSound}
+                  onChange={(e) => {
+                    const val = e.target.value as DevBotSettings['notificationSound'];
+                    updateSettings({ notificationSound: val });
+                    previewNotificationSound(val);
+                  }}
+                  className="rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground"
+                >
+                  {SOUND_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => previewNotificationSound(settings.notificationSound)}
+                  className="text-xs"
+                >
+                  Test
+                </Button>
+              </div>
+            </div>
+          )}
           <ToggleField
             label="Haptic Feedback"
             description="Vibrate device for notifications"

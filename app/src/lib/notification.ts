@@ -13,6 +13,7 @@ let currentSettings: Partial<DevBotSettings> = {
   dndEnabled: false,
   dndStartTime: '22:00',
   dndEndTime: '08:00',
+  notificationSound: 'chime',
 };
 
 export function setNotificationSettings(settings: Partial<DevBotSettings>) {
@@ -49,49 +50,100 @@ function getAudioContext(): AudioContext | null {
   }
 }
 
+type SoundStyle = DevBotSettings['notificationSound'];
+
+function getSoundStyle(): SoundStyle {
+  return currentSettings.notificationSound || 'chime';
+}
+
+function playTone(ctx: AudioContext, freq: number, type: OscillatorType, vol: number, start: number, dur: number) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, start);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + dur);
+}
+
 function playSuccessSound() {
+  const style = getSoundStyle();
+  if (style === 'silent') return;
   const ctx = getAudioContext();
   if (!ctx) return;
-
   const now = ctx.currentTime;
 
-  const osc1 = ctx.createOscillator();
-  const gain1 = ctx.createGain();
-  osc1.type = 'sine';
-  osc1.frequency.value = 523;
-  gain1.gain.setValueAtTime(0.15, now);
-  gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-  osc1.connect(gain1).connect(ctx.destination);
-  osc1.start(now);
-  osc1.stop(now + 0.2);
-
-  const osc2 = ctx.createOscillator();
-  const gain2 = ctx.createGain();
-  osc2.type = 'sine';
-  osc2.frequency.value = 659;
-  gain2.gain.setValueAtTime(0.15, now + 0.12);
-  gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-  osc2.connect(gain2).connect(ctx.destination);
-  osc2.start(now + 0.12);
-  osc2.stop(now + 0.35);
+  if (style === 'chime') {
+    playTone(ctx, 523, 'sine', 0.15, now, 0.2);
+    playTone(ctx, 659, 'sine', 0.15, now + 0.12, 0.23);
+  } else if (style === 'ding') {
+    playTone(ctx, 880, 'sine', 0.12, now, 0.4);
+  } else if (style === 'pop') {
+    playTone(ctx, 700, 'triangle', 0.18, now, 0.08);
+    playTone(ctx, 900, 'triangle', 0.14, now + 0.06, 0.06);
+  } else {
+    playTone(ctx, 523, 'sine', 0.15, now, 0.2);
+    playTone(ctx, 659, 'sine', 0.15, now + 0.12, 0.23);
+  }
 }
 
 function playFailureSound() {
+  const style = getSoundStyle();
+  if (style === 'silent') return;
   const ctx = getAudioContext();
   if (!ctx) return;
-
   const now = ctx.currentTime;
 
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(440, now);
-  osc.frequency.exponentialRampToValueAtTime(300, now + 0.25);
-  gain.gain.setValueAtTime(0.15, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-  osc.connect(gain).connect(ctx.destination);
-  osc.start(now);
-  osc.stop(now + 0.3);
+  if (style === 'chime') {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.25);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  } else if (style === 'ding') {
+    playTone(ctx, 330, 'sine', 0.12, now, 0.5);
+  } else if (style === 'pop') {
+    playTone(ctx, 500, 'triangle', 0.18, now, 0.06);
+    playTone(ctx, 350, 'triangle', 0.14, now + 0.08, 0.06);
+  } else {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.25);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+}
+
+export function previewNotificationSound(style: SoundStyle) {
+  if (style === 'silent') return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  if (style === 'chime') {
+    playTone(ctx, 523, 'sine', 0.15, now, 0.2);
+    playTone(ctx, 659, 'sine', 0.15, now + 0.12, 0.23);
+  } else if (style === 'ding') {
+    playTone(ctx, 880, 'sine', 0.12, now, 0.4);
+  } else if (style === 'pop') {
+    playTone(ctx, 700, 'triangle', 0.18, now, 0.08);
+    playTone(ctx, 900, 'triangle', 0.14, now + 0.06, 0.06);
+  } else {
+    playTone(ctx, 523, 'sine', 0.15, now, 0.2);
+    playTone(ctx, 659, 'sine', 0.15, now + 0.12, 0.23);
+  }
 }
 
 function vibrate(pattern: number | number[]) {
@@ -149,18 +201,19 @@ export function notifyNewMessage() {
   if (!currentSettings.notifyOnNewMessage) return;
 
   if (currentSettings.soundEnabled) {
-    const ctx = getAudioContext();
-    if (ctx) {
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = 600;
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.1);
+    const style = getSoundStyle();
+    if (style !== 'silent') {
+      const ctx = getAudioContext();
+      if (ctx) {
+        const now = ctx.currentTime;
+        if (style === 'pop') {
+          playTone(ctx, 800, 'triangle', 0.1, now, 0.05);
+        } else if (style === 'ding') {
+          playTone(ctx, 700, 'sine', 0.06, now, 0.15);
+        } else {
+          playTone(ctx, 600, 'sine', 0.08, now, 0.1);
+        }
+      }
     }
   }
   if (currentSettings.hapticEnabled) {

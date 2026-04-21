@@ -17,6 +17,7 @@ export interface DevBotSettings {
   dndEnabled: boolean;
   dndStartTime: string;
   dndEndTime: string;
+  notificationSound: 'chime' | 'ding' | 'pop' | 'classic' | 'silent';
 }
 
 const SETTINGS_KEY = 'devbot-settings';
@@ -37,6 +38,7 @@ const DEFAULT_SETTINGS: DevBotSettings = {
   dndEnabled: false,
   dndStartTime: '22:00',
   dndEndTime: '08:00',
+  notificationSound: 'chime',
 };
 
 export function useSettings() {

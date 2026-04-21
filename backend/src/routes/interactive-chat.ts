@@ -718,6 +718,38 @@ router.post(
   }, 'change effort level')
 );
 
+// Change working directory
+router.post(
+  '/:id/working-dir',
+  asyncHandler(async (req, res) => {
+    const { workingDir } = req.body;
+    if (workingDir !== null && (typeof workingDir !== 'string' || !workingDir.trim())) {
+      sendBadRequest(res, 'workingDir must be a non-empty string or null');
+      return;
+    }
+
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    const newSettings = { ...existingSettings };
+    if (workingDir === null) {
+      delete newSettings.workingDir;
+    } else {
+      newSettings.workingDir = workingDir.trim();
+    }
+
+    await updateChatField(req.params.id, { settings: newSettings }, res);
+  }, 'change working directory')
+);
+
 // Archive a chat
 router.post(
   '/:id/archive',

@@ -1,4 +1,4 @@
-import { ArrowLeft, Coins, Eye, EyeOff, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
+import { ArrowLeft, Coins, Eye, EyeOff, FolderRoot, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, GitStatus, InteractiveChat } from '../types';
@@ -22,6 +22,8 @@ interface ChatViewHeaderProps {
   onOpenCostDrawer: () => void;
   onOpenRename: () => void;
   onOpenToolHistory: () => void;
+  onOpenWorkingDir: () => void;
+  workingDir?: string | null;
 }
 
 export function ChatViewHeader({
@@ -41,6 +43,8 @@ export function ChatViewHeader({
   onOpenCostDrawer,
   onOpenRename,
   onOpenToolHistory,
+  onOpenWorkingDir,
+  workingDir,
 }: ChatViewHeaderProps) {
   const toolResultCount = messages.reduce((count, m) => {
     if (m.type === 'tool_use' || m.type === 'tool_result') return count + 1;
@@ -173,6 +177,15 @@ export function ChatViewHeader({
             <Coins className="h-4 w-4 text-muted-foreground" />
           </Button>
         )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={onOpenWorkingDir}
+          title={workingDir ? `Working dir: ${workingDir}` : 'Set working directory'}
+        >
+          <FolderRoot className="h-4 w-4 text-muted-foreground" />
+        </Button>
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
           <Settings className="h-4 w-4 text-muted-foreground" />
         </Button>

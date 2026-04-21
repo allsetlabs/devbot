@@ -55,6 +55,7 @@ import { ChatExportDrawer, type ExportFormat } from '../components/ChatExportDra
 import { ChatSlashHelpDialog } from '../components/ChatSlashHelpDialog';
 import { ChatClearConfirmDialog } from '../components/ChatClearConfirmDialog';
 import { ChatRenameDialog } from '../components/ChatRenameDialog';
+import { ChatWorkingDirDrawer } from '../components/ChatWorkingDirDrawer';
 import { ChatUnsafeBanner } from '../components/ChatUnsafeBanner';
 import { InlineFileEditor } from '../components/InlineFileEditor';
 import type {
@@ -146,6 +147,7 @@ export function InteractiveChatView({
   const [worktreesOpen, setWorktreesOpen] = useState(false);
   const [keybindingsOpen, setKeybindingsOpen] = useState(false);
   const [costDrawerOpen, setCostDrawerOpen] = useState(false);
+  const [workingDirDrawerOpen, setWorkingDirDrawerOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
   const [toolHistoryOpen, setToolHistoryOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -534,6 +536,13 @@ export function InteractiveChatView({
     (effort: string | null) => api.changeChatEffort(chatId!, effort),
     [['interactive-chat', chatId]],
     { onSuccess: () => setEffortDrawerOpen(false) }
+  );
+
+  // Change working directory mutation
+  const workingDirMutation = useCrudMutation(
+    (dir: string | null) => api.changeChatWorkingDir(chatId!, dir),
+    [['interactive-chat', chatId]],
+    { onSuccess: () => setWorkingDirDrawerOpen(false) }
   );
 
   // File upload mutation
@@ -1147,6 +1156,8 @@ export function InteractiveChatView({
             setRenameValue(chat?.name || '');
             setRenameOpen(true);
           }}
+          onOpenWorkingDir={() => setWorkingDirDrawerOpen(true)}
+          workingDir={chat?.workingDir}
         />
       )}
 
@@ -1379,6 +1390,13 @@ export function InteractiveChatView({
       <WorktreeDrawer open={worktreesOpen} onOpenChange={setWorktreesOpen} workingDirectory={chat?.workingDir ?? undefined} />
       <KeybindingsDrawer open={keybindingsOpen} onOpenChange={setKeybindingsOpen} />
       <SessionCostDrawer open={costDrawerOpen} onOpenChange={setCostDrawerOpen} stats={sessionStats} />
+      <ChatWorkingDirDrawer
+        open={workingDirDrawerOpen}
+        onOpenChange={setWorkingDirDrawerOpen}
+        currentDir={chat?.workingDir ?? VITE_DEVBOT_PROJECTS_DIR}
+        isPending={workingDirMutation.isPending}
+        onSave={(dir) => workingDirMutation.mutate(dir || null)}
+      />
 
       {/* Pinned messages drawer */}
       <PinnedMessagesDrawer

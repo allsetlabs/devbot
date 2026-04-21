@@ -272,6 +272,13 @@ export const api = {
     });
   },
 
+  changeChatWorkingDir: (id: string, workingDir: string | null): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/working-dir`, {
+      method: 'POST',
+      body: JSON.stringify({ workingDir }),
+    });
+  },
+
   exportChat: async (
     id: string,
     format: 'markdown' | 'json' | 'plaintext' = 'markdown'

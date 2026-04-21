@@ -13,4 +13,5 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { command: '/compact', description: 'Compact conversation to save context', action: 'sendCompact' },
   { command: '/fast', description: 'Toggle fast output mode', action: 'toggleFastMode' },
   { command: '/config', description: 'Open settings page', action: 'openConfig' },
+  { command: '/cost', description: 'Show session cost and token usage', action: 'openCostDrawer' },
 ];

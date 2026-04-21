@@ -725,6 +725,7 @@ export function InteractiveChatView({
           sendMutation.mutate('/compact');
         },
         openConfig: () => navigate('/settings'),
+        openCostDrawer: () => setCostDrawerOpen(true),
         toggleFastMode: () => {
           if (!chatId) return;
           api.toggleChatFastMode(chatId).then((updated) => {

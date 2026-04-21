@@ -41,6 +41,7 @@ export interface HealthResponse {
   status: 'ok' | 'error';
   activeSessions: number;
   uptime: number;
+  defaultWorkingDirectory?: string;
 }
 
 export interface ScheduledTask {

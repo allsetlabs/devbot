@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Settings, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../hooks/useSettings';
+import { api } from '../lib/api';
 import { SlideNav } from '../components/SlideNav';
 import { requestBrowserNotificationPermission, getBrowserNotificationPermission, previewNotificationSound } from '../lib/notification';
 import type { DevBotSettings } from '../hooks/useSettings';
@@ -113,8 +114,15 @@ function SectionHeader({ title }: { title: string }) {
 
 export function SettingsPage() {
   const [navOpen, setNavOpen] = useState(false);
+  const [serverDefaultDir, setServerDefaultDir] = useState('');
   const navigate = useNavigate();
   const { settings, updateSettings, toggleSound, toggleHaptic, toggleAutoScroll } = useSettings();
+
+  useEffect(() => {
+    api.health().then((h) => {
+      if (h.defaultWorkingDirectory) setServerDefaultDir(h.defaultWorkingDirectory);
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
@@ -295,7 +303,7 @@ export function SettingsPage() {
             type="text"
             value={settings.defaultWorkingDirectory}
             onChange={(e) => updateSettings({ defaultWorkingDirectory: e.target.value })}
-            placeholder="/path/to/projects"
+            placeholder={serverDefaultDir || '/path/to/projects'}
             className="w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-sm text-foreground placeholder:text-muted-foreground"
           />
           <p className="mt-1 text-xs text-muted-foreground">

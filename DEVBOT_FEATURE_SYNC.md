@@ -3,17 +3,18 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T09:28:00Z
-Last implementation run: 2026-04-22T11:40:00Z
+Last implementation run: 2026-04-22T14:00:00Z
 
 ---
 
 ## Pending
-- Settings page Default Working Directory shows placeholder "/path/to/projects" instead of actual configured value — the input field shows a generic placeholder that doesn't reflect the real default working directory from the backend
 - Chat list on desktop has excessive right-side action icons (6 icons per row: play, star, fork, copy, archive, delete) — consider grouping less-used actions into a "..." overflow menu to reduce visual clutter
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Settings page Default Working Directory placeholder now shows actual DEVBOT_PROJECTS_DIR from backend — health endpoint returns defaultWorkingDirectory; SettingsPage fetches it on mount and uses it as placeholder instead of generic "/path/to/projects"
 
 - [2026-04-22] Add subagent/background task progress indicators — AgentSubagentView component with Bot icon, description title, subagent_type/model/isolation/background badges, spinning loader when running vs "Done" badge when completed; renders in both embedded tool_use blocks (ChatMessage.tsx) and standalone tool_use messages (ToolApprovalInline.tsx); expandable prompt preview; hasResult determined by isLast message heuristic
 

@@ -75,6 +75,7 @@ app.get('/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     runningScheduledTasks: getRunningTasks().length,
     activeSessions: getActiveSessionCount(),
+    defaultWorkingDirectory: DEVBOT_PROJECTS_DIR,
   });
 });
 

@@ -52,7 +52,7 @@ export function ArchivedChatItem({
           Archived {chat.archivedAt ? formatRelativeTime(chat.archivedAt) : ''}
         </p>
       </div>
-      {/* Large screens: show icons directly */}
+      {/* Desktop: primary actions inline + overflow menu */}
       <div className="hidden flex-shrink-0 items-center gap-1 lg:flex">
         <Button
           variant="ghost"
@@ -69,47 +69,39 @@ export function ArchivedChatItem({
             className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : 'text-foreground/60'}`}
           />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onDuplicate();
-          }}
-          title="Duplicate"
-        >
-          <Copy className="h-4 w-4 text-foreground/60" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 hover:bg-muted-foreground/20"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onUnarchive();
-          }}
-          title="Unarchive"
-        >
-          <ArchiveRestore className="h-4 w-4 text-foreground/60" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 hover:bg-destructive/20"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onDelete();
-          }}
-          title="Delete"
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-muted-foreground/20"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              title="More actions"
+            >
+              <MoreVertical className="h-4 w-4 text-foreground/60" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onDuplicate}>
+              <Copy className="h-4 w-4" />
+              Duplicate
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onUnarchive}>
+              <ArchiveRestore className="h-4 w-4" />
+              Unarchive
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDelete} className="text-destructive">
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      {/* Small/medium screens: dropdown */}
+      {/* Mobile/tablet: all actions in dropdown */}
       <div className="flex-shrink-0 lg:hidden">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

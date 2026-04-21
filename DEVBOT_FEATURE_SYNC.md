@@ -3,16 +3,17 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T09:28:00Z
-Last implementation run: 2026-04-22T14:00:00Z
+Last implementation run: 2026-04-21T18:00:00Z
 
 ---
 
 ## Pending
-- Chat list on desktop has excessive right-side action icons (6 icons per row: play, star, fork, copy, archive, delete) — consider grouping less-used actions into a "..." overflow menu to reduce visual clutter
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-21] Chat list desktop overflow menu — reduced 6 inline action icons (play, star, terminal, copy, archive, delete) to 3 (play, star, "..."); grouped less-used actions (copy command, duplicate, archive, delete) into overflow dropdown menu; same pattern applied to ArchivedChatItem; mobile dropdown unchanged
 
 - [2026-04-22] Settings page Default Working Directory placeholder now shows actual DEVBOT_PROJECTS_DIR from backend — health endpoint returns defaultWorkingDirectory; SettingsPage fetches it on mount and uses it as placeholder instead of generic "/path/to/projects"
 

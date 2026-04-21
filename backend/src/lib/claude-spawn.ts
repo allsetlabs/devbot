@@ -19,6 +19,10 @@ export function isExecuting(key: string): boolean {
   return runningExecutions.has(key);
 }
 
+export function getActiveSessionCount(): number {
+  return runningExecutions.size;
+}
+
 export function stopExecution(key: string): boolean {
   const proc = runningExecutions.get(key);
   if (proc && !proc.killed) {

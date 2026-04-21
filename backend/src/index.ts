@@ -29,7 +29,7 @@ import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
 import type { LawnProfile } from '@devbot/plugin-lawn-care/backend/schema.js';
-import { spawnClaudeStructured } from './lib/claude-spawn.js';
+import { spawnClaudeStructured, getActiveSessionCount } from './lib/claude-spawn.js';
 import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
 
@@ -74,6 +74,7 @@ app.get('/health', (_req, res) => {
     uptime: Math.floor(uptime),
     timestamp: new Date().toISOString(),
     runningScheduledTasks: getRunningTasks().length,
+    activeSessions: getActiveSessionCount(),
   });
 });
 

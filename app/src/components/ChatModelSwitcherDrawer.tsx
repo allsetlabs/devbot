@@ -44,7 +44,7 @@ export function ChatModelSwitcherDrawer({
                 <Button
                   key={model}
                   variant="ghost"
-                  className={`flex items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentModel ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'}`}
+                  className={`flex h-auto items-start justify-start gap-3 whitespace-normal rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentModel ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'}`}
                   onClick={() => {
                     if (!isCurrentModel) {
                       onModelChange(model);

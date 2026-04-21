@@ -124,7 +124,7 @@ export function ChatViewHeader({
             <Eye className="h-4 w-4 text-muted-foreground" />
           )}
           {hideToolResults && toolResultCount > 0 && (
-            <span className="text-warning-foreground absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-warning text-[10px] font-semibold">
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">
               {toolResultCount > 9 ? '9+' : toolResultCount}
             </span>
           )}

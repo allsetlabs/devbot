@@ -2,12 +2,19 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-20T21:50:00Z
+Last discovery run: 2026-04-21T05:00:00Z
 Last implementation run: 2026-04-21T02:30:00Z
 
 ---
 
 ## Pending
+
+- Fix Dashboard "NaNd ago" bug — formatRelativeTime in app/src/lib/format.ts doesn't handle null/undefined/invalid date strings, causing "NaNd ago" on the Chats card when a chat has no updatedAt
+- Add message retry/regenerate button — Claude Code allows retrying the last assistant response; DevBot should add a retry icon on the last assistant message that re-sends the previous user message
+- Add inline diff viewer for Edit tool calls — when ToolUseMessage renders an Edit/Write tool result, show a syntax-highlighted unified diff instead of raw JSON
+- Add chat message search within a conversation — Claude Code has Cmd+F / search icon to find text within the current chat; DevBot has search on the chat list but not within a conversation
+- Add permission prompt inline UI for interactive chats — when Claude requests tool approval, show an inline approve/deny prompt in the chat stream instead of auto-approving everything
+- Add session cost summary drawer — show cumulative API cost breakdown (input/output/cache tokens, total cost) accessible from the chat header, beyond the current inline token count
 
 ## In Progress
 

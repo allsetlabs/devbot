@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T16:45:00Z
-Last implementation run: 2026-04-22T05:46:00Z
+Last implementation run: 2026-04-22T06:30:00Z
 
 ---
 
 ## Pending
-- Add inline image rendering for base64 images in assistant responses — when Claude returns image content blocks (type: "image") in responses, render them inline instead of ignoring them
 
 ## In Progress
 
@@ -16,6 +15,7 @@ Last implementation run: 2026-04-22T05:46:00Z
 
 ## Completed
 
+- [2026-04-22] Add inline image rendering for base64 images in assistant responses — added 'image' type to ClaudeContentBlock; extracts image blocks from assistant content and renders them as inline `<img>` elements with base64 data URIs, max-height 400px, rounded corners
 - [2026-04-22] Add session pause button — Pause (SIGTSTP) and Resume (SIGCONT) buttons in ChatTextareaWithPickers; backend pause/resume endpoints; header dot shows solid warning color when paused vs pulsing when running; toggles between Pause and Play icons
 - [2026-04-21] Dashboard layout doesn't expand on desktop — added responsive grid (2col mobile, 3col md, 4col lg) with max-w-6xl centered container
 - [2026-04-21] Add collapsible long assistant messages — separate MAX_VISIBLE_LINES_ASSISTANT (500 lines) for assistant messages; "Show more (N lines)" / "Show less" toggle works on all messages including the last one; user messages still use 10-line truncation

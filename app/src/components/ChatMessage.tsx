@@ -179,6 +179,11 @@ export function ChatMessage({
     const { truncated, isTruncated } = truncateToLines(text, MAX_VISIBLE_LINES_ASSISTANT);
     const displayText = expanded ? text : truncated;
 
+    const imageBlocks = (content.message?.content || []).filter(
+      (block): block is ClaudeContentBlock & { type: 'image'; source: { type: 'base64'; media_type: string; data: string } } =>
+        block.type === 'image' && !!block.source && block.source.type === 'base64'
+    );
+
     const toolUseBlocks = (content.message?.content || []).filter(
       (
         block
@@ -206,6 +211,19 @@ export function ChatMessage({
             >
               {expanded ? 'Show less' : `Show more (${text.split('\n').length} lines)`}
             </Button>
+          )}
+          {imageBlocks.length > 0 && (
+            <div className={`flex flex-col gap-2 ${text ? 'mt-2' : ''}`}>
+              {imageBlocks.map((block, idx) => (
+                <img
+                  key={`img-${idx}`}
+                  src={`data:${block.source.media_type};base64,${block.source.data}`}
+                  alt="Generated image"
+                  className="max-w-full rounded-lg"
+                  style={{ maxHeight: 400 }}
+                />
+              ))}
+            </div>
           )}
           {toolUseBlocks.length > 0 && (
             <div className={`flex flex-col gap-2 ${text ? 'mt-2' : ''}`}>

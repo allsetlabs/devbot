@@ -115,7 +115,7 @@ export interface ClaudeMessageContent {
 }
 
 export interface ClaudeContentBlock {
-  type: 'text' | 'tool_use' | 'tool_result' | 'thinking';
+  type: 'text' | 'tool_use' | 'tool_result' | 'thinking' | 'image';
   text?: string;
   thinking?: string;
   id?: string;
@@ -124,6 +124,11 @@ export interface ClaudeContentBlock {
   tool_use_id?: string;
   content?: string | ClaudeContentBlock[];
   is_error?: boolean;
+  source?: {
+    type: 'base64';
+    media_type: string;
+    data: string;
+  };
 }
 
 export type PermissionMode = 'plan' | 'auto-accept' | 'dangerous';

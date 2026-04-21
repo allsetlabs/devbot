@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T16:15:00Z
-Last implementation run: 2026-04-21T19:30:00Z
+Last implementation run: 2026-04-21T20:15:00Z
 
 ---
 
 ## Pending
-- Add session resume button in chat list — backend already supports --resume via sessionId but there is no UI button to resume/continue a previous session from the chat list or chat view
 - Fix Dashboard System card showing "sessions" with no count — the System status bar on Dashboard shows "Online Uptime: Xh Xm sessions" but the session count number is missing before "sessions"
 - Add copy-message-as-markdown button to assistant message action bar — Claude Code lets you copy responses as formatted markdown; add a clipboard-copy icon to the message action bar that copies the raw markdown source
 
@@ -18,6 +17,7 @@ Last implementation run: 2026-04-21T19:30:00Z
 
 ## Completed
 
+- [2026-04-21] Add session resume button in chat list — Play icon button and "· Resumable" status text on chats with sessionId; shown in both desktop inline icons and mobile dropdown menu; navigates to chat view where sending a message resumes the session
 - [2026-04-21] Add thinking budget control UI — ChatThinkingBudgetDrawer component with effort level selector (Low/Medium/High/Extra High/Max); Brain icon button in ChatInputToolbar; backend POST /:id/effort endpoint stores effort in chat settings JSON column; passes --effort flag to Claude CLI via claude-spawn.ts
 - [2026-04-21] Add /compact slash command — added to SLASH_COMMANDS config with sendCompact action; sends `/compact` as prompt to Claude CLI which handles context compaction natively; toast notification on trigger
 - [2026-04-21] Fix hidden-tools count badge style inconsistency — changed eye icon badge from bg-warning/text-warning-foreground to bg-muted/text-muted-foreground to match the history icon badge style

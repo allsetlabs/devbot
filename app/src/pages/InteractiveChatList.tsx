@@ -217,6 +217,7 @@ export function InteractiveChatList() {
           onDeleteArchived={handleDeleteArchived}
           onUnarchive={handleUnarchive}
           onCreate={handleCreate}
+          onResumeSession={handleSelect}
           onClearFilters={() => {
             setShowFavorites(false);
             setSearchParams((p) => {

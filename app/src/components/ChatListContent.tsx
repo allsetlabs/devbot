@@ -26,6 +26,7 @@ interface ChatListContentProps {
   onUnarchive: (id: string) => void;
   onCreate: () => void;
   onClearFilters: () => void;
+  onResumeSession: (chat: InteractiveChat) => void;
 }
 
 export function ChatListContent({
@@ -44,6 +45,7 @@ export function ChatListContent({
   onDelete,
   onCreate,
   onClearFilters,
+  onResumeSession,
 }: ChatListContentProps) {
   if (isLoading && chats.length === 0) {
     return (
@@ -114,6 +116,8 @@ export function ChatListContent({
               e.stopPropagation();
               onDelete(chat.id);
             }}
+            hasResumeSession={!!chat.claudeSessionId && !chat.isRunning}
+            onResumeSession={() => onResumeSession(chat)}
             hasCopyCommand={!!chat.claudeSessionId}
             onCopyCommand={
               chat.claudeSessionId

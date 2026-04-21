@@ -31,6 +31,7 @@ export { formatTokens, formatDuration, formatCost, extractUsageData } from './Sy
 /* eslint-enable react-refresh/only-export-components */
 
 const MAX_VISIBLE_LINES = 10;
+const MAX_VISIBLE_LINES_ASSISTANT = 500;
 
 interface ChatMessageProps {
   message: TaskMessage;
@@ -175,8 +176,8 @@ export function ChatMessage({
   if (type === 'assistant') {
     const text = extractTextContent(content);
     const thinking = extractThinkingContent(content);
-    const { truncated, isTruncated } = truncateToLines(text, MAX_VISIBLE_LINES);
-    const displayText = expanded || isLast ? text : truncated;
+    const { truncated, isTruncated } = truncateToLines(text, MAX_VISIBLE_LINES_ASSISTANT);
+    const displayText = expanded ? text : truncated;
 
     const toolUseBlocks = (content.message?.content || []).filter(
       (
@@ -197,13 +198,13 @@ export function ChatMessage({
         >
           {thinking && <ThinkingBlock thinking={thinking} />}
           {text && <MarkdownRenderer content={displayText} />}
-          {isTruncated && !isLast && (
+          {isTruncated && (
             <Button
               variant="ghost"
               onClick={() => setExpanded(!expanded)}
               className="mt-1 text-xs font-medium text-primary hover:text-primary/80"
             >
-              {expanded ? 'Show less' : 'Show more'}
+              {expanded ? 'Show less' : `Show more (${text.split('\n').length} lines)`}
             </Button>
           )}
           {toolUseBlocks.length > 0 && (

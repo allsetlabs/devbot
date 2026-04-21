@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T16:45:00Z
-Last implementation run: 2026-04-21T09:47:00Z
+Last implementation run: 2026-04-21T17:00:00Z
 
 ---
 
 ## Pending
-- Add collapsible long assistant messages — messages with very long responses should show a "Show more" / "Show less" toggle to avoid overwhelming the chat scroll; collapse after ~500 lines
 - Dashboard layout doesn't expand on desktop — the grid stays mobile-width on 1440px viewport; should use wider max-width or multi-column layout on larger screens
 - Add session pause button — Claude Code supports pausing an active session mid-execution; add a Pause icon button in ChatViewHeader that sends an interrupt signal, complementing the existing Stop button
 - Add inline image rendering for base64 images in assistant responses — when Claude returns image content blocks (type: "image") in responses, render them inline instead of ignoring them
@@ -19,6 +18,7 @@ Last implementation run: 2026-04-21T09:47:00Z
 
 ## Completed
 
+- [2026-04-21] Add collapsible long assistant messages — separate MAX_VISIBLE_LINES_ASSISTANT (500 lines) for assistant messages; "Show more (N lines)" / "Show less" toggle works on all messages including the last one; user messages still use 10-line truncation
 - [2026-04-21] Dashboard System card sessions count — duplicate; fix already committed in 710af46 (activeSessions in /health endpoint); backend process was stale
 - [2026-04-21] Add copy-message-as-markdown button to assistant message action bar — already implemented: CopyMessageButton component copies raw markdown text via extractTextContent(); Copy icon visible on hover in assistant message action bar
 - [2026-04-21] Fix Dashboard System card showing "sessions" with no count — added activeSessions field to backend /health endpoint using getActiveSessionCount() from claude-spawn.ts

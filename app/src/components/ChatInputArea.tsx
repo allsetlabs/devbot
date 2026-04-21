@@ -18,16 +18,8 @@ export interface AttachedFile {
   uploading: boolean;
 }
 
-interface SessionStats {
-  totalTokens: number;
-  totalCost: number;
-  totalDuration: number;
-  turnCount: number;
-}
-
 interface ChatInputAreaProps {
   chat: InteractiveChat | undefined;
-  sessionStats: SessionStats;
   input: string;
   onInputChange: (value: string) => void;
   onCursorChange?: (position: number) => void;
@@ -62,7 +54,6 @@ interface ChatInputAreaProps {
   onBrowseFiles?: () => void;
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
-  onOpenMaxTurns: (currentMaxTurns?: number | null) => void;
   onOpenEffort: () => void;
   onOpenAllowedTools: () => void;
   acceptedExtensions: string;
@@ -70,7 +61,6 @@ interface ChatInputAreaProps {
 
 export function ChatInputArea({
   chat,
-  sessionStats,
   input,
   onInputChange,
   onCursorChange,
@@ -105,7 +95,6 @@ export function ChatInputArea({
   onBrowseFiles,
   onOpenModeDrawer,
   onOpenModelDrawer,
-  onOpenMaxTurns,
   onOpenEffort,
   onOpenAllowedTools,
   acceptedExtensions,
@@ -152,14 +141,12 @@ export function ChatInputArea({
         acceptedExtensions={acceptedExtensions}
       />
 
-      {/* Mode & Model selectors + stats */}
+      {/* Mode & Model selectors */}
       <ChatInputToolbar
         chat={chat}
-        sessionStats={sessionStats}
         input={input}
         onOpenModeDrawer={onOpenModeDrawer}
         onOpenModelDrawer={onOpenModelDrawer}
-        onOpenMaxTurns={onOpenMaxTurns}
         onOpenEffort={onOpenEffort}
         onOpenAllowedTools={onOpenAllowedTools}
       />

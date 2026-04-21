@@ -6,43 +6,28 @@ import {
   Eye,
   CheckCircle,
   Zap,
-  Coins,
-  Clock,
-  Repeat,
   Wrench,
 } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
-import { formatTokens, formatCost, formatDuration } from './ChatMessage';
 import { estimateTokens } from '../lib/format';
 import type { InteractiveChat } from '../types';
 
-interface SessionStats {
-  totalTokens: number;
-  totalCost: number;
-  totalDuration: number;
-  turnCount: number;
-}
-
 interface ChatInputToolbarProps {
   chat: InteractiveChat | undefined;
-  sessionStats: SessionStats;
   input: string;
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
-  onOpenMaxTurns: (currentMaxTurns?: number | null) => void;
   onOpenEffort: () => void;
   onOpenAllowedTools: () => void;
 }
 
 export function ChatInputToolbar({
   chat,
-  sessionStats,
   input,
   onOpenModeDrawer,
   onOpenModelDrawer,
-  onOpenMaxTurns,
   onOpenEffort,
   onOpenAllowedTools,
 }: ChatInputToolbarProps) {
@@ -107,41 +92,6 @@ export function ChatInputToolbar({
           </span>
         )}
       </div>
-      {(sessionStats.totalTokens > 0 || sessionStats.turnCount > 0) && (
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-          {sessionStats.totalTokens > 0 && (
-            <span className="flex items-center gap-0.5">
-              {formatTokens(sessionStats.totalTokens)}
-            </span>
-          )}
-          {sessionStats.turnCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`flex h-auto items-center gap-0.5 rounded px-1 py-0.5 text-[11px] transition-colors hover:bg-muted ${chat?.maxTurns && sessionStats.turnCount >= chat.maxTurns ? 'text-destructive' : ''}`}
-              onClick={() => onOpenMaxTurns(chat?.maxTurns)}
-            >
-              <Repeat className="h-3 w-3" />
-              <span>
-                {sessionStats.turnCount}
-                {chat?.maxTurns ? `/${chat.maxTurns}` : ''}
-              </span>
-            </Button>
-          )}
-          {sessionStats.totalCost > 0 && (
-            <span className="flex items-center gap-0.5">
-              <Coins className="h-3 w-3" />
-              {formatCost(sessionStats.totalCost)}
-            </span>
-          )}
-          {sessionStats.totalDuration > 0 && (
-            <span className="flex items-center gap-0.5">
-              <Clock className="h-3 w-3" />
-              {formatDuration(sessionStats.totalDuration)}
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }

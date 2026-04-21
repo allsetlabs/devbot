@@ -2,12 +2,23 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-22T09:28:00Z
+Last discovery run: 2026-04-21T12:18:00Z
 Last implementation run: 2026-04-21T18:00:00Z
 
 ---
 
 ## Pending
+
+- Chat view header mobile overflow menu — consolidate 8 icon buttons (search, tool visibility, tool history, pinned, cost, working dir, settings, edit name) into 3-4 visible + overflow "..." menu on mobile (sm/md); all icons remain visible on desktop (lg+)
+- Desktop persistent sidebar navigation — on lg+ viewports, render SlideNav as a persistent left sidebar (fixed, always visible) instead of a hamburger overlay; content area shifts right; hamburger menu stays for sm/md only
+- Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
+- Specialized Read tool result renderer — show file content with line numbers and syntax highlighting (reuse MarkdownRenderer code block logic); collapsible if content exceeds 30 lines; show filename header with file icon
+- Specialized Glob tool result renderer — show matching file paths in a compact vertical list with file type icons (folder, code file, config file, etc.); show total match count header
+- Specialized Bash tool output renderer — terminal-style monospace output with dark background; show exit code badge (green for 0, red for non-zero); stderr lines in red; stdout in normal color; collapsible if output exceeds 20 lines
+- Add /doctor slash command — run backend health check returning: backend status, Claude CLI version, active sessions count, working directory validity, disk space, memory usage; display results in a diagnostic card with pass/fail indicators
+- Add /status slash command — display inline card showing: current model, permission mode, context usage (tokens/limit), session cost, working directory, active tools, fast mode state, effort level
+- Chat list date grouping — group chat items under date headers ("Today", "Yesterday", "This Week", "This Month", "Older") based on last activity timestamp; headers are sticky within scroll; applies to both mobile and desktop layouts
+- Global cross-chat message search — add a "Search all messages" toggle/mode to the chat list search bar; when enabled, searches message content across all conversations using backend full-text query; results show message preview with chat name, timestamp, and click-to-navigate
 
 ## In Progress
 

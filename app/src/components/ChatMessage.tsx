@@ -15,7 +15,7 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView } from './ToolUseMessage';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView } from './ToolUseMessage';
 import { SystemMessage } from './SystemMessage';
 
 // Re-export symbols used by other modules
@@ -211,6 +211,8 @@ export function ChatMessage({
                     return <EditDiffView key={block.id || block.name} toolInput={toolInput} />;
                   if (block.name === 'MultiEdit')
                     return <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} />;
+                  if (block.name === 'Write')
+                    return <WriteContentView key={block.id || block.name} toolInput={toolInput} />;
                   return (
                     <ToolUseMessage
                       key={block.id || block.name}
@@ -230,6 +232,11 @@ export function ChatMessage({
                     if (block.name === 'MultiEdit') {
                       return (
                         <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} />
+                      );
+                    }
+                    if (block.name === 'Write') {
+                      return (
+                        <WriteContentView key={block.id || block.name} toolInput={toolInput} />
                       );
                     }
                     return (

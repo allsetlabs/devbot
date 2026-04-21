@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
 import type { ClaudeMessageContent } from '../types';
@@ -200,6 +200,62 @@ export function MultiEditDiffView({ toolInput }: { toolInput: Record<string, unk
   );
 }
 
+/** Content view for Write tool calls — shows all lines as additions */
+export function WriteContentView({ toolInput }: { toolInput: Record<string, unknown> }) {
+  const [expanded, setExpanded] = useState(false);
+  const filePath = (toolInput.file_path as string) || '';
+  const content = (toolInput.content as string) || '';
+
+  const fileName = filePath.split('/').pop() || filePath;
+  const lineCount = content ? content.split('\n').length : 0;
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <Button
+        variant="ghost"
+        onClick={(e) => {
+          const target = e.currentTarget;
+          setExpanded((v) => {
+            if (!v) scrollHeaderToTop(target);
+            return !v;
+          });
+        }}
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+        <FilePlus className="h-3.5 w-3.5 text-primary" />
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">
+          {fileName}
+        </span>
+        <span className="flex-shrink-0 text-xs text-success">+{lineCount}</span>
+      </Button>
+      {expanded && (
+        <div className="border-t border-border">
+          <div className="truncate border-b border-border/50 bg-muted/50 px-3 py-1 font-mono text-[11px] text-muted-foreground">
+            {filePath}
+          </div>
+          <div className="max-h-80 overflow-auto font-mono text-xs">
+            {content.split('\n').map((line, i) => (
+              <div key={i} className="flex bg-success/10">
+                <span className="w-8 flex-shrink-0 select-none text-right pr-1 text-[11px] leading-5 text-muted-foreground/40">
+                  {i + 1}
+                </span>
+                <pre className="min-w-0 flex-1 whitespace-pre-wrap break-all px-1 leading-5 text-success">
+                  {line || ' '}
+                </pre>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
   const [expanded, setExpanded] = useState(false);
   const toolName = content.tool_name || 'Unknown Tool';
@@ -212,6 +268,10 @@ export function ToolUseMessage({ content }: { content: ClaudeMessageContent }) {
 
   if (toolName === 'MultiEdit') {
     return <MultiEditDiffView toolInput={toolInput} />;
+  }
+
+  if (toolName === 'Write') {
+    return <WriteContentView toolInput={toolInput} />;
   }
 
   return (

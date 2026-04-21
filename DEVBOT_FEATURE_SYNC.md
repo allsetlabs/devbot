@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T05:00:00Z
-Last implementation run: 2026-04-20T19:00:00Z
+Last implementation run: 2026-04-21T06:00:00Z
 
 ---
 
 ## Pending
-- Add inline diff viewer for Edit tool calls — when ToolUseMessage renders an Edit/Write tool result, show a syntax-highlighted unified diff instead of raw JSON
 - Add chat message search within a conversation — Claude Code has Cmd+F / search icon to find text within the current chat; DevBot has search on the chat list but not within a conversation
 - Add permission prompt inline UI for interactive chats — when Claude requests tool approval, show an inline approve/deny prompt in the chat stream instead of auto-approving everything
 - Add session cost summary drawer — show cumulative API cost breakdown (input/output/cache tokens, total cost) accessible from the chat header, beyond the current inline token count
@@ -22,6 +21,7 @@ Last implementation run: 2026-04-20T19:00:00Z
 
 ## Completed
 
+- [2026-04-21] Add inline diff viewer for Edit/Write tool calls — WriteContentView component shows file content with line numbers and green highlighting; Edit/MultiEdit already had diff views; Write tool now renders with FilePlus icon, filename, line count instead of raw JSON
 - [2026-04-20] Add message retry/regenerate button — RotateCcw icon on last assistant message action bar; passes onRetry to lastAssistantIndex in MessageList
 - [2026-04-20] Fix Dashboard "NaNd ago" bug — formatRelativeTime now guards against null/undefined/invalid date strings
 - [2026-04-21] Add keyboard shortcuts viewer/editor — KeybindingsDrawer component accessible from SettingsDrawer; backend /api/keybindings route with GET (list), POST (add), DELETE (remove); reads/writes ~/.claude/keybindings.json; shows key combo with kbd styling, command name, optional when condition; supports add and delete

@@ -7,8 +7,8 @@ import { WorkingDirSelector, useValidateAndSaveDir } from '../components/Working
 import { useFavorites } from '../hooks/useFavorites';
 import { extractErrorMessage } from '../lib/format';
 import { ErrorBanner } from '../components/ErrorBanner';
-import { SlideNav } from '../components/SlideNav';
 import { ChatListHeader } from '../components/ChatListHeader';
+import { useNav } from '../hooks/useNav';
 import { ChatListFilters } from '../components/ChatListFilters';
 import { ChatArchiveDrawer } from '../components/ChatArchiveDrawer';
 import { ChatListContent } from '../components/ChatListContent';
@@ -18,7 +18,7 @@ import type { InteractiveChat, PermissionMode, ClaudeModel } from '../types';
 export function InteractiveChatList() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
@@ -172,15 +172,13 @@ export function InteractiveChatList() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <ChatListHeader
         sortBy={sortBy}
         sortDropdownOpen={sortDropdownOpen}
         showFavorites={showFavorites}
         isFetching={isFetching}
         creating={creating}
-        onMenuOpen={() => setNavOpen(true)}
+        onMenuOpen={openNav}
         onSortChange={setSortBy}
         onToggleSortDropdown={() => setSortDropdownOpen(!sortDropdownOpen)}
         onToggleFavorites={() => setShowFavorites(!showFavorites)}

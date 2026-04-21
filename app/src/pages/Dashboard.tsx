@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Menu } from 'lucide-react';
 import { api } from '../lib/api';
 import { lawnCareApi } from '@devbot/plugin-lawn-care/frontend/api';
-import { SlideNav } from '../components/SlideNav';
 import { babyLogsApi } from '@devbot/plugin-baby-logs/frontend/api';
 import { ChatsWidget } from '../components/ChatsWidget';
 import { SchedulerWidget } from '../components/SchedulerWidget';
@@ -12,9 +10,10 @@ import { BabyWidget } from '../components/BabyWidget';
 import { LawnWidget } from '../components/LawnWidget';
 import { HealthWidget } from '../components/HealthWidget';
 import { DashboardQuickActions } from '../components/DashboardQuickActions';
+import { useNav } from '../hooks/useNav';
 
 export function Dashboard() {
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
 
   const { data: chats = [] } = useQuery({
     queryKey: ['interactive-chats'],
@@ -51,12 +50,10 @@ export function Dashboard() {
 
   return (
     <div className="flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       {/* Header */}
       <header className="safe-area-top flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={openNav} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>

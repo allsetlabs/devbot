@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T12:18:00Z
-Last implementation run: 2026-04-22T06:00:00Z
+Last implementation run: 2026-04-22T06:30:00Z
 
 ---
 
 ## Pending
-- Desktop persistent sidebar navigation — on lg+ viewports, render SlideNav as a persistent left sidebar (fixed, always visible) instead of a hamburger overlay; content area shifts right; hamburger menu stays for sm/md only
 - Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
 - Specialized Read tool result renderer — show file content with line numbers and syntax highlighting (reuse MarkdownRenderer code block logic); collapsible if content exceeds 30 lines; show filename header with file icon
 - Specialized Glob tool result renderer — show matching file paths in a compact vertical list with file type icons (folder, code file, config file, etc.); show total match count header
@@ -21,6 +20,8 @@ Last implementation run: 2026-04-22T06:00:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Desktop persistent sidebar navigation — on lg+ viewports, SlideNav renders as a persistent left sidebar (fixed, always visible) with border-right; content area shifts right via lg:ml-64; hamburger menu hidden on lg+ via lg:hidden; mobile overlay behavior preserved; centralized via AppLayout wrapper + NavContext; removed per-page SlideNav state from 12 pages; PersistentSidebar and mobile SlideNav rendered once in AppLayout
 
 - [2026-04-22] Chat view header mobile overflow menu — consolidated 7 icon buttons (search, tool visibility, tool history, pinned, cost, working dir, settings) + rename pencil into 3 visible (search, "..." overflow, settings) on mobile (< lg); overflow DropdownMenu shows tool results toggle with count, tool history with count, pinned messages with count, session cost, working directory, and rename chat; pencil rename button hidden from title row on mobile; all icons remain visible on desktop (lg+)
 

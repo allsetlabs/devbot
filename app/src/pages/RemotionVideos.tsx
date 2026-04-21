@@ -7,8 +7,8 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { DataFetchWrapper } from '@allsetlabs/reusable/components/DataFetchWrapper';
 import { Plus, RefreshCw, Video, Menu } from 'lucide-react';
 import { api } from '../lib/api';
-import { SlideNav } from '../components/SlideNav';
 import { RemotionVideoListItem } from '../components/RemotionVideoListItem';
+import { useNav } from '../hooks/useNav';
 import { VideoPlayerOverlay } from '../components/VideoPlayerOverlay';
 
 const REMOTION_SYSTEM_PROMPT = `You are a Remotion video creator assistant. You work with the Remotion project located at modules/devbot/intro-video/.
@@ -52,7 +52,7 @@ If the render fails, do NOT output this marker. Instead explain what went wrong.
 
 export function RemotionVideos() {
   const navigate = useNavigate();
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
@@ -122,11 +122,9 @@ export function RemotionVideos() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <header className="flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={openNav} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
           <Video className="h-6 w-6 text-primary" />

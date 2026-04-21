@@ -23,39 +23,42 @@ import { SettingsPage } from './pages/SettingsPage';
 import { Dashboard } from './pages/Dashboard';
 import { PinnedMessagesPage } from './pages/PinnedMessagesPage';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
+import { AppLayout } from './components/AppLayout';
 
 function App() {
   return (
     <InitializeReusableChunks applyToBody defaultMuted>
-      <div className="flex h-dvh flex-col overflow-hidden bg-background">
+      <div className="overflow-hidden bg-background">
         <TextSelectionProvider>
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/pinned" element={<PinnedMessagesPage />} />
-            <Route path="/chats" element={<InteractiveChatList />} />
-            <Route path="/chat/:chatId" element={<InteractiveChatView />} />
-            <Route path="/scheduler" element={<SchedulerList />} />
-            <Route path="/scheduler/:taskId" element={<SchedulerView />} />
-            <Route path="/events-timer" element={<EventsTimer />} />
-            <Route path="/plans" element={<PlansPage />} />
-            <Route path="/baby-logs" element={<BabyLogs />} />
-            <Route path="/baby-logs/analytics" element={<BabyAnalytics />} />
-            <Route path="/baby-logs/growth" element={<GrowthCharts />} />
-            <Route path="/lawn-care" element={<LawnCare />} />
-            <Route path="/lawn-care/photos" element={<LawnPhotoJournal />} />
-            <Route path="/videos" element={<RemotionVideos />} />
-            <Route path="/working-directories" element={<WorkingDirectories />} />
-            <Route path="/logs" element={<LogsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/companies" element={<CompanyList />} />
-            <Route path="/company/:companyId" element={<CompanyView />} />
-            {/* Legacy CLI routes */}
-            <Route path="/cli" element={<ChatList />} />
-            <Route path="/cli/:sessionId" element={<ChatView />} />
-            {/* Default and catch-all redirect to chat */}
-            <Route path="/" element={<Navigate to="/chats" replace />} />
-            <Route path="*" element={<Navigate to="/chats" replace />} />
-          </Routes>
+          <AppLayout>
+            <Routes>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/pinned" element={<PinnedMessagesPage />} />
+              <Route path="/chats" element={<InteractiveChatList />} />
+              <Route path="/chat/:chatId" element={<InteractiveChatView />} />
+              <Route path="/scheduler" element={<SchedulerList />} />
+              <Route path="/scheduler/:taskId" element={<SchedulerView />} />
+              <Route path="/events-timer" element={<EventsTimer />} />
+              <Route path="/plans" element={<PlansPage />} />
+              <Route path="/baby-logs" element={<BabyLogs />} />
+              <Route path="/baby-logs/analytics" element={<BabyAnalytics />} />
+              <Route path="/baby-logs/growth" element={<GrowthCharts />} />
+              <Route path="/lawn-care" element={<LawnCare />} />
+              <Route path="/lawn-care/photos" element={<LawnPhotoJournal />} />
+              <Route path="/videos" element={<RemotionVideos />} />
+              <Route path="/working-directories" element={<WorkingDirectories />} />
+              <Route path="/logs" element={<LogsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/companies" element={<CompanyList />} />
+              <Route path="/company/:companyId" element={<CompanyView />} />
+              {/* Legacy CLI routes */}
+              <Route path="/cli" element={<ChatList />} />
+              <Route path="/cli/:sessionId" element={<ChatView />} />
+              {/* Default and catch-all redirect to chat */}
+              <Route path="/" element={<Navigate to="/chats" replace />} />
+              <Route path="*" element={<Navigate to="/chats" replace />} />
+            </Routes>
+          </AppLayout>
         </TextSelectionProvider>
       </div>
       <Toaster position="bottom-center" />

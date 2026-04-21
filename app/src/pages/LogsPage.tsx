@@ -5,12 +5,12 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@allsetlabs/reusable/components/ui/tabs';
 import { Menu, RefreshCw, Trash2, ArrowDown } from 'lucide-react';
 import { api } from '../lib/api';
-import { SlideNav } from '../components/SlideNav';
+import { useNav } from '../hooks/useNav';
 
 type LogSource = 'frontend' | 'backend';
 
 export function LogsPage() {
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [activeTab, setActiveTab] = useState<LogSource>('backend');
   const [autoScroll, setAutoScroll] = useState(true);
   const logRef = useRef<HTMLPreElement>(null);
@@ -54,12 +54,10 @@ export function LogsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       {/* Header */}
       <div className="safe-area-top flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={openNav} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold text-foreground">Logs</h1>

@@ -7,12 +7,12 @@ import { companyHooks } from '../hooks/useCompany';
 import { extractErrorMessage } from '../lib/format';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { EmptyState } from '../components/EmptyState';
-import { SlideNav } from '../components/SlideNav';
 import { ListPageHeader } from '../components/ListPageHeader';
+import { useNav } from '../hooks/useNav';
 
 export function CompanyList() {
   const navigate = useNavigate();
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [showForm, setShowForm] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [companyIdea, setCompanyIdea] = useState('');
@@ -54,12 +54,10 @@ export function CompanyList() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <ListPageHeader
         icon={<Building2 className="h-6 w-6 text-primary" />}
         title="Companies"
-        onMenuClick={() => setNavOpen(true)}
+        onMenuClick={openNav}
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
       >

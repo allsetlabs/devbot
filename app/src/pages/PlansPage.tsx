@@ -7,8 +7,8 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Lightbulb, Menu, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
 import { extractErrorMessage } from '../lib/format';
-import { SlideNav } from '../components/SlideNav';
 import { PlanListItem } from '../components/PlanListItem';
+import { useNav } from '../hooks/useNav';
 import { PlanDetailDrawer } from '../components/PlanDetailDrawer';
 import type { ModulePlan } from '../types';
 
@@ -16,7 +16,7 @@ const STATUS_FILTERS = ['all', 'pending', 'in_progress', 'completed', 'dismissed
 
 export function PlansPage() {
   const navigate = useNavigate();
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedPlan, setSelectedPlan] = useState<ModulePlan | null>(null);
 
@@ -68,11 +68,9 @@ export function PlansPage() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <header className="flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={openNav} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
           <Lightbulb className="h-6 w-6 text-primary" />

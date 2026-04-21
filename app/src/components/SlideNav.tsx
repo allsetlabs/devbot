@@ -18,11 +18,6 @@ import {
   LayoutDashboard,
 } from 'lucide-react';
 
-interface SlideNavProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
 interface NavItem {
   label: string;
   path: string;
@@ -45,12 +40,62 @@ const navItems: NavItem[] = [
   { label: 'Settings', path: '/settings', icon: <Settings className="h-5 w-5" /> },
 ];
 
-export function SlideNav({ isOpen, onClose }: SlideNavProps) {
+function isActivePath(itemPath: string, currentPath: string): boolean {
+  if (itemPath === '/') return currentPath === '/';
+  if (itemPath === '/chats') return currentPath === '/chats' || currentPath.startsWith('/chat/');
+  return currentPath === itemPath || currentPath.startsWith(itemPath + '/');
+}
+
+function NavItems({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleClick = (path: string) => {
+    navigate(path);
+    onNavigate?.();
+  };
+
+  return (
+    <nav className="flex-1 overflow-y-auto px-2 py-4">
+      {navItems.map((item) => {
+        const isActive = isActivePath(item.path, location.pathname);
+        return (
+          <Button
+            key={item.path}
+            variant="ghost"
+            onClick={() => handleClick(item.path)}
+            className={`mb-1 flex w-full items-center justify-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
+              isActive ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'
+            }`}
+          >
+            {item.icon}
+            <span className="font-medium">{item.label}</span>
+          </Button>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function PersistentSidebar() {
+  return (
+    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 z-40 w-64 flex-col border-r border-border bg-background">
+      <div className="flex items-center px-4 py-3 border-b border-border">
+        <h2 className="text-lg font-semibold text-foreground">DevBot</h2>
+      </div>
+      <NavItems />
+    </aside>
+  );
+}
+
+interface SlideNavProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function SlideNav({ isOpen, onClose }: SlideNavProps) {
   const navRef = useRef<HTMLDivElement>(null);
 
-  // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -61,7 +106,6 @@ export function SlideNav({ isOpen, onClose }: SlideNavProps) {
     }
   }, [isOpen, onClose]);
 
-  // Close on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
@@ -74,53 +118,22 @@ export function SlideNav({ isOpen, onClose }: SlideNavProps) {
     }
   }, [isOpen, onClose]);
 
-  const handleNavClick = (path: string) => {
-    navigate(path);
-    onClose();
-  };
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50">
+    <div className="fixed inset-0 z-50 bg-black/50 lg:hidden">
       <div
         ref={navRef}
         className="absolute bottom-0 left-0 top-0 w-64 bg-background shadow-xl transition-transform duration-200"
       >
         <div className="safe-area-top flex h-full flex-col">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <h2 className="text-lg font-semibold text-foreground">DevBot</h2>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-5 w-5" />
             </Button>
           </div>
-
-          {/* Navigation Items */}
-          <nav className="flex-1 px-2 py-4">
-            {navItems.map((item) => {
-              const isActive =
-                item.path === '/'
-                  ? location.pathname === '/'
-                  : item.path === '/chats'
-                    ? location.pathname === '/chats' || location.pathname.startsWith('/chat/')
-                    : location.pathname === item.path ||
-                      location.pathname.startsWith(item.path + '/');
-              return (
-                <Button
-                  key={item.path}
-                  variant="ghost"
-                  onClick={() => handleNavClick(item.path)}
-                  className={`mb-1 flex w-full items-center justify-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors ${
-                    isActive ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {item.icon}
-                  <span className="font-medium">{item.label}</span>
-                </Button>
-              );
-            })}
-          </nav>
+          <NavItems onNavigate={onClose} />
         </div>
       </div>
     </div>

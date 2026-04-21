@@ -6,10 +6,10 @@ import {
   useCreateWorkingDirectory,
   useDeleteWorkingDirectory,
 } from '../hooks/useWorkingDirectories';
-import { SlideNav } from '../components/SlideNav';
+import { useNav } from '../hooks/useNav';
 
 export function WorkingDirectories() {
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [addOpen, setAddOpen] = useState(false);
   const [newPath, setNewPath] = useState('');
   const [error, setError] = useState('');
@@ -39,12 +39,10 @@ export function WorkingDirectories() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       {/* Header */}
       <header className="flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
+          <Button variant="ghost" size="icon" onClick={openNav} className="lg:hidden">
             <span className="sr-only">Menu</span>
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

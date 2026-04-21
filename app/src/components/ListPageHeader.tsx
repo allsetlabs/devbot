@@ -23,7 +23,7 @@ export function ListPageHeader({
   return (
     <header className="flex items-center justify-between border-b border-border px-4 py-3">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={onMenuClick}>
+        <Button variant="ghost" size="icon" onClick={onMenuClick} className="lg:hidden">
           <Menu className="h-5 w-5" />
         </Button>
         {icon}

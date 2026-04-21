@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
@@ -9,13 +8,13 @@ import { extractErrorMessage } from '../lib/format';
 import { ChatItem } from '../components/ChatItem';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { EmptyState } from '../components/EmptyState';
-import { SlideNav } from '../components/SlideNav';
 import { ListPageHeader } from '../components/ListPageHeader';
+import { useNav } from '../hooks/useNav';
 import type { Session } from '../types';
 
 export function ChatList() {
   const navigate = useNavigate();
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
 
   const {
     data: sessions = [],
@@ -46,13 +45,10 @@ export function ChatList() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      {/* Navigation Drawer */}
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <ListPageHeader
         icon={<Terminal className="h-6 w-6 text-primary" />}
         title="CLI"
-        onMenuClick={() => setNavOpen(true)}
+        onMenuClick={openNav}
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
       >

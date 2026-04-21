@@ -11,15 +11,15 @@ import { ErrorBanner } from '../components/ErrorBanner';
 import { EmptyState } from '../components/EmptyState';
 import { SchedulerForm } from '../components/SchedulerForm';
 import { SchedulerSettingsDrawer } from '../components/SchedulerSettingsDrawer';
-import { SlideNav } from '../components/SlideNav';
 import { ListPageHeader } from '../components/ListPageHeader';
+import { useNav } from '../hooks/useNav';
 import type { ScheduledTask, ClaudeModel } from '../types';
 
 export function SchedulerList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const [navOpen, setNavOpen] = useState(false);
+  const { openNav } = useNav();
   const [settingsTask, setSettingsTask] = useState<ScheduledTask | null>(null);
 
   const {
@@ -108,13 +108,10 @@ export function SchedulerList() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      {/* Navigation Drawer */}
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <ListPageHeader
         icon={<Clock className="h-6 w-6 text-primary" />}
         title="Scheduler"
-        onMenuClick={() => setNavOpen(true)}
+        onMenuClick={openNav}
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
       >

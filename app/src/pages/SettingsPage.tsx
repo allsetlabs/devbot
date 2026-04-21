@@ -4,7 +4,6 @@ import { Settings, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../hooks/useSettings';
 import { api } from '../lib/api';
-import { SlideNav } from '../components/SlideNav';
 import { requestBrowserNotificationPermission, getBrowserNotificationPermission, previewNotificationSound } from '../lib/notification';
 import type { DevBotSettings } from '../hooks/useSettings';
 
@@ -113,7 +112,6 @@ function SectionHeader({ title }: { title: string }) {
 }
 
 export function SettingsPage() {
-  const [navOpen, setNavOpen] = useState(false);
   const [serverDefaultDir, setServerDefaultDir] = useState('');
   const navigate = useNavigate();
   const { settings, updateSettings, toggleSound, toggleHaptic, toggleAutoScroll } = useSettings();
@@ -126,8 +124,6 @@ export function SettingsPage() {
 
   return (
     <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       <header className="flex items-center gap-2 border-b border-border px-4 py-3">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ChevronLeft className="h-5 w-5" />

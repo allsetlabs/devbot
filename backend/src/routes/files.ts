@@ -159,3 +159,64 @@ filesRouter.get('/browse', (req, res) => {
     res.status(500).json({ error: 'Failed to browse files' });
   }
 });
+
+// GET /api/files/read?path=relative/path&workingDir=/abs/path — read file contents
+filesRouter.get('/read', (req, res) => {
+  try {
+    const filePath = req.query.path as string;
+    const workDir = (req.query.workingDir as string) || DEVBOT_PROJECTS_DIR;
+    if (!filePath) {
+      res.status(400).json({ error: 'path is required' });
+      return;
+    }
+    const absPath = path.resolve(workDir, filePath);
+    if (!absPath.startsWith(path.resolve(workDir))) {
+      res.status(403).json({ error: 'Path traversal not allowed' });
+      return;
+    }
+    if (!fs.existsSync(absPath)) {
+      res.status(404).json({ error: 'File not found' });
+      return;
+    }
+    const stat = fs.statSync(absPath);
+    if (stat.isDirectory()) {
+      res.status(400).json({ error: 'Cannot read a directory' });
+      return;
+    }
+    if (stat.size > 1024 * 1024) {
+      res.status(413).json({ error: 'File too large (>1MB)' });
+      return;
+    }
+    const content = fs.readFileSync(absPath, 'utf8');
+    res.json({ content, size: stat.size, path: filePath });
+  } catch (err) {
+    console.error('Error reading file:', err);
+    res.status(500).json({ error: 'Failed to read file' });
+  }
+});
+
+// PUT /api/files/write — write file contents
+filesRouter.put('/write', (req, res) => {
+  try {
+    const { path: filePath, content, workingDir } = req.body as {
+      path: string;
+      content: string;
+      workingDir?: string;
+    };
+    const workDir = workingDir || DEVBOT_PROJECTS_DIR;
+    if (!filePath || content === undefined) {
+      res.status(400).json({ error: 'path and content are required' });
+      return;
+    }
+    const absPath = path.resolve(workDir, filePath);
+    if (!absPath.startsWith(path.resolve(workDir))) {
+      res.status(403).json({ error: 'Path traversal not allowed' });
+      return;
+    }
+    fs.writeFileSync(absPath, content, 'utf8');
+    res.json({ success: true, path: filePath });
+  } catch (err) {
+    console.error('Error writing file:', err);
+    res.status(500).json({ error: 'Failed to write file' });
+  }
+});

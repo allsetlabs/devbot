@@ -545,6 +545,27 @@ export const api = {
     if (workingDir) params.set('workingDir', workingDir);
     return fetchApi(`/api/files/browse?${params.toString()}`);
   },
+
+  readFile: (
+    filePath: string,
+    workingDir?: string
+  ): Promise<{ content: string; size: number; path: string }> => {
+    const params = new URLSearchParams({ path: filePath });
+    if (workingDir) params.set('workingDir', workingDir);
+    return fetchApi(`/api/files/read?${params.toString()}`);
+  },
+
+  writeFile: (
+    filePath: string,
+    content: string,
+    workingDir?: string
+  ): Promise<{ success: boolean; path: string }> => {
+    return fetchApi('/api/files/write', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: filePath, content, workingDir }),
+    });
+  },
 };
 
 export function getXtermWsUrl(port: number): string {

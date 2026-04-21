@@ -56,6 +56,7 @@ interface ChatInputAreaProps {
   onResetNavigation: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasteFiles?: (files: File[]) => void;
+  onBrowseFiles?: () => void;
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
   onOpenMaxTurns: (currentMaxTurns?: number | null) => void;
@@ -93,6 +94,7 @@ export function ChatInputArea({
   onResetNavigation,
   onFileInputChange,
   onPasteFiles,
+  onBrowseFiles,
   onOpenModeDrawer,
   onOpenModelDrawer,
   onOpenMaxTurns,
@@ -133,6 +135,7 @@ export function ChatInputArea({
         onStop={onStop}
         onFileInputChange={onFileInputChange}
         onPasteFiles={onPasteFiles}
+        onBrowseFiles={onBrowseFiles}
         acceptedExtensions={acceptedExtensions}
       />
 

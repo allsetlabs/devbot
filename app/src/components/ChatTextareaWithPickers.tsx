@@ -1,4 +1,4 @@
-import { Loader2, Send, Square, Plus } from 'lucide-react';
+import { Loader2, Send, Square, Plus, FolderOpen } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
@@ -42,6 +42,7 @@ interface ChatTextareaWithPickersProps {
   onStop: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasteFiles?: (files: File[]) => void;
+  onBrowseFiles?: () => void;
   acceptedExtensions: string;
 }
 
@@ -74,6 +75,7 @@ export function ChatTextareaWithPickers({
   onStop,
   onFileInputChange,
   onPasteFiles,
+  onBrowseFiles,
   acceptedExtensions,
 }: ChatTextareaWithPickersProps) {
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
@@ -218,6 +220,17 @@ export function ChatTextareaWithPickers({
           >
             <Plus className="h-5 w-5" />
           </Button>
+          {onBrowseFiles && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              onClick={onBrowseFiles}
+              title="Browse & edit files"
+            >
+              <FolderOpen className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       </div>
 

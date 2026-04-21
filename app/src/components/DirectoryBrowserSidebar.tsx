@@ -8,7 +8,7 @@ import {
 } from '@allsetlabs/reusable/components/ui/drawer';
 import { Input } from '@allsetlabs/reusable/components/ui/input';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { FileText, Folder, Search, Loader2 } from 'lucide-react';
+import { FileText, Folder, Search, Loader2, Pencil } from 'lucide-react';
 import { api } from '../lib/api';
 
 interface FileItem {
@@ -23,6 +23,7 @@ interface DirectoryBrowserSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectFile: (filePath: string) => void;
+  onOpenFile?: (filePath: string) => void;
   workingDir?: string;
 }
 
@@ -30,6 +31,7 @@ export function DirectoryBrowserSidebar({
   isOpen,
   onClose,
   onSelectFile,
+  onOpenFile,
   workingDir,
 }: DirectoryBrowserSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -97,34 +99,49 @@ export function DirectoryBrowserSidebar({
             ) : (
               <div className="divide-y divide-border">
                 {sortedFiles.map((file) => (
-                  <Button
+                  <div
                     key={file.id}
-                    variant="ghost"
-                    onClick={() => {
-                      if (file.type === 'file') {
-                        handleSelectFile(file.path);
-                      }
-                    }}
-                    disabled={file.type === 'directory'}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted disabled:cursor-default disabled:opacity-60"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left"
                   >
                     {file.type === 'directory' ? (
                       <Folder className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                     ) : (
                       <FileText className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                     )}
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-foreground">
-                        {file.name}
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        if (file.type === 'file') handleSelectFile(file.path);
+                      }}
+                      disabled={file.type === 'directory'}
+                      className="min-w-0 flex-1 justify-start p-0 text-left disabled:cursor-default disabled:opacity-60"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-foreground">
+                          {file.name}
+                        </div>
+                        <div className="truncate text-xs text-muted-foreground">{file.path}</div>
                       </div>
-                      <div className="truncate text-xs text-muted-foreground">{file.path}</div>
-                    </div>
+                    </Button>
                     {file.size !== undefined && (
-                      <div className="flex-shrink-0 text-xs text-muted-foreground">
+                      <span className="flex-shrink-0 text-xs text-muted-foreground">
                         {(file.size / 1024).toFixed(1)}KB
-                      </div>
+                      </span>
                     )}
-                  </Button>
+                    {onOpenFile && file.type === 'file' && (
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => {
+                          onOpenFile(file.path);
+                          onClose();
+                        }}
+                        title="Open in editor"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 ))}
               </div>
             )}

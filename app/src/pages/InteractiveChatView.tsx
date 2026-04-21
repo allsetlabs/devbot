@@ -53,6 +53,7 @@ import { ChatSlashHelpDialog } from '../components/ChatSlashHelpDialog';
 import { ChatClearConfirmDialog } from '../components/ChatClearConfirmDialog';
 import { ChatRenameDialog } from '../components/ChatRenameDialog';
 import { ChatUnsafeBanner } from '../components/ChatUnsafeBanner';
+import { InlineFileEditor } from '../components/InlineFileEditor';
 import type {
   InteractiveChat,
   ChatMessage as ChatMessageType,
@@ -162,6 +163,7 @@ export function InteractiveChatView({
   const [exportFormatOpen, setExportFormatOpen] = useState(false);
   const [selectedExportFormat, setSelectedExportFormat] = useState<ExportFormat>('markdown');
   const [directoryBrowserOpen, setDirectoryBrowserOpen] = useState(false);
+  const [openEditorFiles, setOpenEditorFiles] = useState<string[]>([]);
   const [unsafeBannerDismissed, setUnsafeBannerDismissed] = useState(
     () => localStorage.getItem('unsafe-banner-dismissed') === '1'
   );
@@ -646,6 +648,16 @@ export function InteractiveChatView({
     },
     [attachedFiles]
   );
+
+  const handleOpenFileEditor = useCallback((filePath: string) => {
+    setOpenEditorFiles((prev) =>
+      prev.includes(filePath) ? prev : [...prev, filePath]
+    );
+  }, []);
+
+  const handleCloseFileEditor = useCallback((filePath: string) => {
+    setOpenEditorFiles((prev) => prev.filter((f) => f !== filePath));
+  }, []);
 
   // Drag and drop
   const onDropFiles = useCallback(
@@ -1385,6 +1397,7 @@ export function InteractiveChatView({
         isOpen={directoryBrowserOpen}
         onClose={() => setDirectoryBrowserOpen(false)}
         onSelectFile={handleSelectFileFromBrowser}
+        onOpenFile={handleOpenFileEditor}
         workingDir={chat?.workingDir ?? undefined}
       />
 
@@ -1425,6 +1438,20 @@ export function InteractiveChatView({
       {/* Help modal */}
       <HelpModal open={helpModalOpen} onOpenChange={setHelpModalOpen} />
 
+      {/* Inline file editors */}
+      {openEditorFiles.length > 0 && (
+        <div className="max-h-96 overflow-y-auto border-t border-border px-2">
+          {openEditorFiles.map((fp) => (
+            <InlineFileEditor
+              key={fp}
+              filePath={fp}
+              workingDir={chat?.workingDir ?? undefined}
+              onClose={() => handleCloseFileEditor(fp)}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Input area */}
       <ChatInputArea
         chat={chat}
@@ -1457,6 +1484,7 @@ export function InteractiveChatView({
         onResetNavigation={resetNavigation}
         onFileInputChange={handleFileInputChange}
         onPasteFiles={handleFilesUpload}
+        onBrowseFiles={() => setDirectoryBrowserOpen(true)}
         onOpenModeDrawer={() => setModeDrawerOpen(true)}
         onOpenModelDrawer={() => setModelDrawerOpen(true)}
         onOpenMaxTurns={(maxTurns) => {

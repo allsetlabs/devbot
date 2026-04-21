@@ -566,6 +566,39 @@ export const api = {
       body: JSON.stringify({ path: filePath, content, workingDir }),
     });
   },
+
+  // Worktree endpoints
+  listWorktrees: (dir: string): Promise<{
+    isGitRepo: boolean;
+    worktrees: Array<{
+      path: string;
+      branch: string;
+      head: string;
+      isBare: boolean;
+      isMain: boolean;
+    }>;
+  }> => {
+    return fetchApi(`/api/worktrees?dir=${encodeURIComponent(dir)}`);
+  },
+
+  createWorktree: (
+    dir: string,
+    path: string,
+    branch: string,
+    newBranch?: boolean
+  ): Promise<{ success: boolean }> => {
+    return fetchApi('/api/worktrees', {
+      method: 'POST',
+      body: JSON.stringify({ dir, path, branch, newBranch }),
+    });
+  },
+
+  removeWorktree: (dir: string, path: string): Promise<{ success: boolean }> => {
+    return fetchApi('/api/worktrees', {
+      method: 'DELETE',
+      body: JSON.stringify({ dir, path }),
+    });
+  },
 };
 
 export function getXtermWsUrl(port: number): string {

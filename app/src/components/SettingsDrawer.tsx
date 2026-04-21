@@ -1,4 +1,4 @@
-import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook, Brain, FileText } from 'lucide-react';
+import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook, Brain, FileText, FolderTree } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -32,6 +32,7 @@ interface SettingsDrawerProps {
   onHooks?: () => void;
   onMemories?: () => void;
   onClaudeMd?: () => void;
+  onWorktrees?: () => void;
 }
 
 export function SettingsDrawer({
@@ -57,6 +58,7 @@ export function SettingsDrawer({
   onHooks,
   onMemories,
   onClaudeMd,
+  onWorktrees,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -119,7 +121,7 @@ export function SettingsDrawer({
           </div>
 
           {/* MCP Servers, Hooks, Memories & CLAUDE.md */}
-          {(onMcpServers || onHooks || onMemories || onClaudeMd) && (
+          {(onMcpServers || onHooks || onMemories || onClaudeMd || onWorktrees) && (
             <div className="flex flex-wrap gap-2">
               {onMcpServers && (
                 <Button
@@ -175,6 +177,20 @@ export function SettingsDrawer({
                 >
                   <FileText className="h-4 w-4" />
                   CLAUDE.md
+                </Button>
+              )}
+              {onWorktrees && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    onOpenChange(false);
+                    setTimeout(() => onWorktrees(), 300);
+                  }}
+                >
+                  <FolderTree className="h-4 w-4" />
+                  Worktrees
                 </Button>
               )}
             </div>

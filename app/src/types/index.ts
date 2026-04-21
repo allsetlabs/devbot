@@ -59,6 +59,7 @@ export interface ScheduledTask {
   isQueued: boolean;
   model: ClaudeModel;
   isSystem: boolean;
+  workingDir?: string;
 }
 
 export interface CreateScheduledTaskRequest {
@@ -77,6 +78,7 @@ export interface UpdateScheduledTaskRequest {
   maxRuns?: number | null;
   name?: string;
   model?: ClaudeModel;
+  workingDir?: string | null;
 }
 
 export interface TaskRun {

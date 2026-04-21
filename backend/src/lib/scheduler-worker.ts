@@ -92,7 +92,7 @@ async function processQueue(): Promise<void> {
 /**
  * Create a chat session for a scheduler run.
  */
-function createSchedulerChat(task: ScheduledTaskRow, runIndex: number, model: 'opus' | 'sonnet' | 'haiku' = 'sonnet'): string | null {
+function createSchedulerChat(task: ScheduledTaskRow, runIndex: number, model: 'opus' | 'sonnet' | 'haiku' = 'sonnet', workingDir?: string): string | null {
   const taskName = task.name || 'Scheduler';
   const chatId = uuidv4().slice(0, 8);
   const chatName = `${taskName} #${runIndex}`;
@@ -110,7 +110,7 @@ function createSchedulerChat(task: ScheduledTaskRow, runIndex: number, model: 'o
         is_executing: true,
         created_by: 'system',
         updated_by: 'system',
-        settings: { task_id: task.id },
+        settings: { task_id: task.id, ...(workingDir ? { workingDir } : {}) },
       })
       .run();
   } catch (err) {
@@ -159,8 +159,8 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
 
   const settings = task.settings as SchedulerSettings | null | undefined;
   const model: 'opus' | 'sonnet' | 'haiku' = settings?.model || 'sonnet';
-  const chatId = createSchedulerChat(task, runIndex, model);
   const workingDir: string = settings?.workingDir || DEVBOT_PROJECTS_DIR;
+  const chatId = createSchedulerChat(task, runIndex, model, settings?.workingDir);
 
   try {
     coreDb

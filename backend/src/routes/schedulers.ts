@@ -43,6 +43,7 @@ export interface ScheduledTask {
   isQueued: boolean;
   model: string;
   isSystem: boolean;
+  workingDir?: string;
 }
 
 export interface TaskRun {
@@ -82,6 +83,7 @@ function rowToTask(row: ScheduledTaskRow): ScheduledTask {
     isQueued: isTaskQueued(row.id),
     model: (row.settings as SchedulerSettings | null | undefined)?.model || 'sonnet',
     isSystem: (row.settings as SchedulerSettings | null | undefined)?.isSystem === true,
+    workingDir: (row.settings as SchedulerSettings | null | undefined)?.workingDir,
   };
 }
 
@@ -227,7 +229,7 @@ router.post(
 router.put(
   '/:id',
   asyncHandler(async (req, res) => {
-    const { prompt, intervalMinutes, status, maxRuns, name, model } = req.body;
+    const { prompt, intervalMinutes, status, maxRuns, name, model, workingDir } = req.body;
 
     // Check if system scheduler — only allow status changes (pause/resume)
     const existing = await coreDb
@@ -242,7 +244,7 @@ router.put(
     }
 
     if ((existing[0].settings as SchedulerSettings | null | undefined)?.isSystem === true) {
-      const nonStatusFields = [prompt, intervalMinutes, maxRuns, name, model].some(
+      const nonStatusFields = [prompt, intervalMinutes, maxRuns, name, model, workingDir].some(
         (v) => v !== undefined
       );
       if (nonStatusFields) {
@@ -287,6 +289,21 @@ router.put(
       if (!requireEnum(res, model, ['opus', 'sonnet', 'haiku'] as const, 'model')) return;
       const currentSettings = (existing[0]?.settings as Record<string, unknown>) || {};
       updates.settings = { ...currentSettings, model };
+    }
+
+    if (workingDir !== undefined) {
+      if (workingDir !== null && (typeof workingDir !== 'string' || !workingDir.trim())) {
+        sendBadRequest(res, 'workingDir must be a non-empty string or null');
+        return;
+      }
+      const currentSettings = (updates.settings as Record<string, unknown>) || (existing[0]?.settings as Record<string, unknown>) || {};
+      if (workingDir === null) {
+        const { workingDir: _removed, ...rest } = currentSettings as Record<string, unknown> & { workingDir?: unknown };
+        void _removed;
+        updates.settings = rest;
+      } else {
+        updates.settings = { ...currentSettings, workingDir: workingDir.trim() };
+      }
     }
 
     if (Object.keys(updates).length === 1 && updates.updated_by) {

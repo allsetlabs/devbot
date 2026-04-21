@@ -136,10 +136,10 @@ export function filterRenderable(messages: TaskMessage[]): TaskMessage[] {
     if (message.type === 'user' || message.type === 'assistant') {
       const text = extractTextContent(message.content);
       const thinking = extractThinkingContent(message.content);
-      const hasToolUse = (message.content?.message?.content || []).some(
-        (block: { type?: string }) => block.type === 'tool_use'
-      );
-      if (!text && !thinking && !hasToolUse) return false;
+      const blocks = message.content?.message?.content || [];
+      const hasToolUse = (blocks as { type?: string }[]).some((b) => b.type === 'tool_use');
+      const hasToolResult = (blocks as { type?: string }[]).some((b) => b.type === 'tool_result');
+      if (!text && !thinking && !hasToolUse && !hasToolResult) return false;
     }
 
     if (message.type === 'system') {

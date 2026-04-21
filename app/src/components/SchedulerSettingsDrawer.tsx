@@ -18,6 +18,7 @@ import { Infinity as InfinityIcon, Loader2 } from 'lucide-react';
 import type { ScheduledTask, ClaudeModel } from '../types';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
 import { ModelPicker } from './ModelPicker';
+import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
 
 interface SchedulerSettingsDrawerProps {
   task: ScheduledTask | null;
@@ -25,7 +26,7 @@ interface SchedulerSettingsDrawerProps {
   onClose: () => void;
   onSave: (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel }
+    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null }
   ) => Promise<void>;
 }
 
@@ -40,11 +41,13 @@ export function SchedulerSettingsDrawer({
   const [intervalMinutes, setIntervalMinutes] = useState(60);
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
   const [isInfinite, setIsInfinite] = useState(false);
-
   const [model, setModel] = useState<ClaudeModel>('sonnet');
+  const [workingDir, setWorkingDir] = useState('');
+
+  const validateAndSaveDir = useValidateAndSaveDir();
 
   const saveMutation = useMutation({
-    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel }) =>
+    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null }) =>
       onSave(task!.id, updates),
     onSuccess: () => onClose(),
   });
@@ -64,6 +67,8 @@ export function SchedulerSettingsDrawer({
       setIsInfinite(task.maxRuns === null);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setModel(task.model);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setWorkingDir(task.workingDir ?? '');
       saveMutation.reset();
     }
   }, [task]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -78,16 +83,23 @@ export function SchedulerSettingsDrawer({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!task || !prompt.trim()) return;
 
-    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel } = {};
+    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null } = {};
     if (name.trim() !== (task.name ?? '')) updates.name = name.trim();
     if (prompt.trim() !== task.prompt) updates.prompt = prompt.trim();
     if (intervalMinutes !== task.intervalMinutes) updates.intervalMinutes = intervalMinutes;
     const newMaxRuns = isInfinite ? null : maxRuns;
     if (newMaxRuns !== task.maxRuns) updates.maxRuns = newMaxRuns;
     if (model !== task.model) updates.model = model;
+
+    const normalizedDir = workingDir.trim() || null;
+    const originalDir = task.workingDir ?? null;
+    if (normalizedDir !== originalDir) {
+      await validateAndSaveDir(workingDir.trim());
+      updates.workingDir = normalizedDir;
+    }
 
     if (Object.keys(updates).length > 0) {
       saveMutation.mutate(updates);
@@ -102,7 +114,8 @@ export function SchedulerSettingsDrawer({
       prompt.trim() !== task.prompt ||
       intervalMinutes !== task.intervalMinutes ||
       (isInfinite ? null : maxRuns) !== task.maxRuns ||
-      model !== task.model);
+      model !== task.model ||
+      (workingDir.trim() || null) !== (task.workingDir ?? null));
 
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
@@ -110,7 +123,7 @@ export function SchedulerSettingsDrawer({
         <DrawerHeader>
           <DrawerTitle className="text-left">Scheduler Settings</DrawerTitle>
         </DrawerHeader>
-        <div className="overflow-y-auto px-4 pb-6">
+        <div className="overflow-y-auto px-4 pb-6" data-vaul-no-drag>
           {saveMutation.error && (
             <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {saveMutation.error instanceof Error ? saveMutation.error.message : 'Failed to save'}
@@ -213,6 +226,14 @@ export function SchedulerSettingsDrawer({
           {/* Model */}
           <div className="mb-6">
             <ModelPicker value={model} onChange={setModel} disabled={task?.isSystem} />
+          </div>
+
+          {/* Working Directory */}
+          <div className="mb-6">
+            <WorkingDirSelector
+              value={workingDir}
+              onChange={setWorkingDir}
+            />
           </div>
 
           {/* Actions */}

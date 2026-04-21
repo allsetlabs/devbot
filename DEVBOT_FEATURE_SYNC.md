@@ -8,7 +8,6 @@ Last implementation run: 2026-04-22T06:30:00Z
 ---
 
 ## Pending
-- Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
 - Specialized Read tool result renderer — show file content with line numbers and syntax highlighting (reuse MarkdownRenderer code block logic); collapsible if content exceeds 30 lines; show filename header with file icon
 - Specialized Glob tool result renderer — show matching file paths in a compact vertical list with file type icons (folder, code file, config file, etc.); show total match count header
 - Specialized Bash tool output renderer — terminal-style monospace output with dark background; show exit code badge (green for 0, red for non-zero); stderr lines in red; stdout in normal color; collapsible if output exceeds 20 lines
@@ -18,6 +17,7 @@ Last implementation run: 2026-04-22T06:30:00Z
 - Global cross-chat message search — add a "Search all messages" toggle/mode to the chat list search bar; when enabled, searches message content across all conversations using backend full-text query; results show message preview with chat name, timestamp, and click-to-navigate
 
 ## In Progress
+- Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
 
 ## Completed
 

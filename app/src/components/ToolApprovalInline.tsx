@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldCheck, ShieldAlert, ShieldOff, Square, ChevronDown, ChevronRight, Code } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, ShieldOff, Square, ChevronDown, ChevronRight, Code, Bot } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import type { ClaudeMessageContent, PermissionMode } from '../types';
 
@@ -102,9 +102,13 @@ export function ToolApprovalInline({ content, permissionMode, onDeny }: ToolAppr
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
           )}
         </Button>
-        <Code className="h-4 w-4 flex-shrink-0 text-primary" />
+        {toolName === 'Agent' ? (
+          <Bot className="h-4 w-4 flex-shrink-0 text-primary" />
+        ) : (
+          <Code className="h-4 w-4 flex-shrink-0 text-primary" />
+        )}
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
-          {toolName}
+          {toolName === 'Agent' ? String(toolInput.description ?? toolName) : toolName}
         </span>
         {denied ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-medium text-destructive">

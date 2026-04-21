@@ -3,18 +3,19 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T09:28:00Z
-Last implementation run: 2026-04-22T10:30:00Z
+Last implementation run: 2026-04-22T11:40:00Z
 
 ---
 
 ## Pending
-- Add subagent/background task progress indicators — Claude Code shows when it spawns Agent subagents with descriptions; parse agent tool_use blocks and show a nested "Agent: description" card with spinner/status in the message stream
 - Settings page Default Working Directory shows placeholder "/path/to/projects" instead of actual configured value — the input field shows a generic placeholder that doesn't reflect the real default working directory from the backend
 - Chat list on desktop has excessive right-side action icons (6 icons per row: play, star, fork, copy, archive, delete) — consider grouping less-used actions into a "..." overflow menu to reduce visual clutter
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Add subagent/background task progress indicators — AgentSubagentView component with Bot icon, description title, subagent_type/model/isolation/background badges, spinning loader when running vs "Done" badge when completed; renders in both embedded tool_use blocks (ChatMessage.tsx) and standalone tool_use messages (ToolApprovalInline.tsx); expandable prompt preview; hasResult determined by isLast message heuristic
 
 - [2026-04-22] Add chat message edit and re-run — Edit icon on user messages opens EditMessageDialog; on confirm, truncates the edited message and all subsequent messages (frontend optimistic + backend DELETE), then re-sends edited text as new prompt; backend POST /:id/truncate-after endpoint; frontend api.truncateMessagesAfter(); editingMessage state includes sequence for accurate truncation
 

@@ -15,7 +15,7 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView } from './ToolUseMessage';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView } from './ToolUseMessage';
 import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
@@ -231,6 +231,8 @@ export function ChatMessage({
                 (() => {
                   const block = toolUseBlocks[0];
                   const toolInput = block.input || {};
+                  if (block.name === 'Agent')
+                    return <AgentSubagentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} hasResult={!isLast} />;
                   if (block.name === 'Edit')
                     return <EditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
                   if (block.name === 'MultiEdit')
@@ -251,6 +253,9 @@ export function ChatMessage({
                 <ToolsGroup count={toolUseBlocks.length}>
                   {toolUseBlocks.map((block) => {
                     const toolInput = block.input || {};
+                    if (block.name === 'Agent') {
+                      return <AgentSubagentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} hasResult={!isLast} />;
+                    }
                     if (block.name === 'Edit') {
                       return <EditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
                     }

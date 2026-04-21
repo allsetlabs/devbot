@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
 import type { ClaudeMessageContent, PermissionMode } from '../types';
@@ -42,7 +42,7 @@ function getToolPreview(toolName: string, toolInput: Record<string, unknown>): s
     case 'Glob':
       return String(toolInput.pattern ?? '');
     case 'Agent':
-      return String(toolInput.prompt ?? '').slice(0, 80);
+      return String(toolInput.description ?? toolInput.prompt ?? '').slice(0, 80);
     case 'WebFetch':
       return String(toolInput.url ?? '');
     case 'WebSearch':
@@ -276,6 +276,82 @@ export function WriteContentView({ toolInput, permissionMode }: { toolInput: Rec
   );
 }
 
+/** Renders Agent (subagent) tool calls with a distinctive card showing description, type, and status */
+export function AgentSubagentView({ toolInput, permissionMode, hasResult }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode; hasResult?: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+  const description = String(toolInput.description ?? 'Agent task');
+  const prompt = String(toolInput.prompt ?? '');
+  const subagentType = toolInput.subagent_type as string | undefined;
+  const runInBackground = toolInput.run_in_background as boolean | undefined;
+  const model = toolInput.model as string | undefined;
+  const isolation = toolInput.isolation as string | undefined;
+
+  const isRunning = !hasResult;
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-primary/20 bg-primary/5">
+      <Button
+        variant="ghost"
+        onClick={(e) => {
+          const target = e.currentTarget;
+          setExpanded((v) => {
+            if (!v) scrollHeaderToTop(target);
+            return !v;
+          });
+        }}
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+        <Bot className="h-4 w-4 text-primary" />
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+          {description}
+        </span>
+        <div className="flex items-center gap-1.5">
+          {subagentType && (
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              {subagentType}
+            </span>
+          )}
+          {runInBackground && (
+            <span className="rounded bg-warning/20 px-1.5 py-0.5 text-[10px] font-medium text-warning">
+              bg
+            </span>
+          )}
+          {model && (
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              {model}
+            </span>
+          )}
+          {isolation && (
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              {isolation}
+            </span>
+          )}
+          {isRunning ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+          ) : (
+            <span className="rounded-full bg-success/15 px-1.5 py-0.5 text-[9px] font-medium text-success">
+              Done
+            </span>
+          )}
+          {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
+        </div>
+      </Button>
+      {expanded && prompt && (
+        <div className="border-t border-primary/10 px-3 py-2">
+          <pre className="max-h-60 overflow-auto whitespace-pre-wrap text-xs text-muted-foreground">
+            {prompt}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMessageContent; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const toolName = content.tool_name || 'Unknown Tool';
@@ -292,6 +368,10 @@ export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMes
 
   if (toolName === 'Write') {
     return <WriteContentView toolInput={toolInput} permissionMode={permissionMode} />;
+  }
+
+  if (toolName === 'Agent') {
+    return <AgentSubagentView toolInput={toolInput} permissionMode={permissionMode} />;
   }
 
   return (

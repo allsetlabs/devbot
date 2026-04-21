@@ -2,12 +2,21 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-21T22:00:00Z
+Last discovery run: 2026-04-22T09:28:00Z
 Last implementation run: 2026-04-21T22:30:00Z
 
 ---
 
 ## Pending
+
+- Add /fast slash command to toggle fast mode — Claude Code supports `/fast` to toggle between fast and normal output mode; add to SLASH_COMMANDS config and wire up backend to pass `--fast` flag or toggle fast mode setting for the session
+- Add /config slash command to open settings — Claude Code has `/config` to open configuration; add to SLASH_COMMANDS and navigate to /settings page when triggered
+- Add /cost slash command to show session cost inline — Claude Code has `/cost` to display running token/cost stats in the chat stream; add to SLASH_COMMANDS and render inline cost summary message using existing sessionStats data
+- Add /memory slash command to open memory viewer — Claude Code has `/memory` to view and manage memories; add to SLASH_COMMANDS and open MemoryViewerDrawer when triggered
+- Add chat message edit and re-run — Claude Code allows editing a previously sent user message and re-running from that point; add an Edit icon to user message action bar that opens EditMessageDialog, truncates messages after the edited one, and re-sends
+- Add subagent/background task progress indicators — Claude Code shows when it spawns Agent subagents with descriptions; parse agent tool_use blocks and show a nested "Agent: description" card with spinner/status in the message stream
+- Settings page Default Working Directory shows placeholder "/path/to/projects" instead of actual configured value — the input field shows a generic placeholder that doesn't reflect the real default working directory from the backend
+- Chat list on desktop has excessive right-side action icons (6 icons per row: play, star, fork, copy, archive, delete) — consider grouping less-used actions into a "..." overflow menu to reduce visual clutter
 
 ## In Progress
 

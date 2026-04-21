@@ -17,6 +17,7 @@ Last implementation run: 2026-04-21T02:30:00Z
 - Add session cost summary drawer — show cumulative API cost breakdown (input/output/cache tokens, total cost) accessible from the chat header, beyond the current inline token count
 - Fix model selector drawer text overlap — ChatModelSwitcherDrawer shows garbled/overlapping pricing text on Claude Sonnet row ("$1TM out") and truncated descriptions; needs proper text wrapping and layout
 - Fix permission mode drawer "Current" badge overlap — ChatModeSwitcherDrawer "Full Auto" row has "Current" badge overlapping the label text; needs spacing/layout fix so badge doesn't clip into the title
+- Fix hidden-tools count badge style inconsistency — the eye (hide tools) icon in ChatViewHeader uses an orange/yellow badge for its count while the tools-used icon uses a gray badge; make the eye icon badge match the gray style used by the tools-used count
 
 ## In Progress
 

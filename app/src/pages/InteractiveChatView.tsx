@@ -1216,8 +1216,8 @@ export function InteractiveChatView({
           permissionMode={chat?.permissionMode || 'dangerous'}
           model={chat?.model || 'sonnet'}
           onSendPrompt={(prompt) => {
-            setInput('');
-            sendMutation.mutate(prompt);
+            setInput(prompt);
+            setTimeout(() => textareaRef.current?.focus(), 0);
           }}
         />
       ) : (

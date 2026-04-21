@@ -15,6 +15,8 @@ Last implementation run: 2026-04-21T02:30:00Z
 - Add chat message search within a conversation — Claude Code has Cmd+F / search icon to find text within the current chat; DevBot has search on the chat list but not within a conversation
 - Add permission prompt inline UI for interactive chats — when Claude requests tool approval, show an inline approve/deny prompt in the chat stream instead of auto-approving everything
 - Add session cost summary drawer — show cumulative API cost breakdown (input/output/cache tokens, total cost) accessible from the chat header, beyond the current inline token count
+- Fix model selector drawer text overlap — ChatModelSwitcherDrawer shows garbled/overlapping pricing text on Claude Sonnet row ("$1TM out") and truncated descriptions; needs proper text wrapping and layout
+- Fix permission mode drawer "Current" badge overlap — ChatModeSwitcherDrawer "Full Auto" row has "Current" badge overlapping the label text; needs spacing/layout fix so badge doesn't clip into the title
 
 ## In Progress
 

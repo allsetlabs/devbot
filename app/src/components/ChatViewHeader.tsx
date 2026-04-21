@@ -1,4 +1,4 @@
-import { ArrowLeft, Eye, EyeOff, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
+import { ArrowLeft, Coins, Eye, EyeOff, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, GitStatus, InteractiveChat } from '../types';
@@ -18,6 +18,7 @@ interface ChatViewHeaderProps {
   pinnedIds: string[];
   onOpenPinnedMessages: () => void;
   onOpenSettings: () => void;
+  onOpenCostDrawer: () => void;
   onOpenRename: () => void;
   onOpenToolHistory: () => void;
 }
@@ -35,6 +36,7 @@ export function ChatViewHeader({
   pinnedIds,
   onOpenPinnedMessages,
   onOpenSettings,
+  onOpenCostDrawer,
   onOpenRename,
   onOpenToolHistory,
 }: ChatViewHeaderProps) {
@@ -156,15 +158,27 @@ export function ChatViewHeader({
             </span>
           )}
         </Button>
+        {totalTokens > 0 && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={onOpenCostDrawer}
+            title="Session cost summary"
+          >
+            <Coins className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        )}
         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
           <Settings className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
       {totalTokens > 0 && (
         <div
-          className="absolute bottom-0 left-0 h-0.5 bg-primary/60 transition-all duration-300"
+          className="absolute bottom-0 left-0 h-0.5 cursor-pointer bg-primary/60 transition-all duration-300"
           style={{ width: `${Math.min((totalTokens / MAX_CONTEXT_TOKENS) * 100, 100)}%` }}
-          title={`${Math.round(totalTokens / 1000)}k / ${MAX_CONTEXT_TOKENS / 1000}k tokens (${Math.round((totalTokens / MAX_CONTEXT_TOKENS) * 100)}%)`}
+          title={`${Math.round(totalTokens / 1000)}k / ${MAX_CONTEXT_TOKENS / 1000}k tokens (${Math.round((totalTokens / MAX_CONTEXT_TOKENS) * 100)}%) — click for details`}
+          onClick={onOpenCostDrawer}
         />
       )}
     </header>

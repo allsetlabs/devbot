@@ -27,6 +27,7 @@ import { MemoryViewerDrawer } from '../components/MemoryViewerDrawer';
 import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
 import { WorktreeDrawer } from '../components/WorktreeDrawer';
 import { KeybindingsDrawer } from '../components/KeybindingsDrawer';
+import { SessionCostDrawer } from '../components/SessionCostDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolHistoryDrawer } from '../components/ToolHistoryDrawer';
 import { EditMessageDialog } from '../components/EditMessageDialog';
@@ -142,6 +143,7 @@ export function InteractiveChatView({
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
   const [worktreesOpen, setWorktreesOpen] = useState(false);
   const [keybindingsOpen, setKeybindingsOpen] = useState(false);
+  const [costDrawerOpen, setCostDrawerOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
   const [toolHistoryOpen, setToolHistoryOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -1016,6 +1018,11 @@ export function InteractiveChatView({
     let totalCost = 0;
     let totalDuration = 0;
     let turnCount = 0;
+    let inputTokens = 0;
+    let outputTokens = 0;
+    let cacheReadTokens = 0;
+    let cacheCreationTokens = 0;
+    const perTurnUsage: import('../components/SystemMessage').UsageData[] = [];
     for (const msg of messages) {
       if (msg.type === 'user') turnCount++;
       const usage = extractUsageData(msg.content);
@@ -1023,9 +1030,14 @@ export function InteractiveChatView({
         totalTokens += usage.inputTokens + usage.outputTokens;
         totalCost += usage.costUsd;
         totalDuration += usage.durationMs;
+        inputTokens += usage.inputTokens;
+        outputTokens += usage.outputTokens;
+        cacheReadTokens += usage.cacheReadTokens;
+        cacheCreationTokens += usage.cacheCreationTokens;
+        perTurnUsage.push(usage);
       }
     }
-    return { totalTokens, totalCost, totalDuration, turnCount };
+    return { totalTokens, totalCost, totalDuration, turnCount, inputTokens, outputTokens, cacheReadTokens, cacheCreationTokens, perTurnUsage };
   }, [messages]);
 
   if (loading) {
@@ -1098,6 +1110,7 @@ export function InteractiveChatView({
           onOpenPinnedMessages={() => setPinnedMessagesOpen(true)}
           onOpenToolHistory={() => setToolHistoryOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
+          onOpenCostDrawer={() => setCostDrawerOpen(true)}
           onOpenRename={() => {
             setRenameValue(chat?.name || '');
             setRenameOpen(true);
@@ -1324,6 +1337,7 @@ export function InteractiveChatView({
       <ClaudeMdDrawer open={claudeMdOpen} onOpenChange={setClaudeMdOpen} workingDirectory={chat?.workingDir ?? undefined} />
       <WorktreeDrawer open={worktreesOpen} onOpenChange={setWorktreesOpen} workingDirectory={chat?.workingDir ?? undefined} />
       <KeybindingsDrawer open={keybindingsOpen} onOpenChange={setKeybindingsOpen} />
+      <SessionCostDrawer open={costDrawerOpen} onOpenChange={setCostDrawerOpen} stats={sessionStats} />
 
       {/* Pinned messages drawer */}
       <PinnedMessagesDrawer

@@ -272,6 +272,13 @@ export const api = {
     });
   },
 
+  changeChatAllowedTools: (id: string, allowedTools: string[] | null): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/allowed-tools`, {
+      method: 'POST',
+      body: JSON.stringify({ allowedTools }),
+    });
+  },
+
   changeChatWorkingDir: (id: string, workingDir: string | null): Promise<InteractiveChat> => {
     return fetchApi(`/api/interactive-chats/${id}/working-dir`, {
       method: 'POST',

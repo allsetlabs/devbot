@@ -56,6 +56,7 @@ import { ChatSlashHelpDialog } from '../components/ChatSlashHelpDialog';
 import { ChatClearConfirmDialog } from '../components/ChatClearConfirmDialog';
 import { ChatRenameDialog } from '../components/ChatRenameDialog';
 import { ChatWorkingDirDrawer } from '../components/ChatWorkingDirDrawer';
+import { ChatAllowedToolsDrawer } from '../components/ChatAllowedToolsDrawer';
 import { ChatUnsafeBanner } from '../components/ChatUnsafeBanner';
 import { InlineFileEditor } from '../components/InlineFileEditor';
 import type {
@@ -139,6 +140,7 @@ export function InteractiveChatView({
   const [maxTurnsOpen, setMaxTurnsOpen] = useState(false);
   const [maxTurnsValue, setMaxTurnsValue] = useState('');
   const [effortDrawerOpen, setEffortDrawerOpen] = useState(false);
+  const [allowedToolsDrawerOpen, setAllowedToolsDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mcpServersOpen, setMcpServersOpen] = useState(false);
   const [hooksOpen, setHooksOpen] = useState(false);
@@ -536,6 +538,13 @@ export function InteractiveChatView({
     (effort: string | null) => api.changeChatEffort(chatId!, effort),
     [['interactive-chat', chatId]],
     { onSuccess: () => setEffortDrawerOpen(false) }
+  );
+
+  // Change allowed tools mutation
+  const allowedToolsMutation = useCrudMutation(
+    (tools: string[] | null) => api.changeChatAllowedTools(chatId!, tools),
+    [['interactive-chat', chatId]],
+    { onSuccess: () => setAllowedToolsDrawerOpen(false) }
   );
 
   // Change working directory mutation
@@ -1329,6 +1338,15 @@ export function InteractiveChatView({
         onSave={(effort) => effortMutation.mutate(effort)}
       />
 
+      {/* Allowed tools drawer */}
+      <ChatAllowedToolsDrawer
+        open={allowedToolsDrawerOpen}
+        onOpenChange={setAllowedToolsDrawerOpen}
+        currentAllowedTools={chat?.allowedTools ?? null}
+        isPending={allowedToolsMutation.isPending}
+        onSave={(tools) => allowedToolsMutation.mutate(tools)}
+      />
+
       {/* Settings drawer */}
       <SettingsDrawer
         open={settingsOpen}
@@ -1534,6 +1552,7 @@ export function InteractiveChatView({
           setMaxTurnsOpen(true);
         }}
         onOpenEffort={() => setEffortDrawerOpen(true)}
+        onOpenAllowedTools={() => setAllowedToolsDrawerOpen(true)}
         acceptedExtensions={ACCEPTED_EXTENSIONS}
       />
     </div>

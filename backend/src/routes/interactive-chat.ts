@@ -36,6 +36,7 @@ interface InteractiveChat {
   createdAt: string;
   archivedAt: string | null;
   workingDir: string | null;
+  allowedTools: string[] | null;
 }
 
 interface ChatMessageResponse {
@@ -65,6 +66,7 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     archivedAt: row.archived_at,
     workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
     effort: typeof settings.effort === 'string' ? settings.effort : null,
+    allowedTools: Array.isArray(settings.allowedTools) ? (settings.allowedTools as string[]) : null,
   };
 }
 
@@ -716,6 +718,39 @@ router.post(
 
     await updateChatField(req.params.id, { settings: newSettings }, res);
   }, 'change effort level')
+);
+
+// Change allowed tools
+router.post(
+  '/:id/allowed-tools',
+  asyncHandler(async (req, res) => {
+    const { allowedTools } = req.body;
+
+    if (allowedTools !== null && !Array.isArray(allowedTools)) {
+      sendBadRequest(res, 'allowedTools must be an array of tool names or null');
+      return;
+    }
+
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    const newSettings = { ...existingSettings };
+    if (allowedTools === null) {
+      delete newSettings.allowedTools;
+    } else {
+      newSettings.allowedTools = allowedTools;
+    }
+
+    await updateChatField(req.params.id, { settings: newSettings }, res);
+  }, 'change allowed tools')
 );
 
 // Change working directory

@@ -25,7 +25,7 @@ export function ChatModeSwitcherDrawer({
   onModeChange,
 }: ChatModeSwitcherDrawerProps) {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} dismissible>
       <DrawerContent className="max-h-[80vh]">
         <DrawerHeader>
           <DrawerTitle>Change Permission Mode</DrawerTitle>
@@ -41,13 +41,15 @@ export function ChatModeSwitcherDrawer({
                 <Button
                   key={mode}
                   variant="ghost"
-                  className={`flex items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : ''} ${isDisabled ? 'cursor-not-allowed opacity-40' : 'active:bg-muted/50'}`}
+                  className={`flex items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'} ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
                   onClick={() => {
-                    if (!isDisabled && !isCurrentMode) {
+                    if (isCurrentMode) {
+                      onOpenChange(false);
+                    } else if (!isDisabled) {
                       onModeChange(mode);
                     }
                   }}
-                  disabled={isDisabled || isCurrentMode || isPending}
+                  disabled={isDisabled || isPending}
                 >
                   <div className={`mt-0.5 flex-shrink-0 ${config.color}`}>
                     {mode === 'plan' && <Eye className="h-5 w-5" />}

@@ -242,6 +242,9 @@ export async function sendMessage(chatId: string, prompt: string, branchId: stri
     sessionId: (chat.claude_session_id as string) || undefined,
     maxTurns: (chat.max_turns as number) || undefined,
     effort: ((chat.settings as Record<string, unknown>)?.effort as string) || undefined,
+    allowedTools: Array.isArray((chat.settings as Record<string, unknown>)?.allowedTools)
+      ? ((chat.settings as Record<string, unknown>).allowedTools as string[])
+      : undefined,
     chrome: true,
     timeoutMs: 30 * 60 * 1000,
     trackAs: chatId,

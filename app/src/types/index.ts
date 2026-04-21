@@ -150,6 +150,7 @@ export interface InteractiveChat {
   updatedAt: string;
   archivedAt: string | null;
   workingDir: string | null;
+  allowedTools: string[] | null;
 }
 
 export interface ChatMessage {

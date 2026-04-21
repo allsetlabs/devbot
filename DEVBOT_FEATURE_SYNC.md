@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T22:00:00Z
-Last implementation run: 2026-04-22T00:00:00Z
+Last implementation run: 2026-04-22T04:00:00Z
 
 ---
 
 ## Pending
-
-- Add allowed tools configuration per chat — UI to select which tools (Read, Edit, Bash, Grep, etc.) a chat session is allowed to use, matching Claude Code's --allowedTools flag; drawer accessible from chat settings
 - Add cross-chat pinned messages view — a page or drawer that aggregates all pinned messages across all chats, with links back to the source chat; accessible from the nav or chats list page
 - Add notification sound picker — replace hardcoded Web Audio tones with selectable notification sounds (chime, ding, pop, silent) in Settings > Notifications
 
@@ -19,6 +17,7 @@ Last implementation run: 2026-04-22T00:00:00Z
 
 ## Completed
 
+- [2026-04-22] Add allowed tools configuration per chat — ChatAllowedToolsDrawer component with checkbox list of 11 Claude Code tools (Read, Edit, Write, Bash, Grep, Glob, Agent, WebSearch, WebFetch, NotebookEdit, TodoWrite); Wrench icon button in ChatInputToolbar shows "All Tools" or "N Tools"; backend POST /:id/allowed-tools endpoint stores in chat settings JSON; claude-spawn passes --allowedTools flag; Select All/Deselect All toggle; Reset button when tools are restricted; scrollable tool list with Save button
 - [2026-04-22] Add working directory switcher inside active chat view — FolderRoot button in ChatViewHeader opens ChatWorkingDirDrawer with WorkingDirSelector; backend POST /:id/working-dir endpoint updates workingDir in chat settings JSON; selecting a saved directory updates immediately and closes drawer
 - [2026-04-21] Add chat starter/template prompts — ChatWelcomeScreen already had 6 quick-action cards (Review code, Find bugs, Write tests, Explain code, Refactor, Plan a feature) with icons in a 2-col grid; changed onSendPrompt to pre-fill the textarea input instead of sending immediately, allowing users to edit before sending; textarea auto-focuses after selection
 - [2026-04-22] Add inline image rendering for base64 images in assistant responses — added 'image' type to ClaudeContentBlock; extracts image blocks from assistant content and renders them as inline `<img>` elements with base64 data URIs, max-height 400px, rounded corners

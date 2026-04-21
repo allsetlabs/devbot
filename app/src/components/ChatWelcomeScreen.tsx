@@ -117,10 +117,10 @@ export function ChatWelcomeScreen({ permissionMode, model, onSendPrompt }: ChatW
             <Button
               key={item.label}
               variant="outline"
-              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3 text-left transition-colors active:bg-muted/50"
+              className="flex items-center gap-2.5 rounded-lg border border-border bg-background p-3 text-left transition-colors active:bg-muted/50"
               onClick={() => onSendPrompt(item.prompt)}
             >
-              <Icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+              <Icon className="h-4 w-4 flex-shrink-0 text-primary" />
               <span className="text-xs leading-snug text-foreground">{item.label}</span>
             </Button>
           );

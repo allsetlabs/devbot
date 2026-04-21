@@ -142,6 +142,13 @@ export const api = {
     return fetchApi('/api/interactive-chats/types');
   },
 
+  fetchPinnedMessages: (pins: { chatId: string; messageIds: string[] }[]): Promise<{ chatId: string; chatName: string; messages: ChatMessage[] }[]> => {
+    return fetchApi('/api/interactive-chats/pinned-messages', {
+      method: 'POST',
+      body: JSON.stringify({ pins }),
+    });
+  },
+
   listInteractiveChats: (type?: string): Promise<InteractiveChat[]> => {
     const params = type ? `?type=${encodeURIComponent(type)}` : '';
     return fetchApi(`/api/interactive-chats${params}`);
@@ -272,6 +279,12 @@ export const api = {
     });
   },
 
+  toggleChatFastMode: (id: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/fast-mode`, {
+      method: 'POST',
+    });
+  },
+
   changeChatAllowedTools: (id: string, allowedTools: string[] | null): Promise<InteractiveChat> => {
     return fetchApi(`/api/interactive-chats/${id}/allowed-tools`, {
       method: 'POST',
@@ -308,6 +321,7 @@ export const api = {
     const blob = await api.exportChat(id, 'markdown');
     return blob.text();
   },
+
 
   // Event Timer (Birth Times) endpoints
   listEventTimerEntries: (): Promise<EventTimerEntry[]> => {

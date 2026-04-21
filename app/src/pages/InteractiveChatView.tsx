@@ -724,6 +724,13 @@ export function InteractiveChatView({
           toast.info('Compacting conversation…');
           sendMutation.mutate('/compact');
         },
+        toggleFastMode: () => {
+          if (!chatId) return;
+          api.toggleChatFastMode(chatId).then((updated) => {
+            queryClient.setQueryData(['interactive-chat', chatId], updated);
+            toast.info(updated.fastMode ? 'Fast mode enabled ⚡' : 'Fast mode disabled');
+          });
+        },
       };
 
       const matched = SLASH_COMMANDS.find((c) => c.command === command);

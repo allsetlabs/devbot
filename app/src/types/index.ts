@@ -151,6 +151,7 @@ export interface InteractiveChat {
   archivedAt: string | null;
   workingDir: string | null;
   allowedTools: string[] | null;
+  fastMode: boolean;
 }
 
 export interface ChatMessage {

@@ -4,6 +4,7 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import {
   Clock,
   MessageCircle,
+  Pin,
   Timer,
   Lightbulb,
   X,
@@ -31,6 +32,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: 'Chat', path: '/chats', icon: <MessageCircle className="h-5 w-5" /> },
+  { label: 'Pinned', path: '/pinned', icon: <Pin className="h-5 w-5" /> },
   { label: 'Scheduler', path: '/scheduler', icon: <Clock className="h-5 w-5" /> },
   { label: 'Events Timer', path: '/events-timer', icon: <Timer className="h-5 w-5" /> },
   { label: 'Plans', path: '/plans', icon: <Lightbulb className="h-5 w-5" /> },

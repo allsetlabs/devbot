@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import fs from 'fs';
-import { eq, desc, gt, isNull, isNotNull, and, lte } from 'drizzle-orm';
+import { eq, desc, gt, isNull, isNotNull, and, lte, inArray } from 'drizzle-orm';
 import { coreDb, interactive_chats, chat_messages, chat_uploads } from '../lib/db/core.js';
 import type {
   InteractiveChatRow,
@@ -37,6 +37,7 @@ interface InteractiveChat {
   archivedAt: string | null;
   workingDir: string | null;
   allowedTools: string[] | null;
+  fastMode: boolean;
 }
 
 interface ChatMessageResponse {
@@ -67,6 +68,7 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
     effort: typeof settings.effort === 'string' ? settings.effort : null,
     allowedTools: Array.isArray(settings.allowedTools) ? (settings.allowedTools as string[]) : null,
+    fastMode: settings.fastMode === true,
   };
 }
 
@@ -295,6 +297,47 @@ router.get(
     res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}.md"`);
     res.send(md);
   }, 'export chat')
+);
+
+// Fetch pinned messages across multiple chats (must be before /:id)
+router.post(
+  '/pinned-messages',
+  asyncHandler(async (req, res) => {
+    const pins = req.body?.pins as { chatId: string; messageIds: string[] }[] | undefined;
+    if (!Array.isArray(pins) || pins.length === 0) {
+      res.json([]);
+      return;
+    }
+
+    const allMessageIds = pins.flatMap((p) => p.messageIds).filter(Boolean);
+    if (allMessageIds.length === 0) {
+      res.json([]);
+      return;
+    }
+
+    const messageRows = await coreDb
+      .select()
+      .from(chat_messages)
+      .where(inArray(chat_messages.id, allMessageIds));
+
+    const chatIds = [...new Set(messageRows.map((m) => m.chat_id))];
+    const chatRows = chatIds.length > 0
+      ? await coreDb.select().from(interactive_chats).where(inArray(interactive_chats.id, chatIds))
+      : [];
+
+    const chatMap = Object.fromEntries(chatRows.map((c) => [c.id, c.name]));
+
+    const grouped = chatIds.map((chatId) => ({
+      chatId,
+      chatName: (chatMap[chatId] as string) ?? 'Unknown Chat',
+      messages: messageRows
+        .filter((m) => m.chat_id === chatId)
+        .sort((a, b) => a.sequence - b.sequence)
+        .map(rowToMessage),
+    }));
+
+    res.json(grouped);
+  }, 'fetch pinned messages across chats')
 );
 
 // Get distinct chat types (must be before /:id to avoid matching "types" as an id)
@@ -718,6 +761,27 @@ router.post(
 
     await updateChatField(req.params.id, { settings: newSettings }, res);
   }, 'change effort level')
+);
+
+// Toggle fast mode
+router.post(
+  '/:id/fast-mode',
+  asyncHandler(async (req, res) => {
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    const newSettings = { ...existingSettings, fastMode: !existingSettings.fastMode };
+
+    await updateChatField(req.params.id, { settings: newSettings }, res);
+  }, 'toggle fast mode')
 );
 
 // Change allowed tools

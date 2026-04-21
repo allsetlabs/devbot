@@ -3,13 +3,12 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T09:28:00Z
-Last implementation run: 2026-04-21T22:30:00Z
+Last implementation run: 2026-04-22T10:00:00Z
 
 ---
 
 ## Pending
 
-- Add /fast slash command to toggle fast mode — Claude Code supports `/fast` to toggle between fast and normal output mode; add to SLASH_COMMANDS config and wire up backend to pass `--fast` flag or toggle fast mode setting for the session
 - Add /config slash command to open settings — Claude Code has `/config` to open configuration; add to SLASH_COMMANDS and navigate to /settings page when triggered
 - Add /cost slash command to show session cost inline — Claude Code has `/cost` to display running token/cost stats in the chat stream; add to SLASH_COMMANDS and render inline cost summary message using existing sessionStats data
 - Add /memory slash command to open memory viewer — Claude Code has `/memory` to view and manage memories; add to SLASH_COMMANDS and open MemoryViewerDrawer when triggered
@@ -22,6 +21,7 @@ Last implementation run: 2026-04-21T22:30:00Z
 
 ## Completed
 
+- [2026-04-22] Add /fast slash command to toggle fast mode — added /fast to SLASH_COMMANDS config; backend POST /:id/fast-mode endpoint toggles fastMode boolean in chat settings JSON; frontend toggleFastMode action calls API and shows toast with lightning bolt emoji; fastMode field added to InteractiveChat type
 - [2026-04-21] Add cross-chat pinned messages view — PinnedMessagesPage at /pinned aggregates all pinned messages across chats grouped by source chat with navigation links; accessible from SlideNav; backend POST /pinned-messages endpoint fetches message content; localStorage-based pin storage
 
 - [2026-04-22] Add notification sound picker — selectable notification sounds (Chime, Ding, Pop, Classic, Silent) in Settings > Channels; dropdown appears when Sound is enabled; Test button previews selected sound; all notification functions (success, failure, new message) respect the chosen style; silent option suppresses all audio

@@ -3,7 +3,7 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T22:00:00Z
-Last implementation run: 2026-04-22T06:00:00Z
+Last implementation run: 2026-04-21T22:30:00Z
 
 ---
 
@@ -11,9 +11,9 @@ Last implementation run: 2026-04-22T06:00:00Z
 
 ## In Progress
 
-- Add cross-chat pinned messages view — a page or drawer that aggregates all pinned messages across all chats, with links back to the source chat; accessible from the nav or chats list page
-
 ## Completed
+
+- [2026-04-21] Add cross-chat pinned messages view — PinnedMessagesPage at /pinned aggregates all pinned messages across chats grouped by source chat with navigation links; accessible from SlideNav; backend POST /pinned-messages endpoint fetches message content; localStorage-based pin storage
 
 - [2026-04-22] Add notification sound picker — selectable notification sounds (Chime, Ding, Pop, Classic, Silent) in Settings > Channels; dropdown appears when Sound is enabled; Test button previews selected sound; all notification functions (success, failure, new message) respect the chosen style; silent option suppresses all audio
 - [2026-04-22] Add allowed tools configuration per chat — ChatAllowedToolsDrawer component with checkbox list of 11 Claude Code tools (Read, Edit, Write, Bash, Grep, Glob, Agent, WebSearch, WebFetch, NotebookEdit, TodoWrite); Wrench icon button in ChatInputToolbar shows "All Tools" or "N Tools"; backend POST /:id/allowed-tools endpoint stores in chat settings JSON; claude-spawn passes --allowedTools flag; Select All/Deselect All toggle; Reset button when tools are restricted; scrollable tool list with Save button

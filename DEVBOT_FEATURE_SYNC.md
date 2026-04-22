@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T23:00:00Z
-Last implementation run: 2026-04-22T23:15:00Z
+Last implementation run: 2026-04-22T16:40:00Z
 
 ---
 
 ## Pending
-
-- TodoWrite tool result renderer — TodoWrite tool results currently show as raw JSON preview in ToolUseMessage.tsx; add a dedicated visual renderer that parses the `todos` array and renders each item as a checkbox row (✓ for completed, ○ for pending, ✗ for cancelled) with a "X/Y done" count badge header; show in both tool_use blocks and standalone tool messages
 
 - NotebookEdit tool result renderer — no renderer exists for NotebookEdit tool results; add a renderer showing the cell number, operation type (create/edit/delete), cell type badge (code/markdown), and a syntax-highlighted preview of the new_source content; similar style to the existing Read renderer
 
@@ -26,6 +24,8 @@ Last implementation run: 2026-04-22T23:15:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] TodoWrite tool result renderer — TodoWriteView component in ToolUseMessage.tsx; collapsible header with ListTodo icon and "X/Y done" badge; per-item status icons (CheckCircle2/Circle/Loader2/XCircle); completed/cancelled items shown with strikethrough + muted text; priority badges (high/medium/low); wired in ToolUseMessage early-return and ChatMessage.tsx tool_result section
 
 - [2026-04-22] Scheduler list show "Next run" relative time per item — added formatRelativeFuture() to format.ts returning "in Xm/Xh/Xd/now"; SchedulerItem, DashboardActiveSchedulers, and SchedulerWidget updated to use it; 30s setInterval tick in SchedulerList forces re-render so countdown stays live without server refetch
 

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal, ListTodo, CheckCircle2, XCircle, Circle } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
@@ -842,6 +842,116 @@ export function ReadResultView({
   );
 }
 
+interface TodoItem {
+  id?: string;
+  content: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  priority?: 'high' | 'medium' | 'low';
+}
+
+function TodoStatusIcon({ status }: { status: TodoItem['status'] }) {
+  switch (status) {
+    case 'completed':
+      return <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-success" />;
+    case 'in_progress':
+      return <Loader2 className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 animate-spin text-primary" />;
+    case 'cancelled':
+      return <XCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/40" />;
+    default:
+      return <Circle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />;
+  }
+}
+
+function TodoPriorityBadge({ priority }: { priority: 'high' | 'medium' | 'low' }) {
+  const cls =
+    priority === 'high'
+      ? 'bg-destructive/15 text-destructive'
+      : priority === 'medium'
+        ? 'bg-warning/15 text-warning'
+        : 'bg-muted text-muted-foreground';
+  return (
+    <span className={`flex-shrink-0 rounded px-1 py-0.5 text-[9px] font-semibold uppercase ${cls}`}>
+      {priority}
+    </span>
+  );
+}
+
+/** Specialized renderer for TodoWrite tool — shows todo list with status icons and "X/Y done" header */
+export function TodoWriteView({
+  toolInput,
+  permissionMode,
+}: {
+  toolInput: Record<string, unknown>;
+  permissionMode?: PermissionMode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const todos = useMemo(() => {
+    const raw = toolInput.todos;
+    if (!Array.isArray(raw)) return [] as TodoItem[];
+    return raw as TodoItem[];
+  }, [toolInput]);
+
+  const completedCount = todos.filter((t) => t.status === 'completed').length;
+  const total = todos.length;
+  const summaryLabel = total === 0 ? 'No todos' : `${completedCount}/${total} done`;
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <Button
+        variant="ghost"
+        onClick={(e) => {
+          const target = e.currentTarget;
+          setExpanded((v) => {
+            if (!v) scrollHeaderToTop(target);
+            return !v;
+          });
+        }}
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+        <ListTodo className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">TodoWrite</span>
+        {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
+        <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {summaryLabel}
+        </span>
+      </Button>
+      {expanded && (
+        <div className="border-t border-border">
+          {todos.length === 0 ? (
+            <p className="px-3 py-2 text-xs text-muted-foreground">No todos</p>
+          ) : (
+            <div className="divide-y divide-border/40 py-1">
+              {todos.map((todo, i) => (
+                <div key={todo.id ?? i} className="flex items-start gap-2 px-3 py-1.5">
+                  <TodoStatusIcon status={todo.status} />
+                  <span
+                    className={`min-w-0 flex-1 text-xs leading-5 ${
+                      todo.status === 'completed'
+                        ? 'text-muted-foreground line-through'
+                        : todo.status === 'cancelled'
+                          ? 'text-muted-foreground/50 line-through'
+                          : 'text-foreground'
+                    }`}
+                  >
+                    {todo.content}
+                  </span>
+                  {todo.priority && <TodoPriorityBadge priority={todo.priority} />}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMessageContent; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const toolName = content.tool_name || 'Unknown Tool';
@@ -862,6 +972,10 @@ export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMes
 
   if (toolName === 'Agent') {
     return <AgentSubagentView toolInput={toolInput} permissionMode={permissionMode} />;
+  }
+
+  if (toolName === 'TodoWrite') {
+    return <TodoWriteView toolInput={toolInput} permissionMode={permissionMode} />;
   }
 
   return (

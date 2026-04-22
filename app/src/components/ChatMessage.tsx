@@ -15,7 +15,7 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView, ReadResultView, GlobResultView, BashResultView } from './ToolUseMessage';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView, ReadResultView, GlobResultView, BashResultView, TodoWriteView } from './ToolUseMessage';
 import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
@@ -154,6 +154,9 @@ export function ChatMessage({
                   isError={block.is_error}
                 />
               );
+            }
+            if (toolInfo?.name === 'TodoWrite') {
+              return <TodoWriteView key={idx} toolInput={toolInfo.input} />;
             }
             return null;
           })}

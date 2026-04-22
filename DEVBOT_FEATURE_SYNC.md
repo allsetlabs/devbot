@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T23:00:00Z
-Last implementation run: 2026-04-22T15:32:00Z
+Last implementation run: 2026-04-22T23:15:00Z
 
 ---
 
 ## Pending
-
-- Scheduler list show "Next run" relative time per item — SchedulerItem has `task.nextRunAt` but the scheduler list page only shows "Running..." for active tasks and "Last: {date}" for paused ones; add "Next: in Xm" relative countdown using formatRelativeTime for non-running tasks and show it inline in the metadata row; use 30s polling interval to keep it live
 
 - TodoWrite tool result renderer — TodoWrite tool results currently show as raw JSON preview in ToolUseMessage.tsx; add a dedicated visual renderer that parses the `todos` array and renders each item as a checkbox row (✓ for completed, ○ for pending, ✗ for cancelled) with a "X/Y done" count badge header; show in both tool_use blocks and standalone tool messages
 
@@ -28,6 +26,8 @@ Last implementation run: 2026-04-22T15:32:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Scheduler list show "Next run" relative time per item — added formatRelativeFuture() to format.ts returning "in Xm/Xh/Xd/now"; SchedulerItem, DashboardActiveSchedulers, and SchedulerWidget updated to use it; 30s setInterval tick in SchedulerList forces re-render so countdown stays live without server refetch
 
 - [2026-04-22] Quick "Running" filter pill in chat list — "Running N" pill alongside All/Manual/Scheduler in ChatListFilters; pulsing dot indicator; only visible when runningCount > 0 or active; client-side filter on isRunning; URL param `?running=1`; clicking "All" clears it; auto-hides when no chats are running
 

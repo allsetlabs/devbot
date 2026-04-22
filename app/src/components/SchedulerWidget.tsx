@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Clock, ChevronRight, Pause, Play } from 'lucide-react';
-import { formatDateTime, formatInterval } from '../lib/format';
+import { formatRelativeFuture, formatInterval } from '../lib/format';
 import type { ScheduledTask } from '../types';
 
 export function SchedulerWidget({ tasks }: { tasks: ScheduledTask[] }) {
@@ -43,7 +43,7 @@ export function SchedulerWidget({ tasks }: { tasks: ScheduledTask[] }) {
         {running.length > 0 && <span className="text-primary">{running.length} running now</span>}
         {nextRun?.nextRunAt && (
           <span className="truncate">
-            Next: {formatDateTime(nextRun.nextRunAt)} ({formatInterval(nextRun.intervalMinutes)})
+            Next: {formatRelativeFuture(nextRun.nextRunAt)} ({formatInterval(nextRun.intervalMinutes)})
           </span>
         )}
         {active.length === 0 && paused.length === 0 && <span>No tasks</span>}

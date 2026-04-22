@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Clock, ChevronRight, Play, Pause, Loader2 } from 'lucide-react';
-import { formatDateTime, formatInterval } from '../lib/format';
+import { formatRelativeFuture, formatInterval } from '../lib/format';
 import type { ScheduledTask } from '../types';
 
 export function DashboardActiveSchedulers({ tasks }: { tasks: ScheduledTask[] }) {
@@ -49,7 +49,7 @@ export function DashboardActiveSchedulers({ tasks }: { tasks: ScheduledTask[] })
                 {task.nextRunAt && task.status === 'active' && (
                   <>
                     <span>·</span>
-                    <span>Next: {formatDateTime(task.nextRunAt)}</span>
+                    <span>Next: {formatRelativeFuture(task.nextRunAt)}</span>
                   </>
                 )}
                 {task.status === 'paused' && <span className="text-warning">Paused</span>}

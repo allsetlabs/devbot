@@ -23,6 +23,21 @@ export function formatRelativeTime(dateStr: string | null | undefined): string {
   return `${days}d ago`;
 }
 
+/** Format a future date as relative countdown (e.g., "in 5m", "in 2h 30m", "in 3d") */
+export function formatRelativeFuture(dateStr: string | null): string {
+  if (!dateStr) return '';
+  const diff = new Date(dateStr).getTime() - Date.now();
+  if (Number.isNaN(diff)) return '';
+  if (diff <= 0) return 'now';
+  const mins = Math.ceil(diff / 60000);
+  if (mins < 60) return `in ${mins}m`;
+  const hrs = Math.floor(diff / 3600000);
+  const remainMins = Math.ceil((diff % 3600000) / 60000);
+  if (hrs < 24) return remainMins > 0 ? `in ${hrs}h ${remainMins}m` : `in ${hrs}h`;
+  const days = Math.floor(diff / 86400000);
+  return `in ${days}d`;
+}
+
 /** Format a minute interval as compact string (e.g., 90 → "1h 30m") */
 export function formatInterval(minutes: number): string {
   if (minutes < 60) return `${minutes}m`;

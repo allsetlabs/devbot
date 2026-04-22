@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
@@ -21,6 +21,12 @@ export function SchedulerList() {
   const [showForm, setShowForm] = useState(false);
   const { openNav } = useNav();
   const [settingsTask, setSettingsTask] = useState<ScheduledTask | null>(null);
+  const [, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
 
   const {
     data: tasks = [],

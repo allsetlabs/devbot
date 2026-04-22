@@ -2,7 +2,7 @@ import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
 import { Trash2, Pause, Play, MessageSquare, CheckCircle, Settings, RotateCcw } from 'lucide-react';
 import type { ScheduledTask } from '../types';
-import { formatDateTime, formatInterval } from '../lib/format';
+import { formatDateTime, formatInterval, formatRelativeFuture } from '../lib/format';
 
 interface SchedulerItemProps {
   task: ScheduledTask;
@@ -95,7 +95,7 @@ export function SchedulerItem({
             <span>Last: {formatDateTime(task.lastRunAt)}</span>
           )}
           {!isRunning && !isCompleted && task.nextRunAt && !isPaused && (
-            <span>Next: {formatDateTime(task.nextRunAt)}</span>
+            <span>Next: {formatRelativeFuture(task.nextRunAt)}</span>
           )}
           {isPaused && !isCompleted && <span className="text-warning">Paused</span>}
         </div>

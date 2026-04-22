@@ -106,7 +106,7 @@ export function DoctorDrawer({ open, onOpenChange }: DoctorDrawerProps) {
           </Button>
         </DrawerHeader>
 
-        <div className="flex-1 overflow-auto px-4 pb-6">
+        <div className="min-h-[50vh] flex-1 overflow-auto px-4 pb-6">
           {loading && !data && (
             <div className="flex flex-col items-center gap-2 py-10 text-muted-foreground">
               <RefreshCw className="h-5 w-5 animate-spin" />

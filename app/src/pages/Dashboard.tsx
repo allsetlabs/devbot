@@ -10,6 +10,8 @@ import { BabyWidget } from '../components/BabyWidget';
 import { LawnWidget } from '../components/LawnWidget';
 import { HealthWidget } from '../components/HealthWidget';
 import { DashboardQuickActions } from '../components/DashboardQuickActions';
+import { DashboardRecentChats } from '../components/DashboardRecentChats';
+import { DashboardActiveSchedulers } from '../components/DashboardActiveSchedulers';
 import { useNav } from '../hooks/useNav';
 
 export function Dashboard() {
@@ -62,13 +64,17 @@ export function Dashboard() {
 
       {/* Widget Grid */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-          <ChatsWidget chats={chats} />
-          <SchedulerWidget tasks={tasks} />
-          <BabyWidget logs={babyLogs} />
-          <LawnWidget profiles={lawnProfiles} plans={lawnPlans} />
-          <DashboardQuickActions />
-          <HealthWidget health={health} />
+        <div className="mx-auto w-full max-w-6xl space-y-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+            <ChatsWidget chats={chats} />
+            <SchedulerWidget tasks={tasks} />
+            <BabyWidget logs={babyLogs} />
+            <LawnWidget profiles={lawnProfiles} plans={lawnPlans} />
+            <DashboardQuickActions />
+            <HealthWidget health={health} />
+          </div>
+          <DashboardRecentChats chats={chats} />
+          <DashboardActiveSchedulers tasks={tasks} />
         </div>
       </div>
     </div>

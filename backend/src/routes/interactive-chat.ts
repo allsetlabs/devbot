@@ -34,6 +34,7 @@ interface InteractiveChat {
   effort: string | null;
   isRunning: boolean;
   createdAt: string;
+  updatedAt: string;
   archivedAt: string | null;
   workingDir: string | null;
   allowedTools: string[] | null;
@@ -64,6 +65,7 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     maxTurns: row.max_turns,
     isRunning: row.is_executing ?? false,
     createdAt: row.created_at,
+    updatedAt: row.updated_at,
     archivedAt: row.archived_at,
     workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
     effort: typeof settings.effort === 'string' ? settings.effort : null,

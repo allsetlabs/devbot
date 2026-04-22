@@ -77,17 +77,6 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function PersistentSidebar() {
-  return (
-    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 z-40 w-64 flex-col border-r border-border bg-background">
-      <div className="flex items-center px-4 py-3 border-b border-border">
-        <h2 className="text-lg font-semibold text-foreground">DevBot</h2>
-      </div>
-      <NavItems />
-    </aside>
-  );
-}
-
 interface SlideNavProps {
   isOpen: boolean;
   onClose: () => void;
@@ -121,7 +110,7 @@ export function SlideNav({ isOpen, onClose }: SlideNavProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 lg:hidden">
+    <div className="fixed inset-0 z-50 bg-black/50">
       <div
         ref={navRef}
         className="absolute bottom-0 left-0 top-0 w-64 bg-background shadow-xl transition-transform duration-200"

@@ -7,6 +7,7 @@ import {
   CheckCircle,
   Zap,
   Wrench,
+  Repeat2,
 } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
@@ -21,6 +22,7 @@ interface ChatInputToolbarProps {
   onOpenModelDrawer: () => void;
   onOpenEffort: () => void;
   onOpenAllowedTools: () => void;
+  onOpenMaxTurns?: (currentMaxTurns: number | null) => void;
 }
 
 export function ChatInputToolbar({
@@ -30,6 +32,7 @@ export function ChatInputToolbar({
   onOpenModelDrawer,
   onOpenEffort,
   onOpenAllowedTools,
+  onOpenMaxTurns,
 }: ChatInputToolbarProps) {
   return (
     <div className="flex items-center justify-between">
@@ -82,6 +85,18 @@ export function ChatInputToolbar({
         >
           <Wrench className="h-3.5 w-3.5" />
         </Button>
+        {/* Max turns — repeat icon */}
+        {onOpenMaxTurns && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`h-6 w-6 transition-colors active:opacity-70 ${chat?.maxTurns ? 'text-primary hover:text-primary/80' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => onOpenMaxTurns(chat?.maxTurns ?? null)}
+            title={chat?.maxTurns ? `Max turns: ${chat.maxTurns}` : 'Max Turns (unlimited)'}
+          >
+            <Repeat2 className="h-3.5 w-3.5" />
+          </Button>
+        )}
         {input.length > 0 && (
           <span className="text-[11px] text-muted-foreground">
             {input.length >= 1000 ? `${(input.length / 1000).toFixed(1)}k` : input.length}c/

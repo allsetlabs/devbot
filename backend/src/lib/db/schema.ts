@@ -282,6 +282,24 @@ export const companies = sqliteTable('companies', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// Chat message queue (messages waiting to be sent when current execution completes)
+export const chat_message_queue = sqliteTable('chat_message_queue', {
+  id: text('id').primaryKey(),
+  chat_id: text('chat_id').notNull(),
+  branch_id: text('branch_id').notNull().default('main'),
+  prompt: text('prompt').notNull(),
+  position: integer('position').notNull(),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
 // Commands (synced from .claude/)
 export const commands = sqliteTable('commands', {
   id: text('id').primaryKey(),

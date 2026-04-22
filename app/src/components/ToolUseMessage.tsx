@@ -1,7 +1,11 @@
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File } from 'lucide-react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
+import { copyToClipboard } from '../lib/clipboard';
+import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
 import type { ClaudeMessageContent, ClaudeContentBlock, PermissionMode } from '../types';
 
 function ToolApprovalBadge({ mode }: { mode: PermissionMode }) {
@@ -488,6 +492,237 @@ export function GrepResultView({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+const GLOB_COLLAPSE_THRESHOLD = 20;
+
+type GlobFileType = 'folder' | 'code' | 'config' | 'text' | 'style' | 'other';
+
+const CODE_EXTS = new Set(['ts', 'tsx', 'js', 'jsx', 'py', 'go', 'rs', 'rb', 'java', 'cpp', 'c', 'swift', 'kt', 'php', 'sh', 'bash', 'sql', 'graphql', 'html', 'vue', 'svelte']);
+const CONFIG_EXTS = new Set(['json', 'yaml', 'yml', 'toml', 'env', 'ini', 'cfg', 'conf', 'lock', 'xml']);
+const TEXT_EXTS = new Set(['md', 'txt', 'rst', 'log']);
+const STYLE_EXTS = new Set(['css', 'scss', 'sass', 'less']);
+
+function getGlobFileType(path: string): GlobFileType {
+  if (path.endsWith('/')) return 'folder';
+  const ext = path.split('.').pop()?.toLowerCase() || '';
+  if (CODE_EXTS.has(ext)) return 'code';
+  if (CONFIG_EXTS.has(ext)) return 'config';
+  if (TEXT_EXTS.has(ext)) return 'text';
+  if (STYLE_EXTS.has(ext)) return 'style';
+  return 'other';
+}
+
+function GlobFileIcon({ type }: { type: GlobFileType }) {
+  const cls = 'h-3.5 w-3.5 flex-shrink-0';
+  switch (type) {
+    case 'folder': return <Folder className={`${cls} text-warning`} />;
+    case 'code': return <FileCode className={`${cls} text-primary`} />;
+    case 'config': return <FileJson className={`${cls} text-success`} />;
+    case 'text': return <FileText className={`${cls} text-muted-foreground`} />;
+    case 'style': return <FileCode className={`${cls} text-purple-400`} />;
+    default: return <File className={`${cls} text-muted-foreground`} />;
+  }
+}
+
+/** Specialized renderer for Glob tool results — compact file list with type icons and match count */
+export function GlobResultView({
+  content,
+  pattern,
+}: {
+  content?: string | ClaudeContentBlock[];
+  pattern?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const text =
+    typeof content === 'string'
+      ? content
+      : Array.isArray(content)
+        ? content
+            .filter((b) => b.type === 'text')
+            .map((b) => b.text || '')
+            .join('')
+        : '';
+
+  const paths = useMemo(
+    () => text.split('\n').map((l) => l.trim()).filter(Boolean),
+    [text]
+  );
+  const total = paths.length;
+  const displayPaths = !expanded && total > GLOB_COLLAPSE_THRESHOLD ? paths.slice(0, GLOB_COLLAPSE_THRESHOLD) : paths;
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <Button
+        variant="ghost"
+        onClick={(e) => {
+          const target = e.currentTarget;
+          setExpanded((v) => {
+            if (!v) scrollHeaderToTop(target);
+            return !v;
+          });
+        }}
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+        <FolderSearch className="h-3.5 w-3.5 text-warning" />
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">
+          {pattern ?? 'Glob'}
+        </span>
+        <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {total === 0 ? 'No matches' : `${total} match${total !== 1 ? 'es' : ''}`}
+        </span>
+      </Button>
+      {expanded && (
+        <div className="border-t border-border">
+          {total === 0 ? (
+            <p className="px-3 py-2 text-xs text-muted-foreground">No files matched</p>
+          ) : (
+            <>
+              <div className="max-h-96 overflow-auto py-1 font-mono text-xs">
+                {displayPaths.map((path, i) => (
+                  <div key={i} className="flex items-center gap-2 px-3 py-0.5 hover:bg-muted/50">
+                    <GlobFileIcon type={getGlobFileType(path)} />
+                    <span className="min-w-0 flex-1 truncate text-foreground/80">{path}</span>
+                  </div>
+                ))}
+              </div>
+              {total > GLOB_COLLAPSE_THRESHOLD && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setExpanded(true)}
+                  className="w-full rounded-none border-t border-border py-1 text-xs text-muted-foreground hover:bg-muted/50"
+                >
+                  <ChevronDown className="mr-1 h-3 w-3" /> Show {total - GLOB_COLLAPSE_THRESHOLD} more files
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const READ_COLLAPSE_THRESHOLD = 30;
+
+const EXT_LANGUAGE_MAP: Record<string, string> = {
+  ts: 'typescript', tsx: 'tsx', js: 'javascript', jsx: 'jsx',
+  py: 'python', json: 'json', md: 'markdown', css: 'css',
+  html: 'html', sh: 'bash', bash: 'bash', sql: 'sql',
+  yaml: 'yaml', yml: 'yaml', rs: 'rust', go: 'go',
+  rb: 'ruby', java: 'java', cpp: 'cpp', c: 'c',
+  swift: 'swift', kt: 'kotlin', php: 'php', xml: 'xml',
+  toml: 'toml', graphql: 'graphql', txt: 'text',
+};
+
+function detectLanguage(filePath: string): string {
+  const ext = filePath.split('.').pop()?.toLowerCase() || '';
+  return EXT_LANGUAGE_MAP[ext] || 'text';
+}
+
+/** Strips the `cat -n` style line-number prefix (e.g. "   1\t") that Claude Code's Read tool prepends */
+function stripCatNPrefix(text: string): string {
+  const lines = text.split('\n');
+  const hasCatN = lines.slice(0, 5).filter((l) => l.length > 0).some((l) => /^\s*\d+\t/.test(l));
+  if (!hasCatN) return text;
+  return lines.map((l) => l.replace(/^\s*\d+\t/, '')).join('\n');
+}
+
+/** Specialized renderer for Read tool results — shows file content with line numbers and syntax highlighting */
+export function ReadResultView({
+  content,
+  filePath,
+}: {
+  content?: string | ClaudeContentBlock[];
+  filePath?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const { status: copied, show: showCopied } = useTemporaryStatus(2000);
+
+  const rawText =
+    typeof content === 'string'
+      ? content
+      : Array.isArray(content)
+        ? content
+            .filter((b) => b.type === 'text')
+            .map((b) => b.text || '')
+            .join('')
+        : '';
+
+  const text = useMemo(() => stripCatNPrefix(rawText), [rawText]);
+  const lines = useMemo(() => text.split('\n'), [text]);
+  const lineCount = lines.length;
+  const language = detectLanguage(filePath || '');
+  const fileName = filePath ? filePath.split('/').pop() || filePath : 'file';
+
+  const displayText =
+    !expanded && lineCount > READ_COLLAPSE_THRESHOLD
+      ? lines.slice(0, READ_COLLAPSE_THRESHOLD).join('\n')
+      : text;
+
+  const handleCopy = () => {
+    copyToClipboard(rawText);
+    showCopied('copied');
+  };
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <div className="flex items-center gap-2 px-3 py-2">
+        <FileCode className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">{fileName}</span>
+        <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {lineCount} line{lineCount !== 1 ? 's' : ''}
+        </span>
+        <Button
+          variant="ghost"
+          onClick={handleCopy}
+          className="h-6 w-6 flex-shrink-0 rounded p-1 text-muted-foreground hover:text-foreground"
+        >
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        </Button>
+      </div>
+      <div className="relative border-t border-border">
+        <SyntaxHighlighter
+          style={oneDark}
+          language={language}
+          PreTag="div"
+          showLineNumbers
+          customStyle={{
+            margin: 0,
+            borderRadius: 0,
+            fontSize: '0.75rem',
+            maxHeight: '24rem',
+            overflow: 'auto',
+          }}
+        >
+          {displayText}
+        </SyntaxHighlighter>
+        {lineCount > READ_COLLAPSE_THRESHOLD && (
+          <Button
+            variant="ghost"
+            onClick={() => setExpanded((v) => !v)}
+            className="w-full rounded-none border-t border-border py-1 text-xs text-muted-foreground hover:bg-muted/50"
+          >
+            {expanded ? (
+              <>
+                <ChevronDown className="mr-1 h-3 w-3 rotate-180" /> Show less
+              </>
+            ) : (
+              <>
+                <ChevronDown className="mr-1 h-3 w-3" /> Show {lineCount - READ_COLLAPSE_THRESHOLD} more lines
+              </>
+            )}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

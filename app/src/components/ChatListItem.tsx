@@ -111,7 +111,7 @@ export function ChatListItem({
           )}
         </p>
       </div>
-      {/* Desktop: primary actions inline + overflow menu */}
+      {/* Desktop: all actions inline */}
       <div className="hidden flex-shrink-0 items-center gap-1 lg:flex">
         {hasResumeSession && (
           <Button
@@ -143,43 +143,60 @@ export function ChatListItem({
             className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : 'text-foreground/60'}`}
           />
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 hover:bg-muted-foreground/20"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              title="More actions"
-            >
-              <MoreVertical className="h-4 w-4 text-foreground/60" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {hasCopyCommand && (
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCopyCommand?.(); }}>
-                <Terminal className="h-4 w-4" />
-                Copy resume command
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={onDuplicate}>
-              <Copy className="h-4 w-4" />
-              Duplicate
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onArchive}>
-              <Archive className="h-4 w-4" />
-              Archive
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onDelete} className="text-destructive">
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {hasCopyCommand && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-muted-foreground/20"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCopyCommand?.();
+            }}
+            title="Copy resume command"
+          >
+            <Terminal className="h-4 w-4 text-foreground/60" />
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-muted-foreground/20"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDuplicate(e);
+          }}
+          title="Duplicate"
+        >
+          <Copy className="h-4 w-4 text-foreground/60" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-muted-foreground/20"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onArchive(e);
+          }}
+          title="Archive"
+        >
+          <Archive className="h-4 w-4 text-foreground/60" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-destructive/20"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete(e);
+          }}
+          title="Delete"
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
       </div>
       {/* Mobile/tablet: all actions in dropdown */}
       <div className="flex-shrink-0 lg:hidden">

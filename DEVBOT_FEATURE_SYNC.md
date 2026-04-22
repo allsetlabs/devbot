@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T12:18:00Z
-Last implementation run: 2026-04-22T08:45:00Z
+Last implementation run: 2026-04-22T12:00:00Z
 
 ---
 
 ## Pending
-- Specialized Read tool result renderer — show file content with line numbers and syntax highlighting (reuse MarkdownRenderer code block logic); collapsible if content exceeds 30 lines; show filename header with file icon
-- Specialized Glob tool result renderer — show matching file paths in a compact vertical list with file type icons (folder, code file, config file, etc.); show total match count header
 - Specialized Bash tool output renderer — terminal-style monospace output with dark background; show exit code badge (green for 0, red for non-zero); stderr lines in red; stdout in normal color; collapsible if output exceeds 20 lines
 - Add /doctor slash command — run backend health check returning: backend status, Claude CLI version, active sessions count, working directory validity, disk space, memory usage; display results in a diagnostic card with pass/fail indicators
 - Add /status slash command — display inline card showing: current model, permission mode, context usage (tokens/limit), session cost, working directory, active tools, fast mode state, effort level
@@ -19,6 +17,10 @@ Last implementation run: 2026-04-22T08:45:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Specialized Glob tool result renderer — show matching file paths in a compact vertical list with file type icons (folder, code file, config file, etc.); show total match count header; collapsible at 20-file threshold
+
+- [2026-04-22] Specialized Read tool result renderer — file content with line numbers and syntax highlighting; collapsible at 30-line threshold; filename header with FileCode icon; copy button; strips cat -n prefixes; language detection from extension; also wired onOpenMaxTurns through ChatInputArea→ChatInputToolbar with Repeat2 button; removed unused sessionStats prop from ChatInputArea
 
 - [2026-04-22] Specialized Grep tool result renderer — show matched lines with syntax highlighting, search pattern highlighted in yellow/orange, file paths as monospace links; compact summary showing match count and file count
 

@@ -276,6 +276,24 @@ export async function initializeCoreDatabase() {
       // Column already exists or migration already applied
     }
 
+    // Create chat_message_queue table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS chat_message_queue (
+        id TEXT PRIMARY KEY,
+        chat_id TEXT NOT NULL,
+        branch_id TEXT NOT NULL DEFAULT 'main',
+        prompt TEXT NOT NULL,
+        position INTEGER NOT NULL,
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
     // Create commands table
     await runSQL(
       `

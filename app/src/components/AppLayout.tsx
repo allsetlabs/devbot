@@ -1,15 +1,14 @@
 import type { ReactNode } from 'react';
 import { NavProvider, useNav } from '../hooks/useNav';
-import { PersistentSidebar, SlideNav } from './SlideNav';
+import { SlideNav } from './SlideNav';
 
 function LayoutInner({ children }: { children: ReactNode }) {
   const { isNavOpen, closeNav } = useNav();
 
   return (
     <>
-      <PersistentSidebar />
       <SlideNav isOpen={isNavOpen} onClose={closeNav} />
-      <div className="flex h-dvh flex-col lg:ml-64">
+      <div className="flex h-dvh flex-col">
         {children}
       </div>
     </>

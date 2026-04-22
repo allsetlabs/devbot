@@ -53,7 +53,7 @@ export function Dashboard() {
       {/* Header */}
       <header className="safe-area-top flex items-center justify-between border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={openNav} className="lg:hidden">
+          <Button variant="ghost" size="icon" onClick={openNav}>
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>

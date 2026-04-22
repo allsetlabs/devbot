@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { coreDb, interactive_chats, chat_messages, remotion_videos } from './db/core.js';
-import { sql, eq, and } from 'drizzle-orm';
+import { coreDb, interactive_chats, chat_messages, chat_message_queue, remotion_videos } from './db/core.js';
+import { sql, eq, and, asc } from 'drizzle-orm';
 import type { StreamParserConfig } from './stream-parser.js';
 import type { ChatSettings } from './db/types.js';
 import { generateName } from './generate-name.js';
@@ -125,6 +125,33 @@ async function checkForRemotionVideoResult(
     } catch (err) {
       console.error(`[InteractiveChat] Failed to parse remotion video result:`, err);
     }
+  }
+}
+
+function processQueue(chatId: string): void {
+  try {
+    const next = coreDb
+      .select()
+      .from(chat_message_queue)
+      .where(eq(chat_message_queue.chat_id, chatId))
+      .orderBy(asc(chat_message_queue.position))
+      .limit(1)
+      .get();
+
+    if (!next) return;
+
+    coreDb
+      .delete(chat_message_queue)
+      .where(eq(chat_message_queue.id, next.id))
+      .run();
+
+    console.log(`[InteractiveChat] Processing queued message for chat ${chatId}: "${next.prompt.slice(0, 50)}..."`);
+
+    sendMessage(chatId, next.prompt, next.branch_id).catch((err) => {
+      console.error(`[InteractiveChat] Failed to send queued message for chat ${chatId}:`, err);
+    });
+  } catch (err) {
+    console.error(`[InteractiveChat] Queue processing failed for chat ${chatId}:`, err);
   }
 }
 

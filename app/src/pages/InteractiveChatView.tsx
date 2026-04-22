@@ -1534,7 +1534,6 @@ export function InteractiveChatView({
       {/* Input area */}
       <ChatInputArea
         chat={chat}
-        sessionStats={sessionStats}
         input={input}
         onInputChange={setInput}
         onCursorChange={setCursorPosition}

@@ -15,7 +15,7 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView } from './ToolUseMessage';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView, ReadResultView, GlobResultView } from './ToolUseMessage';
 import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
@@ -121,6 +121,24 @@ export function ChatMessage({
             if (toolInfo?.name === 'Grep') {
               return (
                 <GrepResultView
+                  key={idx}
+                  content={block.content}
+                  pattern={toolInfo.input.pattern as string | undefined}
+                />
+              );
+            }
+            if (toolInfo?.name === 'Read') {
+              return (
+                <ReadResultView
+                  key={idx}
+                  content={block.content}
+                  filePath={toolInfo.input.file_path as string | undefined}
+                />
+              );
+            }
+            if (toolInfo?.name === 'Glob') {
+              return (
+                <GlobResultView
                   key={idx}
                   content={block.content}
                   pattern={toolInfo.input.pattern as string | undefined}

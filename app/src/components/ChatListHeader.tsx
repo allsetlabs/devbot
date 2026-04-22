@@ -33,7 +33,7 @@ export function ChatListHeader({
   return (
     <header className="flex items-center justify-between border-b border-border px-4 py-3">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={onMenuOpen} className="lg:hidden">
+        <Button variant="ghost" size="icon" onClick={onMenuOpen}>
           <Menu className="h-5 w-5" />
         </Button>
         <MessageCircle className="h-6 w-6 text-primary" />

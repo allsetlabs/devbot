@@ -7,9 +7,12 @@ interface ChatListFiltersProps {
   selectedType: string | null;
   chatTypes: string[];
   searchMode: 'chats' | 'messages';
+  showRunning: boolean;
+  runningCount: number;
   onSearchChange: (value: string) => void;
   onTypeChange: (value: string | null) => void;
   onSearchModeChange: (mode: 'chats' | 'messages') => void;
+  onToggleRunning: () => void;
 }
 
 export function ChatListFilters({
@@ -17,9 +20,12 @@ export function ChatListFilters({
   selectedType,
   chatTypes,
   searchMode,
+  showRunning,
+  runningCount,
   onSearchChange,
   onTypeChange,
   onSearchModeChange,
+  onToggleRunning,
 }: ChatListFiltersProps) {
   return (
     <>
@@ -60,27 +66,48 @@ export function ChatListFilters({
         </div>
       </div>
 
-      {chatTypes.length > 1 && searchMode === 'chats' && (
+      {(chatTypes.length > 1 || runningCount > 0 || showRunning) && searchMode === 'chats' && (
         <div className="no-scrollbar flex gap-2 overflow-x-auto border-b border-border px-4 py-2">
-          <Button
-            variant={selectedType === null ? 'default' : 'outline'}
-            size="sm"
-            className="flex-shrink-0"
-            onClick={() => onTypeChange(null)}
-          >
-            All
-          </Button>
-          {chatTypes.map((type) => (
+          {chatTypes.length > 1 && (
+            <>
+              <Button
+                variant={selectedType === null && !showRunning ? 'default' : 'outline'}
+                size="sm"
+                className="flex-shrink-0"
+                onClick={() => onTypeChange(null)}
+              >
+                All
+              </Button>
+              {chatTypes.map((type) => (
+                <Button
+                  key={type}
+                  variant={selectedType === type ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex-shrink-0"
+                  onClick={() => onTypeChange(type)}
+                >
+                  {type}
+                </Button>
+              ))}
+            </>
+          )}
+          {(runningCount > 0 || showRunning) && (
             <Button
-              key={type}
-              variant={selectedType === type ? 'default' : 'outline'}
+              variant={showRunning ? 'default' : 'outline'}
               size="sm"
-              className="flex-shrink-0"
-              onClick={() => onTypeChange(type)}
+              className="flex-shrink-0 gap-1.5"
+              onClick={onToggleRunning}
             >
-              {type}
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+              </span>
+              Running
+              {runningCount > 0 && (
+                <span className="ml-0.5 text-xs opacity-70">{runningCount}</span>
+              )}
             </Button>
-          ))}
+          )}
         </div>
       )}
     </>

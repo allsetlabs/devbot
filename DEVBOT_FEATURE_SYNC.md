@@ -3,16 +3,17 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-22T17:10:00Z
+Last implementation run: 2026-04-22T15:32:00Z
 
 ---
 
 ## Pending
-- Quick "Running" filter pill in chat list — add a "Running" filter pill alongside "All / Manual / Scheduler" in ChatListFilters; when active, filters to only chats where `isRunning === true` using the existing filter mechanism; the pill auto-disappears when no chats are running
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Quick "Running" filter pill in chat list — "Running N" pill alongside All/Manual/Scheduler in ChatListFilters; pulsing dot indicator; only visible when runningCount > 0 or active; client-side filter on isRunning; URL param `?running=1`; clicking "All" clears it; auto-hides when no chats are running
 
 - [2026-04-22] Voice input via Web Speech API — Mic button in left toolbar of ChatTextareaWithPickers; uses webkitSpeechRecognition with continuous=false, interimResults=true; interim text shown as italic preview above button row; red border + pulsing dot while recording; finalizes by appending to input; toast if browser unsupported; cleanup on unmount
 

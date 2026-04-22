@@ -33,6 +33,7 @@ export function InteractiveChatList() {
   const selectedType = searchParams.get('type') ?? null;
   const sortBy = (searchParams.get('sort') as SortOption) ?? 'recent';
   const searchMode = (searchParams.get('sm') as 'chats' | 'messages') ?? 'chats';
+  const showRunning = searchParams.get('running') === '1';
 
   const setSearchQuery = (value: string) => {
     setSearchParams(
@@ -64,6 +65,7 @@ export function InteractiveChatList() {
         const next = new URLSearchParams(prev);
         if (value) next.set('type', value);
         else next.delete('type');
+        next.delete('running');
         return next;
       },
       { replace: true }
@@ -76,6 +78,18 @@ export function InteractiveChatList() {
         const next = new URLSearchParams(prev);
         if (value !== 'recent') next.set('sort', value);
         else next.delete('sort');
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const toggleRunning = () => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (prev.get('running') === '1') next.delete('running');
+        else next.set('running', '1');
         return next;
       },
       { replace: true }
@@ -175,7 +189,12 @@ export function InteractiveChatList() {
   };
   const handleSelect = (chat: InteractiveChat) => navigate(`/chat/${chat.id}`);
 
+  const runningCount = chats.filter((c) => c.isRunning).length;
+
   let filteredChats = getSortedChats(chats, sortBy);
+  if (showRunning) {
+    filteredChats = filteredChats.filter((chat) => chat.isRunning);
+  }
   if (showFavorites) {
     filteredChats = filteredChats.filter((chat) => isFavorite(chat.id));
   }
@@ -210,9 +229,12 @@ export function InteractiveChatList() {
         selectedType={selectedType}
         chatTypes={chatTypes}
         searchMode={searchMode}
+        showRunning={showRunning}
+        runningCount={runningCount}
         onSearchChange={setSearchQuery}
         onTypeChange={setSelectedType}
         onSearchModeChange={setSearchMode}
+        onToggleRunning={toggleRunning}
       />
 
       <ErrorBanner error={error} />

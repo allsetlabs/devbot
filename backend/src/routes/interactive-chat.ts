@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import fs from 'fs';
-import { eq, desc, gt, isNull, isNotNull, and, lte, inArray } from 'drizzle-orm';
+import { eq, desc, gt, isNull, isNotNull, and, lte, inArray, sql } from 'drizzle-orm';
 import { coreDb, interactive_chats, chat_messages, chat_uploads } from '../lib/db/core.js';
 import type {
   InteractiveChatRow,
@@ -388,6 +388,74 @@ router.get(
 
     res.json(rows.map(rowToChat));
   }, 'list chats')
+);
+
+// Search messages across all chats
+router.get(
+  '/search-messages',
+  asyncHandler(async (req, res) => {
+    const q = ((req.query.q as string | undefined) ?? '').trim();
+    if (q.length < 2) { res.json([]); return; }
+
+    const rows = coreDb
+      .select({
+        messageId: chat_messages.id,
+        chatId: chat_messages.chat_id,
+        sequence: chat_messages.sequence,
+        type: chat_messages.type,
+        content: chat_messages.content,
+        createdAt: chat_messages.created_at,
+        chatName: interactive_chats.name,
+      })
+      .from(chat_messages)
+      .innerJoin(interactive_chats, eq(chat_messages.chat_id, interactive_chats.id))
+      .where(
+        and(
+          isNull(interactive_chats.archived_at),
+          sql`cast(${chat_messages.content} as TEXT) LIKE ${'%' + q + '%'}`,
+          inArray(chat_messages.type, ['user', 'assistant'])
+        )
+      )
+      .orderBy(desc(chat_messages.created_at))
+      .limit(50)
+      .all();
+
+    function extractText(content: unknown): string {
+      if (!content || typeof content !== 'object') return '';
+      const c = content as Record<string, unknown>;
+      const msg = c.message as Record<string, unknown> | undefined;
+      if (!msg?.content || !Array.isArray(msg.content)) return '';
+      return (msg.content as Array<{ type?: string; text?: string }>)
+        .filter((b) => b.type === 'text' && b.text)
+        .map((b) => b.text!)
+        .join(' ');
+    }
+
+    const lowerQ = q.toLowerCase();
+    const results = rows
+      .map((row) => {
+        const text = extractText(row.content);
+        if (!text) return null;
+        const lowerText = text.toLowerCase();
+        const matchIdx = lowerText.indexOf(lowerQ);
+        const start = Math.max(0, matchIdx - 50);
+        const end = Math.min(text.length, (matchIdx === -1 ? 0 : matchIdx) + q.length + 100);
+        const preview =
+          (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+        return {
+          messageId: row.messageId,
+          chatId: row.chatId,
+          chatName: row.chatName,
+          sequence: row.sequence,
+          type: row.type,
+          preview: preview || text.slice(0, 150),
+          timestamp: row.createdAt,
+        };
+      })
+      .filter(Boolean);
+
+    res.json(results);
+  }, 'search messages')
 );
 
 // Get single chat

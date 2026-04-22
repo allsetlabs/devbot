@@ -3,16 +3,17 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T12:18:00Z
-Last implementation run: 2026-04-22T20:20:00Z
+Last implementation run: 2026-04-22T21:00:00Z
 
 ---
 
 ## Pending
-- Global cross-chat message search — add a "Search all messages" toggle/mode to the chat list search bar; when enabled, searches message content across all conversations using backend full-text query; results show message preview with chat name, timestamp, and click-to-navigate
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Global cross-chat message search — MessagesSquare toggle in ChatListFilters switches to messages mode (sm=messages URL param); useSearchMessages React Query hook calls GET /api/interactive-chats/search-messages?q=; MessageSearchResults component shows matched messages with chat name, timestamp, Bot/User icon, yellow-highlighted query term in preview; click navigates to chat; empty state shows "Type at least 2 characters" prompt; type filter pills hidden in messages mode
 
 - [2026-04-22] Chat list date grouping — group chat items under date headers ("Today", "Yesterday", "This Week", "This Month", "Older") based on updatedAt; sticky overlay header tracks current group via scroll listener and shows at top of list; applies to both mobile and desktop; headers as virtual items in @tanstack/react-virtual list
 

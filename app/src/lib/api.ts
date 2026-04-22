@@ -31,6 +31,7 @@ import type {
   HooksResponse,
   MemoriesResponse,
   GitStatus,
+  MessageSearchResult,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -158,6 +159,9 @@ export const api = {
     const params = type ? `?type=${encodeURIComponent(type)}` : '';
     return fetchApi(`/api/interactive-chats${params}`);
   },
+
+  searchMessages: (q: string): Promise<MessageSearchResult[]> =>
+    fetchApi(`/api/interactive-chats/search-messages?q=${encodeURIComponent(q)}`),
 
   getInteractiveChat: (id: string): Promise<InteractiveChat> => {
     return fetchApi(`/api/interactive-chats/${id}`);

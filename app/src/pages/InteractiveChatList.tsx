@@ -12,6 +12,7 @@ import { useNav } from '../hooks/useNav';
 import { ChatListFilters } from '../components/ChatListFilters';
 import { ChatArchiveDrawer } from '../components/ChatArchiveDrawer';
 import { ChatListContent } from '../components/ChatListContent';
+import { MessageSearchResults } from '../components/MessageSearchResults';
 import { getSortedChats, type SortOption } from '../lib/chat-sort';
 import type { InteractiveChat, PermissionMode, ClaudeModel } from '../types';
 
@@ -31,6 +32,7 @@ export function InteractiveChatList() {
   const searchQuery = searchParams.get('q') ?? '';
   const selectedType = searchParams.get('type') ?? null;
   const sortBy = (searchParams.get('sort') as SortOption) ?? 'recent';
+  const searchMode = (searchParams.get('sm') as 'chats' | 'messages') ?? 'chats';
 
   const setSearchQuery = (value: string) => {
     setSearchParams(
@@ -38,6 +40,18 @@ export function InteractiveChatList() {
         const next = new URLSearchParams(prev);
         if (value) next.set('q', value);
         else next.delete('q');
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const setSearchMode = (mode: 'chats' | 'messages') => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (mode !== 'chats') next.set('sm', mode);
+        else next.delete('sm');
         return next;
       },
       { replace: true }
@@ -71,18 +85,23 @@ export function InteractiveChatList() {
   const { data: chatTypes = [] } = chatHooks.useGetChatTypes();
 
   const {
+    data: messageSearchResults = [],
+    isFetching: messageSearchFetching,
+  } = chatHooks.useSearchMessages(searchQuery, searchMode === 'messages' && searchQuery.length >= 2);
+
+  const {
     data: chats = [],
     isLoading,
     isFetching,
     error: chatsError,
     refetch,
-  } = chatHooks.useGetChats({ type: selectedType, q: searchQuery });
+  } = chatHooks.useGetChats({ type: selectedType, q: searchMode === 'chats' ? searchQuery : '' });
 
   const {
     data: archivedChats = [],
     isLoading: archiveLoading,
     error: archiveQueryError,
-  } = chatHooks.useGetArchivedChats({ type: selectedType, q: searchQuery });
+  } = chatHooks.useGetArchivedChats({ type: selectedType, q: searchMode === 'chats' ? searchQuery : '' });
 
   const createMutation = chatHooks.useCreateChat();
   const deleteMutation = chatHooks.useDeleteChat();
@@ -190,40 +209,50 @@ export function InteractiveChatList() {
         searchQuery={searchQuery}
         selectedType={selectedType}
         chatTypes={chatTypes}
+        searchMode={searchMode}
         onSearchChange={setSearchQuery}
         onTypeChange={setSelectedType}
+        onSearchModeChange={setSearchMode}
       />
 
       <ErrorBanner error={error} />
 
       <main className="flex-1 overflow-hidden">
-        <ChatListContent
-          chats={chats}
-          filteredChats={filteredChats}
-          filteredArchivedChats={filteredArchivedChats}
-          isLoading={isLoading}
-          creating={creating}
-          searchQuery={searchQuery}
-          showFavorites={showFavorites}
-          selectedType={selectedType}
-          isFavorite={isFavorite}
-          onSelect={handleSelect}
-          onToggleFavorite={(id) => toggleFavorite(id)}
-          onDuplicate={handleDuplicate}
-          onArchive={handleArchive}
-          onDelete={handleDelete}
-          onDeleteArchived={handleDeleteArchived}
-          onUnarchive={handleUnarchive}
-          onCreate={handleCreate}
-          onResumeSession={handleSelect}
-          onClearFilters={() => {
-            setShowFavorites(false);
-            setSearchParams((p) => {
-              p.delete('q');
-              return p;
-            });
-          }}
-        />
+        {searchMode === 'messages' ? (
+          <MessageSearchResults
+            results={messageSearchResults}
+            query={searchQuery}
+            loading={messageSearchFetching && searchQuery.length >= 2}
+          />
+        ) : (
+          <ChatListContent
+            chats={chats}
+            filteredChats={filteredChats}
+            filteredArchivedChats={filteredArchivedChats}
+            isLoading={isLoading}
+            creating={creating}
+            searchQuery={searchQuery}
+            showFavorites={showFavorites}
+            selectedType={selectedType}
+            isFavorite={isFavorite}
+            onSelect={handleSelect}
+            onToggleFavorite={(id) => toggleFavorite(id)}
+            onDuplicate={handleDuplicate}
+            onArchive={handleArchive}
+            onDelete={handleDelete}
+            onDeleteArchived={handleDeleteArchived}
+            onUnarchive={handleUnarchive}
+            onCreate={handleCreate}
+            onResumeSession={handleSelect}
+            onClearFilters={() => {
+              setShowFavorites(false);
+              setSearchParams((p) => {
+                p.delete('q');
+                return p;
+              });
+            }}
+          />
+        )}
       </main>
 
       {/* New Chat Modal */}

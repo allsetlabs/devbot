@@ -54,6 +54,15 @@ export function useGetChats(filters: { type?: string | null; q?: string } = {}) 
   });
 }
 
+export function useSearchMessages(q: string, enabled: boolean) {
+  return useQuery({
+    queryKey: [...chatKeys.all, 'message-search', q] as const,
+    queryFn: () => api.searchMessages(q),
+    enabled: enabled && q.trim().length >= 2,
+    staleTime: 10000,
+  });
+}
+
 export function useGetArchivedChats(filters: { type?: string | null; q?: string } = {}) {
   return useQuery({
     queryKey: chatKeys.archivedList({ type: filters.type }),
@@ -300,6 +309,7 @@ export function useStopChat() {
 
 export const chatHooks = {
   useGetChats,
+  useSearchMessages,
   useGetArchivedChats,
   useGetChatTypes,
   useGetChat,

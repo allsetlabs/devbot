@@ -1,3 +1,13 @@
+export interface MessageSearchResult {
+  messageId: string;
+  chatId: string;
+  chatName: string;
+  sequence: number;
+  type: 'user' | 'assistant';
+  preview: string;
+  timestamp: string;
+}
+
 export interface GitStatus {
   isGitRepo: boolean;
   branch: string | null;

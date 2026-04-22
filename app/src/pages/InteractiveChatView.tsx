@@ -69,7 +69,6 @@ import type {
 } from '../types';
 import type { TaskMessage } from '../types';
 import { extractUsageData } from '../components/ChatMessage';
-import { generateChatTitle } from '../lib/format';
 
 const ACCEPTED_EXTENSIONS = [
   '.png',
@@ -379,42 +378,22 @@ export function InteractiveChatView({
     }
   }, [chatId, dataUpdatedAt, fetchMessages]);
 
-  // Auto-generate chat title from first user message
+  // Auto-name chat from first user message after Claude's first response arrives
   const queryClient = useQueryClient();
   useEffect(() => {
-    if (!chat || !chatId || hasGeneratedTitle || messages.length === 0) return;
+    if (!chat || !chatId || hasGeneratedTitle || chat.name !== 'New Chat') return;
+    const hasAssistantResponse = messages.some((msg) => msg.type === 'assistant');
+    if (!hasAssistantResponse) return;
 
-    // Find the first user message
-    const firstUserMsg = messages.find((msg) => msg.type === 'user');
-    if (!firstUserMsg) return;
-
-    // Extract message text
-    const msgText = firstUserMsg.content?.message?.content
-      ?.filter((b) => b.type === 'text')
-      .map((b) => (b as { text: string }).text)
-      .join(' ');
-
-    if (!msgText) return;
-
-    // Generate title and update chat
-    const generatedTitle = generateChatTitle(msgText);
-    if (generatedTitle && generatedTitle !== 'New Chat' && chat.name === 'New Chat') {
-      // Call API to update chat name
-      api
-        .renameInteractiveChat(chatId, generatedTitle)
-        .then((updatedChat) => {
-          // Update the query cache with the new chat data
-          queryClient.setQueryData(['interactive-chat', chatId], updatedChat);
-          setHasGeneratedTitle(true);
-        })
-        .catch((err) => {
-          console.error('Failed to auto-generate chat title:', err);
-          setHasGeneratedTitle(true); // Still mark as generated to prevent retries
-        });
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHasGeneratedTitle(true);
-    }
+    api
+      .autoNameChat(chatId)
+      .then((updatedChat) => {
+        queryClient.setQueryData(['interactive-chat', chatId], updatedChat);
+        setHasGeneratedTitle(true);
+      })
+      .catch(() => {
+        setHasGeneratedTitle(true);
+      });
   }, [messages, chat, chatId, hasGeneratedTitle, queryClient]);
 
   // Search messages logic

@@ -247,6 +247,10 @@ export const api = {
     });
   },
 
+  autoNameChat: (id: string): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/auto-name`, { method: 'POST' });
+  },
+
   listArchivedChats: (type?: string): Promise<InteractiveChat[]> => {
     const params = type ? `?type=${encodeURIComponent(type)}` : '';
     return fetchApi(`/api/interactive-chats/archived${params}`);

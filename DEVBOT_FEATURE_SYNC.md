@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-23T02:00:00Z
+Last implementation run: 2026-04-23T02:30:00Z
 
 ---
 
 ## Pending
-- Auto-name chat from first message — after Claude returns its first response in a chat still named "New Chat" (or matching default pattern), call a backend POST /:id/auto-name endpoint that picks a short title (≤40 chars) from the first user message using a heuristic (first non-trivial line) and PATCH the chat name; show the updated name in the header without a page reload
 - Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
 - Input draft auto-save per chat — when navigating away from a chat with text typed in the input but not sent, save the draft to localStorage under key `draft:{chatId}`; on returning to the chat, restore and pre-fill the textarea; clear the draft on successful send; add a subtle "Draft restored" label when draft is applied
 - Voice input via Web Speech API — add a Mic icon button to ChatTextareaWithPickers; clicking it starts browser SpeechRecognition, streams interim results into the textarea as italic preview text, finalizes on silence; show pulsing red dot while recording; gracefully degrade with a toast if browser doesn't support it
@@ -17,6 +16,8 @@ Last implementation run: 2026-04-23T02:00:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-23] Auto-name chat from first message — backend POST /:id/auto-name endpoint extracts first non-trivial line (≤40 chars) from first user message via heuristic; frontend effect fires after first assistant response is detected, calls api.autoNameChat(), updates React Query cache so header updates without page reload; idempotent (skips already-named chats)
 
 - [2026-04-23] Dashboard empty space below widgets — added DashboardRecentChats (6 most recent chats with model badge, running indicator, working dir) and DashboardActiveSchedulers (up to 5 schedulers with status, interval, next run, run count) sections below the widget grid; both use existing query data, no new API calls; "View all" links to /chats and /scheduler
 

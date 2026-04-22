@@ -713,6 +713,29 @@ router.get(
   }, 'list messages')
 );
 
+/** Extract a short auto-name from raw message text using heuristic */
+function extractAutoName(text: string, maxLength: number): string {
+  if (!text) return 'New Chat';
+  const cleaned = text.replace(/\s*\[Attached file:[^\]]+\]\s*/g, ' ').trim();
+  // Find the first non-trivial line (non-empty, not a slash command)
+  const lines = cleaned.split('\n');
+  const firstLine =
+    lines.find((l) => {
+      const t = l.trim();
+      return t.length > 0 && !t.startsWith('/');
+    }) ?? cleaned;
+
+  let title = firstLine.trim();
+  if (title.length > maxLength) {
+    title = title.substring(0, maxLength);
+    const lastSpace = title.lastIndexOf(' ');
+    if (lastSpace > 0) title = title.substring(0, lastSpace);
+  }
+  title = title.replace(/[.!?]+$/, '').trim();
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  return title || 'New Chat';
+}
+
 /** Helper for single-field chat updates */
 async function updateChatField(
   chatId: string,
@@ -741,6 +764,74 @@ router.post(
     if (!requireString(res, name, 'Name')) return;
     await updateChatField(req.params.id, { name: name.trim() }, res);
   }, 'rename chat')
+);
+
+// Auto-name chat from first user message (heuristic, no AI)
+router.post(
+  '/:id/auto-name',
+  asyncHandler(async (req, res) => {
+    const chatId = req.params.id;
+
+    const chatRows = await coreDb
+      .select({ id: interactive_chats.id, name: interactive_chats.name })
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, chatId))
+      .limit(1);
+
+    if (!chatRows || chatRows.length === 0) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    if (chatRows[0].name !== 'New Chat') {
+      const currentRows = await coreDb
+        .select()
+        .from(interactive_chats)
+        .where(eq(interactive_chats.id, chatId))
+        .limit(1);
+      res.json(rowToChat(currentRows[0]));
+      return;
+    }
+
+    const firstUserMsg = await coreDb
+      .select({ content: chat_messages.content })
+      .from(chat_messages)
+      .where(and(eq(chat_messages.chat_id, chatId), eq(chat_messages.type, 'user')))
+      .orderBy(chat_messages.sequence)
+      .limit(1);
+
+    if (!firstUserMsg || firstUserMsg.length === 0) {
+      const currentRows = await coreDb
+        .select()
+        .from(interactive_chats)
+        .where(eq(interactive_chats.id, chatId))
+        .limit(1);
+      res.json(rowToChat(currentRows[0]));
+      return;
+    }
+
+    const content = firstUserMsg[0].content as Record<string, any>;
+    const blocks: Array<{ type: string; text?: string }> =
+      content?.message?.content ?? content?.content ?? [];
+    const rawText = blocks
+      .filter((b) => b.type === 'text')
+      .map((b) => b.text ?? '')
+      .join(' ')
+      .trim();
+
+    const title = extractAutoName(rawText, 40);
+    if (!title || title === 'New Chat') {
+      const currentRows = await coreDb
+        .select()
+        .from(interactive_chats)
+        .where(eq(interactive_chats.id, chatId))
+        .limit(1);
+      res.json(rowToChat(currentRows[0]));
+      return;
+    }
+
+    await updateChatField(chatId, { name: title }, res);
+  }, 'auto-name chat')
 );
 
 // Change permission mode

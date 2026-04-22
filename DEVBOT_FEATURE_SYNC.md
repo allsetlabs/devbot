@@ -2,12 +2,28 @@
 
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
-Last discovery run: 2026-04-22T22:00:00Z
+Last discovery run: 2026-04-22T23:00:00Z
 Last implementation run: 2026-04-22T15:32:00Z
 
 ---
 
 ## Pending
+
+- Scheduler list show "Next run" relative time per item — SchedulerItem has `task.nextRunAt` but the scheduler list page only shows "Running..." for active tasks and "Last: {date}" for paused ones; add "Next: in Xm" relative countdown using formatRelativeTime for non-running tasks and show it inline in the metadata row; use 30s polling interval to keep it live
+
+- TodoWrite tool result renderer — TodoWrite tool results currently show as raw JSON preview in ToolUseMessage.tsx; add a dedicated visual renderer that parses the `todos` array and renders each item as a checkbox row (✓ for completed, ○ for pending, ✗ for cancelled) with a "X/Y done" count badge header; show in both tool_use blocks and standalone tool messages
+
+- NotebookEdit tool result renderer — no renderer exists for NotebookEdit tool results; add a renderer showing the cell number, operation type (create/edit/delete), cell type badge (code/markdown), and a syntax-highlighted preview of the new_source content; similar style to the existing Read renderer
+
+- Dedicated Archived Chats page at /archived — the "Archived (25)" bar at bottom of chat list opens a drawer; replace with navigation to /archived route; create ArchivedChatsPage reusing ChatListContent pre-filtered to archived chats; update the "Archived" bar to navigate instead of toggling drawer; add /archived route to App.tsx
+
+- Always-visible message timestamps setting — currently message timestamps use `opacity-0 group-hover:opacity-100` (ChatMessage.tsx ~line 194) so they only appear on hover; add "Always show timestamps" toggle in Settings > Appearance; store in useSettings; when enabled, replace opacity classes with always-visible timestamps below each message bubble
+
+- Scheduler run cost badge in run history — in SchedulerView.tsx run selector list, add a small "$X.XX" cost badge next to each run entry by fetching the associated chat's sessionStats.totalCost; helps users track which scheduler runs were expensive
+
+- Chat export shortcut in chat list overflow menu — export is currently only accessible from inside a chat via the header; add "Export..." option to the chat list item "..." overflow menu (ChatListItem.tsx) that opens ChatExportDrawer directly from the list view; saves navigating into the chat just to export
+
+- Scheduler list run success/failure rate badge — add a small colored badge on each scheduler item showing success rate (e.g. "178/180 ✓") based on completed vs failed task runs; backend already tracks TaskRun records with status field; helps identify flaky schedulers at a glance
 
 ## In Progress
 

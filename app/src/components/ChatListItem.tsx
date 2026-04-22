@@ -105,7 +105,7 @@ export function ChatListItem({
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          {chat.isRunning ? 'Running...' : formatRelativeTime(chat.createdAt)}
+          {chat.isRunning ? 'Running...' : formatRelativeTime(chat.updatedAt)}
           {hasResumeSession && !chat.isRunning && (
             <span className="ml-1.5 text-primary">· Resumable</span>
           )}

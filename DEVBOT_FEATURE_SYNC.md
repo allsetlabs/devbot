@@ -3,13 +3,12 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-22T21:30:00Z
+Last implementation run: 2026-04-23T00:00:00Z
 
 ---
 
 ## Pending
 
-- Chat list item shows `createdAt` instead of `updatedAt` for the relative timestamp — ChatListItem.tsx line 108 renders `formatRelativeTime(chat.createdAt)` but should show `updatedAt` so recently-active old chats display "just now" instead of their creation date; backend already returns `updatedAt` in the chat list API
 - Settings page stretches full-width at desktop — settings rows span the full 1728px viewport making label-on-left, value-on-right look unreadably stretched; add `max-w-2xl mx-auto` container inside SettingsPage to cap the content width
 - Dashboard empty space below widgets — at desktop the 4 top widgets and System card occupy only the top third of the page, leaving a large blank area; add more useful content below (e.g. recent activity feed, recent chats widget inline, or quick stats cards showing total tokens today, total cost this month, active schedulers count)
 - Auto-name chat from first message — after Claude returns its first response in a chat still named "New Chat" (or matching default pattern), call a backend POST /:id/auto-name endpoint that picks a short title (≤40 chars) from the first user message using a heuristic (first non-trivial line) and PATCH the chat name; show the updated name in the header without a page reload
@@ -21,6 +20,8 @@ Last implementation run: 2026-04-22T21:30:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-23] Chat list item timestamp now shows `updatedAt` instead of `createdAt` — ChatListItem.tsx line 108 was rendering `formatRelativeTime(chat.createdAt)`; changed to `chat.updatedAt` so recently-active old chats show "just now" instead of their creation date
 
 - [2026-04-22] Global cross-chat message search — MessagesSquare toggle in ChatListFilters switches to messages mode (sm=messages URL param); useSearchMessages React Query hook calls GET /api/interactive-chats/search-messages?q=; MessageSearchResults component shows matched messages with chat name, timestamp, Bot/User icon, yellow-highlighted query term in preview; click navigates to chat; empty state shows "Type at least 2 characters" prompt; type filter pills hidden in messages mode
 

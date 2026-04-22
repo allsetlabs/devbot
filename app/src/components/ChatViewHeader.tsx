@@ -63,7 +63,12 @@ export function ChatViewHeader({
     return count;
   }, 0);
 
+  const tokenPercent = Math.round((totalTokens / MAX_CONTEXT_TOKENS) * 100);
+  const showContextWarning = totalTokens > 0 && tokenPercent >= 80;
+  const isContextCritical = tokenPercent >= 95;
+
   return (
+    <>
     <header className="relative flex items-center justify-between border-b border-border px-4 py-3">
       <div className="flex min-w-0 items-center gap-3">
         <Button variant="ghost" size="icon" className="flex-shrink-0" onClick={onBack}>
@@ -271,5 +276,19 @@ export function ChatViewHeader({
         />
       )}
     </header>
+    {showContextWarning && (
+      <div
+        className={`flex cursor-pointer items-center justify-center border-b py-1 text-xs font-medium transition-colors ${
+          isContextCritical
+            ? 'border-destructive/30 bg-destructive/20 text-destructive-foreground'
+            : 'border-warning/30 bg-warning/20 text-warning-foreground'
+        }`}
+        onClick={onOpenCostDrawer}
+        title="Click to view session cost and token usage"
+      >
+        Context {tokenPercent}% full — consider /compact
+      </div>
+    )}
+    </>
   );
 }

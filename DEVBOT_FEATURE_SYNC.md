@@ -3,7 +3,7 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-22T03:15:00Z
+Last implementation run: 2026-04-22T14:52:00Z
 
 ---
 
@@ -12,9 +12,10 @@ Last implementation run: 2026-04-22T03:15:00Z
 - Quick "Running" filter pill in chat list — add a "Running" filter pill alongside "All / Manual / Scheduler" in ChatListFilters; when active, filters to only chats where `isRunning === true` using the existing filter mechanism; the pill auto-disappears when no chats are running
 
 ## In Progress
-- Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
 
 ## Completed
+
+- [2026-04-22] Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
 
 - [2026-04-22] Input draft auto-save per chat — draft saved to localStorage under `devbot-chat-draft:{chatId}` with 500ms debounce; restored on navigation back to chat; cleared on send; subtle "Draft restored" label with RotateCcw icon appears above textarea when draft is pre-filled; label dismisses on first keystroke
 

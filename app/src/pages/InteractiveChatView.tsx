@@ -129,6 +129,7 @@ export function InteractiveChatView({
   const navigate = useNavigate();
   // UI-only state — seed input from localStorage draft
   const [input, setInput] = useState(() => (chatId ? getCachedDraft(chatId) : ''));
+  const [draftRestored, setDraftRestored] = useState(() => Boolean(chatId && getCachedDraft(chatId)));
   const [cursorPosition, setCursorPosition] = useState(0);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [interrupting, setInterrupting] = useState(false);
@@ -370,6 +371,12 @@ export function InteractiveChatView({
     const timer = setTimeout(() => setCachedDraft(chatId, input), 500);
     return () => clearTimeout(timer);
   }, [chatId, input]);
+
+  // Wrap setInput to dismiss the "Draft restored" label on first keystroke
+  const handleInputChange = useCallback((value: string) => {
+    setInput(value);
+    setDraftRestored(false);
+  }, []);
 
   // Fetch messages whenever status query updates (replaces manual setInterval polling)
   useEffect(() => {
@@ -1534,7 +1541,8 @@ export function InteractiveChatView({
       <ChatInputArea
         chat={chat}
         input={input}
-        onInputChange={setInput}
+        showDraftRestored={draftRestored}
+        onInputChange={handleInputChange}
         onCursorChange={setCursorPosition}
         attachedFiles={attachedFiles}
         onSetAttachedFiles={setAttachedFiles}

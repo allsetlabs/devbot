@@ -6,6 +6,7 @@ import {
   type FileIntellisensePickerHandle,
   type FileIntellisenseItem,
 } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
+import { RotateCcw } from 'lucide-react';
 import { ChatInputToolbar } from './ChatInputToolbar';
 import { ChatAttachedFiles } from './ChatAttachedFiles';
 import { ChatTextareaWithPickers } from './ChatTextareaWithPickers';
@@ -21,6 +22,7 @@ export interface AttachedFile {
 interface ChatInputAreaProps {
   chat: InteractiveChat | undefined;
   input: string;
+  showDraftRestored?: boolean;
   onInputChange: (value: string) => void;
   onCursorChange?: (position: number) => void;
   attachedFiles: AttachedFile[];
@@ -63,6 +65,7 @@ interface ChatInputAreaProps {
 export function ChatInputArea({
   chat,
   input,
+  showDraftRestored,
   onInputChange,
   onCursorChange,
   attachedFiles,
@@ -105,6 +108,14 @@ export function ChatInputArea({
     <div className="flex flex-col gap-2 border-t border-border bg-background px-4 py-3">
       {/* Attached file chips */}
       <ChatAttachedFiles attachedFiles={attachedFiles} onSetAttachedFiles={onSetAttachedFiles} />
+
+      {/* Draft restored indicator */}
+      {showDraftRestored && (
+        <div className="flex items-center gap-1 px-1 text-xs text-muted-foreground">
+          <RotateCcw className="h-3 w-3" />
+          <span>Draft restored</span>
+        </div>
+      )}
 
       {/* Textarea with pickers and action buttons */}
       <ChatTextareaWithPickers

@@ -3,19 +3,20 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-22T02:35:00Z
+Last implementation run: 2026-04-22T03:15:00Z
 
 ---
 
 ## Pending
-- Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
-- Input draft auto-save per chat — when navigating away from a chat with text typed in the input but not sent, save the draft to localStorage under key `draft:{chatId}`; on returning to the chat, restore and pre-fill the textarea; clear the draft on successful send; add a subtle "Draft restored" label when draft is applied
 - Voice input via Web Speech API — add a Mic icon button to ChatTextareaWithPickers; clicking it starts browser SpeechRecognition, streams interim results into the textarea as italic preview text, finalizes on silence; show pulsing red dot while recording; gracefully degrade with a toast if browser doesn't support it
 - Quick "Running" filter pill in chat list — add a "Running" filter pill alongside "All / Manual / Scheduler" in ChatListFilters; when active, filters to only chats where `isRunning === true` using the existing filter mechanism; the pill auto-disappears when no chats are running
 
 ## In Progress
+- Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
 
 ## Completed
+
+- [2026-04-22] Input draft auto-save per chat — draft saved to localStorage under `devbot-chat-draft:{chatId}` with 500ms debounce; restored on navigation back to chat; cleared on send; subtle "Draft restored" label with RotateCcw icon appears above textarea when draft is pre-filled; label dismisses on first keystroke
 
 - [2026-04-23] Auto-name chat from first message — backend POST /:id/auto-name endpoint extracts first non-trivial line (≤40 chars) from first user message via heuristic; frontend effect fires after first assistant response is detected, calls api.autoNameChat(), updates React Query cache so header updates without page reload; idempotent (skips already-named chats)
 

@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-23T00:00:00Z
+Last implementation run: 2026-04-23T01:00:00Z
 
 ---
 
 ## Pending
-
-- Settings page stretches full-width at desktop — settings rows span the full 1728px viewport making label-on-left, value-on-right look unreadably stretched; add `max-w-2xl mx-auto` container inside SettingsPage to cap the content width
 - Dashboard empty space below widgets — at desktop the 4 top widgets and System card occupy only the top third of the page, leaving a large blank area; add more useful content below (e.g. recent activity feed, recent chats widget inline, or quick stats cards showing total tokens today, total cost this month, active schedulers count)
 - Auto-name chat from first message — after Claude returns its first response in a chat still named "New Chat" (or matching default pattern), call a backend POST /:id/auto-name endpoint that picks a short title (≤40 chars) from the first user message using a heuristic (first non-trivial line) and PATCH the chat name; show the updated name in the header without a page reload
 - Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
@@ -20,6 +18,8 @@ Last implementation run: 2026-04-23T00:00:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-23] Settings page max-width desktop fix — added `max-w-2xl mx-auto` wrapper div inside SettingsPage `<main>` to cap content at 672px and center it; prevents settings rows from stretching to full viewport width on wide desktops; mobile unaffected
 
 - [2026-04-23] Chat list item timestamp now shows `updatedAt` instead of `createdAt` — ChatListItem.tsx line 108 was rendering `formatRelativeTime(chat.createdAt)`; changed to `chat.updatedAt` so recently-active old chats show "just now" instead of their creation date
 

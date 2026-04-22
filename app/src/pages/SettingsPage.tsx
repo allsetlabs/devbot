@@ -133,6 +133,7 @@ export function SettingsPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 pb-8">
+        <div className="mx-auto max-w-2xl">
         <SectionHeader title="General" />
         <div className="divide-y divide-border">
           <SelectField
@@ -305,6 +306,7 @@ export function SettingsPage() {
           <p className="mt-1 text-xs text-muted-foreground">
             Default path for new chat sessions
           </p>
+        </div>
         </div>
       </main>
     </div>

@@ -1,4 +1,6 @@
-import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
 import {
@@ -12,6 +14,45 @@ import {
   type FileIntellisenseItem,
 } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
 import type { AttachedFile } from './ChatInputArea';
+
+// Minimal types for Web Speech API (not in standard TS lib)
+interface SpeechRecognitionResult {
+  readonly length: number;
+  [index: number]: { transcript: string };
+  isFinal: boolean;
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+  resultIndex: number;
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onstart: ((ev: Event) => void) | null;
+  onend: ((ev: Event) => void) | null;
+  onresult: ((ev: SpeechRecognitionEvent) => void) | null;
+  onerror: ((ev: Event) => void) | null;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
+function getSpeechRecognition(): SpeechRecognitionConstructor | undefined {
+  const w = window as Window & {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition;
+}
 
 interface ChatTextareaWithPickersProps {
   input: string;
@@ -87,6 +128,77 @@ export function ChatTextareaWithPickers({
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
   const anyUploading = attachedFiles.some((f) => f.uploading);
   const isTouchDevice = navigator.maxTouchPoints > 0;
+
+  const [isListening, setIsListening] = useState(false);
+  const [interimText, setInterimText] = useState('');
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  // Use ref to avoid stale closure in recognition callbacks
+  const inputRef = useRef(input);
+  inputRef.current = input;
+
+  const startVoiceInput = useCallback(() => {
+    const SR = getSpeechRecognition();
+    if (!SR) {
+      toast.error('Voice input is not supported in this browser');
+      return;
+    }
+
+    const recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => {
+      setIsListening(false);
+      setInterimText('');
+      recognitionRef.current = null;
+    };
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let interim = '';
+      let final = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        if (result.isFinal) {
+          final += result[0].transcript;
+        } else {
+          interim += result[0].transcript;
+        }
+      }
+      setInterimText(interim);
+      if (final) {
+        const current = inputRef.current.trim();
+        onInputChange(current ? `${current} ${final.trim()}` : final.trim());
+        setInterimText('');
+      }
+    };
+    recognition.onerror = () => {
+      setIsListening(false);
+      setInterimText('');
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [onInputChange]);
+
+  const stopVoiceInput = useCallback(() => {
+    recognitionRef.current?.stop();
+  }, []);
+
+  const toggleVoiceInput = useCallback(() => {
+    if (isListening) {
+      stopVoiceInput();
+    } else {
+      startVoiceInput();
+    }
+  }, [isListening, startVoiceInput, stopVoiceInput]);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
 
   return (
     <>
@@ -193,9 +305,16 @@ export function ChatTextareaWithPickers({
               className="w-full resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:outline-none"
               style={{ overflow: 'auto' }}
             />
+            {/* Interim voice transcript preview */}
+            {interimText && (
+              <div className="border-t border-input/40 px-3 py-1 text-sm italic text-muted-foreground">
+                {interimText}
+                <span className="ml-1 animate-pulse">...</span>
+              </div>
+            )}
             {/* Button row — always below text, never overlaps */}
             <div className="flex items-center justify-between px-2 pb-2 pt-1">
-              {/* Left: attach + browse */}
+              {/* Left: attach + browse + voice */}
               <div className="flex items-center gap-1">
                 <Button
                   variant="outline"
@@ -218,6 +337,18 @@ export function ChatTextareaWithPickers({
                     <FolderOpen className="h-5 w-5" />
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className={`relative h-8 w-8 transition-colors ${isListening ? 'border-destructive text-destructive hover:border-destructive hover:text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
+                  onClick={toggleVoiceInput}
+                  title={isListening ? 'Stop voice input' : 'Voice input'}
+                >
+                  {isListening && (
+                    <span className="absolute right-0.5 top-0.5 h-2 w-2 animate-pulse rounded-full bg-destructive" />
+                  )}
+                  <Mic className="h-5 w-5" />
+                </Button>
               </div>
               {/* Right: pause/stop/send */}
               <div className="flex items-center gap-1">

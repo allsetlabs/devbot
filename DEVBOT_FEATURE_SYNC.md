@@ -3,17 +3,18 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T22:00:00Z
-Last implementation run: 2026-04-22T14:52:00Z
+Last implementation run: 2026-04-22T17:10:00Z
 
 ---
 
 ## Pending
-- Voice input via Web Speech API — add a Mic icon button to ChatTextareaWithPickers; clicking it starts browser SpeechRecognition, streams interim results into the textarea as italic preview text, finalizes on silence; show pulsing red dot while recording; gracefully degrade with a toast if browser doesn't support it
 - Quick "Running" filter pill in chat list — add a "Running" filter pill alongside "All / Manual / Scheduler" in ChatListFilters; when active, filters to only chats where `isRunning === true` using the existing filter mechanism; the pill auto-disappears when no chats are running
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Voice input via Web Speech API — Mic button in left toolbar of ChatTextareaWithPickers; uses webkitSpeechRecognition with continuous=false, interimResults=true; interim text shown as italic preview above button row; red border + pulsing dot while recording; finalizes by appending to input; toast if browser unsupported; cleanup on unmount
 
 - [2026-04-22] Context window warning banner — when token usage exceeds 80% of 200k (160k tokens), show a thin amber warning bar below the ChatViewHeader ("Context 80% full — consider /compact"); at 95%+ show it red; disappears when tokens drop; reads from existing sessionStats.totalTokens already in state
 

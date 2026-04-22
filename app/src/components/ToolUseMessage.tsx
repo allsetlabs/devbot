@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal, ListTodo, CheckCircle2, XCircle, Circle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal, ListTodo, CheckCircle2, XCircle, Circle, BookOpen } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
@@ -54,6 +54,11 @@ function getToolPreview(toolName: string, toolInput: Record<string, unknown>): s
     case 'TodoWrite': {
       const count = (toolInput.todos as unknown[])?.length ?? 0;
       return `${count} todos`;
+    }
+    case 'NotebookEdit': {
+      const nb = String(toolInput.notebook_path ?? '').split('/').pop() || 'notebook.ipynb';
+      const cell = toolInput.cell_number != null ? `cell ${Number(toolInput.cell_number) + 1}` : '';
+      return cell ? `${nb} — ${cell}` : nb;
     }
     default: {
       const firstKey = Object.keys(toolInput)[0];
@@ -952,6 +957,104 @@ export function TodoWriteView({
   );
 }
 
+/** Specialized renderer for NotebookEdit tool — shows cell number, operation type, cell type, and source preview */
+export function NotebookEditView({
+  toolInput,
+  permissionMode,
+}: {
+  toolInput: Record<string, unknown>;
+  permissionMode?: PermissionMode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const notebookPath = String(toolInput.notebook_path ?? '');
+  const fileName = notebookPath.split('/').pop() || 'notebook.ipynb';
+  const cellNumber = toolInput.cell_number != null ? Number(toolInput.cell_number) + 1 : null;
+  const editMode = String(toolInput.edit_mode ?? 'replace').toLowerCase();
+  const cellType = String(toolInput.new_cell_type ?? toolInput.cell_type ?? 'code').toLowerCase();
+  const newSource = String(toolInput.new_source ?? '');
+
+  const operationLabel = editMode === 'insert' ? 'Insert' : editMode === 'delete' ? 'Delete' : 'Edit';
+  const operationColor =
+    editMode === 'insert'
+      ? 'bg-success/15 text-success'
+      : editMode === 'delete'
+        ? 'bg-destructive/15 text-destructive'
+        : 'bg-primary/15 text-primary';
+  const cellTypeColor = cellType === 'markdown' ? 'bg-warning/15 text-warning' : 'bg-muted text-muted-foreground';
+  const language = cellType === 'markdown' ? 'markdown' : 'python';
+
+  const lines = newSource.split('\n');
+  const COLLAPSE_THRESHOLD = 20;
+  const displaySource =
+    !expanded && lines.length > COLLAPSE_THRESHOLD ? lines.slice(0, COLLAPSE_THRESHOLD).join('\n') : newSource;
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
+      <Button
+        variant="ghost"
+        onClick={(e) => {
+          const target = e.currentTarget;
+          setExpanded((v) => {
+            if (!v) scrollHeaderToTop(target);
+            return !v;
+          });
+        }}
+        className="flex w-full items-center justify-start gap-2 px-3 py-2 text-left"
+      >
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        )}
+        <BookOpen className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">{fileName}</span>
+        {cellNumber != null && (
+          <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            Cell {cellNumber}
+          </span>
+        )}
+        <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${operationColor}`}>
+          {operationLabel}
+        </span>
+        <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${cellTypeColor}`}>
+          {cellType}
+        </span>
+        {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
+      </Button>
+      {expanded && newSource && (
+        <div className="border-t border-border">
+          <SyntaxHighlighter
+            style={oneDark}
+            language={language}
+            PreTag="div"
+            showLineNumbers
+            customStyle={{
+              margin: 0,
+              borderRadius: 0,
+              fontSize: '0.75rem',
+              maxHeight: '20rem',
+              overflow: 'auto',
+            }}
+          >
+            {displaySource}
+          </SyntaxHighlighter>
+          {lines.length > COLLAPSE_THRESHOLD && (
+            <Button
+              variant="ghost"
+              onClick={() => setExpanded((v) => !v)}
+              className="w-full rounded-none border-t border-border py-1 text-xs text-muted-foreground hover:bg-muted/50"
+            >
+              <ChevronDown className="mr-1 h-3 w-3" />
+              Show {lines.length - COLLAPSE_THRESHOLD} more lines
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMessageContent; permissionMode?: PermissionMode }) {
   const [expanded, setExpanded] = useState(false);
   const toolName = content.tool_name || 'Unknown Tool';
@@ -976,6 +1079,10 @@ export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMes
 
   if (toolName === 'TodoWrite') {
     return <TodoWriteView toolInput={toolInput} permissionMode={permissionMode} />;
+  }
+
+  if (toolName === 'NotebookEdit') {
+    return <NotebookEditView toolInput={toolInput} permissionMode={permissionMode} />;
   }
 
   return (

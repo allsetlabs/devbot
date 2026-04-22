@@ -3,13 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T23:00:00Z
-Last implementation run: 2026-04-22T16:40:00Z
+Last implementation run: 2026-04-22T17:20:00Z
 
 ---
 
 ## Pending
-
-- NotebookEdit tool result renderer — no renderer exists for NotebookEdit tool results; add a renderer showing the cell number, operation type (create/edit/delete), cell type badge (code/markdown), and a syntax-highlighted preview of the new_source content; similar style to the existing Read renderer
 
 - Dedicated Archived Chats page at /archived — the "Archived (25)" bar at bottom of chat list opens a drawer; replace with navigation to /archived route; create ArchivedChatsPage reusing ChatListContent pre-filtered to archived chats; update the "Archived" bar to navigate instead of toggling drawer; add /archived route to App.tsx
 
@@ -24,6 +22,8 @@ Last implementation run: 2026-04-22T16:40:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] NotebookEdit tool result renderer — NotebookEditView component in ToolUseMessage.tsx; collapsible with BookOpen icon, filename, Cell N badge (1-based display), operation badge (Insert/Edit/Delete with color coding), cell type badge (code/markdown), permissionMode badge; expands to SyntaxHighlighter with python/markdown; capped at 20 lines with "show more"; wired in ToolUseMessage dispatcher and getToolPreview
 
 - [2026-04-22] TodoWrite tool result renderer — TodoWriteView component in ToolUseMessage.tsx; collapsible header with ListTodo icon and "X/Y done" badge; per-item status icons (CheckCircle2/Circle/Loader2/XCircle); completed/cancelled items shown with strikethrough + muted text; priority badges (high/medium/low); wired in ToolUseMessage early-return and ChatMessage.tsx tool_result section
 

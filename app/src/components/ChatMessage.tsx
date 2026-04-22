@@ -15,7 +15,7 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView, ReadResultView, GlobResultView } from './ToolUseMessage';
+import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView, ReadResultView, GlobResultView, BashResultView } from './ToolUseMessage';
 import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
@@ -142,6 +142,16 @@ export function ChatMessage({
                   key={idx}
                   content={block.content}
                   pattern={toolInfo.input.pattern as string | undefined}
+                />
+              );
+            }
+            if (toolInfo?.name === 'Bash') {
+              return (
+                <BashResultView
+                  key={idx}
+                  content={block.content}
+                  command={toolInfo.input.command as string | undefined}
+                  isError={block.is_error}
                 />
               );
             }

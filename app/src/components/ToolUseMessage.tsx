@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File } from 'lucide-react';
+import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
@@ -408,6 +408,121 @@ function highlightInText(text: string, pattern: string): React.ReactNode {
   } catch {
     return text;
   }
+}
+
+const BASH_COLLAPSE_THRESHOLD = 20;
+
+interface BashLine {
+  text: string;
+  isStderr: boolean;
+}
+
+function parseBashOutput(text: string): { lines: BashLine[]; exitCode: number | null } {
+  let exitCode: number | null = null;
+  let mainText = text;
+
+  const exitCodeMatch = text.match(/<exit_code>(\d+)<\/exit_code>/);
+  if (exitCodeMatch) {
+    exitCode = parseInt(exitCodeMatch[1], 10);
+    mainText = text.replace(/<exit_code>\d+<\/exit_code>\s*$/, '').trimEnd();
+  }
+
+  const lines: BashLine[] = [];
+  const parts = mainText.split(/(<stderr>[\s\S]*?<\/stderr>)/);
+  for (const part of parts) {
+    const stderrMatch = part.match(/^<stderr>([\s\S]*)<\/stderr>$/);
+    if (stderrMatch) {
+      stderrMatch[1].split('\n').forEach((line) => lines.push({ text: line, isStderr: true }));
+    } else {
+      part.split('\n').forEach((line) => lines.push({ text: line, isStderr: false }));
+    }
+  }
+
+  return { lines, exitCode };
+}
+
+/** Specialized renderer for Bash tool results — terminal-style output with exit code badge, collapsible */
+export function BashResultView({
+  content,
+  command,
+  isError = false,
+}: {
+  content?: string | ClaudeContentBlock[];
+  command?: string;
+  isError?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const { status: copied, show: showCopied } = useTemporaryStatus(2000);
+
+  const rawText =
+    typeof content === 'string'
+      ? content
+      : Array.isArray(content)
+        ? content
+            .filter((b) => b.type === 'text')
+            .map((b) => b.text || '')
+            .join('')
+        : '';
+
+  const { lines, exitCode } = useMemo(() => parseBashOutput(rawText), [rawText]);
+  const totalLines = lines.length;
+  const displayLines = !expanded && totalLines > BASH_COLLAPSE_THRESHOLD ? lines.slice(0, BASH_COLLAPSE_THRESHOLD) : lines;
+
+  const resolvedExitCode = exitCode !== null ? exitCode : isError ? 1 : 0;
+  const isFailure = resolvedExitCode !== 0;
+  const cmdPreview = command ? command.split('\n')[0].slice(0, 60) : 'Bash';
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border">
+      <div className="flex items-center gap-2 bg-[#1a1a2e] px-3 py-2">
+        <Terminal className="h-3.5 w-3.5 flex-shrink-0 text-green-400" />
+        <span className="min-w-0 flex-1 truncate font-mono text-xs text-gray-300">{cmdPreview}</span>
+        <span
+          className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+            isFailure ? 'bg-red-900/60 text-red-300' : 'bg-green-900/60 text-green-300'
+          }`}
+        >
+          exit {resolvedExitCode}
+        </span>
+        <Button
+          variant="ghost"
+          onClick={() => { copyToClipboard(rawText); showCopied('copied'); }}
+          className="h-6 w-6 flex-shrink-0 rounded p-1 text-gray-400 hover:text-gray-200"
+        >
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        </Button>
+      </div>
+      {totalLines > 0 && (
+        <div className="border-t border-[#2a2a3e] bg-[#0d1117]">
+          <div className="max-h-96 overflow-auto py-1 font-mono text-xs">
+            {displayLines.map((line, i) => (
+              <div
+                key={i}
+                className={`px-3 py-0.5 leading-5 whitespace-pre-wrap break-all ${
+                  line.isStderr ? 'text-red-400' : 'text-gray-200'
+                }`}
+              >
+                {line.text || ' '}
+              </div>
+            ))}
+          </div>
+          {totalLines > BASH_COLLAPSE_THRESHOLD && (
+            <Button
+              variant="ghost"
+              onClick={() => setExpanded((v) => !v)}
+              className="w-full rounded-none border-t border-[#2a2a3e] py-1 text-xs text-gray-400 hover:bg-[#1a1a2e] hover:text-gray-200"
+            >
+              {expanded ? (
+                <><ChevronDown className="mr-1 h-3 w-3 rotate-180" /> Show less</>
+              ) : (
+                <><ChevronDown className="mr-1 h-3 w-3" /> Show {totalLines - BASH_COLLAPSE_THRESHOLD} more lines</>
+              )}
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /** Specialized renderer for Grep tool results — shows matched lines grouped by file with pattern highlighting */

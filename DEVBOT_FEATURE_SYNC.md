@@ -3,12 +3,11 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-21T12:18:00Z
-Last implementation run: 2026-04-22T12:00:00Z
+Last implementation run: 2026-04-22T12:30:00Z
 
 ---
 
 ## Pending
-- Specialized Bash tool output renderer — terminal-style monospace output with dark background; show exit code badge (green for 0, red for non-zero); stderr lines in red; stdout in normal color; collapsible if output exceeds 20 lines
 - Add /doctor slash command — run backend health check returning: backend status, Claude CLI version, active sessions count, working directory validity, disk space, memory usage; display results in a diagnostic card with pass/fail indicators
 - Add /status slash command — display inline card showing: current model, permission mode, context usage (tokens/limit), session cost, working directory, active tools, fast mode state, effort level
 - Chat list date grouping — group chat items under date headers ("Today", "Yesterday", "This Week", "This Month", "Older") based on last activity timestamp; headers are sticky within scroll; applies to both mobile and desktop layouts
@@ -17,6 +16,8 @@ Last implementation run: 2026-04-22T12:00:00Z
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Specialized Bash tool output renderer — terminal-style monospace dark background (#0d1117); exit code badge (green exit 0, red exit 1+) derived from is_error or parsed <exit_code> tags; collapsible at 20-line threshold; copy button; Terminal icon header; command preview truncated to 60 chars
 
 - [2026-04-22] Specialized Glob tool result renderer — show matching file paths in a compact vertical list with file type icons (folder, code file, config file, etc.); show total match count header; collapsible at 20-file threshold
 

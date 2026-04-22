@@ -44,6 +44,18 @@ export interface HealthResponse {
   defaultWorkingDirectory?: string;
 }
 
+export interface DoctorCheck {
+  status: 'pass' | 'warn' | 'fail';
+  label: string;
+  value?: string;
+  detail?: string;
+}
+
+export interface DoctorResponse {
+  checks: Record<string, DoctorCheck>;
+  timestamp: string;
+}
+
 export interface ScheduledTask {
   id: string;
   prompt: string;

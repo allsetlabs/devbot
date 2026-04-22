@@ -290,6 +290,7 @@ export async function sendMessage(chatId: string, prompt: string, branchId: stri
     },
     onComplete: (code) => {
       markChatNotExecuting(chatId);
+      processQueue(chatId);
       console.log(`[InteractiveChat] Chat ${chatId} process exited with code ${code}`);
     },
   });

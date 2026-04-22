@@ -3,6 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import http from 'http';
 import https from 'https';
+import { execSync } from 'child_process';
+import fs from 'fs';
 import { loadDevCert } from './lib/https-cert.js';
 import { initializeCoreDatabase } from './lib/db/init-core.js';
 import { sessionsRouter } from './routes/sessions.js';
@@ -77,6 +79,80 @@ app.get('/health', (_req, res) => {
     activeSessions: getActiveSessionCount(),
     defaultWorkingDirectory: DEVBOT_PROJECTS_DIR,
   });
+});
+
+// Doctor — comprehensive backend diagnostics
+app.get('/api/doctor', (_req, res) => {
+  const checks: Record<string, { status: 'pass' | 'warn' | 'fail'; label: string; value?: string; detail?: string }> = {};
+
+  // Backend status
+  const uptime = Math.floor(process.uptime());
+  const h = Math.floor(uptime / 3600);
+  const m = Math.floor((uptime % 3600) / 60);
+  const s = uptime % 60;
+  const uptimeStr = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`;
+  checks.backend = { status: 'pass', label: 'Backend', value: 'Running', detail: `Uptime ${uptimeStr}` };
+
+  // Claude CLI version
+  try {
+    const version = execSync('claude --version', { timeout: 3000, encoding: 'utf8' }).trim().split('\n')[0];
+    checks.claudeCLI = { status: 'pass', label: 'Claude CLI', value: version };
+  } catch {
+    checks.claudeCLI = { status: 'fail', label: 'Claude CLI', value: 'Not found', detail: 'claude CLI is not installed or not in PATH' };
+  }
+
+  // Active sessions
+  const sessions = getActiveSessionCount();
+  checks.activeSessions = { status: 'pass', label: 'Active Sessions', value: String(sessions) };
+
+  // Working directory
+  try {
+    const exists = fs.existsSync(DEVBOT_PROJECTS_DIR);
+    checks.workingDirectory = {
+      status: exists ? 'pass' : 'warn',
+      label: 'Working Directory',
+      value: exists ? 'Exists' : 'Missing',
+      detail: DEVBOT_PROJECTS_DIR,
+    };
+  } catch {
+    checks.workingDirectory = { status: 'fail', label: 'Working Directory', value: 'Error', detail: DEVBOT_PROJECTS_DIR };
+  }
+
+  // Disk space
+  try {
+    const dfOut = execSync(`df -k "${DEVBOT_PROJECTS_DIR}" 2>/dev/null || df -k /`, { timeout: 3000, encoding: 'utf8' });
+    const lines = dfOut.trim().split('\n');
+    const parts = lines[lines.length - 1].trim().split(/\s+/);
+    const totalKb = parseInt(parts[1], 10);
+    const usedKb = parseInt(parts[2], 10);
+    const pctStr = parts[4] || '';
+    const pct = parseInt(pctStr, 10) || 0;
+    const freeGb = ((totalKb - usedKb) / 1024 / 1024).toFixed(1);
+    const totalGb = (totalKb / 1024 / 1024).toFixed(1);
+    checks.diskSpace = {
+      status: pct >= 90 ? 'fail' : pct >= 80 ? 'warn' : 'pass',
+      label: 'Disk Space',
+      value: `${freeGb}GB free / ${totalGb}GB`,
+      detail: `${pct}% used`,
+    };
+  } catch {
+    checks.diskSpace = { status: 'warn', label: 'Disk Space', value: 'Unknown' };
+  }
+
+  // Memory usage
+  const mem = process.memoryUsage();
+  const rss = (mem.rss / 1024 / 1024).toFixed(0);
+  const heapUsed = (mem.heapUsed / 1024 / 1024).toFixed(0);
+  const heapTotal = (mem.heapTotal / 1024 / 1024).toFixed(0);
+  const heapPct = Math.round((mem.heapUsed / mem.heapTotal) * 100);
+  checks.memory = {
+    status: heapPct >= 90 ? 'fail' : heapPct >= 70 ? 'warn' : 'pass',
+    label: 'Memory',
+    value: `${rss}MB RSS`,
+    detail: `Heap: ${heapUsed}/${heapTotal}MB (${heapPct}%)`,
+  };
+
+  res.json({ checks, timestamp: new Date().toISOString() });
 });
 
 // Serve uploaded files (photos, documents, etc.)

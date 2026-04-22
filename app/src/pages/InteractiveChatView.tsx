@@ -28,6 +28,7 @@ import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
 import { WorktreeDrawer } from '../components/WorktreeDrawer';
 import { KeybindingsDrawer } from '../components/KeybindingsDrawer';
 import { SessionCostDrawer } from '../components/SessionCostDrawer';
+import { DoctorDrawer } from '../components/DoctorDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolHistoryDrawer } from '../components/ToolHistoryDrawer';
 import { EditMessageDialog } from '../components/EditMessageDialog';
@@ -145,6 +146,7 @@ export function InteractiveChatView({
   const [mcpServersOpen, setMcpServersOpen] = useState(false);
   const [hooksOpen, setHooksOpen] = useState(false);
   const [memoriesOpen, setMemoriesOpen] = useState(false);
+  const [doctorOpen, setDoctorOpen] = useState(false);
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
   const [worktreesOpen, setWorktreesOpen] = useState(false);
   const [keybindingsOpen, setKeybindingsOpen] = useState(false);
@@ -727,6 +729,7 @@ export function InteractiveChatView({
         openConfig: () => navigate('/settings'),
         openCostDrawer: () => setCostDrawerOpen(true),
         openMemoryDrawer: () => setMemoriesOpen(true),
+        openDoctor: () => setDoctorOpen(true),
         toggleFastMode: () => {
           if (!chatId) return;
           api.toggleChatFastMode(chatId).then((updated) => {
@@ -1429,6 +1432,7 @@ export function InteractiveChatView({
       <ClaudeMdDrawer open={claudeMdOpen} onOpenChange={setClaudeMdOpen} workingDirectory={chat?.workingDir ?? undefined} />
       <WorktreeDrawer open={worktreesOpen} onOpenChange={setWorktreesOpen} workingDirectory={chat?.workingDir ?? undefined} />
       <KeybindingsDrawer open={keybindingsOpen} onOpenChange={setKeybindingsOpen} />
+      <DoctorDrawer open={doctorOpen} onOpenChange={setDoctorOpen} />
       <SessionCostDrawer open={costDrawerOpen} onOpenChange={setCostDrawerOpen} stats={sessionStats} />
       <ChatWorkingDirDrawer
         open={workingDirDrawerOpen}

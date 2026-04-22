@@ -2,6 +2,7 @@ import type {
   Session,
   CreateSessionResponse,
   HealthResponse,
+  DoctorResponse,
   ScheduledTask,
   CreateScheduledTaskRequest,
   UpdateScheduledTaskRequest,
@@ -57,6 +58,10 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
 export const api = {
   health: (): Promise<HealthResponse> => {
     return fetchApi('/health');
+  },
+
+  doctor: (): Promise<DoctorResponse> => {
+    return fetchApi('/api/doctor');
   },
 
   listSessions: (): Promise<Session[]> => {

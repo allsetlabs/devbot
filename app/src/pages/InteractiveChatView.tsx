@@ -29,6 +29,7 @@ import { WorktreeDrawer } from '../components/WorktreeDrawer';
 import { KeybindingsDrawer } from '../components/KeybindingsDrawer';
 import { SessionCostDrawer } from '../components/SessionCostDrawer';
 import { DoctorDrawer } from '../components/DoctorDrawer';
+import { StatusDrawer } from '../components/StatusDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
 import { ToolHistoryDrawer } from '../components/ToolHistoryDrawer';
 import { EditMessageDialog } from '../components/EditMessageDialog';
@@ -147,6 +148,7 @@ export function InteractiveChatView({
   const [hooksOpen, setHooksOpen] = useState(false);
   const [memoriesOpen, setMemoriesOpen] = useState(false);
   const [doctorOpen, setDoctorOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
   const [worktreesOpen, setWorktreesOpen] = useState(false);
   const [keybindingsOpen, setKeybindingsOpen] = useState(false);
@@ -730,6 +732,7 @@ export function InteractiveChatView({
         openCostDrawer: () => setCostDrawerOpen(true),
         openMemoryDrawer: () => setMemoriesOpen(true),
         openDoctor: () => setDoctorOpen(true),
+        openStatus: () => setStatusOpen(true),
         toggleFastMode: () => {
           if (!chatId) return;
           api.toggleChatFastMode(chatId).then((updated) => {
@@ -1433,6 +1436,19 @@ export function InteractiveChatView({
       <WorktreeDrawer open={worktreesOpen} onOpenChange={setWorktreesOpen} workingDirectory={chat?.workingDir ?? undefined} />
       <KeybindingsDrawer open={keybindingsOpen} onOpenChange={setKeybindingsOpen} />
       <DoctorDrawer open={doctorOpen} onOpenChange={setDoctorOpen} />
+      <StatusDrawer
+        open={statusOpen}
+        onOpenChange={setStatusOpen}
+        model={chat?.model as ClaudeModel | undefined}
+        permissionMode={chat?.permissionMode as PermissionMode | undefined}
+        totalTokens={sessionStats.totalTokens}
+        contextLimit={200_000}
+        totalCost={sessionStats.totalCost}
+        workingDir={chat?.workingDir}
+        allowedTools={chat?.allowedTools}
+        fastMode={chat?.fastMode}
+        effort={chat?.effort}
+      />
       <SessionCostDrawer open={costDrawerOpen} onOpenChange={setCostDrawerOpen} stats={sessionStats} />
       <ChatWorkingDirDrawer
         open={workingDirDrawerOpen}

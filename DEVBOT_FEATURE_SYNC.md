@@ -8,13 +8,14 @@ Last implementation run: 2026-04-22T20:00:00Z
 ---
 
 ## Pending
-- Add /status slash command — display inline card showing: current model, permission mode, context usage (tokens/limit), session cost, working directory, active tools, fast mode state, effort level
 - Chat list date grouping — group chat items under date headers ("Today", "Yesterday", "This Week", "This Month", "Older") based on last activity timestamp; headers are sticky within scroll; applies to both mobile and desktop layouts
 - Global cross-chat message search — add a "Search all messages" toggle/mode to the chat list search bar; when enabled, searches message content across all conversations using backend full-text query; results show message preview with chat name, timestamp, and click-to-navigate
 
 ## In Progress
 
 ## Completed
+
+- [2026-04-22] Add /status slash command — StatusDrawer showing model, permission mode, context usage (tokens/200k + %), session cost, working directory (~-prefixed), active tools count (or "All tools"), fast mode on/off, effort level; openStatus slashAction in InteractiveChatView; uses MODEL_CONFIG and MODE_CONFIG for colored labels
 
 - [2026-04-22] Add /doctor slash command — run backend health check returning: backend status, Claude CLI version, active sessions count, working directory validity, disk space, memory usage; display results in a diagnostic card with pass/fail indicators; /api/doctor endpoint; DoctorDrawer with 6 checks (backend uptime, claude CLI version, active sessions, working dir validity, disk space, memory heap); openDoctor slashAction in InteractiveChatView
 

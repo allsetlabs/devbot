@@ -16,4 +16,5 @@ export const SLASH_COMMANDS: SlashCommand[] = [
   { command: '/cost', description: 'Show session cost and token usage', action: 'openCostDrawer' },
   { command: '/memory', description: 'View and manage memories', action: 'openMemoryDrawer' },
   { command: '/doctor', description: 'Run backend health diagnostics', action: 'openDoctor' },
+  { command: '/status', description: 'Show current session status (model, mode, cost, tools)', action: 'openStatus' },
 ];

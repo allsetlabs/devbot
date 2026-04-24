@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Archive, ChevronRight } from 'lucide-react';
 import { chatHooks } from '../hooks/useChat';
 import { WorkingDirSelector, useValidateAndSaveDir } from '../components/WorkingDirSelector';
 import { useFavorites } from '../hooks/useFavorites';
@@ -10,7 +10,6 @@ import { ErrorBanner } from '../components/ErrorBanner';
 import { ChatListHeader } from '../components/ChatListHeader';
 import { useNav } from '../hooks/useNav';
 import { ChatListFilters } from '../components/ChatListFilters';
-import { ChatArchiveDrawer } from '../components/ChatArchiveDrawer';
 import { ChatListContent } from '../components/ChatListContent';
 import { MessageSearchResults } from '../components/MessageSearchResults';
 import { getSortedChats, type SortOption } from '../lib/chat-sort';
@@ -20,7 +19,6 @@ export function InteractiveChatList() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { openNav } = useNav();
-  const [archiveOpen, setArchiveOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [newChatOpen, setNewChatOpen] = useState(false);
@@ -111,17 +109,11 @@ export function InteractiveChatList() {
     refetch,
   } = chatHooks.useGetChats({ type: selectedType, q: searchMode === 'chats' ? searchQuery : '' });
 
-  const {
-    data: archivedChats = [],
-    isLoading: archiveLoading,
-    error: archiveQueryError,
-  } = chatHooks.useGetArchivedChats({ type: selectedType, q: searchMode === 'chats' ? searchQuery : '' });
+  const { data: archivedChats = [] } = chatHooks.useGetArchivedChats({});
 
   const createMutation = chatHooks.useCreateChat();
   const deleteMutation = chatHooks.useDeleteChat();
   const archiveMutation = chatHooks.useArchiveChat();
-  const unarchiveMutation = chatHooks.useUnarchiveChat();
-  const deleteArchivedMutation = chatHooks.useDeleteChat();
   const duplicateMutation = chatHooks.useDuplicateChat();
 
   const creating = createMutation.isPending;
@@ -131,12 +123,6 @@ export function InteractiveChatList() {
     createMutation.error,
     deleteMutation.error,
     archiveMutation.error
-  );
-
-  const archiveError = extractErrorMessage(
-    archiveQueryError,
-    unarchiveMutation.error,
-    deleteArchivedMutation.error
   );
 
   const handleCreate = () => {
@@ -182,8 +168,6 @@ export function InteractiveChatList() {
 
   const handleDelete = (id: string) => deleteMutation.mutate(id);
   const handleArchive = (id: string) => archiveMutation.mutate(id);
-  const handleUnarchive = (id: string) => unarchiveMutation.mutate(id);
-  const handleDeleteArchived = (id: string) => deleteArchivedMutation.mutate(id);
   const handleDuplicate = (id: string) => {
     duplicateMutation.mutate(id, { onSuccess: (newChat) => navigate(`/chat/${newChat.id}`) });
   };
@@ -197,15 +181,6 @@ export function InteractiveChatList() {
   }
   if (showFavorites) {
     filteredChats = filteredChats.filter((chat) => isFavorite(chat.id));
-  }
-  let filteredArchivedChats = getSortedChats(archivedChats, sortBy);
-  if (searchQuery) {
-    filteredArchivedChats = filteredArchivedChats.filter((chat) =>
-      chat.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
-  if (showFavorites) {
-    filteredArchivedChats = filteredArchivedChats.filter((chat) => isFavorite(chat.id));
   }
 
   return (
@@ -250,7 +225,6 @@ export function InteractiveChatList() {
           <ChatListContent
             chats={chats}
             filteredChats={filteredChats}
-            filteredArchivedChats={filteredArchivedChats}
             isLoading={isLoading}
             creating={creating}
             searchQuery={searchQuery}
@@ -262,8 +236,6 @@ export function InteractiveChatList() {
             onDuplicate={handleDuplicate}
             onArchive={handleArchive}
             onDelete={handleDelete}
-            onDeleteArchived={handleDeleteArchived}
-            onUnarchive={handleUnarchive}
             onCreate={handleCreate}
             onResumeSession={handleSelect}
             onClearFilters={() => {
@@ -320,19 +292,22 @@ export function InteractiveChatList() {
         </div>
       )}
 
-      <ChatArchiveDrawer
-        open={archiveOpen}
-        onOpenChange={setArchiveOpen}
-        archivedChats={filteredArchivedChats}
-        isLoading={archiveLoading}
-        error={archiveError}
-        isFavorite={isFavorite}
-        onSelect={handleSelect}
-        onToggleFavorite={(id) => toggleFavorite(id)}
-        onDuplicate={handleDuplicate}
-        onUnarchive={handleUnarchive}
-        onDelete={handleDeleteArchived}
-      />
+      <div className="border-t border-border">
+        <Button
+          variant="ghost"
+          className="flex w-full items-center justify-between px-4 py-3"
+          onClick={() => navigate('/archived')}
+        >
+          <div className="flex items-center gap-2">
+            <Archive className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">Archived</span>
+            {archivedChats.length > 0 && (
+              <span className="text-xs text-muted-foreground">({archivedChats.length})</span>
+            )}
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </div>
     </div>
   );
 }

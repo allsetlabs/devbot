@@ -19,8 +19,6 @@ Last implementation run: 2026-04-22T17:20:00Z
 
 ## In Progress
 
-- Dedicated Archived Chats page at /archived — the "Archived (25)" bar at bottom of chat list opens a drawer; replace with navigation to /archived route; create ArchivedChatsPage reusing ChatListContent pre-filtered to archived chats; update the "Archived" bar to navigate instead of toggling drawer; add /archived route to App.tsx
-
 ## Completed
 
 - [2026-04-22] NotebookEdit tool result renderer — NotebookEditView component in ToolUseMessage.tsx; collapsible with BookOpen icon, filename, Cell N badge (1-based display), operation badge (Insert/Edit/Delete with color coding), cell type badge (code/markdown), permissionMode badge; expands to SyntaxHighlighter with python/markdown; capped at 20 lines with "show more"; wired in ToolUseMessage dispatcher and getToolPreview
@@ -128,4 +126,4 @@ Last implementation run: 2026-04-22T17:20:00Z
 
 ## Failed
 
-<!-- Items that failed implementation -->
+- [2026-04-24] Dedicated Archived Chats page at /archived — user explicitly prefers the drawer staying open over the chat list (no navigation away); reverted. Do not re-attempt navigation-based approach.

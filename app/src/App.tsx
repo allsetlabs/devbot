@@ -35,7 +35,6 @@ function App() {
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/pinned" element={<PinnedMessagesPage />} />
-              <Route path="/archived" element={<ArchivedChatsPage />} />
               <Route path="/chats" element={<InteractiveChatList />} />
               <Route path="/archived" element={<ArchivedChatsPage />} />
               <Route path="/chat/:chatId" element={<InteractiveChatView />} />

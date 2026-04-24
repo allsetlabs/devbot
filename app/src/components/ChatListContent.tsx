@@ -53,6 +53,7 @@ function buildGroupedRows(chats: InteractiveChat[]): ChatRow[] {
 interface ChatListContentProps {
   chats: InteractiveChat[];
   filteredChats: InteractiveChat[];
+  filteredArchivedChats: InteractiveChat[];
   isLoading: boolean;
   creating: boolean;
   searchQuery: string;
@@ -64,6 +65,8 @@ interface ChatListContentProps {
   onDuplicate: (id: string) => void;
   onArchive: (id: string) => void;
   onDelete: (id: string) => void;
+  onDeleteArchived: (id: string) => void;
+  onUnarchive: (id: string) => void;
   onCreate: () => void;
   onClearFilters: () => void;
   onResumeSession: (chat: InteractiveChat) => void;

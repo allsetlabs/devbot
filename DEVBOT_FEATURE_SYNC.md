@@ -3,7 +3,7 @@
 Auto-maintained by the DevBot Feature Sync scheduler. Do not edit manually.
 
 Last discovery run: 2026-04-22T23:00:00Z
-Last implementation run: 2026-04-24T20:40:00Z
+Last implementation run: 2026-04-22T17:20:00Z
 
 ---
 
@@ -19,9 +19,9 @@ Last implementation run: 2026-04-24T20:40:00Z
 
 ## In Progress
 
-## Completed
+- Dedicated Archived Chats page at /archived — the "Archived (25)" bar at bottom of chat list opens a drawer; replace with navigation to /archived route; create ArchivedChatsPage reusing ChatListContent pre-filtered to archived chats; update the "Archived" bar to navigate instead of toggling drawer; add /archived route to App.tsx
 
-- [2026-04-24] Dedicated Archived Chats page at /archived — created ArchivedChatsPage with virtual-scrolled ArchivedChatItem list, back-arrow header with count badge; replaced ChatArchiveDrawer with a navigate-to-/archived button (Archive icon + ChevronRight) at bottom of chat list; added /archived route to App.tsx; deleted ChatArchiveDrawer.tsx; cleaned unused props (filteredArchivedChats, onDeleteArchived, onUnarchive) from ChatListContent
+## Completed
 
 - [2026-04-22] NotebookEdit tool result renderer — NotebookEditView component in ToolUseMessage.tsx; collapsible with BookOpen icon, filename, Cell N badge (1-based display), operation badge (Insert/Edit/Delete with color coding), cell type badge (code/markdown), permissionMode badge; expands to SyntaxHighlighter with python/markdown; capped at 20 lines with "show more"; wired in ToolUseMessage dispatcher and getToolPreview
 

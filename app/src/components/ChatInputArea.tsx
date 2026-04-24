@@ -6,11 +6,12 @@ import {
   type FileIntellisensePickerHandle,
   type FileIntellisenseItem,
 } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Clock, X } from 'lucide-react';
+import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ChatInputToolbar } from './ChatInputToolbar';
 import { ChatAttachedFiles } from './ChatAttachedFiles';
 import { ChatTextareaWithPickers } from './ChatTextareaWithPickers';
-import type { InteractiveChat } from '../types';
+import type { InteractiveChat, QueuedMessage } from '../types';
 
 export interface AttachedFile {
   id: string;
@@ -59,6 +60,9 @@ interface ChatInputAreaProps {
   onOpenEffort: () => void;
   onOpenAllowedTools: () => void;
   onOpenMaxTurns?: (currentMaxTurns: number | null) => void;
+  onQueue?: () => void;
+  queuedMessages?: QueuedMessage[];
+  onRemoveQueued?: (queueId: string) => void;
   acceptedExtensions: string;
 }
 
@@ -102,6 +106,9 @@ export function ChatInputArea({
   onOpenEffort,
   onOpenAllowedTools,
   onOpenMaxTurns,
+  onQueue,
+  queuedMessages,
+  onRemoveQueued,
   acceptedExtensions,
 }: ChatInputAreaProps) {
   return (
@@ -114,6 +121,33 @@ export function ChatInputArea({
         <div className="flex items-center gap-1 px-1 text-xs text-muted-foreground">
           <RotateCcw className="h-3 w-3" />
           <span>Draft restored</span>
+        </div>
+      )}
+
+      {/* Queued messages */}
+      {queuedMessages && queuedMessages.length > 0 && (
+        <div className="flex flex-col gap-1">
+          {queuedMessages.map((qm) => (
+            <div
+              key={qm.id}
+              className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5 text-xs"
+            >
+              <Clock className="h-3 w-3 shrink-0 text-muted-foreground" />
+              <span className="min-w-0 flex-1 truncate text-secondary-foreground">
+                {qm.prompt}
+              </span>
+              {onRemoveQueued && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5 shrink-0 text-muted-foreground hover:text-destructive"
+                  onClick={() => onRemoveQueued(qm.id)}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -151,6 +185,7 @@ export function ChatInputArea({
         onFileInputChange={onFileInputChange}
         onPasteFiles={onPasteFiles}
         onBrowseFiles={onBrowseFiles}
+        onQueue={onQueue}
         acceptedExtensions={acceptedExtensions}
       />
 

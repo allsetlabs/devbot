@@ -64,6 +64,7 @@ import { InlineFileEditor } from '../components/InlineFileEditor';
 import type {
   InteractiveChat,
   ChatMessage as ChatMessageType,
+  QueuedMessage,
   PermissionMode,
   ClaudeModel,
 } from '../types';
@@ -475,6 +476,26 @@ export function InteractiveChatView({
     }
   );
 
+  // Queue: fetch queued messages
+  const { data: queuedMessages = [] } = useQuery<QueuedMessage[]>({
+    queryKey: ['chat-queue', chatId],
+    queryFn: () => api.getChatQueue(chatId!),
+    enabled: !!chatId,
+    refetchInterval: () => (isRunningRef.current ? POLL_INTERVALS.chatRunning : false),
+  });
+
+  // Queue message mutation
+  const queueMutation = useCrudMutation(
+    (prompt: string) => api.queueChatMessage(chatId!, prompt, currentBranch),
+    [['chat-queue', chatId]],
+  );
+
+  // Remove queued message mutation
+  const removeQueueMutation = useCrudMutation(
+    (queueId: string) => api.removeQueuedMessage(chatId!, queueId),
+    [['chat-queue', chatId]],
+  );
+
   // Stop chat mutation
   const stopMutation = useCrudMutation(() => api.stopChat(chatId!), [['chat-status', chatId]], {
     onSuccess: () => {
@@ -784,6 +805,33 @@ export function InteractiveChatView({
     messages,
     chat,
   ]);
+
+  // Queue message (add to queue instead of sending immediately)
+  const handleQueue = useCallback(() => {
+    const trimmed = input.trim();
+    if (!trimmed || !chatId || sending || interrupting) return;
+
+    let prompt = trimmed;
+    if (readyFiles.length > 0) {
+      const unmentioned = readyFiles.filter((f) => !trimmed.includes(`@${f.path}`));
+      if (unmentioned.length > 0) {
+        const fileTags = unmentioned.map((f) => `[Attached file: ${f.path}]`).join('\n');
+        prompt = prompt ? `${prompt}\n\n${fileTags}` : fileTags;
+      }
+    }
+
+    pushHistory(trimmed);
+    setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
+    setAttachedFiles([]);
+    uploadMutation.reset();
+    if (chatId) setCachedDraft(chatId, '');
+
+    queueMutation.mutate(prompt);
+    toast.success('Message queued');
+  }, [input, chatId, sending, interrupting, readyFiles, queueMutation, uploadMutation, pushHistory]);
 
   // Stop execution
   const handleStop = useCallback(() => {
@@ -1582,6 +1630,9 @@ export function InteractiveChatView({
         onOpenEffort={() => setEffortDrawerOpen(true)}
         onOpenAllowedTools={() => setAllowedToolsDrawerOpen(true)}
         acceptedExtensions={ACCEPTED_EXTENSIONS}
+        onQueue={handleQueue}
+        queuedMessages={queuedMessages}
+        onRemoveQueued={(queueId) => removeQueueMutation.mutate(queueId)}
       />
     </div>
   );

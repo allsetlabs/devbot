@@ -22,6 +22,7 @@ import { CompanyView } from './pages/CompanyView';
 import { SettingsPage } from './pages/SettingsPage';
 import { Dashboard } from './pages/Dashboard';
 import { PinnedMessagesPage } from './pages/PinnedMessagesPage';
+import { ArchivedChatsPage } from './pages/ArchivedChatsPage';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
 
@@ -35,6 +36,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/pinned" element={<PinnedMessagesPage />} />
               <Route path="/chats" element={<InteractiveChatList />} />
+              <Route path="/archived" element={<ArchivedChatsPage />} />
               <Route path="/chat/:chatId" element={<InteractiveChatView />} />
               <Route path="/scheduler" element={<SchedulerList />} />
               <Route path="/scheduler/:taskId" element={<SchedulerView />} />

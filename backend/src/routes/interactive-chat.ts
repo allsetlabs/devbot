@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import fs from 'fs';
-import { eq, desc, gt, isNull, isNotNull, and, lte, inArray, sql } from 'drizzle-orm';
-import { coreDb, interactive_chats, chat_messages, chat_uploads } from '../lib/db/core.js';
+import { eq, desc, gt, isNull, isNotNull, and, lte, inArray, sql, asc } from 'drizzle-orm';
+import { coreDb, interactive_chats, chat_messages, chat_uploads, chat_message_queue } from '../lib/db/core.js';
 import type {
   InteractiveChatRow,
   ChatMessageRow,
@@ -1127,6 +1127,92 @@ router.post(
 
     res.json({ branchId: name, messagesCopied: messagesToCopy.length });
   }, 'create branch')
+);
+
+// --- Message Queue ---
+
+// List queued messages for a chat
+router.get(
+  '/:id/queue',
+  asyncHandler(async (req, res) => {
+    const rows = await coreDb
+      .select()
+      .from(chat_message_queue)
+      .where(eq(chat_message_queue.chat_id, req.params.id))
+      .orderBy(asc(chat_message_queue.position));
+
+    res.json(
+      rows.map((r) => ({
+        id: r.id,
+        chatId: r.chat_id,
+        branchId: r.branch_id,
+        prompt: r.prompt,
+        position: r.position,
+        createdAt: r.created_at,
+      }))
+    );
+  }, 'list queued messages')
+);
+
+// Add a message to the queue
+router.post(
+  '/:id/queue',
+  asyncHandler(async (req, res) => {
+    const { prompt, branch } = req.body;
+    if (!requireString(res, prompt, 'Prompt')) return;
+
+    const chatId = req.params.id;
+    const branchId = (branch as string) || 'main';
+
+    const maxPosRow = coreDb
+      .select({ position: chat_message_queue.position })
+      .from(chat_message_queue)
+      .where(eq(chat_message_queue.chat_id, chatId))
+      .orderBy(desc(chat_message_queue.position))
+      .limit(1)
+      .get();
+
+    const nextPosition = (maxPosRow?.position ?? 0) + 1;
+
+    const id = generateId();
+    coreDb
+      .insert(chat_message_queue)
+      .values({
+        id,
+        chat_id: chatId,
+        branch_id: branchId,
+        prompt: prompt.trim(),
+        position: nextPosition,
+        created_by: 'user',
+        updated_by: 'user',
+      })
+      .run();
+
+    res.status(201).json({
+      id,
+      chatId,
+      branchId,
+      prompt: prompt.trim(),
+      position: nextPosition,
+    });
+  }, 'queue message')
+);
+
+// Remove a message from the queue
+router.delete(
+  '/:id/queue/:queueId',
+  asyncHandler(async (req, res) => {
+    await coreDb
+      .delete(chat_message_queue)
+      .where(
+        and(
+          eq(chat_message_queue.chat_id, req.params.id),
+          eq(chat_message_queue.id, req.params.queueId)
+        )
+      );
+
+    res.json({ success: true });
+  }, 'remove queued message')
 );
 
 export { router as interactiveChatRouter };

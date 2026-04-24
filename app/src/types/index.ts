@@ -189,6 +189,15 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+export interface QueuedMessage {
+  id: string;
+  chatId: string;
+  branchId: string;
+  prompt: string;
+  position: number;
+  createdAt: string;
+}
+
 export interface EventTimerEntry {
   id: string;
   recordedAt: string;

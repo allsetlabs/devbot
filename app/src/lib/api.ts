@@ -32,6 +32,7 @@ import type {
   MemoriesResponse,
   GitStatus,
   MessageSearchResult,
+  QueuedMessage,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -219,6 +220,21 @@ export const api = {
 
   getChatStatus: (chatId: string): Promise<{ isRunning: boolean; isPaused: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/status`);
+  },
+
+  getChatQueue: (chatId: string): Promise<QueuedMessage[]> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/queue`);
+  },
+
+  queueChatMessage: (chatId: string, prompt: string, branch?: string): Promise<QueuedMessage> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/queue`, {
+      method: 'POST',
+      body: JSON.stringify({ prompt, branch }),
+    });
+  },
+
+  removeQueuedMessage: (chatId: string, queueId: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/queue/${queueId}`, { method: 'DELETE' });
   },
 
   getChatMessages: (chatId: string, afterSequence = 0, branch = 'main'): Promise<ChatMessage[]> => {

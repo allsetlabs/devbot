@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic } from 'lucide-react';
+import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
@@ -87,6 +87,7 @@ interface ChatTextareaWithPickersProps {
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasteFiles?: (files: File[]) => void;
   onBrowseFiles?: () => void;
+  onQueue?: () => void;
   acceptedExtensions: string;
 }
 
@@ -123,6 +124,7 @@ export function ChatTextareaWithPickers({
   onFileInputChange,
   onPasteFiles,
   onBrowseFiles,
+  onQueue,
   acceptedExtensions,
 }: ChatTextareaWithPickersProps) {
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
@@ -371,6 +373,19 @@ export function ChatTextareaWithPickers({
                       <Square className="h-4 w-4" />
                     </Button>
                   </>
+                )}
+                {isRunning && onQueue && (
+                  <Button
+                    onClick={onQueue}
+                    disabled={
+                      (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
+                    }
+                    size="icon"
+                    className="h-8 w-8 bg-secondary text-secondary-foreground hover:bg-secondary/80 disabled:bg-muted disabled:text-muted-foreground"
+                    title="Queue message (send after current task completes)"
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
                 )}
                 <Button
                   onClick={onSend}

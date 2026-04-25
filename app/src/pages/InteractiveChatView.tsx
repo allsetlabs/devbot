@@ -862,13 +862,15 @@ export function InteractiveChatView({
     // Cmd/Ctrl+Enter to send (alternative to Enter)
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
-      handleSend();
+      if (isRunning) handleQueue();
+      else handleSend();
       return;
     }
 
     if (e.key === 'Enter' && !e.shiftKey && !isTouchDevice) {
       e.preventDefault();
-      handleSend();
+      if (isRunning) handleQueue();
+      else handleSend();
       return;
     }
 
@@ -1631,6 +1633,7 @@ export function InteractiveChatView({
         onOpenAllowedTools={() => setAllowedToolsDrawerOpen(true)}
         acceptedExtensions={ACCEPTED_EXTENSIONS}
         onQueue={handleQueue}
+        onOcrText={(text) => setInput((prev) => prev + text)}
         queuedMessages={queuedMessages}
         onRemoveQueued={(queueId) => removeQueueMutation.mutate(queueId)}
       />

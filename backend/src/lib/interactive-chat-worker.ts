@@ -130,24 +130,26 @@ async function checkForRemotionVideoResult(
 
 function processQueue(chatId: string): void {
   try {
-    const next = coreDb
+    const all = coreDb
       .select()
       .from(chat_message_queue)
       .where(eq(chat_message_queue.chat_id, chatId))
       .orderBy(asc(chat_message_queue.position))
-      .limit(1)
-      .get();
+      .all();
 
-    if (!next) return;
+    if (all.length === 0) return;
 
     coreDb
       .delete(chat_message_queue)
-      .where(eq(chat_message_queue.id, next.id))
+      .where(eq(chat_message_queue.chat_id, chatId))
       .run();
 
-    console.log(`[InteractiveChat] Processing queued message for chat ${chatId}: "${next.prompt.slice(0, 50)}..."`);
+    const combined = all.map((m) => m.prompt).join('\n\n');
+    const branch_id = all[0].branch_id;
 
-    sendMessage(chatId, next.prompt, next.branch_id).catch((err) => {
+    console.log(`[InteractiveChat] Processing ${all.length} queued message(s) for chat ${chatId}`);
+
+    sendMessage(chatId, combined, branch_id).catch((err) => {
       console.error(`[InteractiveChat] Failed to send queued message for chat ${chatId}:`, err);
     });
   } catch (err) {

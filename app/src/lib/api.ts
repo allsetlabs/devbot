@@ -33,6 +33,8 @@ import type {
   GitStatus,
   MessageSearchResult,
   QueuedMessage,
+  OcrDocument,
+  OcrUploadResponse,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -746,3 +748,42 @@ export async function uploadFiles(files: File[], chatId?: string): Promise<Uploa
 
 /** @deprecated Use uploadFile instead */
 export const uploadImage = uploadFile;
+
+// OCR API
+
+export async function listOcrDocuments(): Promise<OcrDocument[]> {
+  return fetchApi('/api/ocr');
+}
+
+export async function getOcrDocument(id: string): Promise<OcrDocument> {
+  return fetchApi(`/api/ocr/${id}`);
+}
+
+export async function uploadOcrImage(file: File): Promise<OcrUploadResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`${BACKEND_URL}/api/ocr/upload`, {
+    method: 'POST',
+    headers: { 'X-API-Key': API_KEY },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error((error as { error: string }).error || `HTTP ${response.status}`);
+  }
+
+  return response.json() as Promise<OcrUploadResponse>;
+}
+
+export async function saveOcrText(id: string, text: string): Promise<OcrDocument> {
+  return fetchApi(`/api/ocr/${id}/text`, {
+    method: 'PATCH',
+    body: JSON.stringify({ text }),
+  });
+}
+
+export async function deleteOcrDocument(id: string): Promise<void> {
+  await fetchApi(`/api/ocr/${id}`, { method: 'DELETE' });
+}

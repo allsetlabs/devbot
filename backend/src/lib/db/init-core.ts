@@ -329,6 +329,25 @@ export async function initializeCoreDatabase() {
     `
     );
 
+    // Create ocr_documents table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS ocr_documents (
+        id TEXT PRIMARY KEY,
+        original_name TEXT NOT NULL,
+        image_path TEXT NOT NULL,
+        txt_path TEXT,
+        extracted_text TEXT,
+        status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'processing', 'completed', 'failed')),
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
     console.log('[DB] Core database schema initialized successfully');
   } catch (err) {
     console.error('[DB] Failed to initialize core database:', err);

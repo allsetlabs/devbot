@@ -1,3 +1,22 @@
+export interface OcrDocument {
+  id: string;
+  original_name: string;
+  image_path: string;
+  txt_path: string | null;
+  extracted_text: string | null;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string;
+  settings: Record<string, unknown>;
+}
+
+export interface OcrUploadResponse {
+  success: boolean;
+  doc: OcrDocument;
+}
+
 export interface MessageSearchResult {
   messageId: string;
   chatId: string;

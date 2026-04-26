@@ -98,7 +98,7 @@ export function ChatListContent({
     if (parentRef.current) {
       parentRef.current.scrollTop = 0;
     }
-  }, [rows]);
+  }, [searchQuery, showFavorites, selectedType]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({

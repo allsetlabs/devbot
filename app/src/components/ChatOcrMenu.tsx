@@ -132,9 +132,7 @@ export function ChatOcrMenu({ disabled, onOcrText }: ChatOcrMenuProps) {
         className="h-8 w-8 text-muted-foreground hover:text-foreground"
         disabled={disabled || processing}
         title="Extract text from file"
-        // onPointerDown avoids the iOS double-tap-to-focus issue
-        onPointerDown={(e) => {
-          e.preventDefault();
+        onClick={() => {
           inputRef.current?.click();
         }}
       >

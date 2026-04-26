@@ -327,8 +327,7 @@ export function ChatTextareaWithPickers({
                   className="h-8 w-8 text-muted-foreground hover:text-foreground"
                   disabled={anyUploading}
                   title="Attach file"
-                  onPointerDown={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     fileInputRef.current?.click();
                   }}
                 >

@@ -166,6 +166,27 @@ export const chat_uploads = sqliteTable('chat_uploads', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// OCR documents (images scanned/uploaded for text extraction)
+export const ocr_documents = sqliteTable('ocr_documents', {
+  id: text('id').primaryKey(),
+  original_name: text('original_name').notNull(),
+  image_path: text('image_path').notNull(),
+  txt_path: text('txt_path'),
+  extracted_text: text('extracted_text'),
+  status: text('status', { enum: ['pending', 'processing', 'completed', 'failed'] })
+    .notNull()
+    .default('pending'),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, unknown>>().default({}),
+});
+
 // Birth time entries
 export const birth_time_entries = sqliteTable('birth_time_entries', {
   id: text('id').primaryKey(),

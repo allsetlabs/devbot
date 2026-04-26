@@ -94,6 +94,12 @@ export function ChatListContent({
 
   const rows = useMemo(() => buildGroupedRows(filteredChats), [filteredChats]);
 
+  useEffect(() => {
+    if (parentRef.current) {
+      parentRef.current.scrollTop = 0;
+    }
+  }, [searchQuery, showFavorites, selectedType]);
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -199,7 +205,7 @@ export function ChatListContent({
           if (row.type === 'header') {
             return (
               <div
-                key={`header-${row.label}`}
+                key={`${virtualItem.index}-header-${row.label}`}
                 ref={virtualizer.measureElement}
                 data-index={virtualItem.index}
                 style={{
@@ -227,7 +233,7 @@ export function ChatListContent({
 
           return (
             <div
-              key={chat.id}
+              key={`${virtualItem.index}-${chat.id}`}
               ref={virtualizer.measureElement}
               data-index={virtualItem.index}
               className={showBorder ? 'border-b border-border' : ''}

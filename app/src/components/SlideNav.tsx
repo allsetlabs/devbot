@@ -16,6 +16,7 @@ import {
   Building2,
   Settings,
   LayoutDashboard,
+  ScanLine,
 } from 'lucide-react';
 
 interface NavItem {
@@ -36,6 +37,7 @@ const navItems: NavItem[] = [
   { label: 'Lawn Care', path: '/lawn-care', icon: <Leaf className="h-5 w-5" /> },
   { label: 'Directories', path: '/working-directories', icon: <FolderOpen className="h-5 w-5" /> },
   { label: 'Companies', path: '/companies', icon: <Building2 className="h-5 w-5" /> },
+  { label: 'OCR', path: '/ocr', icon: <ScanLine className="h-5 w-5" /> },
   { label: 'Logs', path: '/logs', icon: <ScrollText className="h-5 w-5" /> },
   { label: 'Settings', path: '/settings', icon: <Settings className="h-5 w-5" /> },
 ];
@@ -43,6 +45,7 @@ const navItems: NavItem[] = [
 function isActivePath(itemPath: string, currentPath: string): boolean {
   if (itemPath === '/') return currentPath === '/';
   if (itemPath === '/chats') return currentPath === '/chats' || currentPath.startsWith('/chat/');
+  if (itemPath === '/ocr') return currentPath === '/ocr' || currentPath.startsWith('/ocr/');
   return currentPath === itemPath || currentPath.startsWith(itemPath + '/');
 }
 

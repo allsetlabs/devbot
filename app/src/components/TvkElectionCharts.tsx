@@ -12,14 +12,14 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// ECI count — May 4, 2026 (7:33 PM final round)
+// ECI final count — May 4, 2026 (8:00 PM)
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
-// TVK: 62 Won + 45 Leading = 107 | DMK: 58 | ADMK: 48 | DMK Alliance: 71
-// Tirukkoyilur FLIPPED to ADMK+161 · Polur TVK+258 (now riskiest)
+// TVK: 69 Won + 37 Leading = 106 | DMK: 59 | ADMK: 47 | DMK Alliance: 72
+// Polur FLIPPED to DMDK+67 · Kumbakonam TVK+535 (new riskiest)
 
 const TVK_WIN_STATUS = [
-  { name: 'TVK Leading/Won', value: 107, color: '#e855a8' },
-  { name: 'Not Leading', value: 127, color: '#e2e8f0' },
+  { name: 'TVK Leading/Won', value: 106, color: '#e855a8' },
+  { name: 'Not Leading', value: 128, color: '#e2e8f0' },
 ];
 
 // Margin breakdown for all 107 TVK leading/won seats (statewise data — 7:33 PM round)
@@ -34,9 +34,9 @@ const TVK_MARGIN_DIST = [
 ];
 
 const ALL_PARTIES = [
-  { party: 'TVK', seats: 107, fill: '#e855a8' },
-  { party: 'DMK', seats: 58, fill: '#22c55e' },
-  { party: 'ADMK', seats: 48, fill: '#a3731a' },
+  { party: 'TVK', seats: 106, fill: '#e855a8' },
+  { party: 'DMK', seats: 59, fill: '#22c55e' },
+  { party: 'ADMK', seats: 47, fill: '#a3731a' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
   { party: 'INC', seats: 5, fill: '#3b82f6' },
   { party: 'BJP', seats: 1, fill: '#f97316' },
@@ -44,7 +44,7 @@ const ALL_PARTIES = [
   { party: 'CPI(M)', seats: 2, fill: '#b91c1c' },
   { party: 'VCK', seats: 2, fill: '#7c3aed' },
   { party: 'CPI', seats: 2, fill: '#dc2626' },
-  { party: 'DMDK', seats: 1, fill: '#d97706' },
+  { party: 'DMDK', seats: 2, fill: '#d97706' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
 ];
 
@@ -64,19 +64,19 @@ const VOTE_SHARE = [
   { party: 'IUML', share: 0.36, fill: '#0284c7' },
 ];
 
-// 10 TVK-leading seats with smallest margins (most at risk) — 7:33 PM round
-// Tirukkoyilur FLIPPED to ADMK+161 · Manamadurai new entrant 637 · Polur now riskiest at 258
+// 10 TVK-leading seats with smallest margins (most at risk) — 8:00 PM final
+// Polur FLIPPED to DMDK+67 · Kumbakonam TVK+535 is now riskiest
 const TVK_WINS_AT_RISK = [
-  { name: 'Polur', margin: 258, fill: '#ef4444' },
-  { name: 'Kumbakonam', margin: 432, fill: '#ef4444' },
+  { name: 'Kumbakonam', margin: 535, fill: '#ef4444' },
   { name: 'Kulithalai', margin: 560, fill: '#ef4444' },
-  { name: 'Manamadurai', margin: 637, fill: '#f97316' },
-  { name: 'Kallakurichi', margin: 798, fill: '#f97316' },
-  { name: 'Srivaikuntam', margin: 1186, fill: '#fbbf24' },
-  { name: 'Cumbum', margin: 1426, fill: '#fbbf24' },
+  { name: 'Cumbum', margin: 751, fill: '#ef4444' },
+  { name: 'Kallakurichi', margin: 798, fill: '#ef4444' },
+  { name: 'Manamadurai', margin: 895, fill: '#f97316' },
+  { name: 'Srivaikuntam', margin: 1186, fill: '#f97316' },
   { name: 'Manapparai', margin: 1426, fill: '#fbbf24' },
-  { name: 'Usilampatti', margin: 1805, fill: '#d97706' },
+  { name: 'Usilampatti', margin: 1805, fill: '#fbbf24' },
   { name: 'Modakkurichi', margin: 2430, fill: '#d97706' },
+  { name: 'Tiruvadanai', margin: 2513, fill: '#d97706' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -90,7 +90,7 @@ export function ChartCard({ title, children }: { title: string; children: React.
 
 export function TvkWinLossChart() {
   return (
-    <ChartCard title="TVK Seat Status (234 constituencies) — May 4, 7:33 PM">
+    <ChartCard title="TVK Seat Status (234 constituencies) — May 4, 8:00 PM Final">
       <ResponsiveContainer width="100%" height={190}>
         <PieChart>
           <Pie
@@ -124,7 +124,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>11 seats short</strong> (62 Won + 45 Leading)
+        Majority needs <strong>118</strong> — TVK is <strong>12 seats short</strong> (69 Won + 37 Leading)
       </div>
     </ChartCard>
   );
@@ -147,7 +147,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        107 TVK seats · 5 leads &lt;1K at risk · 62 officially Won · Tirukkoyilur FLIPPED to ADMK+161
+        106 TVK seats · 5 leads &lt;1K at risk · 69 officially Won · Polur FLIPPED to DMDK+67
       </p>
     </ChartCard>
   );
@@ -155,7 +155,7 @@ export function TvkMarginChart() {
 
 export function TvkWinsAtRiskChart() {
   return (
-    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads (7:33 PM)">
+    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads (8:00 PM Final)">
       <ResponsiveContainer width="100%" height={260}>
         <BarChart
           data={TVK_WINS_AT_RISK}
@@ -177,7 +177,7 @@ export function TvkWinsAtRiskChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Red = extreme risk (&lt;700) · Polur TVK+258 (riskiest) · Tirukkoyilur FLIPPED to ADMK+161
+        Red = extreme risk (&lt;1000) · Kumbakonam TVK+535 (riskiest) · Polur FLIPPED to DMDK+67
       </p>
     </ChartCard>
   );

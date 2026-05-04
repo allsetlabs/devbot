@@ -25,6 +25,7 @@ import { PinnedMessagesPage } from './pages/PinnedMessagesPage';
 import { ArchivedChatsPage } from './pages/ArchivedChatsPage';
 import { OcrList } from './pages/OcrList';
 import { OcrView } from './pages/OcrView';
+import { TvkElection } from './pages/TvkElection';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
 
@@ -57,6 +58,7 @@ function App() {
               <Route path="/company/:companyId" element={<CompanyView />} />
               <Route path="/ocr" element={<OcrList />} />
               <Route path="/ocr/:docId" element={<OcrView />} />
+              <Route path="/tvk" element={<TvkElection />} />
               {/* Legacy CLI routes */}
               <Route path="/cli" element={<ChatList />} />
               <Route path="/cli/:sessionId" element={<ChatView />} />

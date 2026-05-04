@@ -9,27 +9,49 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  ReferenceLine,
 } from 'recharts';
 
-const SEAT_STATUS = [
-  { name: 'Comfortable Win', value: 75, color: '#16a34a', description: '>10K margin' },
-  { name: 'Close Win', value: 45, color: '#4ade80', description: '1K–10K margin' },
-  { name: 'Close Contest', value: 32, color: '#facc15', description: 'Trailing within 10K' },
-  { name: 'Trailing', value: 57, color: '#f97316', description: 'Behind by 10K–30K' },
-  { name: 'Not Competitive', value: 25, color: '#ef4444', description: 'Behind by >30K' },
+// Official ECI data — 12:12 PM, May 5, 2026 (counting ongoing)
+// Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
+
+const TVK_WIN_STATUS = [
+  { name: 'TVK Leading', value: 106, color: '#e855a8' },
+  { name: 'Not Leading', value: 128, color: '#e2e8f0' },
 ];
 
-const PARTY_SEATS = [
-  { party: 'TVK', seats: 120, fill: '#16a34a' },
-  { party: 'AIADMK+', seats: 70, fill: '#f97316' },
-  { party: 'DMK+', seats: 44, fill: '#3b82f6' },
+// Actual margin breakdown for 106 TVK-leading constituencies (from ECI)
+const TVK_MARGIN_DIST = [
+  { range: '<1K', seats: 14, fill: '#facc15' },
+  { range: '1K–3K', seats: 27, fill: '#86efac' },
+  { range: '3K–5K', seats: 14, fill: '#4ade80' },
+  { range: '5K–10K', seats: 33, fill: '#22c55e' },
+  { range: '10K–20K', seats: 16, fill: '#16a34a' },
+  { range: '>20K', seats: 2, fill: '#15803d' },
 ];
 
+const ALL_PARTIES = [
+  { party: 'TVK', seats: 106, fill: '#e855a8' },
+  { party: 'ADMK', seats: 64, fill: '#a3731a' },
+  { party: 'DMK', seats: 43, fill: '#22c55e' },
+  { party: 'INC', seats: 5, fill: '#3b82f6' },
+  { party: 'PMK', seats: 4, fill: '#65a30d' },
+  { party: 'BJP', seats: 3, fill: '#f97316' },
+  { party: 'VCK', seats: 2, fill: '#7c3aed' },
+  { party: 'DMDK', seats: 2, fill: '#d97706' },
+  { party: 'CPI', seats: 2, fill: '#dc2626' },
+  { party: 'Others', seats: 3, fill: '#94a3b8' },
+];
+
+// ECI vote share — TVK appears under "Other" (new party classification)
 const VOTE_SHARE = [
-  { party: 'TVK', share: 32, fill: '#16a34a' },
-  { party: 'DMK Alliance', share: 32, fill: '#3b82f6' },
-  { party: 'AIADMK Bloc', share: 30, fill: '#f97316' },
-  { party: 'Others', share: 6, fill: '#94a3b8' },
+  { party: 'TVK*', share: 38.74, fill: '#e855a8' },
+  { party: 'DMK', share: 24.2, fill: '#22c55e' },
+  { party: 'ADMK', share: 22.29, fill: '#a3731a' },
+  { party: 'NTK', share: 3.91, fill: '#475569' },
+  { party: 'INC', share: 3.5, fill: '#3b82f6' },
+  { party: 'BJP', share: 3.18, fill: '#f97316' },
+  { party: 'Others', share: 4.18, fill: '#94a3b8' },
 ];
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -41,48 +63,67 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-function SeatStatusLegend() {
+export function TvkWinLossChart() {
   return (
-    <div className="mt-3 grid grid-cols-1 gap-1">
-      {SEAT_STATUS.map((s) => (
-        <div key={s.name} className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: s.color }} />
-            <span className="text-xs text-foreground">{s.name}</span>
-            <span className="text-xs text-muted-foreground">({s.description})</span>
-          </div>
-          <span className="text-xs font-medium text-foreground">{s.value} seats</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export function TvkSeatStatusChart() {
-  return (
-    <ChartCard title="TVK Seat Status (234 constituencies)">
-      <ResponsiveContainer width="100%" height={220}>
+    <ChartCard title="TVK Lead Status (234 constituencies)">
+      <ResponsiveContainer width="100%" height={190}>
         <PieChart>
           <Pie
-            data={SEAT_STATUS}
+            data={TVK_WIN_STATUS}
             cx="50%"
             cy="50%"
             innerRadius={55}
-            outerRadius={90}
+            outerRadius={85}
             paddingAngle={2}
             dataKey="value"
           >
-            {SEAT_STATUS.map((entry) => (
+            {TVK_WIN_STATUS.map((entry) => (
               <Cell key={entry.name} fill={entry.color} />
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: number, name: string) => [`${value} seats`, name]}
+            formatter={(v: number, n: string) => [`${v} seats`, n]}
             contentStyle={{ fontSize: 12 }}
           />
         </PieChart>
       </ResponsiveContainer>
-      <SeatStatusLegend />
+      <div className="mt-2 grid grid-cols-2 gap-3">
+        {TVK_WIN_STATUS.map((s) => (
+          <div key={s.name} className="flex items-center gap-2">
+            <div className="h-3 w-3 flex-shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+            <div>
+              <div className="text-xs text-muted-foreground">{s.name}</div>
+              <div className="text-lg font-bold text-foreground">{s.value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
+        Majority needs <strong>118</strong> — TVK is <strong>12 seats short</strong>
+      </div>
+    </ChartCard>
+  );
+}
+
+export function TvkMarginChart() {
+  return (
+    <ChartCard title="TVK Winning Margins — 106 Seats">
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={TVK_MARGIN_DIST} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+          <XAxis dataKey="range" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 11 }} />
+          <Tooltip formatter={(v: number) => [`${v} seats`]} contentStyle={{ fontSize: 12 }} />
+          <Bar dataKey="seats" radius={[4, 4, 0, 0]}>
+            {TVK_MARGIN_DIST.map((entry) => (
+              <Cell key={entry.range} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      <p className="mt-1 text-center text-xs text-muted-foreground">
+        Avg margin: 5,629 · Highest: 30,315 (Madavaram) · 14 seats won by &lt;1,000 votes
+      </p>
     </ChartCard>
   );
 }
@@ -90,40 +131,42 @@ export function TvkSeatStatusChart() {
 export function PartySeatsChart() {
   return (
     <ChartCard title="Party-wise Seat Tally (234 total)">
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={PARTY_SEATS} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+      <ResponsiveContainer width="100%" height={220}>
+        <BarChart data={ALL_PARTIES} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-          <XAxis dataKey="party" tick={{ fontSize: 12 }} />
-          <YAxis tick={{ fontSize: 11 }} domain={[0, 140]} />
+          <XAxis dataKey="party" tick={{ fontSize: 10 }} />
+          <YAxis tick={{ fontSize: 11 }} domain={[0, 120]} />
           <Tooltip formatter={(v: number) => [`${v} seats`]} contentStyle={{ fontSize: 12 }} />
+          <ReferenceLine
+            y={118}
+            stroke="#94a3b8"
+            strokeDasharray="4 4"
+            label={{ value: '118', fontSize: 10, fill: '#94a3b8', position: 'right' }}
+          />
           <Bar dataKey="seats" radius={[4, 4, 0, 0]}>
-            {PARTY_SEATS.map((entry) => (
+            {ALL_PARTIES.map((entry) => (
               <Cell key={entry.party} fill={entry.fill} />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      <div className="mt-2 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-        <div className="h-0.5 w-12 bg-muted-foreground/40" />
-        <span>Majority mark: 118</span>
-        <div className="h-0.5 w-12 bg-muted-foreground/40" />
-      </div>
+      <p className="mt-1 text-center text-xs text-muted-foreground">Dashed line = majority mark (118 seats)</p>
     </ChartCard>
   );
 }
 
 export function VoteShareChart() {
   return (
-    <ChartCard title="Vote Share (%)">
-      <ResponsiveContainer width="100%" height={180}>
+    <ChartCard title="Vote Share (%) — ECI Official">
+      <ResponsiveContainer width="100%" height={230}>
         <BarChart
           data={VOTE_SHARE}
           layout="vertical"
-          margin={{ top: 0, right: 32, left: 60, bottom: 0 }}
+          margin={{ top: 0, right: 40, left: 54, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
-          <XAxis type="number" tick={{ fontSize: 11 }} domain={[0, 40]} unit="%" />
-          <YAxis type="category" dataKey="party" tick={{ fontSize: 11 }} width={70} />
+          <XAxis type="number" tick={{ fontSize: 11 }} domain={[0, 45]} unit="%" />
+          <YAxis type="category" dataKey="party" tick={{ fontSize: 11 }} width={54} />
           <Tooltip formatter={(v: number) => [`${v}%`]} contentStyle={{ fontSize: 12 }} />
           <Bar dataKey="share" radius={[0, 4, 4, 0]}>
             {VOTE_SHARE.map((entry) => (
@@ -132,6 +175,9 @@ export function VoteShareChart() {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      <p className="mt-1 text-center text-xs text-muted-foreground">
+        * TVK classified as "Other" in ECI vote share — 38.74% = 50.2L votes
+      </p>
     </ChartCard>
   );
 }

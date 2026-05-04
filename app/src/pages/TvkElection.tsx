@@ -81,7 +81,7 @@ export function TvkElection() {
       </header>
 
       <div className="border-b border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-xs text-yellow-600 dark:text-yellow-400">
-        Counting update — May 4, 2026 (latest round). Source: ECI official (results.eci.gov.in). TVK 109 (15 Won+94 Leading) · DMK Alliance 71 · ADMK 45 · BJP 2.
+        Counting update — May 4, 2026 (latest round). Source: ECI official (results.eci.gov.in). TVK 109 (22 Won+87 Leading) · DMK Alliance 73 · ADMK 44 · BJP 1.
       </div>
 
       <main className="flex-1 space-y-4 overflow-y-auto p-4">
@@ -106,7 +106,7 @@ export function TvkElection() {
           <StatCard
             label="Close Losses"
             value={`~${TVK_CLOSE_LOSSES}`}
-            sub="seats lost by <5K · Kumbakonam/Palani flipped to TVK · Sholavandan 40!"
+            sub="seats lost by <5K · Palani/Bargur/Cumbum flipped to losses · Polur 316!"
             variant="warn"
           />
           <StatCard
@@ -138,12 +138,12 @@ export function TvkElection() {
           <p className="font-medium text-foreground">Data notes</p>
           <ul className="mt-1 list-disc space-y-1 pl-4">
             <li>Count data — May 4, 2026 (latest round). Counting in progress. Source: ECI (results.eci.gov.in).</li>
-            <li>TVK leading/won 109 seats (15 officially won + 94 leading). ~27 close losses (&lt;5K). ~98 not competitive.</li>
-            <li>Key flips: Kumbakonam (was DMK+86, now TVK+432) · Palani (was ADMK+1246, now TVK+482). Cumbum/Bargur now officially Won!</li>
-            <li>New extreme risks: Sholavandan 40 votes (14/19 rounds) · Polur 316 (12/22) · Tiruvadanai 678 (25/27).</li>
-            <li>DMK Alliance at 71 seats (DMK 59+INC 5+VCK 1+CPI 2+CPI(M) 2+IUML 2). BJP dropped from 3→2 seats.</li>
+            <li>TVK leading/won 109 seats (22 officially won + 87 leading). 27 close losses (&lt;5K). ~98 not competitive.</li>
+            <li>Key flips: Palani (TVK→ADMK+753) · Bargur (TVK→ADMK+882) · Cumbum (TVK→DMK+1596) vs previous round.</li>
+            <li>Current risks: Polur 316 · Kovilpatti 329 · Kumbakonam 432 · Sholavandan recovered to 523 · Kulithalai 542.</li>
+            <li>DMK Alliance at 73 seats (DMK 60+INC 5+VCK 2+CPI 2+CPI(M) 2+IUML 2). BJP dropped from 2→1 seat. ADMK 45→44.</li>
             <li>TVK vote share listed as "Other (39.19%)" in ECI — newly registered party classification.</li>
-            <li>TVK contested all 234 seats solo — no alliance. Historic debut. Srivilliputhur flipped from CPI to TVK.</li>
+            <li>TVK contested all 234 seats solo — no alliance. Historic debut. 52 seats TVK not even in top 2.</li>
             <li>
               Official source:{' '}
               <a href={DATA_SOURCE_URL} target="_blank" rel="noreferrer" className="underline">

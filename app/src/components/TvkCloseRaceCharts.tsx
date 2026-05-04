@@ -12,14 +12,14 @@ import {
 } from 'recharts';
 import { ChartCard } from './TvkElectionCharts';
 
-// 234 total: TVK 46 Won + 61 Leading = 107 — final round
-// Won(46) + Safe lead >5K(43) + Close lead <5K(19) + Close loss(28) + Not competitive(98)
+// 234 total: TVK 62 Won + 45 Leading = 107 — 7:33 PM round
+// Won(62) + Safe lead >5K(27) + Close lead <5K(18) + Close loss(28) + Not competitive(99)
 const TVK_STATUS = [
-  { name: 'Won (Final)', value: 46, color: '#0ea5e9' },
-  { name: 'Safe Lead (>5K)', value: 43, color: '#16a34a' },
-  { name: 'Close Lead (<5K)', value: 19, color: '#86efac' },
+  { name: 'Won (Final)', value: 62, color: '#0ea5e9' },
+  { name: 'Safe Lead (>5K)', value: 27, color: '#16a34a' },
+  { name: 'Close Lead (<5K)', value: 18, color: '#86efac' },
   { name: 'Close Loss (<5K)', value: 28, color: '#fb923c' },
-  { name: 'Not Competitive', value: 98, color: '#cbd5e1' },
+  { name: 'Not Competitive', value: 99, color: '#cbd5e1' },
 ];
 
 const PARTY_COLOR: Record<string, string> = {
@@ -34,27 +34,27 @@ const PARTY_COLOR: Record<string, string> = {
   IUML: '#0284c7',
 };
 
-// Top 12 closest TVK losses (final round — 28 total <5K losses)
-// Tiruvannamalai DMK+646 is new #1 · Yercaud FLIPPED TVK+312 → ADMK+2119
+// Top 12 closest TVK losses (7:33 PM round — 28 total <5K losses)
+// Tirukkoyilur FLIPPED: was TVK+69, now ADMK+161 (new #1 closest loss!)
 const TVK_CLOSE_LOSSES = [
-  { name: 'Tiruvannamalai', by: 'DMK', margin: 646 },
-  { name: 'Palani', by: 'ADMK', margin: 753 },
-  { name: 'Kovilpatti', by: 'DMK', margin: 962 },
+  { name: 'Tirukkoyilur', by: 'ADMK', margin: 161 },
+  { name: 'Palani', by: 'ADMK', margin: 742 },
+  { name: 'Kovilpatti', by: 'DMK', margin: 937 },
   { name: 'Udhagamandalam', by: 'BJP', margin: 976 },
+  { name: 'Tiruvannamalai', by: 'DMK', margin: 993 },
+  { name: 'Papanasam', by: 'IUML', margin: 1065 },
+  { name: 'Tiruppattur', by: 'DMK', margin: 1127 },
   { name: 'Dindigul', by: 'DMK', margin: 1131 },
   { name: 'Karur', by: 'ADMK', margin: 1340 },
-  { name: 'Thirumayam', by: 'DMK', margin: 1539 },
-  { name: 'Papanasam', by: 'IUML', margin: 1733 },
-  { name: 'Tiruppattur', by: 'DMK', margin: 1738 },
-  { name: 'Pudukkottai', by: 'DMK', margin: 2031 },
-  { name: 'Yercaud', by: 'ADMK', margin: 2119 },
-  { name: 'Tittakudi', by: 'DMK', margin: 2190 },
+  { name: 'Thirumayam', by: 'DMK', margin: 1492 },
+  { name: 'Vikravandi', by: 'PMK', margin: 1810 },
+  { name: 'Pudukkottai', by: 'DMK', margin: 1867 },
 ];
 
-// Parties leading where TVK is in 2nd place (75 seats, final round)
+// Parties leading where TVK is in 2nd place (76 seats, 7:33 PM round)
 const WHO_BEATS_TVK = [
   { party: 'DMK', seats: 37, fill: '#22c55e' },
-  { party: 'ADMK', seats: 23, fill: '#a3731a' },
+  { party: 'ADMK', seats: 24, fill: '#a3731a' },
   { party: 'INC', seats: 4, fill: '#3b82f6' },
   { party: 'PMK', seats: 4, fill: '#65a30d' },
   { party: 'CPI(M)', seats: 2, fill: '#b91c1c' },
@@ -66,7 +66,7 @@ const WHO_BEATS_TVK = [
 
 export function TvkStatusBreakdown() {
   return (
-    <ChartCard title="TVK Seat Status (234 constituencies) — May 4 final">
+    <ChartCard title="TVK Seat Status (234 constituencies) — May 4, 7:33 PM">
       <ResponsiveContainer width="100%" height={190}>
         <PieChart>
           <Pie
@@ -100,7 +100,7 @@ export function TvkStatusBreakdown() {
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        Competitive in ~135 seats (107 leading + 28 close losses) · 46 officially Won · 19 close leads
+        Competitive in 135 seats (107 leading + 28 close losses) · 62 officially Won · 18 close leads
       </p>
     </ChartCard>
   );
@@ -108,7 +108,7 @@ export function TvkStatusBreakdown() {
 
 export function TvkCloseRacesChart() {
   return (
-    <ChartCard title="12 Closest TVK Losses — May 4 final (28 total <5K)">
+    <ChartCard title="12 Closest TVK Losses — May 4, 7:33 PM (28 total <5K)">
       <ResponsiveContainer width="100%" height={310}>
         <BarChart
           data={TVK_CLOSE_LOSSES}
@@ -130,7 +130,7 @@ export function TvkCloseRacesChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Bar color = winning party · 28 total lost by &lt;5K · Tiruvannamalai DMK+646 closest · Yercaud ADMK+2119
+        Bar color = winning party · 28 total lost by &lt;5K · Tirukkoyilur ADMK+161 closest · Polur TVK+258 riskiest win
       </p>
     </ChartCard>
   );
@@ -138,7 +138,7 @@ export function TvkCloseRacesChart() {
 
 export function TvkBeaterChart() {
   return (
-    <ChartCard title="Who Beats TVK — 75 seats (May 4 final)">
+    <ChartCard title="Who Beats TVK — 76 seats (May 4, 7:33 PM)">
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={WHO_BEATS_TVK} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -153,7 +153,7 @@ export function TvkBeaterChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        51 seats TVK not in top 2 · 75 seats TVK is in 2nd place · DMK 37 · ADMK 23
+        51 seats TVK not in top 2 · 76 seats TVK is in 2nd place · DMK 37 · ADMK 24
       </p>
     </ChartCard>
   );

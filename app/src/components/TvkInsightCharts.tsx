@@ -13,12 +13,12 @@ import {
 } from 'recharts';
 import { ChartCard } from './TvkElectionCharts';
 
-// Alliance groupings — Tamil Nadu 2026 (May 4 final)
-// TVK contested solo. TVK: 107, DMK: 61, ADMK: 45, VCK: 2. DMK Alliance: 74.
+// Alliance groupings — Tamil Nadu 2026 (May 4, 7:33 PM)
+// TVK contested solo. TVK: 107, DMK: 58, ADMK: 48, VCK: 2. DMK Alliance: 71.
 const ALLIANCE_DATA = [
   { name: 'TVK\n(Solo)', seats: 107, fill: '#e855a8', label: 'TVK' },
-  { name: 'DMK\nAlliance', seats: 74, fill: '#22c55e', label: 'DMK(61)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2)' },
-  { name: 'ADMK\n(Solo)', seats: 45, fill: '#a3731a', label: 'ADMK' },
+  { name: 'DMK\nAlliance', seats: 71, fill: '#22c55e', label: 'DMK(58)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2)' },
+  { name: 'ADMK\n(Solo)', seats: 48, fill: '#a3731a', label: 'ADMK' },
   { name: 'PMK &\nOthers', seats: 7, fill: '#94a3b8', label: 'PMK(5)+DMDK(1)+AMMK(1)' },
   { name: 'BJP', seats: 1, fill: '#f97316', label: 'BJP' },
 ];
@@ -26,17 +26,17 @@ const ALLIANCE_DATA = [
 // Pie data for alliance share of 234 seats
 const ALLIANCE_PIE = [
   { name: 'TVK (Solo)', value: 107, color: '#e855a8' },
-  { name: 'DMK Alliance', value: 74, color: '#22c55e' },
-  { name: 'ADMK (Solo)', value: 45, color: '#a3731a' },
+  { name: 'DMK Alliance', value: 71, color: '#22c55e' },
+  { name: 'ADMK (Solo)', value: 48, color: '#a3731a' },
   { name: 'PMK & Others', value: 7, color: '#94a3b8' },
   { name: 'BJP', value: 1, color: '#f97316' },
 ];
 
-// 28 seats TVK lost by <5K — breakdown by winning party (May 4 final)
-// Yercaud FLIPPED TVK+312 → ADMK+2119 · Tiruvannamalai DMK+646 is new #1 closest
+// 28 seats TVK lost by <5K — breakdown by winning party (May 4, 7:33 PM)
+// Tirukkoyilur FLIPPED to ADMK+161 · DMK 12 · ADMK now 6 (was 5)
 const CLOSE_LOSS_BY_PARTY = [
-  { party: 'DMK', seats: 13, fill: '#22c55e' },
-  { party: 'ADMK', seats: 5, fill: '#a3731a' },
+  { party: 'DMK', seats: 12, fill: '#22c55e' },
+  { party: 'ADMK', seats: 6, fill: '#a3731a' },
   { party: 'INC', seats: 3, fill: '#3b82f6' },
   { party: 'PMK', seats: 2, fill: '#65a30d' },
   { party: 'IUML', seats: 2, fill: '#0284c7' },
@@ -81,7 +81,7 @@ export function TvkAlliancePieChart() {
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        TVK contested ALL 234 seats solo — unprecedented debut · DMK Alliance: 74 · ADMK: 45 · BJP: 1
+        TVK contested ALL 234 seats solo — unprecedented debut · DMK Alliance: 71 · ADMK: 48 · BJP: 1
       </p>
     </ChartCard>
   );
@@ -116,19 +116,19 @@ export function TvkAllianceBarChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        DMK Alliance = DMK(61)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2) = 74 · ADMK rose to 45
+        DMK Alliance = DMK(58)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2) = 71 · ADMK rose to 48
       </p>
     </ChartCard>
   );
 }
 
 export function TvkMajorityPathChart() {
-  // +<1K: Tiruvannamalai(646)+Palani(753)+Kovilpatti(962)+Udhagamandalam(976) = 4 seats → 111
+  // +<1K: Tirukkoyilur(161)+Palani(742)+Kovilpatti(937)+Udhagamandalam(976)+Tiruvannamalai(993) = 5 seats → 112
   // +All Close (<5K): 28 seats → 135
   const data = [
     { label: 'TVK Won', seats: 107, fill: '#e855a8' },
     { label: 'Majority', seats: 118, fill: '#94a3b8' },
-    { label: '+<1K Losses', seats: 111, fill: '#fbbf24' },
+    { label: '+<1K Losses', seats: 112, fill: '#fbbf24' },
     { label: '+All Close', seats: 135, fill: '#f97316' },
   ];
   return (
@@ -154,8 +154,8 @@ export function TvkMajorityPathChart() {
       </ResponsiveContainer>
       <div className="mt-2 space-y-1 text-xs text-muted-foreground">
         <p>
-          <span className="font-medium text-foreground">+&lt;1K Losses:</span> If TVK had won 4 seats
-          lost by &lt;1,000 votes (Tiruvannamalai 646, Palani 753, Kovilpatti 962, Ooty 976) → 111 (still 7 short)
+          <span className="font-medium text-foreground">+&lt;1K Losses:</span> If TVK had won 5 seats
+          lost by &lt;1,000 votes (Tirukkoyilur 161, Palani 742, Kovilpatti 937, Ooty 976, Tiruvannamalai 993) → 112 (still 6 short)
         </p>
         <p>
           <span className="font-medium text-foreground">+All Close:</span> If TVK had won all 28
@@ -186,7 +186,7 @@ export function TvkCloseLossByPartyChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        DMK+ADMK together denied TVK majority — 18 of 28 close losses · ADMK now 5 (was 4) after Yercaud flip
+        DMK+ADMK together denied TVK majority — 18 of 28 close losses · ADMK now 6 (Tirukkoyilur ADMK+161)
       </p>
     </ChartCard>
   );

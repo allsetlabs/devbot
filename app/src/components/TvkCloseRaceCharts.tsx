@@ -12,13 +12,13 @@ import {
 } from 'recharts';
 import { ChartCard } from './TvkElectionCharts';
 
-// 234 total: TVK leading 107, trailing 2nd in 72, not in top-2 in 57
-// Safe lead (>5K margin): 71 | Close lead (<5K): 34 | Close loss (<5K): 38 | Not competitive: 91
+// 234 total: TVK leading 103, trailing 2nd in 75, not in top-2 in 56 — live May 4 refresh
+// Safe lead (>5K margin): 77 | Close lead (<5K): 26 | Close loss (<5K): 41 | Not competitive: 90
 const TVK_STATUS = [
-  { name: 'Safe Lead (>5K)', value: 71, color: '#16a34a' },
-  { name: 'Close Lead (<5K)', value: 34, color: '#86efac' },
-  { name: 'Close Loss (<5K)', value: 38, color: '#fb923c' },
-  { name: 'Not Competitive', value: 91, color: '#cbd5e1' },
+  { name: 'Safe Lead (>5K)', value: 77, color: '#16a34a' },
+  { name: 'Close Lead (<5K)', value: 26, color: '#86efac' },
+  { name: 'Close Loss (<5K)', value: 41, color: '#fb923c' },
+  { name: 'Not Competitive', value: 90, color: '#cbd5e1' },
 ];
 
 const PARTY_COLOR: Record<string, string> = {
@@ -33,41 +33,41 @@ const PARTY_COLOR: Record<string, string> = {
   IUML: '#0284c7',
 };
 
-// Top 15 closest TVK losses (live count, May 4 2026 — latest round)
+// Top 15 closest TVK losses (live count, May 4 2026 — latest round refresh)
 const TVK_CLOSE_LOSSES = [
+  { name: 'Sholavandan', by: 'DMK', margin: 15 },
+  { name: 'Vellore', by: 'DMK', margin: 40 },
   { name: 'Sattur', by: 'DMK', margin: 46 },
   { name: 'Kumbakonam', by: 'DMK', margin: 86 },
-  { name: 'Sholavandan', by: 'DMK', margin: 100 },
-  { name: 'Udhagamandalam', by: 'BJP', margin: 189 },
-  { name: 'Tirukkoyilur', by: 'ADMK', margin: 279 },
+  { name: 'Paramakudi', by: 'DMK', margin: 103 },
+  { name: 'Vikravandi', by: 'PMK', margin: 166 },
+  { name: 'Manapparai', by: 'ADMK', margin: 293 },
+  { name: 'Udhagamandalam', by: 'BJP', margin: 433 },
   { name: 'Namakkal', by: 'ADMK', margin: 502 },
-  { name: 'Srivaikuntam', by: 'ADMK', margin: 544 },
-  { name: 'Mettuppalayam', by: 'DMK', margin: 691 },
-  { name: 'Cbe South', by: 'DMK', margin: 855 },
-  { name: 'Bodinayakanur', by: 'DMK', margin: 919 },
-  { name: 'Bhavanisagar', by: 'ADMK', margin: 967 },
-  { name: 'Viluppuram', by: 'DMK', margin: 1148 },
-  { name: 'Vellore', by: 'DMK', margin: 1240 },
-  { name: 'Chepauk-T.V.', by: 'DMK', margin: 1365 },
-  { name: 'Lalgudi', by: 'ADMK', margin: 1663 },
+  { name: 'Gudiyattam', by: 'DMDK', margin: 920 },
+  { name: 'Lalgudi', by: 'ADMK', margin: 974 },
+  { name: 'Dindigul', by: 'DMK', margin: 1079 },
+  { name: 'Bhavanisagar', by: 'ADMK', margin: 1161 },
+  { name: 'Cbe South', by: 'DMK', margin: 1198 },
+  { name: 'Katpadi', by: 'ADMK', margin: 1313 },
 ];
 
-// Parties leading where TVK is in 2nd place (72 seats, live May 4 2026)
+// Parties leading where TVK is in 2nd place (75 seats, live May 4 2026 refresh)
 const WHO_BEATS_TVK = [
   { party: 'DMK', seats: 35, fill: '#22c55e' },
   { party: 'ADMK', seats: 26, fill: '#a3731a' },
   { party: 'INC', seats: 3, fill: '#3b82f6' },
-  { party: 'PMK', seats: 2, fill: '#65a30d' },
+  { party: 'PMK', seats: 3, fill: '#65a30d' },
   { party: 'CPI', seats: 2, fill: '#dc2626' },
+  { party: 'IUML', seats: 2, fill: '#0284c7' },
+  { party: 'DMDK', seats: 2, fill: '#d97706' },
   { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
   { party: 'BJP', seats: 1, fill: '#f97316' },
-  { party: 'IUML', seats: 1, fill: '#0284c7' },
-  { party: 'DMDK', seats: 1, fill: '#d97706' },
 ];
 
 export function TvkStatusBreakdown() {
   return (
-    <ChartCard title="TVK Seat Status (234 constituencies)">
+    <ChartCard title="TVK Seat Status (234 constituencies) — latest round">
       <ResponsiveContainer width="100%" height={190}>
         <PieChart>
           <Pie
@@ -101,7 +101,7 @@ export function TvkStatusBreakdown() {
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        Competitive in 145 seats (107 leading + 38 close losses)
+        Competitive in 144 seats (103 leading + 41 close losses)
       </p>
     </ChartCard>
   );
@@ -109,7 +109,7 @@ export function TvkStatusBreakdown() {
 
 export function TvkCloseRacesChart() {
   return (
-    <ChartCard title="15 Closest TVK Losses — live May 4 (latest round)">
+    <ChartCard title="15 Closest TVK Losses — May 4 (refreshed round)">
       <ResponsiveContainer width="100%" height={310}>
         <BarChart
           data={TVK_CLOSE_LOSSES}
@@ -131,7 +131,7 @@ export function TvkCloseRacesChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Bar color = winning party · 38 total seats lost by &lt;5K votes · Sattur lost by 46 votes
+        Bar color = winning party · 41 total seats lost by &lt;5K · Sholavandan lost by 15 votes!
       </p>
     </ChartCard>
   );
@@ -154,7 +154,7 @@ export function TvkBeaterChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        57 seats TVK wasn't in top 2 · DMK surged +2 seats vs previous count
+        56 seats TVK wasn't in top 2 · 75 seats TVK is in 2nd place
       </p>
     </ChartCard>
   );

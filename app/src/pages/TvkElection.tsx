@@ -21,11 +21,11 @@ import {
 } from '../components/TvkInsightCharts';
 
 const MAJORITY_MARK = 118;
-const TVK_SEATS = 109;
+const TVK_SEATS = 108;
 const TOTAL_SEATS = 234;
 const SEATS_SHORT = MAJORITY_MARK - TVK_SEATS;
 const TVK_CLOSE_LOSSES = 27;
-const TVK_NOT_COMPETITIVE = 98;
+const TVK_NOT_COMPETITIVE = 99;
 
 const DATA_SOURCE_URL = 'https://results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm';
 
@@ -81,7 +81,7 @@ export function TvkElection() {
       </header>
 
       <div className="border-b border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-xs text-yellow-600 dark:text-yellow-400">
-        Counting update — May 4, 2026 (latest round). Source: ECI official (results.eci.gov.in). TVK 109 (22 Won+87 Leading) · DMK Alliance 73 · ADMK 44 · BJP 1.
+        Counting update — May 4, 2026 (final round). Source: ECI official (results.eci.gov.in). TVK 108 (30 Won+78 Leading) · DMK Alliance 73 · ADMK 45 · BJP 1.
       </div>
 
       <main className="flex-1 space-y-4 overflow-y-auto p-4">
@@ -106,7 +106,7 @@ export function TvkElection() {
           <StatCard
             label="Close Losses"
             value={`~${TVK_CLOSE_LOSSES}`}
-            sub="seats lost by <5K · Palani/Bargur/Cumbum flipped to losses · Polur 316!"
+            sub="seats lost by <5K · Kallakurichi flipped ADMK+156 · Polur 316!"
             variant="warn"
           />
           <StatCard
@@ -137,13 +137,13 @@ export function TvkElection() {
         <div className="rounded-xl border border-border bg-card px-4 py-3 text-xs text-muted-foreground">
           <p className="font-medium text-foreground">Data notes</p>
           <ul className="mt-1 list-disc space-y-1 pl-4">
-            <li>Count data — May 4, 2026 (latest round). Counting in progress. Source: ECI (results.eci.gov.in).</li>
-            <li>TVK leading/won 109 seats (22 officially won + 87 leading). 27 close losses (&lt;5K). ~98 not competitive.</li>
-            <li>Key flips: Palani (TVK→ADMK+753) · Bargur (TVK→ADMK+882) · Cumbum (TVK→DMK+1596) vs previous round.</li>
-            <li>Current risks: Polur 316 · Kovilpatti 329 · Kumbakonam 432 · Sholavandan recovered to 523 · Kulithalai 542.</li>
-            <li>DMK Alliance at 73 seats (DMK 60+INC 5+VCK 2+CPI 2+CPI(M) 2+IUML 2). BJP dropped from 2→1 seat. ADMK 45→44.</li>
+            <li>Count data — May 4, 2026 (final round). Source: ECI (results.eci.gov.in).</li>
+            <li>TVK leading/won 108 seats (30 officially won + 78 leading). 27 close losses (&lt;5K). ~99 not competitive.</li>
+            <li>Key flip this round: Kallakurichi (TVK→ADMK+156) · Tirukkoyilur now at 497 · Sholavandan 499.</li>
+            <li>Extreme risks: Polur 316 · Kovilpatti 329 · Kumbakonam 432 · Tirukkoyilur 497 · Sholavandan 499.</li>
+            <li>DMK Alliance at 73 seats (DMK 61+INC 5+VCK 1+CPI 2+CPI(M) 2+IUML 2). ADMK rose from 44→45.</li>
             <li>TVK vote share listed as "Other (39.19%)" in ECI — newly registered party classification.</li>
-            <li>TVK contested all 234 seats solo — no alliance. Historic debut. 52 seats TVK not even in top 2.</li>
+            <li>TVK contested all 234 seats solo — no alliance. Historic debut. 50 seats TVK not even in top 2.</li>
             <li>
               Official source:{' '}
               <a href={DATA_SOURCE_URL} target="_blank" rel="noreferrer" className="underline">

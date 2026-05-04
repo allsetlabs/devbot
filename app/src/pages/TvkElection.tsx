@@ -21,7 +21,7 @@ import {
 } from '../components/TvkInsightCharts';
 
 const MAJORITY_MARK = 118;
-const TVK_SEATS = 108;
+const TVK_SEATS = 107;
 const TOTAL_SEATS = 234;
 const SEATS_SHORT = MAJORITY_MARK - TVK_SEATS;
 const TVK_CLOSE_LOSSES = 28;
@@ -81,7 +81,7 @@ export function TvkElection() {
       </header>
 
       <div className="border-b border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-xs text-yellow-600 dark:text-yellow-400">
-        Counting update — May 4, 2026. Source: ECI (results.eci.gov.in). TVK 108 (38 Won+70 Leading) · DMK Alliance 75 · ADMK 43 · BJP 1. Thirumayam DMK+3!
+        Counting update — May 4, 2026. Source: ECI (results.eci.gov.in). TVK 107 (46 Won+61 Leading) · DMK Alliance 74 · ADMK 45. Yercaud flipped ADMK+2119 · Tirukkoyilur TVK+69!
       </div>
 
       <main className="flex-1 space-y-4 overflow-y-auto p-4">
@@ -106,7 +106,7 @@ export function TvkElection() {
           <StatCard
             label="Close Losses"
             value={`~${TVK_CLOSE_LOSSES}`}
-            sub="seats lost by <5K · Thirumayam DMK+3! · Tirukkoyilur 254"
+            sub="seats lost by <5K · Tiruvannamalai DMK+646 · Tirukkoyilur TVK+69!"
             variant="warn"
           />
           <StatCard
@@ -137,11 +137,11 @@ export function TvkElection() {
         <div className="rounded-xl border border-border bg-card px-4 py-3 text-xs text-muted-foreground">
           <p className="font-medium text-foreground">Data notes</p>
           <ul className="mt-1 list-disc space-y-1 pl-4">
-            <li>Count data — May 4, 2026 (updated round). Source: ECI (results.eci.gov.in).</li>
-            <li>TVK leading/won 108 seats (38 officially won + 70 leading). 28 close losses (&lt;5K). ~98 not competitive.</li>
-            <li>Key flip: Thirumayam DMK+3 (razor thin) · Tirukkoyilur 254 · Kovilpatti flipped TVK→DMK+962.</li>
-            <li>Extreme risks: Tirukkoyilur 254 · Yercaud 312 · Polur 316 · Kumbakonam 432 · Kulithalai 560.</li>
-            <li>DMK Alliance at 75 seats (DMK 62+INC 5+VCK 2+CPI 2+CPI(M) 2+IUML 2). ADMK fell to 43.</li>
+            <li>Count data — May 4, 2026 (final round). Source: ECI (results.eci.gov.in).</li>
+            <li>TVK leading/won 107 seats (46 officially won + 61 leading). 28 close losses (&lt;5K). ~98 not competitive.</li>
+            <li>Key flip: Yercaud flipped TVK+312 → ADMK+2119. Thirumayam settled at DMK+1539 (was showing DMK+3 early).</li>
+            <li>Extreme risk: Tirukkoyilur TVK+69 · Polur TVK+316 · Kumbakonam TVK+432 · Kulithalai TVK+560.</li>
+            <li>DMK Alliance at 74 seats (DMK 61+INC 5+VCK 2+CPI 2+CPI(M) 2+IUML 2). ADMK rose to 45.</li>
             <li>TVK vote share listed as "Other (39.19%)" in ECI — newly registered party classification.</li>
             <li>TVK contested all 234 seats solo — no alliance. Historic debut. 51 seats TVK not even in top 2.</li>
             <li>

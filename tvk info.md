@@ -17,7 +17,7 @@ Read this file **before every data refresh run**. It documents the official ECI 
 
 **Party code:** `3679` (Tamilaga Vettri Kazhagam)  
 **State code:** `S22` (Tamil Nadu)  
-**Last fetched:** May 4, 2026 (updated counting round — 38W+70L=108)
+**Last fetched:** May 4, 2026 (final counting round — 46W+61L=107)
 
 ---
 
@@ -124,101 +124,100 @@ data.sort((a,b)=>a.margin-b.margin);
 
 ---
 
-## Data Reference (as of May 4, 2026 — updated round)
+## Data Reference (as of May 4, 2026 — FINAL round)
 
 ### Party-wise totals
 
 | Party | Won | Leading | Total |
 |-------|-----|---------|-------|
-| TVK | 38 | 70 | **108** |
-| DMK | 17 | 45 | 62 |
-| ADMK | 13 | 30 | 43 |
-| PMK | 1 | 4 | 5 |
+| TVK | 46 | 61 | **107** |
+| DMK | 20 | 41 | 61 |
+| ADMK | 18 | 27 | 45 |
+| PMK | 2 | 3 | 5 |
 | INC | 1 | 4 | 5 |
-| IUML | 0 | 2 | 2 |
+| IUML | 1 | 1 | 2 |
+| CPI | 1 | 1 | 2 |
 | VCK | 0 | 2 | 2 |
 | CPI(M) | 1 | 1 | 2 |
-| CPI | 1 | 1 | 2 |
 | BJP | 1 | 0 | 1 |
 | DMDK | 0 | 1 | 1 |
 | AMMK | 1 | 0 | 1 |
-| **Total** | **75** | **160** | **234** |
+| **Total** | **93** | **143** | **234** |
 
-**Key changes from previous snapshot (30 Won + 78 Leading = 108):**
-- TVK: 30→38 officially Won, 78→70 Leading, total stays 108
-- Kovilpatti FLIPPED from TVK leading → DMK+962 loss
-- Kallakurichi BACK to TVK+798 (was showing ADMK+156 before)
-- Thirumayam is new #1 closest loss: DMK+3 votes
-- Tirukkoyilur margin dropped to 254 (was 497)
-- DMK: 61→62 (+1), ADMK: 45→43 (-2), VCK: 1→2 (+1), AMMK: 0→1 (+1)
-- DMK Alliance rose to 75: DMK(62)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2)
+**Key changes from previous snapshot (38W+70L=108):**
+- TVK: 38→46 Won, 70→61 Leading, **total dropped 108→107** (Yercaud flip)
+- Yercaud FLIPPED: was TVK+312 leading → now ADMK+2119 (major swing!)
+- Tirukkoyilur now at TVK+69 (was 254) — most extreme risk remaining
+- Thirumayam settled at DMK+1539 (was showing DMK+3 in early rounds — was a counting artifact)
+- DMK: 62→61, ADMK: 43→45, DMK Alliance: 75→74
+- Sholavandan, Tiruvadanai declared Won (no longer in leading page)
 
-### TVK margin summary (70 Leading seats — 38 Won counted separately)
+### TVK margin summary (108 seats total — statewise data incl. won)
 
 | Margin Range | Seats |
 |-------------|-------|
-| < 1,000 | 6 |
-| 1K – 3K | 4 |
-| 3K – 5K | 4 |
+| < 1,000 | 5 |
+| 1K – 3K | 9 |
+| 3K – 5K | 5 |
 | 5K – 10K | 13 |
-| 10K – 20K | 15 |
-| > 20K | 28 |
-| **Total** | **70** |
+| 10K – 20K | 33 |
+| > 20K | 43 |
+| **Total** | **108** |
 
-### TVK 10 most at-risk wins (smallest leading margins — 70 leading seats)
+### TVK 10 most at-risk wins (smallest leading margins — 61 still-leading seats)
 
 | Constituency | Margin | Status | Risk |
 |-------------|--------|--------|------|
-| Tirukkoyilur | 254 | 22/24 | Extreme |
-| Yercaud | 312 | 22/24 | Extreme |
+| Tirukkoyilur | 69 | 22/24 | Extreme |
 | Polur | 316 | 12/22 | Extreme |
 | Kumbakonam | 432 | 20/22 | Extreme |
 | Kulithalai | 560 | 19/21 | High |
-| Kallakurichi | 798 | 27/27 | Locked |
+| Kallakurichi | 798 | — | Medium |
+| Srivaikuntam | 1,186 | — | Medium |
+| Cumbum | 1,421 | — | Medium |
 | Manapparai | 1,426 | 26/26 | Locked |
-| Sholavandan | 1,622 | 18/19 | Medium |
-| Usilampatti | 2,374 | 22/25 | Medium |
-| Tiruvadanai | 2,513 | 28/28 | Locked |
+| Usilampatti | 1,617 | 24/25 | Medium |
+| Modakkurichi | 2,430 | — | Low |
 
 ### Close losses (TVK lost by < 5K, 28 seats)
 
 | Constituency | Winner | Margin |
 |-------------|--------|--------|
-| Thirumayam | DMK | 3 |
-| Tiruvannamalai | DMK | 402 |
+| Tiruvannamalai | DMK | 646 |
 | Palani | ADMK | 753 |
 | Kovilpatti | DMK | 962 |
 | Udhagamandalam | BJP | 976 |
 | Dindigul | DMK | 1,131 |
-| Tittakudi | DMK | 1,445 |
-| Pudukkottai | DMK | 1,455 |
-| Karur | ADMK | 1,856 |
-| Cumbum | DMK | 1,943 |
-| Papanasam | IUML | 2,208 |
-| Tiruppattur | DMK | 2,237 |
+| Karur | ADMK | 1,340 |
+| Thirumayam | DMK | 1,539 |
+| Papanasam | IUML | 1,733 |
+| Tiruppattur | DMK | 1,738 |
+| Pudukkottai | DMK | 2,031 |
+| Yercaud | ADMK | 2,119 |
+| Tittakudi | DMK | 2,190 |
 | Coimbatore (South) | DMK | 2,271 |
 | Kilvelur | CPI(M) | 2,278 |
 | Vriddhachalam | DMDK | 2,387 |
-| Colachal | INC | 2,499 |
+| Sholingur | PMK | 2,475 |
 | Melur | INC | 2,724 |
-| Lalgudi | ADMK | 2,731 |
+| Lalgudi | ADMK | 2,739 |
+| Colachal | INC | 2,943 |
 | Vaniyambadi | IUML | 2,982 |
-| Bargur | ADMK | 3,076 |
+| Vikravandi | PMK | 3,046 |
 | Killiyoor | INC | 3,285 |
-| Aruppukkottai | DMK | 3,510 |
 | Paramakudi | DMK | 3,548 |
-| Vikravandi | PMK | 4,004 |
+| Aruppukkottai | DMK | 3,885 |
 | Viluppuram | DMK | 4,119 |
-| Sholingur | PMK | 4,240 |
+| Bargur | ADMK | 4,182 |
 | Tiruchirappalli (West) | DMK | 4,786 |
-| Rishivandiyam | DMK | 4,870 |
+| Rishivandiyam | DMK | 4,997 |
 
 ### Who beats TVK (75 seats where TVK is 2nd)
 
 | Party | Seats |
 |-------|-------|
-| DMK | 38 |
-| ADMK | 22 |
+| DMK | 37 |
+| ADMK | 23 |
 | INC | 4 |
 | PMK | 4 |
 | CPI(M) | 2 |
@@ -232,9 +231,9 @@ data.sort((a,b)=>a.margin-b.margin);
 
 | Category | Count |
 |----------|-------|
-| Won (Final) | 38 |
-| Safe Lead (>5K) | 56 |
-| Close Lead (<5K) | 14 |
+| Won (Final) | 46 |
+| Safe Lead (>5K) | 43 |
+| Close Lead (<5K) | 19 |
 | Close Loss (<5K) | 28 |
 | Not Competitive | 98 |
 | **Total** | **234** |

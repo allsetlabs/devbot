@@ -12,31 +12,31 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// ECI count — May 4, 2026 (latest round refresh)
+// ECI count — May 4, 2026 (final round)
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
-// TVK: 38 Won + 70 Leading = 108 | DMK: 62 | ADMK: 43 | VCK: 2 | DMK Alliance: 75
-// Thirumayam DMK+3 · Tirukkoyilur 254 · Kallakurichi TVK+798 (back)
+// TVK: 46 Won + 61 Leading = 107 | DMK: 61 | ADMK: 45 | DMK Alliance: 74
+// Yercaud FLIPPED TVK+312 → ADMK+2119 · Tirukkoyilur TVK+69 (most at risk)
 
 const TVK_WIN_STATUS = [
-  { name: 'TVK Leading/Won', value: 108, color: '#e855a8' },
-  { name: 'Not Leading', value: 126, color: '#e2e8f0' },
+  { name: 'TVK Leading/Won', value: 107, color: '#e855a8' },
+  { name: 'Not Leading', value: 127, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 70 TVK leading seats (38 already Won, counted separately)
-// Tirukkoyilur 254 · Yercaud 312 · Polur 316 · Kumbakonam 432 · Kulithalai 560
+// Margin breakdown for all 108 TVK leading/won seats (statewise data — final round)
+// Tirukkoyilur 69 · Polur 316 · Kumbakonam 432 · Kulithalai 560 · Yercaud FLIPPED to ADMK
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 6, fill: '#facc15' },
-  { range: '1K–3K', seats: 4, fill: '#86efac' },
-  { range: '3K–5K', seats: 4, fill: '#4ade80' },
+  { range: '<1K', seats: 5, fill: '#facc15' },
+  { range: '1K–3K', seats: 9, fill: '#86efac' },
+  { range: '3K–5K', seats: 5, fill: '#4ade80' },
   { range: '5K–10K', seats: 13, fill: '#22c55e' },
-  { range: '10K–20K', seats: 15, fill: '#16a34a' },
-  { range: '>20K', seats: 28, fill: '#15803d' },
+  { range: '10K–20K', seats: 33, fill: '#16a34a' },
+  { range: '>20K', seats: 43, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
-  { party: 'TVK', seats: 108, fill: '#e855a8' },
-  { party: 'DMK', seats: 62, fill: '#22c55e' },
-  { party: 'ADMK', seats: 43, fill: '#a3731a' },
+  { party: 'TVK', seats: 107, fill: '#e855a8' },
+  { party: 'DMK', seats: 61, fill: '#22c55e' },
+  { party: 'ADMK', seats: 45, fill: '#a3731a' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
   { party: 'INC', seats: 5, fill: '#3b82f6' },
   { party: 'BJP', seats: 1, fill: '#f97316' },
@@ -64,19 +64,19 @@ const VOTE_SHARE = [
   { party: 'IUML', share: 0.36, fill: '#0284c7' },
 ];
 
-// 10 TVK-leading seats with smallest margins (most at risk) — latest round
-// Tirukkoyilur dropped to 254 · Yercaud 312 · Kallakurichi back to TVK+798
+// 10 TVK-leading seats with smallest margins (most at risk) — final round
+// Yercaud FLIPPED to ADMK · Tirukkoyilur now at just TVK+69 — extreme risk!
 const TVK_WINS_AT_RISK = [
-  { name: 'Tirukkoyilur', margin: 254, fill: '#ef4444' },
-  { name: 'Yercaud', margin: 312, fill: '#ef4444' },
+  { name: 'Tirukkoyilur', margin: 69, fill: '#ef4444' },
   { name: 'Polur', margin: 316, fill: '#ef4444' },
   { name: 'Kumbakonam', margin: 432, fill: '#ef4444' },
   { name: 'Kulithalai', margin: 560, fill: '#f97316' },
   { name: 'Kallakurichi', margin: 798, fill: '#f97316' },
+  { name: 'Srivaikuntam', margin: 1186, fill: '#fbbf24' },
+  { name: 'Cumbum', margin: 1421, fill: '#fbbf24' },
   { name: 'Manapparai', margin: 1426, fill: '#fbbf24' },
-  { name: 'Sholavandan', margin: 1622, fill: '#fbbf24' },
-  { name: 'Usilampatti', margin: 2374, fill: '#d97706' },
-  { name: 'Tiruvadanai', margin: 2513, fill: '#d97706' },
+  { name: 'Usilampatti', margin: 1617, fill: '#d97706' },
+  { name: 'Modakkurichi', margin: 2430, fill: '#d97706' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -90,7 +90,7 @@ export function ChartCard({ title, children }: { title: string; children: React.
 
 export function TvkWinLossChart() {
   return (
-    <ChartCard title="TVK Lead Status (234 constituencies) — May 4 final round">
+    <ChartCard title="TVK Seat Status (234 constituencies) — May 4 final round">
       <ResponsiveContainer width="100%" height={190}>
         <PieChart>
           <Pie
@@ -124,7 +124,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>10 seats short</strong> (38 Won + 70 Leading)
+        Majority needs <strong>118</strong> — TVK is <strong>11 seats short</strong> (46 Won + 61 Leading)
       </div>
     </ChartCard>
   );
@@ -147,7 +147,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        70 still-leading seats · 6 leads &lt;1,000 · 38 already Won (separate) · Tirukkoyilur 254!
+        108 TVK seats total · 5 leads &lt;1,000 · 46 officially Won · Tirukkoyilur 69! Yercaud FLIPPED to ADMK
       </p>
     </ChartCard>
   );
@@ -155,7 +155,7 @@ export function TvkMarginChart() {
 
 export function TvkWinsAtRiskChart() {
   return (
-    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads (latest round)">
+    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads (final round)">
       <ResponsiveContainer width="100%" height={260}>
         <BarChart
           data={TVK_WINS_AT_RISK}
@@ -177,7 +177,7 @@ export function TvkWinsAtRiskChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Red = extreme risk (&lt;500) · Tirukkoyilur 254 · Yercaud 312 · Kallakurichi back TVK+798
+        Red = extreme risk (&lt;500) · Tirukkoyilur TVK+69 (closest!) · Yercaud FLIPPED to ADMK+2119
       </p>
     </ChartCard>
   );

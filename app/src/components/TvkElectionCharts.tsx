@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// Official ECI data — 12:12 PM, May 5, 2026 (counting ongoing)
+// Official ECI data — May 5, 2026 (final count)
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
 
 const TVK_WIN_STATUS = [
@@ -20,41 +20,44 @@ const TVK_WIN_STATUS = [
   { name: 'Not Leading', value: 128, color: '#e2e8f0' },
 ];
 
-// Actual margin breakdown for 106 TVK-leading constituencies (from ECI)
+// Margin breakdown for 106 TVK-leading constituencies (from ECI constituency detail)
 const TVK_MARGIN_DIST = [
   { range: '<1K', seats: 14, fill: '#facc15' },
-  { range: '1K–3K', seats: 27, fill: '#86efac' },
-  { range: '3K–5K', seats: 14, fill: '#4ade80' },
-  { range: '5K–10K', seats: 33, fill: '#22c55e' },
-  { range: '10K–20K', seats: 16, fill: '#16a34a' },
-  { range: '>20K', seats: 2, fill: '#15803d' },
+  { range: '1K–3K', seats: 21, fill: '#86efac' },
+  { range: '3K–5K', seats: 15, fill: '#4ade80' },
+  { range: '5K–10K', seats: 31, fill: '#22c55e' },
+  { range: '10K–20K', seats: 22, fill: '#16a34a' },
+  { range: '>20K', seats: 3, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
   { party: 'TVK', seats: 106, fill: '#e855a8' },
-  { party: 'ADMK', seats: 64, fill: '#a3731a' },
-  { party: 'DMK', seats: 43, fill: '#22c55e' },
+  { party: 'ADMK', seats: 62, fill: '#a3731a' },
+  { party: 'DMK', seats: 45, fill: '#22c55e' },
   { party: 'INC', seats: 5, fill: '#3b82f6' },
-  { party: 'PMK', seats: 4, fill: '#65a30d' },
-  { party: 'BJP', seats: 3, fill: '#f97316' },
+  { party: 'PMK', seats: 5, fill: '#65a30d' },
   { party: 'VCK', seats: 2, fill: '#7c3aed' },
   { party: 'DMDK', seats: 2, fill: '#d97706' },
   { party: 'CPI', seats: 2, fill: '#dc2626' },
-  { party: 'Others', seats: 3, fill: '#94a3b8' },
+  { party: 'BJP', seats: 2, fill: '#f97316' },
+  { party: 'IUML', seats: 1, fill: '#0284c7' },
+  { party: 'AMMK', seats: 1, fill: '#64748b' },
+  { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
 ];
 
 // ECI vote share — TVK appears under "Other" (new party classification)
 const VOTE_SHARE = [
-  { party: 'TVK*', share: 38.74, fill: '#e855a8' },
-  { party: 'DMK', share: 24.2, fill: '#22c55e' },
-  { party: 'ADMK', share: 22.29, fill: '#a3731a' },
+  { party: 'TVK*', share: 38.92, fill: '#e855a8' },
+  { party: 'DMK', share: 24.13, fill: '#22c55e' },
+  { party: 'ADMK', share: 22.16, fill: '#a3731a' },
   { party: 'NTK', share: 3.91, fill: '#475569' },
-  { party: 'INC', share: 3.5, fill: '#3b82f6' },
-  { party: 'BJP', share: 3.18, fill: '#f97316' },
-  { party: 'Others', share: 4.18, fill: '#94a3b8' },
+  { party: 'INC', share: 3.53, fill: '#3b82f6' },
+  { party: 'BJP', share: 3.17, fill: '#f97316' },
+  { party: 'DMDK', share: 1.07, fill: '#d97706' },
+  { party: 'Others', share: 3.11, fill: '#94a3b8' },
 ];
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <h2 className="mb-4 text-base font-semibold text-foreground">{title}</h2>
@@ -122,7 +125,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 5,629 · Highest: 30,315 (Madavaram) · 14 seats won by &lt;1,000 votes
+        Avg margin: 6,788 · Highest: 35,728 (Madavaram) · 14 seats won by &lt;1,000 votes
       </p>
     </ChartCard>
   );

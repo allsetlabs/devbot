@@ -2,7 +2,7 @@
 
 ## Overview
 Tamil Nadu 2026 Assembly Election results for TVK (Tamilaga Vettri Kazhagam — Vijay's party).
-Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result date: 4 May 2026
+Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result date: May 5, 2026
 
 **BEFORE EVERY RUN:** Read this file first. Navigate to the ECI URLs below to get fresh data.
 
@@ -32,109 +32,197 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 - **Table selector**: `table tbody tr` → cells[1]=Party, cells[2]=Vote%, cells[3]=TotalVotes
 - **Note**: TVK appears under "Other" in vote share — it's a newly registered party
 
-### 4. Wikipedia (for finalized summary)
+### 4. ECI All Constituencies At a Glance (PAGINATED — 12 pages)
+- **URLs**: `https://results.eci.gov.in/ResultAcGenMay2026/statewiseS22{1..12}.htm`
+  (i.e., statewiseS221.htm, statewiseS222.htm, ... statewiseS2212.htm)
+- **Found via**: "All Constituencies at a glance >" link on the main results page
+- **Table structure**: 31 cells per row (tooltip spans inflate cell count)
+  - cells[0] = Constituency name
+  - cells[1] = Constituency number
+  - cells[2] = Leading candidate
+  - cells[4] = Leading party (clean, after removing tooltip span)
+  - cells[15] = Trailing candidate
+  - cells[17] = Trailing party (clean)
+  - cells[28] = Margin
+  - cells[30] = Status
+- **JS to fetch ALL 12 pages** (run from any ECI tab):
+```js
+(async () => {
+  function extractFromHTML(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const rows = doc.querySelectorAll('table tbody tr');
+    const data = [];
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if(cells.length >= 29) {
+        const constituency = cells[0]?.textContent.trim();
+        const constNo = cells[1]?.textContent.trim();
+        const leadingParty = cells[4]?.textContent.trim();
+        const trailingParty = cells[17]?.textContent.trim();
+        const margin = parseInt(cells[28]?.textContent.trim().replace(/,/g,'')) || 0;
+        if(constituency && constNo.match(/^\d+$/)) {
+          data.push({constituency, constNo: parseInt(constNo), leadingParty, trailingParty, margin});
+        }
+      }
+    });
+    return data;
+  }
+  const base = 'https://results.eci.gov.in/ResultAcGenMay2026/statewiseS22';
+  const allData = [];
+  for(let i = 1; i <= 12; i++) {
+    const resp = await fetch(base + i + '.htm');
+    const html = await resp.text();
+    allData.push(...extractFromHTML(html));
+  }
+  window._electionData = allData;
+  return JSON.stringify({total: allData.length});
+})()
+```
+
+### 5. Wikipedia (for finalized summary)
 - **URL**: `https://en.wikipedia.org/wiki/2026_Tamil_Nadu_Legislative_Assembly_election`
 - **Useful for**: Final confirmed seat tallies post-counting
 - **Table selector**: `.wikitable` — "Results summary" or "Party-wise results" section
 
 ---
 
-## Data Last Fetched: 2026-05-05 12:12 PM
+## Data Last Fetched: 2026-05-05 (Final Count)
 
 ### Party-wise Seat Tally (Official ECI)
-| Party | Won | Leading | Total |
-|---|---|---|---|
-| TVK (Tamilaga Vettri Kazhagam) | 0 | 106 | 106 |
-| ADMK | 0 | 64 | 64 |
-| DMK | 0 | 43 | 43 |
-| INC | 0 | 5 | 5 |
-| PMK | 0 | 4 | 4 |
-| BJP | 0 | 3 | 3 |
-| DMDK | 0 | 2 | 2 |
-| VCK | 0 | 2 | 2 |
-| CPI | 0 | 2 | 2 |
-| IUML | 0 | 1 | 1 |
-| AMMKMNKZ | 0 | 1 | 1 |
-| CPI(M) | 0 | 1 | 1 |
-| **Total** | **0** | **234** | **234** |
-
-### TVK Winning Margin Breakdown (106 seats — real ECI data)
-| Margin Range | Seats | Note |
-|---|---|---|
-| Very close (<1,000) | 14 | At risk if recounting |
-| Close win (1K–3K) | 27 | Narrow win |
-| Moderate (3K–5K) | 14 | Comfortable |
-| Good (5K–10K) | 33 | Safe |
-| Comfortable (10K–20K) | 16 | Very safe |
-| Dominant (>20K) | 2 | Madavaram (30,315), Poonamallee (21,249) |
-| **Total** | **106** | Avg margin: 5,629 votes |
+| Party | Total |
+|---|---|
+| TVK (Tamilaga Vettri Kazhagam) | 106 |
+| ADMK | 62 |
+| DMK | 45 |
+| INC | 5 |
+| PMK | 5 |
+| VCK | 2 |
+| DMDK | 2 |
+| CPI | 2 |
+| BJP | 2 |
+| IUML | 1 |
+| AMMKMNKZ | 1 |
+| CPI(M) | 1 |
+| **Total** | **234** |
 
 ### Alliance Summary
-| Alliance | Parties | Seats | Vote Share |
-|---|---|---|---|
-| TVK (solo) | TVK | 106 | ~38.74%* |
-| AIADMK+ | ADMK + BJP | 67 | ~25.47% |
-| DMK Alliance (SPA) | DMK + INC + VCK + CPI + CPI(M) + IUML | 54 | ~30.26% |
-| Others | PMK + DMDK + AMMKMNKZ | 7 | ~5.53% |
-
-### Vote Share (Official ECI — named parties)
-| Party | Vote % | Total Votes |
+| Alliance | Parties | Seats |
 |---|---|---|
-| Other (incl. TVK*) | 38.74% | 50,21,272 |
-| DMK | 24.20% | 31,36,703 |
-| ADMK | 22.29% | 28,89,410 |
-| NTK | 3.91% | 5,06,253 |
-| INC | 3.50% | 4,54,118 |
-| BJP | 3.18% | 4,12,316 |
-| DMDK | 1.06% | 1,37,696 |
-| VCK | 0.88% | 1,14,294 |
-| CPI | 0.70% | 90,496 |
-| CPI(M) | 0.60% | 77,833 |
-| NOTA | 0.41% | 53,471 |
-| IUML | 0.38% | 49,028 |
-| BSP | 0.12% | 14,993 |
+| TVK (solo) | TVK | 106 |
+| AIADMK+ | ADMK(62) + BJP(2) | 64 |
+| DMK Alliance (SPA) | DMK(45)+INC(5)+VCK(2)+CPI(2)+CPI(M)(1)+IUML(1) | 56 |
+| Others | PMK(5)+DMDK(2)+AMMK(1) | 8 |
 
-*TVK is classified as "Other" in ECI vote share — it's a newly registered party not yet recognized as a state party.
+### TVK Constituency Status (All 234)
+| Status | Count | Description |
+|---|---|---|
+| Safe Win (>5K margin) | 56 | Dominant lead |
+| Close Win (<5K margin) | 50 | Could be challenged: <1K(14), 1K-3K(21), 3K-5K(15) |
+| Close Loss (<5K behind) | 50 | Lost but could have swung |
+| Not Competitive | 78 | Far loss (19 in 2nd, 59 not in top-2) |
+
+### TVK Who's Beating TVK (69 seats TVK is in 2nd place)
+| Party | Seats |
+|---|---|
+| ADMK | 28 |
+| DMK | 27 |
+| INC | 4 |
+| PMK | 4 |
+| DMDK | 2 |
+| BJP | 1 |
+| CPI | 1 |
+| CPI(M) | 1 |
+| IUML | 1 |
+
+### Top 15 Closest TVK Losses
+| Constituency | Won By | Margin |
+|---|---|---|
+| Cuddalore | INC | 26 |
+| Valparai | DMK | 113 |
+| Madurantakam | ADMK | 118 |
+| Coimbatore South | DMK | 127 |
+| Kangayam | ADMK | 301 |
+| Veerapandi | ADMK | 338 |
+| Vikravandi | PMK | 406 |
+| Udhagamandalam (Ooty) | BJP | 509 |
+| Yercaud | ADMK | 522 |
+| Kancheepuram | ADMK | 692 |
+| Virudhunagar | DMDK | 897 |
+| Nilakkottai | DMK | 1,288 |
+| Tiruvadanai | INC | 1,288 |
+| Nagercoil | DMK | 1,379 |
+| Sankarankovil | ADMK | 1,425 |
+
+### TVK Winning Margin Breakdown (106 seats)
+| Margin Range | Seats |
+|---|---|
+| <1,000 (at risk) | 14 |
+| 1K–3K | 21 |
+| 3K–5K | 15 |
+| 5K–10K | 31 |
+| 10K–20K | 22 |
+| >20K | 3 |
+| **Total** | **106** |
+| Avg margin | 6,788 votes |
+| Highest | Madavaram 35,728 |
+
+### Vote Share (Official ECI)
+| Party | Vote % |
+|---|---|
+| Other (incl. TVK*) | 38.92% |
+| DMK | 24.13% |
+| ADMK | 22.16% |
+| NTK | 3.91% |
+| INC | 3.53% |
+| BJP | 3.17% |
+| DMDK | 1.07% |
+| VCK | 0.92% |
+| CPI | 0.67% |
+| CPI(M) | 0.58% |
+| IUML | 0.39% |
+| NOTA | 0.41% |
+
+*TVK is classified as "Other" in ECI vote share — newly registered party.
 
 ---
 
 ## Scraping Instructions
 
-### Step 1: Get party totals + TVK detail URL
+### Step 1: Get party totals
 ```
-1. tabs_create_mcp → new tab
-2. navigate → https://results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
-3. wait 3s
-4. javascript_tool: document.querySelectorAll('table tbody tr') → extract cells[0..3] + links[0].href for TVK row
+1. navigate → https://results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
+2. wait 3s
+3. javascript_tool: document.querySelectorAll('table tbody tr') → extract cells[0..3]
 ```
 
 ### Step 2: Get TVK constituency margins
 ```
-1. navigate → href from Step 1 (partywiseleadresult-XXXXS22.htm)
+1. navigate → https://results.eci.gov.in/ResultAcGenMay2026/partywiseleadresult-3679S22.htm
 2. wait 2s
-3. javascript_tool:
-   const rows = document.querySelectorAll('table tbody tr');
-   const margins = [];
-   rows.forEach(row => {
-     const cells = row.querySelectorAll('td');
-     const m = parseInt(cells[4]?.textContent?.trim().replace(/,/g,''));
-     if(!isNaN(m)) margins.push(m);
-   });
-   // Then categorize by range
+3. javascript_tool: extract cells[4] (margin) from each row
 ```
 
 ### Step 3: Get vote share
 ```
 1. navigate → https://results.eci.gov.in/ResultAcGenMay2026/voteshareresult-S22.htm
-   (OR click the "Party Wise Vote Share – View Full Details" link on the results page)
 2. wait 3s
-3. javascript_tool: document.querySelectorAll('table tbody tr') → cells[1]=Party, cells[2]=Vote%, cells[3]=TotalVotes
+3. javascript_tool: cells[1]=Party, cells[2]=Vote%
+```
+
+### Step 4: Get all 234 constituencies (for close race analysis)
+```
+1. Navigate to any ECI page
+2. Run the async fetch loop above (fetches all 12 pages in parallel)
+3. Extract leadingParty, trailingParty, margin for all rows
+4. Filter: tvkTrailing = where trailingParty includes 'Tamilaga Vettri'
+5. Filter: closeLosses = tvkTrailing where margin < 5000
 ```
 
 ### Key selectors summary
-| Data | URL | JS Selector |
-|---|---|---|
-| Party seats | partywiseresult-S22.htm | `table tbody tr` → cells[0..3] |
-| TVK detail link | partywiseresult-S22.htm | TVK row `a[href]` |
-| TVK margins | partywiseleadresult-3679S22.htm | `table tbody tr` → cells[4] |
-| Vote share | voteshareresult-S22.htm | `table tbody tr` → cells[1..3] |
+| Data | URL | JS Selector | Key cells |
+|---|---|---|---|
+| Party seats | partywiseresult-S22.htm | `table tbody tr` | cells[0..3] |
+| TVK margins | partywiseleadresult-3679S22.htm | `table tbody tr` | cells[4] |
+| Vote share | voteshareresult-S22.htm | `table tbody tr` | cells[1,2] |
+| All constituencies | statewiseS22{1..12}.htm | `table tbody tr` (31 cells/row) | cells[4,17,28] |

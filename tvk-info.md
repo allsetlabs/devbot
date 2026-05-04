@@ -24,6 +24,7 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
   (URL suffix changes if party ID changes — always extract from step 1 first)
 - **Table columns**: cells[0]=Serial, cells[1]=Constituency(+No), cells[2]=Candidate, cells[3]=Votes, cells[4]=Margin, cells[5]=Status(rounds)
 - **JS to extract margins**: `document.querySelectorAll('table tbody tr')` → `parseInt(cells[4].textContent.replace(/,/g,''))`
+- **Note**: This page shows "leading" seats only (~101 seats). Won seats appear separately. Total TVK = 108 (4 won + 104 leading).
 
 ### 3. ECI Vote Share
 - **URL**: `https://results.eci.gov.in/ResultAcGenMay2026/voteshareresult-S22.htm`
@@ -95,21 +96,21 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 
 ---
 
-## Data Last Fetched: 2026-05-04 (Live Count — latest round, afternoon counting)
+## Data Last Fetched: 2026-05-04 (Live Count — evening counting round)
 
 ### Party-wise Seat Tally (ECI Live — counting in progress)
 | Party | Total (Won+Leading) |
 |---|---|
-| TVK (Tamilaga Vettri Kazhagam) | 107 (2 won + 105 leading) |
-| DMK | 58 (3 won + 55 leading) |
-| ADMK | 47 |
+| TVK (Tamilaga Vettri Kazhagam) | 108 (4 won + 104 leading) |
+| DMK | 59 (6 won + 53 leading) |
+| ADMK | 44 |
+| PMK | 5 |
 | INC | 5 |
-| PMK | 4 |
-| CPI | 3 |
+| BJP | 3 |
 | IUML | 2 |
 | VCK | 2 |
-| BJP | 2 |
 | CPI(M) | 2 |
+| CPI | 2 |
 | DMDK | 1 |
 | AMMK | 1 |
 | **Total** | **234** |
@@ -117,102 +118,99 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 ### Alliance Breakdown
 | Alliance | Parties | Seats |
 |---|---|---|
-| TVK (Solo) | TVK | 107 |
+| TVK (Solo) | TVK | 108 |
 | DMK Alliance | DMK+INC+VCK+CPI+CPI(M)+IUML | 72 |
-| ADMK (Solo) | ADMK | 47 |
-| Others | PMK+DMDK+AMMK | 6 |
-| BJP | BJP | 2 |
+| ADMK (Solo) | ADMK | 44 |
+| Others | PMK+DMDK+AMMK | 7 |
+| BJP | BJP | 3 |
 
-**Note**: TVK at 107 seats, 11 short of majority. DMK Alliance at 72 (DMK 58+INC 5+VCK 2+CPI 3+CPI(M) 2+IUML 2). BJP dropped to 2. CPI up to 3, CPI(M) up to 2.
-**Note on TVK leading link**: URL changed from `partywiseleadresult-3679S22.htm` → also check `partywisewinresult-3679S22.htm` for declared wins. Use leads page for all 107.
+**Note**: TVK at 108 seats, 10 short of majority. DMK Alliance at 72 (DMK 59+INC 5+VCK 2+CPI 2+CPI(M) 2+IUML 2). BJP up to 3. ADMK dropped to 44.
 
-### TVK Constituency Status (All 234 — live latest round)
+### TVK Constituency Status (All 234 — live evening round)
 | Status | Count | Description |
 |---|---|---|
-| Safe Lead (>5K margin) | 75 | Dominant lead |
-| Close Lead (<5K margin) | 32 | At risk: <1K(8), 1K-3K(17), 3K-5K(7) |
-| Close Loss (<5K behind) | 31 | Lost but could have swung |
+| Safe Lead (>5K margin) | 82 | Dominant lead |
+| Close Lead (<5K margin) | 26 | At risk: <1K(4), 1K-3K(15), 3K-5K(7) |
+| Close Loss (<5K behind) | 30 | Lost but could have swung |
 | Not Competitive (trailing >5K or not in top 2) | 96 | Wide loss or not in top-2 |
 
-### TVK Who's Beating TVK (69 seats TVK is in 2nd place — live latest round)
+### TVK Who's Beating TVK (70 seats TVK is in 2nd place — live evening round)
 | Party | Seats |
 |---|---|
-| DMK | 33 |
-| ADMK | 22 |
+| DMK | 36 |
+| ADMK | 19 |
 | INC | 4 |
-| PMK | 2 |
+| PMK | 3 |
 | CPI(M) | 2 |
 | IUML | 2 |
 | CPI | 2 |
-| DMDK | 1 |
 | BJP | 1 |
+| DMDK | 1 |
 
-### Top 15 Closest TVK Losses (Latest Round — May 4, 2026 afternoon)
+### Top 15 Closest TVK Losses (Latest Round — May 4, 2026 evening)
 | Constituency | Won By | Margin |
 |---|---|---|
 | Kumbakonam | DMK | 86 |
-| Srivaikuntam | ADMK | 136 |
-| Katpadi | ADMK | 141 |
-| Tiruvannamalai | DMK | 291 |
-| Tittakudi | DMK | 530 |
-| Kilvelur | CPI(M) | 663 |
-| Vikravandi | PMK | 730 |
-| Killiyoor | INC | 910 |
-| Paramakudi | DMK | 1,132 |
-| Coimbatore South | DMK | 1,231 |
+| Dindigul | DMK | 279 |
+| Nilakkottai | DMK | 513 |
+| Tiruvannamalai | DMK | 1,074 |
+| Vikravandi | PMK | 1,075 |
+| Lalgudi | ADMK | 1,101 |
+| Tittakudi | DMK | 1,125 |
 | Udhagamandalam | BJP | 1,231 |
-| Lalgudi | ADMK | 1,368 |
-| Dindigul | DMK | 1,471 |
-| Viluppuram | DMK | 1,491 |
-| Pudukkottai | DMK | 2,376 |
+| Palani | ADMK | 1,246 |
+| Sholingur | PMK | 1,561 |
+| Kilvelur | CPI(M) | 1,679 |
+| Killiyoor | INC | 1,987 |
+| Paramakudi | DMK | 2,437 |
+| Srivilliputhur | CPI | 2,515 |
+| Vaniyambadi | IUML | 2,572 |
 
-**Note**: Senthamangalam and Ranipet flipped from losses to TVK wins vs previous round! Nilakkottai is now a TVK lead (was a loss).
-
-### TVK Wins at Risk (10 Slimmest TVK Leading Margins — latest round)
+### TVK Wins at Risk (10 Slimmest TVK Leading Margins — evening round)
 | Constituency | TVK Lead (votes) |
 |---|---|
-| Nilakkottai | 16 |
-| Ambur | 275 |
-| Manapparai | 369 |
-| Sholingur | 437 |
-| Sholavandan | 628 |
-| Senthamangalam | 760 |
-| Ranipet | 843 |
-| Bargur | 954 |
-| Polur | 1,085 |
-| Yercaud | 1,190 |
+| Aruppukkottai | 278 |
+| Bargur | 442 |
+| Manapparai | 561 |
+| Polur | 684 |
+| Srivaikuntam | 1,186 |
+| Katpadi | 1,266 |
+| Namakkal | 1,325 |
+| Senthamangalam | 1,466 |
+| Sholavandan | 1,504 |
+| Cumbum | 1,605 |
 
-### TVK Winning Margin Breakdown (105 leading + 2 won = 107 seats — live updated)
+### TVK Winning Margin Breakdown (108 seats — evening round)
 | Margin Range | Seats |
 |---|---|
-| <1,000 (at risk) | 8 |
-| 1K–3K | 17 |
+| <1,000 (at risk) | 4 |
+| 1K–3K | 15 |
 | 3K–5K | 7 |
-| 5K–10K | 13 |
-| 10K–20K | 30 |
-| >20K | 32 |
-| **Total** | **107** |
-| Avg margin | 15,552 votes |
-| Highest | Madavaram 91,600 |
-| Lowest (leading) | Nilakkottai 16 |
+| 5K–10K | 14 |
+| 10K–20K | 29 |
+| >20K | 39 |
+| **Total** | **108** |
+| Avg margin | 17,143 votes |
+| Highest | Madavaram 94,985 |
+| Lowest (leading) | Aruppukkottai 278 |
 
 ### What-If Scenarios
 | Scenario | Seats | vs Majority (118) |
 |---|---|---|
-| Current (live) | 107 | -11 |
-| If won all <1K losses (8 seats) | 115 | -3 |
-| If won all <5K losses (31 seats) | 138 | +20 |
+| Current (live) | 108 | -10 |
+| If won all <1K losses (3 seats) | 111 | -7 |
+| If won all <5K losses (30 seats) | 138 | +20 |
 
-### Close Losses by Winning Party (31 seats, <5K margin)
+### Close Losses by Winning Party (30 seats, <5K margin)
 | Party | Seats |
 |---|---|
-| DMK | 15 |
-| ADMK | 7 |
+| DMK | 16 |
+| ADMK | 4 |
 | INC | 3 |
-| BJP | 1 |
-| PMK | 1 |
+| PMK | 2 |
 | CPI(M) | 1 |
 | CPI | 1 |
+| BJP | 1 |
 | IUML | 1 |
 | DMDK | 1 |
 
@@ -270,8 +268,8 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 
 ### Step 5: Get TVK wins at risk (smallest TVK winning margins)
 ```
-1. navigate → https://results.eci.gov.in/ResultAcGenMay2026/partywiseleadresult-3679S22.htm
-2. javascript_tool: extract cells[1] (name), cells[4] (margin) → sort ascending → take top 10
+1. Run step 4 first (statewise data in window._electionData)
+2. Filter tvkLeading, sort ascending by margin, take top 10
 ```
 
 ### Key selectors summary
@@ -279,7 +277,7 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 |---|---|---|---|
 | Party seats | partywiseresult-S22.htm | `table tbody tr` | cells[0..3] |
 | TVK margins | partywiseleadresult-3679S22.htm | `table tbody tr` | cells[1,4] |
-| TVK wins at risk | partywiseleadresult-3679S22.htm | `table tbody tr` sorted asc by cells[4] | cells[1,4] |
+| TVK wins at risk | statewiseS22{1-12}.htm (via fetch loop) | filter tvkLeading, sort asc | margin |
 | Vote share | voteshareresult-S22.htm | `table tbody tr` | cells[1,2] |
 | All constituencies | statewiseS22{1..12}.htm | `table tbody tr` (31 cells/row) | cells[4,17,28] |
 

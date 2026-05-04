@@ -21,11 +21,11 @@ import {
 } from '../components/TvkInsightCharts';
 
 const MAJORITY_MARK = 118;
-const TVK_SEATS = 103;
+const TVK_SEATS = 107;
 const TOTAL_SEATS = 234;
 const SEATS_SHORT = MAJORITY_MARK - TVK_SEATS;
-const TVK_CLOSE_LOSSES = 41;
-const TVK_NOT_COMPETITIVE = 90;
+const TVK_CLOSE_LOSSES = 34;
+const TVK_NOT_COMPETITIVE = 93;
 
 const DATA_SOURCE_URL = 'https://results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm';
 
@@ -81,7 +81,7 @@ export function TvkElection() {
       </header>
 
       <div className="border-b border-yellow-500/30 bg-yellow-500/10 px-4 py-2 text-xs text-yellow-600 dark:text-yellow-400">
-        Live counting — May 4, 2026 (latest refresh). Source: ECI official (results.eci.gov.in).
+        Live counting — May 4, 2026 (latest round). Source: ECI official (results.eci.gov.in). TVK 107 seats.
       </div>
 
       <main className="flex-1 space-y-4 overflow-y-auto p-4">
@@ -106,7 +106,7 @@ export function TvkElection() {
           <StatCard
             label="Close Losses"
             value={TVK_CLOSE_LOSSES.toString()}
-            sub="seats lost by <5K · 10 by <1K · closest: 15"
+            sub="seats lost by <5K · 6 by <1K · closest: 86"
             variant="warn"
           />
           <StatCard
@@ -137,13 +137,13 @@ export function TvkElection() {
         <div className="rounded-xl border border-border bg-card px-4 py-3 text-xs text-muted-foreground">
           <p className="font-medium text-foreground">Data notes</p>
           <ul className="mt-1 list-disc space-y-1 pl-4">
-            <li>Live count data — May 4, 2026 (refreshed). Counting in progress. Source: ECI (results.eci.gov.in).</li>
-            <li>TVK leading 103 seats. In 2nd place (trailing) in 75 seats. Not in top-2 in 56 seats.</li>
-            <li>41 seats lost by &lt;5,000 votes — 10 of those by &lt;1,000 votes. Closest: Sholavandan by 15 votes!</li>
-            <li>Even winning all 10 seats lost by &lt;1K gives only 113 — still 5 short of majority.</li>
-            <li>DMK Alliance at 72 seats (DMK 61+INC 4+VCK 2+CPI 2+CPI(M) 1+IUML 2). BJP won 2 seats.</li>
+            <li>Live count data — May 4, 2026 (latest refresh). Counting in progress. Source: ECI (results.eci.gov.in).</li>
+            <li>TVK leading/won 107 seats. In 2nd place (trailing) in 70 seats. Not in top-2 in 57 seats.</li>
+            <li>34 seats lost by &lt;5,000 votes — 6 of those by &lt;1,000 votes. Closest: Kumbakonam by 86 votes!</li>
+            <li>Even winning all 6 seats lost by &lt;1K gives only 113 — still 5 short of majority.</li>
+            <li>DMK Alliance at 71 seats (DMK 59+INC 5+VCK 2+CPI 2+CPI(M) 1+IUML 2). BJP won 3 seats.</li>
             <li>TVK vote share listed as "Other (39.19%)" in ECI — newly registered party classification.</li>
-            <li>TVK contested all 234 seats solo — no alliance. Historic debut. Avg win margin: 14,141 votes.</li>
+            <li>TVK contested all 234 seats solo — no alliance. Historic debut. Avg win margin: 14,563 votes.</li>
             <li>
               Official source:{' '}
               <a href={DATA_SOURCE_URL} target="_blank" rel="noreferrer" className="underline">

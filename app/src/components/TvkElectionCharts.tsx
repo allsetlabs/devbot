@@ -16,32 +16,32 @@ import {
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
 
 const TVK_WIN_STATUS = [
-  { name: 'TVK Leading', value: 103, color: '#e855a8' },
-  { name: 'Not Leading', value: 131, color: '#e2e8f0' },
+  { name: 'TVK Leading/Won', value: 107, color: '#e855a8' },
+  { name: 'Not Leading', value: 127, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 103 TVK-leading constituencies (from ECI all-constituencies fetch)
+// Margin breakdown for 106 TVK-leading constituencies (from ECI all-constituencies fetch; +1 already declared won)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 8, fill: '#facc15' },
-  { range: '1K–3K', seats: 9, fill: '#86efac' },
+  { range: '<1K', seats: 10, fill: '#facc15' },
+  { range: '1K–3K', seats: 12, fill: '#86efac' },
   { range: '3K–5K', seats: 9, fill: '#4ade80' },
-  { range: '5K–10K', seats: 19, fill: '#22c55e' },
-  { range: '10K–20K', seats: 30, fill: '#16a34a' },
-  { range: '>20K', seats: 28, fill: '#15803d' },
+  { range: '5K–10K', seats: 18, fill: '#22c55e' },
+  { range: '10K–20K', seats: 28, fill: '#16a34a' },
+  { range: '>20K', seats: 29, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
-  { party: 'TVK', seats: 103, fill: '#e855a8' },
-  { party: 'DMK', seats: 61, fill: '#22c55e' },
-  { party: 'ADMK', seats: 49, fill: '#a3731a' },
-  { party: 'PMK', seats: 5, fill: '#65a30d' },
-  { party: 'INC', seats: 4, fill: '#3b82f6' },
+  { party: 'TVK', seats: 107, fill: '#e855a8' },
+  { party: 'DMK', seats: 59, fill: '#22c55e' },
+  { party: 'ADMK', seats: 47, fill: '#a3731a' },
+  { party: 'INC', seats: 5, fill: '#3b82f6' },
+  { party: 'PMK', seats: 4, fill: '#65a30d' },
+  { party: 'BJP', seats: 3, fill: '#f97316' },
   { party: 'CPI', seats: 2, fill: '#dc2626' },
   { party: 'IUML', seats: 2, fill: '#0284c7' },
   { party: 'VCK', seats: 2, fill: '#7c3aed' },
   { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
-  { party: 'DMDK', seats: 2, fill: '#d97706' },
-  { party: 'BJP', seats: 2, fill: '#f97316' },
+  { party: 'DMDK', seats: 1, fill: '#d97706' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
 ];
 
@@ -61,18 +61,18 @@ const VOTE_SHARE = [
   { party: 'IUML', share: 0.36, fill: '#0284c7' },
 ];
 
-// 10 TVK-leading seats with smallest margins (most at risk of flipping) — live May 4 refresh
+// 10 TVK-leading seats with smallest margins (most at risk of flipping) — live May 4 latest round
 const TVK_WINS_AT_RISK = [
-  { name: 'Tiruvadanai', margin: 17, fill: '#ef4444' },
-  { name: 'Srivaikuntam', margin: 38, fill: '#ef4444' },
-  { name: 'Mettuppalayam', margin: 52, fill: '#ef4444' },
-  { name: 'Killiyoor', margin: 151, fill: '#ef4444' },
-  { name: 'Tirukkoyilur', margin: 385, fill: '#fbbf24' },
-  { name: 'Tiruvannamalai', margin: 395, fill: '#fbbf24' },
-  { name: 'Sholingur', margin: 841, fill: '#fbbf24' },
-  { name: 'Yercaud', margin: 973, fill: '#fbbf24' },
-  { name: 'Polur', margin: 1431, fill: '#d97706' },
-  { name: 'Sivakasi', margin: 1572, fill: '#d97706' },
+  { name: 'Manapparai', margin: 31, fill: '#ef4444' },
+  { name: 'Vikravandi', margin: 169, fill: '#ef4444' },
+  { name: 'Bhavanisagar', margin: 276, fill: '#ef4444' },
+  { name: 'Tiruvadanai', margin: 345, fill: '#ef4444' },
+  { name: 'Kilvelur', margin: 425, fill: '#fbbf24' },
+  { name: 'Sholingur', margin: 437, fill: '#fbbf24' },
+  { name: 'Namakkal', margin: 446, fill: '#fbbf24' },
+  { name: 'Mettuppalayam', margin: 637, fill: '#fbbf24' },
+  { name: 'Sholavandan', margin: 701, fill: '#d97706' },
+  { name: 'Tirukkoyilur', margin: 972, fill: '#d97706' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -120,7 +120,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>15 seats short</strong> (counting live)
+        Majority needs <strong>118</strong> — TVK is <strong>11 seats short</strong> (counting live)
       </div>
     </ChartCard>
   );
@@ -143,7 +143,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 14,141 · Highest: 79,885 (Madavaram) · 8 seats leading by &lt;1,000 votes
+        Avg margin: 14,563 · Highest: 86,155 (Madavaram) · 10 seats leading by &lt;1,000 votes
       </p>
     </ChartCard>
   );
@@ -173,7 +173,7 @@ export function TvkWinsAtRiskChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Red = extreme risk (&lt;500 votes) · Yellow = high risk (&lt;1K) · 3 seats by &lt;100 votes!
+        Red = extreme risk (&lt;500 votes) · Orange = high risk (&lt;1K) · Manapparai leads by only 31!
       </p>
     </ChartCard>
   );

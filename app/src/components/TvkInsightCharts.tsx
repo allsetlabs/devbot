@@ -13,12 +13,12 @@ import {
 } from 'recharts';
 import { ChartCard } from './TvkElectionCharts';
 
-// Alliance groupings — Tamil Nadu 2026 (May 4 final round)
-// TVK contested solo. TVK: 109→108, DMK: 60→61, ADMK: 44→45, VCK: 2→1. DMK Alliance stays 73.
+// Alliance groupings — Tamil Nadu 2026 (May 4 updated)
+// TVK contested solo. TVK: 108, DMK: 62, ADMK: 43, VCK: 2. DMK Alliance: 75.
 const ALLIANCE_DATA = [
   { name: 'TVK\n(Solo)', seats: 108, fill: '#e855a8', label: 'TVK' },
-  { name: 'DMK\nAlliance', seats: 73, fill: '#22c55e', label: 'DMK(61)+INC(5)+VCK(1)+CPI(2)+CPI(M)(2)+IUML(2)' },
-  { name: 'ADMK\n(Solo)', seats: 45, fill: '#a3731a', label: 'ADMK' },
+  { name: 'DMK\nAlliance', seats: 75, fill: '#22c55e', label: 'DMK(62)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2)' },
+  { name: 'ADMK\n(Solo)', seats: 43, fill: '#a3731a', label: 'ADMK' },
   { name: 'PMK &\nOthers', seats: 7, fill: '#94a3b8', label: 'PMK(5)+DMDK(1)+AMMK(1)' },
   { name: 'BJP', seats: 1, fill: '#f97316', label: 'BJP' },
 ];
@@ -26,19 +26,20 @@ const ALLIANCE_DATA = [
 // Pie data for alliance share of 234 seats
 const ALLIANCE_PIE = [
   { name: 'TVK (Solo)', value: 108, color: '#e855a8' },
-  { name: 'DMK Alliance', value: 73, color: '#22c55e' },
-  { name: 'ADMK (Solo)', value: 45, color: '#a3731a' },
+  { name: 'DMK Alliance', value: 75, color: '#22c55e' },
+  { name: 'ADMK (Solo)', value: 43, color: '#a3731a' },
   { name: 'PMK & Others', value: 7, color: '#94a3b8' },
   { name: 'BJP', value: 1, color: '#f97316' },
 ];
 
-// 27 seats TVK lost by <5K — breakdown by winning party (May 4 final — Kallakurichi new #1 ADMK+156)
+// 28 seats TVK lost by <5K — breakdown by winning party (May 4 updated — Thirumayam DMK+3 new#1)
+// Kovilpatti flipped from TVK leading → DMK loss
 const CLOSE_LOSS_BY_PARTY = [
-  { party: 'DMK', seats: 13, fill: '#22c55e' },
-  { party: 'ADMK', seats: 5, fill: '#a3731a' },
+  { party: 'DMK', seats: 14, fill: '#22c55e' },
+  { party: 'ADMK', seats: 4, fill: '#a3731a' },
   { party: 'INC', seats: 3, fill: '#3b82f6' },
+  { party: 'PMK', seats: 2, fill: '#65a30d' },
   { party: 'IUML', seats: 2, fill: '#0284c7' },
-  { party: 'PMK', seats: 1, fill: '#65a30d' },
   { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
   { party: 'BJP', seats: 1, fill: '#f97316' },
   { party: 'DMDK', seats: 1, fill: '#d97706' },
@@ -80,7 +81,7 @@ export function TvkAlliancePieChart() {
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        TVK contested ALL 234 seats solo — unprecedented debut · DMK Alliance: 73 · ADMK: 45 · BJP: 1
+        TVK contested ALL 234 seats solo — unprecedented debut · DMK Alliance: 75 · ADMK: 43 · BJP: 1
       </p>
     </ChartCard>
   );
@@ -115,18 +116,20 @@ export function TvkAllianceBarChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        DMK Alliance = DMK(61)+INC(5)+VCK(1)+CPI(2)+CPI(M)(2)+IUML(2) = 73 · ADMK: 44→45
+        DMK Alliance = DMK(62)+INC(5)+VCK(2)+CPI(2)+CPI(M)(2)+IUML(2) = 75 · ADMK: 45→43
       </p>
     </ChartCard>
   );
 }
 
 export function TvkMajorityPathChart() {
+  // +<1K: Thirumayam(3)+Tiruvannamalai(402)+Palani(753)+Kovilpatti(962)+Udhagamandalam(976) = 5 seats → 113
+  // +All Close (<5K): 28 seats → 136
   const data = [
     { label: 'TVK Won', seats: 108, fill: '#e855a8' },
     { label: 'Majority', seats: 118, fill: '#94a3b8' },
-    { label: '+<1K Losses', seats: 111, fill: '#fbbf24' },
-    { label: '+All Close', seats: 135, fill: '#f97316' },
+    { label: '+<1K Losses', seats: 113, fill: '#fbbf24' },
+    { label: '+All Close', seats: 136, fill: '#f97316' },
   ];
   return (
     <ChartCard title="TVK Path to Majority — What-If Scenarios">
@@ -151,12 +154,12 @@ export function TvkMajorityPathChart() {
       </ResponsiveContainer>
       <div className="mt-2 space-y-1 text-xs text-muted-foreground">
         <p>
-          <span className="font-medium text-foreground">+&lt;1K Losses:</span> If TVK had won seats
-          lost by &lt;1,000 votes (Kallakurichi, Thirumayam, Tiruvannamalai) → 111 (still 7 short)
+          <span className="font-medium text-foreground">+&lt;1K Losses:</span> If TVK had won 5 seats
+          lost by &lt;1,000 votes (Thirumayam 3, Tiruvannamalai, Palani, Kovilpatti, Ooty) → 113 (still 5 short)
         </p>
         <p>
-          <span className="font-medium text-foreground">+All Close:</span> If TVK had won all 27
-          seats lost by &lt;5,000 votes → 135 (17 over majority)
+          <span className="font-medium text-foreground">+All Close:</span> If TVK had won all 28
+          seats lost by &lt;5,000 votes → 136 (18 over majority)
         </p>
       </div>
     </ChartCard>
@@ -165,7 +168,7 @@ export function TvkMajorityPathChart() {
 
 export function TvkCloseLossByPartyChart() {
   return (
-    <ChartCard title="Close Losses by Winning Party (~27 seats, <5K margin)">
+    <ChartCard title="Close Losses by Winning Party (28 seats, <5K margin)">
       <ResponsiveContainer width="100%" height={180}>
         <BarChart data={CLOSE_LOSS_BY_PARTY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -183,7 +186,7 @@ export function TvkCloseLossByPartyChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        DMK+ADMK together denied TVK majority — 18 of 27 close losses
+        DMK+ADMK together denied TVK majority — 18 of 28 close losses
       </p>
     </ChartCard>
   );

@@ -17,8 +17,8 @@ const MAJORITY_MARK = 118;
 const TVK_SEATS = 110;
 const TOTAL_SEATS = 234;
 const SEATS_SHORT = MAJORITY_MARK - TVK_SEATS;
-const TVK_CLOSE_LOSSES = 40;
-const TVK_NOT_COMPETITIVE = 84;
+const TVK_CLOSE_LOSSES = 39;
+const TVK_NOT_COMPETITIVE = 85;
 
 const DATA_SOURCE_URL = 'https://results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm';
 
@@ -126,11 +126,11 @@ export function TvkElection() {
           <p className="font-medium text-foreground">Data notes</p>
           <ul className="mt-1 list-disc space-y-1 pl-4">
             <li>Live count data — May 4, 2026. Counting in progress. Source: ECI (results.eci.gov.in).</li>
-            <li>TVK leading 110 seats. In 2nd place (trailing) in 66 seats. Not in top-2 in 58 seats.</li>
-            <li>40 seats lost by &lt;5,000 votes — 7 of those by &lt;1,000 votes.</li>
+            <li>TVK leading 110 seats. In 2nd place (trailing) in 68 seats. Not in top-2 in 56 seats.</li>
+            <li>39 seats lost by &lt;5,000 votes — 9 of those by &lt;1,000 votes. Closest: Madurantakam by 2 votes!</li>
             <li>TVK vote share listed as "Other (38.92%)" in ECI — newly registered party classification.</li>
             <li>AIADMK+: ADMK(57)+. DMK alliance: DMK(48)+INC+VCK+CPI+CPI(M)+IUML. TVK contested solo — historic debut.</li>
-            <li>Avg win margin: 7,873 votes. Highest: 48,561 (Madavaram).</li>
+            <li>Avg win margin: 8,735 votes. Highest: 52,347 (Madavaram).</li>
             <li>
               Official source:{' '}
               <a href={DATA_SOURCE_URL} target="_blank" rel="noreferrer" className="underline">

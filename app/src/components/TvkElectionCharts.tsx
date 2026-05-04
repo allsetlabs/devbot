@@ -22,18 +22,18 @@ const TVK_WIN_STATUS = [
 
 // Margin breakdown for 110 TVK-leading constituencies (from ECI constituency detail)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 16, fill: '#facc15' },
-  { range: '1K–3K', seats: 18, fill: '#86efac' },
-  { range: '3K–5K', seats: 14, fill: '#4ade80' },
+  { range: '<1K', seats: 12, fill: '#facc15' },
+  { range: '1K–3K', seats: 20, fill: '#86efac' },
+  { range: '3K–5K', seats: 12, fill: '#4ade80' },
   { range: '5K–10K', seats: 26, fill: '#22c55e' },
-  { range: '10K–20K', seats: 29, fill: '#16a34a' },
-  { range: '>20K', seats: 7, fill: '#15803d' },
+  { range: '10K–20K', seats: 31, fill: '#16a34a' },
+  { range: '>20K', seats: 9, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
   { party: 'TVK', seats: 110, fill: '#e855a8' },
-  { party: 'ADMK', seats: 57, fill: '#a3731a' },
-  { party: 'DMK', seats: 48, fill: '#22c55e' },
+  { party: 'ADMK', seats: 56, fill: '#a3731a' },
+  { party: 'DMK', seats: 49, fill: '#22c55e' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
   { party: 'INC', seats: 4, fill: '#3b82f6' },
   { party: 'VCK', seats: 2, fill: '#7c3aed' },
@@ -47,14 +47,15 @@ const ALL_PARTIES = [
 
 // ECI vote share — TVK appears under "Other" (new party classification)
 const VOTE_SHARE = [
-  { party: 'TVK*', share: 38.92, fill: '#e855a8' },
-  { party: 'DMK', share: 24.13, fill: '#22c55e' },
-  { party: 'ADMK', share: 22.16, fill: '#a3731a' },
-  { party: 'NTK', share: 3.91, fill: '#475569' },
-  { party: 'INC', share: 3.53, fill: '#3b82f6' },
-  { party: 'BJP', share: 3.17, fill: '#f97316' },
-  { party: 'DMDK', share: 1.07, fill: '#d97706' },
-  { party: 'Others', share: 3.11, fill: '#94a3b8' },
+  { party: 'TVK*', share: 39.01, fill: '#e855a8' },
+  { party: 'DMK', share: 24.16, fill: '#22c55e' },
+  { party: 'ADMK', share: 22.12, fill: '#a3731a' },
+  { party: 'NTK', share: 3.95, fill: '#475569' },
+  { party: 'INC', share: 3.59, fill: '#3b82f6' },
+  { party: 'BJP', share: 3.02, fill: '#f97316' },
+  { party: 'DMDK', share: 1.10, fill: '#d97706' },
+  { party: 'VCK', share: 0.96, fill: '#7c3aed' },
+  { party: 'Others', share: 1.09, fill: '#94a3b8' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -125,7 +126,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 7,873 · Highest: 48,561 (Madavaram) · 16 seats leading by &lt;1,000 votes
+        Avg margin: 8,735 · Highest: 52,347 (Madavaram) · 12 seats leading by &lt;1,000 votes
       </p>
     </ChartCard>
   );
@@ -179,7 +180,7 @@ export function VoteShareChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        * TVK classified as "Other" in ECI vote share — 38.74% = 50.2L votes
+        * TVK classified as "Other" in ECI vote share — 39.01% ≈ 79.3L votes
       </p>
     </ChartCard>
   );

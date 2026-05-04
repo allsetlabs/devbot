@@ -16,32 +16,32 @@ import {
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
 
 const TVK_WIN_STATUS = [
-  { name: 'TVK Leading', value: 106, color: '#e855a8' },
-  { name: 'Not Leading', value: 128, color: '#e2e8f0' },
+  { name: 'TVK Leading', value: 107, color: '#e855a8' },
+  { name: 'Not Leading', value: 127, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 106 TVK-leading constituencies (from ECI all-constituencies fetch)
+// Margin breakdown for 107 TVK-leading constituencies (from ECI all-constituencies fetch)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 5, fill: '#facc15' },
+  { range: '<1K', seats: 4, fill: '#facc15' },
   { range: '1K–3K', seats: 19, fill: '#86efac' },
-  { range: '3K–5K', seats: 10, fill: '#4ade80' },
-  { range: '5K–10K', seats: 20, fill: '#22c55e' },
-  { range: '10K–20K', seats: 33, fill: '#16a34a' },
-  { range: '>20K', seats: 19, fill: '#15803d' },
+  { range: '3K–5K', seats: 11, fill: '#4ade80' },
+  { range: '5K–10K', seats: 15, fill: '#22c55e' },
+  { range: '10K–20K', seats: 35, fill: '#16a34a' },
+  { range: '>20K', seats: 21, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
-  { party: 'TVK', seats: 106, fill: '#e855a8' },
-  { party: 'DMK', seats: 54, fill: '#22c55e' },
-  { party: 'ADMK', seats: 55, fill: '#a3731a' },
-  { party: 'PMK', seats: 5, fill: '#65a30d' },
+  { party: 'TVK', seats: 107, fill: '#e855a8' },
+  { party: 'DMK', seats: 58, fill: '#22c55e' },
+  { party: 'ADMK', seats: 51, fill: '#a3731a' },
+  { party: 'PMK', seats: 4, fill: '#65a30d' },
   { party: 'INC', seats: 4, fill: '#3b82f6' },
-  { party: 'CPI', seats: 3, fill: '#dc2626' },
+  { party: 'CPI', seats: 2, fill: '#dc2626' },
   { party: 'IUML', seats: 2, fill: '#0284c7' },
   { party: 'VCK', seats: 1, fill: '#7c3aed' },
   { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
   { party: 'DMDK', seats: 1, fill: '#d97706' },
-  { party: 'BJP', seats: 1, fill: '#f97316' },
+  { party: 'BJP', seats: 2, fill: '#f97316' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
 ];
 
@@ -63,16 +63,16 @@ const VOTE_SHARE = [
 
 // 10 TVK-leading seats with smallest margins (most at risk of flipping)
 const TVK_WINS_AT_RISK = [
-  { name: 'Namakkal', margin: 49, fill: '#ef4444' },
-  { name: 'Tirukkoyilur', margin: 335, fill: '#f97316' },
-  { name: 'Sholavandan', margin: 385, fill: '#f97316' },
-  { name: 'Sattur', margin: 648, fill: '#fbbf24' },
-  { name: 'Kulithalai', margin: 928, fill: '#fbbf24' },
+  { name: 'Tiruvadanai', margin: 119, fill: '#ef4444' },
+  { name: 'Tiruvannamalai', margin: 395, fill: '#ef4444' },
+  { name: 'Vikravandi', margin: 542, fill: '#fbbf24' },
+  { name: 'Palayamkottai', margin: 792, fill: '#fbbf24' },
   { name: 'Thiruverumbur', margin: 1077, fill: '#fbbf24' },
-  { name: 'Tiruvannamalai', margin: 1107, fill: '#fbbf24' },
-  { name: 'Killiyoor', margin: 1115, fill: '#fbbf24' },
+  { name: 'Paramakudi', margin: 1155, fill: '#fbbf24' },
   { name: 'Polur', margin: 1431, fill: '#d97706' },
-  { name: 'Kallakurichi', margin: 1472, fill: '#d97706' },
+  { name: 'Kulithalai', margin: 1446, fill: '#d97706' },
+  { name: 'Kumarapalayam', margin: 1511, fill: '#d97706' },
+  { name: 'Sivakasi', margin: 1572, fill: '#d97706' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -120,7 +120,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>12 seats short</strong> (counting live)
+        Majority needs <strong>118</strong> — TVK is <strong>11 seats short</strong> (counting live)
       </div>
     </ChartCard>
   );
@@ -143,7 +143,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 11,656 · Highest: 67,983 (Madavaram) · 5 seats leading by &lt;1,000 votes
+        Avg margin: 12,803 · Highest: 74,243 (Madavaram) · 4 seats leading by &lt;1,000 votes
       </p>
     </ChartCard>
   );
@@ -173,7 +173,7 @@ export function TvkWinsAtRiskChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Red = extreme risk (&lt;100 votes) · Orange = high risk (&lt;500) · These seats could still flip
+        Red = extreme risk (&lt;500 votes) · Yellow = high risk (&lt;1K) · These seats could still flip
       </p>
     </ChartCard>
   );

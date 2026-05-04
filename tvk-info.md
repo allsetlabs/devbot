@@ -100,46 +100,46 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 ### Party-wise Seat Tally (ECI Live — counting in progress)
 | Party | Total (Leading) |
 |---|---|
-| TVK (Tamilaga Vettri Kazhagam) | 106 |
-| ADMK | 55 |
-| DMK | 54 |
-| PMK | 5 |
+| TVK (Tamilaga Vettri Kazhagam) | 107 |
+| DMK | 58 |
+| ADMK | 51 |
+| PMK | 4 |
 | INC | 4 |
-| CPI | 3 |
 | IUML | 2 |
-| VCK | 1 |
-| CPI(M) | 1 |
+| BJP | 2 |
+| CPI | 2 |
 | DMDK | 1 |
-| BJP | 1 |
+| VCK | 1 |
 | AMMK | 1 |
+| CPI(M) | 1 |
 | **Total** | **234** |
 
 ### Alliance Breakdown
 | Alliance | Parties | Seats |
 |---|---|---|
-| TVK (Solo) | TVK | 106 |
-| DMK Alliance | DMK+INC+VCK+CPI+CPI(M)+IUML | 65 |
-| ADMK (Solo) | ADMK | 55 |
-| Others | PMK+DMDK+AMMK | 7 |
-| BJP | BJP | 1 |
+| TVK (Solo) | TVK | 107 |
+| DMK Alliance | DMK+INC+VCK+CPI+CPI(M)+IUML | 68 |
+| ADMK (Solo) | ADMK | 51 |
+| Others | PMK+DMDK+AMMK | 6 |
+| BJP | BJP | 2 |
 
-**Note**: DMK Alliance surged to 65 seats. BJP won 1 seat (Udhagamandalam). TVK short of majority by 12.
+**Note**: DMK Alliance surged to 68 seats. BJP won 2 seats (incl. Udhagamandalam). TVK short of majority by 11.
 
 ### TVK Constituency Status (All 234 — live)
 | Status | Count | Description |
 |---|---|---|
-| Safe Lead (>5K margin) | 72 | Dominant lead |
-| Close Lead (<5K margin) | 34 | At risk: <1K(5), 1K-3K(19), 3K-5K(10) |
-| Close Loss (<5K behind) | 39 | Lost but could have swung |
-| Not Competitive | 89 | Wide loss or not in top-2 |
+| Safe Lead (>5K margin) | 71 | Dominant lead |
+| Close Lead (<5K margin) | 34 | At risk: <1K(4), 1K-3K(19), 3K-5K(11) |
+| Close Loss (<5K behind) | 38 | Lost but could have swung |
+| Not Competitive (trailing >5K + not in top 2) | 91 | Wide loss or not in top-2 |
 
-### TVK Who's Beating TVK (71 seats TVK is in 2nd place — live)
+### TVK Who's Beating TVK (72 seats TVK is in 2nd place — live)
 | Party | Seats |
 |---|---|
-| DMK | 33 |
+| DMK | 35 |
 | ADMK | 26 |
 | INC | 3 |
-| PMK | 3 |
+| PMK | 2 |
 | CPI | 2 |
 | CPI(M) | 1 |
 | BJP | 1 |
@@ -149,67 +149,65 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 ### Top 15 Closest TVK Losses (Live — May 4, 2026 latest round)
 | Constituency | Won By | Margin |
 |---|---|---|
-| Sivakasi | ADMK | 63 |
-| Vikravandi | PMK | 102 |
+| Sattur | DMK | 46 |
+| Kumbakonam | DMK | 86 |
+| Sholavandan | DMK | 100 |
 | Udhagamandalam | BJP | 189 |
-| Tiruvadanai | ADMK | 482 |
-| Kumbakonam | DMK | 632 |
-| Srivaikuntam | ADMK | 652 |
-| Pudukkottai | DMK | 675 |
+| Tirukkoyilur | ADMK | 279 |
+| Namakkal | ADMK | 502 |
+| Srivaikuntam | ADMK | 544 |
+| Mettuppalayam | DMK | 691 |
+| Coimbatore South | DMK | 855 |
 | Bodinayakanur | DMK | 919 |
-| Dindigul | DMK | 1,005 |
-| Coimbatore South | DMK | 1,124 |
-| Rishivandiyam | DMK | 1,211 |
+| Bhavanisagar | ADMK | 967 |
+| Viluppuram | DMK | 1,148 |
+| Vellore | DMK | 1,240 |
 | Chepauk-Thiruvallikeni | DMK | 1,365 |
-| Madurantakam | ADMK | 1,424 |
-| Viluppuram | DMK | 1,478 |
-| Sankarankovil | ADMK | 1,836 |
+| Lalgudi | ADMK | 1,663 |
 
 ### TVK Wins at Risk (10 Slimmest TVK Leading Margins)
 | Constituency | TVK Lead (votes) |
 |---|---|
-| Namakkal | 49 |
-| Tirukkoyilur | 335 |
-| Sholavandan | 385 |
-| Sattur | 648 |
-| Kulithalai | 928 |
+| Tiruvadanai | 119 |
+| Tiruvannamalai | 395 |
+| Vikravandi | 542 |
+| Palayamkottai | 792 |
 | Thiruverumbur | 1,077 |
-| Tiruvannamalai | 1,107 |
-| Killiyoor | 1,115 |
+| Paramakudi | 1,155 |
 | Polur | 1,431 |
-| Kallakurichi | 1,472 |
+| Kulithalai | 1,446 |
+| Kumarapalayam | 1,511 |
+| Sivakasi | 1,572 |
 
-### TVK Winning Margin Breakdown (106 seats — live updated)
+### TVK Winning Margin Breakdown (107 seats — live updated)
 | Margin Range | Seats |
 |---|---|
-| <1,000 (at risk) | 5 |
+| <1,000 (at risk) | 4 |
 | 1K–3K | 19 |
-| 3K–5K | 10 |
-| 5K–10K | 20 |
-| 10K–20K | 33 |
-| >20K | 19 |
-| **Total** | **106** |
-| Avg margin | 11,656 votes |
-| Highest | Madavaram 67,983 |
-| Lowest | Namakkal 49 |
+| 3K–5K | 11 |
+| 5K–10K | 15 |
+| 10K–20K | 35 |
+| >20K | 21 |
+| **Total** | **105** (statewise) / **107** (party page) |
+| Avg margin | 12,803 votes |
+| Highest | Madavaram 74,243 |
+| Lowest | Tiruvadanai 119 |
 
 ### What-If Scenarios
 | Scenario | Seats | vs Majority (118) |
 |---|---|---|
-| Current (live) | 106 | -12 |
-| If won all <1K losses | 111 | -7 (still short!) |
-| If won all <5K losses | 145 | +27 |
+| Current (live) | 107 | -11 |
+| If won all <1K losses (10 seats) | 117 | -1 (razor thin!) |
+| If won all <5K losses (38 seats) | 145 | +27 |
 
-### Close Losses by Winning Party (39 seats, <5K margin)
+### Close Losses by Winning Party (38 seats, <5K margin)
 | Party | Seats |
 |---|---|
-| DMK | 18 |
-| ADMK | 15 |
-| INC | 2 |
-| CPI | 1 |
+| DMK | 21 |
+| ADMK | 14 |
 | BJP | 1 |
-| PMK | 1 |
 | DMDK | 1 |
+| INC | 1 |
 
 ### Vote Share (Official ECI — live updated)
 | Party | Vote % | Total Votes |

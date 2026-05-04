@@ -16,22 +16,22 @@ import {
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
 
 const TVK_WIN_STATUS = [
-  { name: 'TVK Leading', value: 110, color: '#e855a8' },
-  { name: 'Not Leading', value: 124, color: '#e2e8f0' },
+  { name: 'TVK Leading', value: 109, color: '#e855a8' },
+  { name: 'Not Leading', value: 125, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 110 TVK-leading constituencies (from ECI constituency detail)
+// Margin breakdown for 109 TVK-leading constituencies (from ECI all-constituencies fetch)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 12, fill: '#facc15' },
-  { range: '1K–3K', seats: 20, fill: '#86efac' },
-  { range: '3K–5K', seats: 12, fill: '#4ade80' },
-  { range: '5K–10K', seats: 26, fill: '#22c55e' },
-  { range: '10K–20K', seats: 31, fill: '#16a34a' },
-  { range: '>20K', seats: 9, fill: '#15803d' },
+  { range: '<1K', seats: 10, fill: '#facc15' },
+  { range: '1K–3K', seats: 17, fill: '#86efac' },
+  { range: '3K–5K', seats: 14, fill: '#4ade80' },
+  { range: '5K–10K', seats: 21, fill: '#22c55e' },
+  { range: '10K–20K', seats: 36, fill: '#16a34a' },
+  { range: '>20K', seats: 11, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
-  { party: 'TVK', seats: 110, fill: '#e855a8' },
+  { party: 'TVK', seats: 109, fill: '#e855a8' },
   { party: 'ADMK', seats: 56, fill: '#a3731a' },
   { party: 'DMK', seats: 49, fill: '#22c55e' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
@@ -47,15 +47,18 @@ const ALL_PARTIES = [
 
 // ECI vote share — TVK appears under "Other" (new party classification)
 const VOTE_SHARE = [
-  { party: 'TVK*', share: 39.01, fill: '#e855a8' },
-  { party: 'DMK', share: 24.16, fill: '#22c55e' },
+  { party: 'TVK*', share: 39.07, fill: '#e855a8' },
+  { party: 'DMK', share: 24.09, fill: '#22c55e' },
   { party: 'ADMK', share: 22.12, fill: '#a3731a' },
   { party: 'NTK', share: 3.95, fill: '#475569' },
-  { party: 'INC', share: 3.59, fill: '#3b82f6' },
-  { party: 'BJP', share: 3.02, fill: '#f97316' },
-  { party: 'DMDK', share: 1.10, fill: '#d97706' },
-  { party: 'VCK', share: 0.96, fill: '#7c3aed' },
-  { party: 'Others', share: 1.09, fill: '#94a3b8' },
+  { party: 'INC', share: 3.65, fill: '#3b82f6' },
+  { party: 'BJP', share: 2.99, fill: '#f97316' },
+  { party: 'DMDK', share: 1.09, fill: '#d97706' },
+  { party: 'VCK', share: 0.95, fill: '#7c3aed' },
+  { party: 'CPI', share: 0.61, fill: '#dc2626' },
+  { party: 'CPI(M)', share: 0.60, fill: '#b91c1c' },
+  { party: 'NOTA', share: 0.41, fill: '#94a3b8' },
+  { party: 'IUML', share: 0.33, fill: '#0284c7' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -103,7 +106,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>8 seats short</strong> (counting live)
+        Majority needs <strong>118</strong> — TVK is <strong>9 seats short</strong> (counting live)
       </div>
     </ChartCard>
   );
@@ -111,7 +114,7 @@ export function TvkWinLossChart() {
 
 export function TvkMarginChart() {
   return (
-    <ChartCard title="TVK Winning Margins — 110 Seats (live)">
+    <ChartCard title="TVK Winning Margins — 109 Seats (live)">
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={TVK_MARGIN_DIST} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -126,7 +129,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 8,735 · Highest: 52,347 (Madavaram) · 12 seats leading by &lt;1,000 votes
+        Avg margin: 9,695 · Highest: 52,347 (Madavaram) · 10 seats leading by &lt;1,000 votes
       </p>
     </ChartCard>
   );
@@ -162,7 +165,7 @@ export function PartySeatsChart() {
 export function VoteShareChart() {
   return (
     <ChartCard title="Vote Share (%) — ECI Official">
-      <ResponsiveContainer width="100%" height={230}>
+      <ResponsiveContainer width="100%" height={280}>
         <BarChart
           data={VOTE_SHARE}
           layout="vertical"
@@ -180,7 +183,7 @@ export function VoteShareChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        * TVK classified as "Other" in ECI vote share — 39.01% ≈ 79.3L votes
+        * TVK classified as "Other" in ECI vote share — 39.07% ≈ 86.3L votes
       </p>
     </ChartCard>
   );

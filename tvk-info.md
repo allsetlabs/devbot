@@ -22,7 +22,7 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 ### 2. ECI TVK Constituency Detail (for margin data)
 - **URL**: `https://results.eci.gov.in/ResultAcGenMay2026/partywiseleadresult-3679S22.htm`
   (URL suffix changes if party ID changes — always extract from step 1 first)
-- **Table columns**: cells[0]=Serial, cells[1]=Constituency(+No), cells[2]=Candidate, cells[3]=Votes, cells[4]=Margin
+- **Table columns**: cells[0]=Serial, cells[1]=Constituency(+No), cells[2]=Candidate, cells[3]=Votes, cells[4]=Margin, cells[5]=Status(rounds)
 - **JS to extract margins**: `document.querySelectorAll('table tbody tr')` → `parseInt(cells[4].textContent.replace(/,/g,''))`
 
 ### 3. ECI Vote Share
@@ -87,100 +87,91 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 
 ---
 
-## Data Last Fetched: 2026-05-05 (Final Count)
+## Data Last Fetched: 2026-05-04 (Live Count, Counting in Progress)
 
-### Party-wise Seat Tally (Official ECI)
-| Party | Total |
+### Party-wise Seat Tally (ECI Live — counting in progress)
+| Party | Total (Leading) |
 |---|---|
-| TVK (Tamilaga Vettri Kazhagam) | 106 |
-| ADMK | 62 |
-| DMK | 45 |
-| INC | 5 |
+| TVK (Tamilaga Vettri Kazhagam) | 110 |
+| ADMK | 57 |
+| DMK | 48 |
 | PMK | 5 |
+| INC | 4 |
 | VCK | 2 |
-| DMDK | 2 |
 | CPI | 2 |
-| BJP | 2 |
+| CPI(M) | 2 |
+| BJP | 1 |
+| DMDK | 1 |
 | IUML | 1 |
-| AMMKMNKZ | 1 |
-| CPI(M) | 1 |
+| AMMK | 1 |
 | **Total** | **234** |
 
-### Alliance Summary
-| Alliance | Parties | Seats |
-|---|---|---|
-| TVK (solo) | TVK | 106 |
-| AIADMK+ | ADMK(62) + BJP(2) | 64 |
-| DMK Alliance (SPA) | DMK(45)+INC(5)+VCK(2)+CPI(2)+CPI(M)(1)+IUML(1) | 56 |
-| Others | PMK(5)+DMDK(2)+AMMK(1) | 8 |
-
-### TVK Constituency Status (All 234)
+### TVK Constituency Status (All 234 — live)
 | Status | Count | Description |
 |---|---|---|
-| Safe Win (>5K margin) | 56 | Dominant lead |
-| Close Win (<5K margin) | 50 | Could be challenged: <1K(14), 1K-3K(21), 3K-5K(15) |
-| Close Loss (<5K behind) | 50 | Lost but could have swung |
-| Not Competitive | 78 | Far loss (19 in 2nd, 59 not in top-2) |
+| Safe Lead (>5K margin) | 62 | Dominant lead |
+| Close Lead (<5K margin) | 48 | At risk: <1K(16), 1K-3K(18), 3K-5K(14) |
+| Close Loss (<5K behind) | 40 | Lost but could have swung |
+| Not Competitive | 84 | Far loss (26 in 2nd, 58 not in top-2) |
 
-### TVK Who's Beating TVK (69 seats TVK is in 2nd place)
+### TVK Who's Beating TVK (66 seats TVK is in 2nd place — live)
 | Party | Seats |
 |---|---|
-| ADMK | 28 |
-| DMK | 27 |
-| INC | 4 |
-| PMK | 4 |
-| DMDK | 2 |
-| BJP | 1 |
-| CPI | 1 |
+| DMK | 29 |
+| ADMK | 27 |
+| INC | 3 |
+| PMK | 3 |
 | CPI(M) | 1 |
+| CPI | 1 |
 | IUML | 1 |
+| DMDK | 1 |
 
-### Top 15 Closest TVK Losses
+### Top 15 Closest TVK Losses (Live — May 4, 2026)
 | Constituency | Won By | Margin |
 |---|---|---|
-| Cuddalore | INC | 26 |
-| Valparai | DMK | 113 |
+| Tiruchuli | DMK | 29 |
 | Madurantakam | ADMK | 118 |
-| Coimbatore South | DMK | 127 |
-| Kangayam | ADMK | 301 |
-| Veerapandi | ADMK | 338 |
 | Vikravandi | PMK | 406 |
-| Udhagamandalam (Ooty) | BJP | 509 |
-| Yercaud | ADMK | 522 |
-| Kancheepuram | ADMK | 692 |
-| Virudhunagar | DMDK | 897 |
-| Nilakkottai | DMK | 1,288 |
-| Tiruvadanai | INC | 1,288 |
-| Nagercoil | DMK | 1,379 |
-| Sankarankovil | ADMK | 1,425 |
+| Tiruchendur | DMK | 453 |
+| Valparai | DMK | 742 |
+| Coimbatore South | DMK | 803 |
+| Namakkal | ADMK | 980 |
+| Nagercoil | DMK | 1,172 |
+| Vriddhachalam | DMDK | 1,212 |
+| Sivakasi | ADMK | 1,261 |
+| Srivaikuntam | ADMK | 1,436 |
+| Kangayam | ADMK | 1,496 |
+| Viluppuram | DMK | 1,668 |
+| Tirukkoyilur | ADMK | 1,695 |
+| Pennagaram | PMK | 1,754 |
 
-### TVK Winning Margin Breakdown (106 seats)
+### TVK Winning Margin Breakdown (110 seats — live)
 | Margin Range | Seats |
 |---|---|
-| <1,000 (at risk) | 14 |
-| 1K–3K | 21 |
-| 3K–5K | 15 |
-| 5K–10K | 31 |
-| 10K–20K | 22 |
-| >20K | 3 |
-| **Total** | **106** |
-| Avg margin | 6,788 votes |
-| Highest | Madavaram 35,728 |
+| <1,000 (at risk) | 16 |
+| 1K–3K | 18 |
+| 3K–5K | 14 |
+| 5K–10K | 26 |
+| 10K–20K | 29 |
+| >20K | 7 |
+| **Total** | **110** |
+| Avg margin | 7,873 votes |
+| Highest | Madavaram 48,561 |
 
 ### Vote Share (Official ECI)
 | Party | Vote % |
 |---|---|
 | Other (incl. TVK*) | 38.92% |
-| DMK | 24.13% |
+| DMK | 24.19% |
 | ADMK | 22.16% |
-| NTK | 3.91% |
-| INC | 3.53% |
-| BJP | 3.17% |
-| DMDK | 1.07% |
-| VCK | 0.92% |
-| CPI | 0.67% |
+| NTK | 3.94% |
+| INC | 3.57% |
+| BJP | 3.08% |
+| DMDK | 1.08% |
+| VCK | 0.93% |
+| CPI | 0.63% |
 | CPI(M) | 0.58% |
-| IUML | 0.39% |
+| IUML | 0.37% |
 | NOTA | 0.41% |
 
 *TVK is classified as "Other" in ECI vote share — newly registered party.

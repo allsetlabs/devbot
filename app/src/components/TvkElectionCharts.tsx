@@ -12,37 +12,37 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// Official ECI data — May 5, 2026 (final count)
+// Live ECI count — May 4, 2026 (counting in progress)
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
 
 const TVK_WIN_STATUS = [
-  { name: 'TVK Leading', value: 106, color: '#e855a8' },
-  { name: 'Not Leading', value: 128, color: '#e2e8f0' },
+  { name: 'TVK Leading', value: 110, color: '#e855a8' },
+  { name: 'Not Leading', value: 124, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 106 TVK-leading constituencies (from ECI constituency detail)
+// Margin breakdown for 110 TVK-leading constituencies (from ECI constituency detail)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 14, fill: '#facc15' },
-  { range: '1K–3K', seats: 21, fill: '#86efac' },
-  { range: '3K–5K', seats: 15, fill: '#4ade80' },
-  { range: '5K–10K', seats: 31, fill: '#22c55e' },
-  { range: '10K–20K', seats: 22, fill: '#16a34a' },
-  { range: '>20K', seats: 3, fill: '#15803d' },
+  { range: '<1K', seats: 16, fill: '#facc15' },
+  { range: '1K–3K', seats: 18, fill: '#86efac' },
+  { range: '3K–5K', seats: 14, fill: '#4ade80' },
+  { range: '5K–10K', seats: 26, fill: '#22c55e' },
+  { range: '10K–20K', seats: 29, fill: '#16a34a' },
+  { range: '>20K', seats: 7, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
-  { party: 'TVK', seats: 106, fill: '#e855a8' },
-  { party: 'ADMK', seats: 62, fill: '#a3731a' },
-  { party: 'DMK', seats: 45, fill: '#22c55e' },
-  { party: 'INC', seats: 5, fill: '#3b82f6' },
+  { party: 'TVK', seats: 110, fill: '#e855a8' },
+  { party: 'ADMK', seats: 57, fill: '#a3731a' },
+  { party: 'DMK', seats: 48, fill: '#22c55e' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
+  { party: 'INC', seats: 4, fill: '#3b82f6' },
   { party: 'VCK', seats: 2, fill: '#7c3aed' },
-  { party: 'DMDK', seats: 2, fill: '#d97706' },
   { party: 'CPI', seats: 2, fill: '#dc2626' },
-  { party: 'BJP', seats: 2, fill: '#f97316' },
+  { party: 'CPI(M)', seats: 2, fill: '#b91c1c' },
+  { party: 'BJP', seats: 1, fill: '#f97316' },
+  { party: 'DMDK', seats: 1, fill: '#d97706' },
   { party: 'IUML', seats: 1, fill: '#0284c7' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
-  { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
 ];
 
 // ECI vote share — TVK appears under "Other" (new party classification)
@@ -102,7 +102,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>12 seats short</strong>
+        Majority needs <strong>118</strong> — TVK is <strong>8 seats short</strong> (counting live)
       </div>
     </ChartCard>
   );
@@ -110,7 +110,7 @@ export function TvkWinLossChart() {
 
 export function TvkMarginChart() {
   return (
-    <ChartCard title="TVK Winning Margins — 106 Seats">
+    <ChartCard title="TVK Winning Margins — 110 Seats (live)">
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={TVK_MARGIN_DIST} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -125,7 +125,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 6,788 · Highest: 35,728 (Madavaram) · 14 seats won by &lt;1,000 votes
+        Avg margin: 7,873 · Highest: 48,561 (Madavaram) · 16 seats leading by &lt;1,000 votes
       </p>
     </ChartCard>
   );

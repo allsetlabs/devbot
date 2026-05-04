@@ -4,6 +4,7 @@ import { useNav } from '../hooks/useNav';
 import {
   TvkWinLossChart,
   TvkMarginChart,
+  TvkWinsAtRiskChart,
   PartySeatsChart,
   VoteShareChart,
 } from '../components/TvkElectionCharts';
@@ -23,8 +24,8 @@ const MAJORITY_MARK = 118;
 const TVK_SEATS = 109;
 const TOTAL_SEATS = 234;
 const SEATS_SHORT = MAJORITY_MARK - TVK_SEATS;
-const TVK_CLOSE_LOSSES = 39;
-const TVK_NOT_COMPETITIVE = 86;
+const TVK_CLOSE_LOSSES = 40;
+const TVK_NOT_COMPETITIVE = 85;
 
 const DATA_SOURCE_URL = 'https://results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm';
 
@@ -122,6 +123,7 @@ export function TvkElection() {
 
         <TvkStatusBreakdown />
         <TvkMajorityPathChart />
+        <TvkWinsAtRiskChart />
         <TvkWinLossChart />
         <TvkAlliancePieChart />
         <TvkAllianceBarChart />
@@ -137,10 +139,11 @@ export function TvkElection() {
           <ul className="mt-1 list-disc space-y-1 pl-4">
             <li>Live count data — May 4, 2026. Counting in progress. Source: ECI (results.eci.gov.in).</li>
             <li>TVK leading 109 seats. In 2nd place (trailing) in 70 seats. Not in top-2 in 55 seats.</li>
-            <li>39 seats lost by &lt;5,000 votes — 10 of those by &lt;1,000 votes. Closest: Bodinayakanur by 173 votes.</li>
-            <li>If TVK had won just the 10 seats lost by &lt;1K, they'd have 119 — one over majority.</li>
-            <li>TVK vote share listed as "Other (39.07%)" in ECI — newly registered party classification.</li>
-            <li>TVK contested all 234 seats solo — no alliance. Historic debut. Avg win margin: 9,695 votes.</li>
+            <li>40 seats lost by &lt;5,000 votes — 8 of those by &lt;1,000 votes. Closest: Vikravandi by 102 votes.</li>
+            <li>Even winning all 8 seats lost by &lt;1K gives only 117 — still 1 short of majority.</li>
+            <li>ADMK surged to 59 seats. TVK &amp; ADMK neck-and-neck as largest opposition.</li>
+            <li>TVK vote share listed as "Other (39.12%)" in ECI — newly registered party classification.</li>
+            <li>TVK contested all 234 seats solo — no alliance. Historic debut. Avg win margin: 10,483 votes.</li>
             <li>
               Official source:{' '}
               <a href={DATA_SOURCE_URL} target="_blank" rel="noreferrer" className="underline">

@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// Live ECI count — May 4, 2026 (counting in progress)
+// Live ECI count — May 4, 2026 (updated latest round)
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
 
 const TVK_WIN_STATUS = [
@@ -22,24 +22,23 @@ const TVK_WIN_STATUS = [
 
 // Margin breakdown for 109 TVK-leading constituencies (from ECI all-constituencies fetch)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 10, fill: '#facc15' },
-  { range: '1K–3K', seats: 17, fill: '#86efac' },
+  { range: '<1K', seats: 8, fill: '#facc15' },
+  { range: '1K–3K', seats: 19, fill: '#86efac' },
   { range: '3K–5K', seats: 14, fill: '#4ade80' },
-  { range: '5K–10K', seats: 21, fill: '#22c55e' },
-  { range: '10K–20K', seats: 36, fill: '#16a34a' },
-  { range: '>20K', seats: 11, fill: '#15803d' },
+  { range: '5K–10K', seats: 18, fill: '#22c55e' },
+  { range: '10K–20K', seats: 37, fill: '#16a34a' },
+  { range: '>20K', seats: 13, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
   { party: 'TVK', seats: 109, fill: '#e855a8' },
-  { party: 'ADMK', seats: 56, fill: '#a3731a' },
+  { party: 'ADMK', seats: 59, fill: '#a3731a' },
   { party: 'DMK', seats: 49, fill: '#22c55e' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
   { party: 'INC', seats: 4, fill: '#3b82f6' },
-  { party: 'VCK', seats: 2, fill: '#7c3aed' },
-  { party: 'CPI', seats: 2, fill: '#dc2626' },
-  { party: 'CPI(M)', seats: 2, fill: '#b91c1c' },
-  { party: 'BJP', seats: 1, fill: '#f97316' },
+  { party: 'CPI', seats: 3, fill: '#dc2626' },
+  { party: 'VCK', seats: 1, fill: '#7c3aed' },
+  { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
   { party: 'DMDK', seats: 1, fill: '#d97706' },
   { party: 'IUML', seats: 1, fill: '#0284c7' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
@@ -47,18 +46,32 @@ const ALL_PARTIES = [
 
 // ECI vote share — TVK appears under "Other" (new party classification)
 const VOTE_SHARE = [
-  { party: 'TVK*', share: 39.07, fill: '#e855a8' },
-  { party: 'DMK', share: 24.09, fill: '#22c55e' },
-  { party: 'ADMK', share: 22.12, fill: '#a3731a' },
+  { party: 'TVK*', share: 39.12, fill: '#e855a8' },
+  { party: 'DMK', share: 24.03, fill: '#22c55e' },
+  { party: 'ADMK', share: 21.99, fill: '#a3731a' },
   { party: 'NTK', share: 3.95, fill: '#475569' },
-  { party: 'INC', share: 3.65, fill: '#3b82f6' },
-  { party: 'BJP', share: 2.99, fill: '#f97316' },
-  { party: 'DMDK', share: 1.09, fill: '#d97706' },
-  { party: 'VCK', share: 0.95, fill: '#7c3aed' },
+  { party: 'INC', share: 3.66, fill: '#3b82f6' },
+  { party: 'BJP', share: 3.05, fill: '#f97316' },
+  { party: 'VCK', share: 1.02, fill: '#7c3aed' },
+  { party: 'DMDK', share: 1.08, fill: '#d97706' },
   { party: 'CPI', share: 0.61, fill: '#dc2626' },
   { party: 'CPI(M)', share: 0.60, fill: '#b91c1c' },
   { party: 'NOTA', share: 0.41, fill: '#94a3b8' },
-  { party: 'IUML', share: 0.33, fill: '#0284c7' },
+  { party: 'IUML', share: 0.34, fill: '#0284c7' },
+];
+
+// 10 TVK-leading seats with smallest margins (most at risk of flipping)
+const TVK_WINS_AT_RISK = [
+  { name: 'Namakkal', margin: 49, fill: '#ef4444' },
+  { name: 'Tirukkoyilur', margin: 54, fill: '#ef4444' },
+  { name: 'Nagercoil', margin: 66, fill: '#ef4444' },
+  { name: 'Aravakurichi', margin: 310, fill: '#f97316' },
+  { name: 'Sholavandan', margin: 385, fill: '#f97316' },
+  { name: 'Udhagamandalam', margin: 495, fill: '#f97316' },
+  { name: 'Kulithalai', margin: 530, fill: '#fbbf24' },
+  { name: 'Thiruverumbur', margin: 601, fill: '#fbbf24' },
+  { name: 'Sattur', margin: 654, fill: '#fbbf24' },
+  { name: 'Killiyoor', margin: 774, fill: '#fbbf24' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -129,7 +142,37 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 9,695 · Highest: 52,347 (Madavaram) · 10 seats leading by &lt;1,000 votes
+        Avg margin: 10,483 · Highest: 61,467 (Madavaram) · 8 seats leading by &lt;1,000 votes
+      </p>
+    </ChartCard>
+  );
+}
+
+export function TvkWinsAtRiskChart() {
+  return (
+    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads">
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart
+          data={TVK_WINS_AT_RISK}
+          layout="vertical"
+          margin={{ top: 0, right: 60, left: 110, bottom: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
+          <XAxis type="number" tick={{ fontSize: 10 }} />
+          <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={110} />
+          <Tooltip
+            formatter={(v: number) => [`Leading by ${v} votes`]}
+            contentStyle={{ fontSize: 12 }}
+          />
+          <Bar dataKey="margin" radius={[0, 4, 4, 0]}>
+            {TVK_WINS_AT_RISK.map((entry) => (
+              <Cell key={entry.name} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      <p className="mt-1 text-center text-xs text-muted-foreground">
+        Red = extreme risk (&lt;100) · Orange = high risk (&lt;500) · These seats could still flip
       </p>
     </ChartCard>
   );
@@ -183,7 +226,7 @@ export function VoteShareChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        * TVK classified as "Other" in ECI vote share — 39.07% ≈ 86.3L votes
+        * TVK classified as "Other" in ECI vote share — 39.12% ≈ 92.9L votes
       </p>
     </ChartCard>
   );

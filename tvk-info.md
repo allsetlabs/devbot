@@ -95,119 +95,123 @@ Total seats: 234 | Majority mark: 118 | Election date: 23 April 2026 | Result da
 
 ---
 
-## Data Last Fetched: 2026-05-04 (Live Count — latest round during counting)
+## Data Last Fetched: 2026-05-04 (Live Count — latest round, afternoon counting)
 
 ### Party-wise Seat Tally (ECI Live — counting in progress)
 | Party | Total (Won+Leading) |
 |---|---|
-| TVK (Tamilaga Vettri Kazhagam) | 107 (1 won + 106 leading) |
-| DMK | 59 (3 won + 56 leading) |
+| TVK (Tamilaga Vettri Kazhagam) | 107 (2 won + 105 leading) |
+| DMK | 58 (3 won + 55 leading) |
 | ADMK | 47 |
 | INC | 5 |
 | PMK | 4 |
-| BJP | 3 |
+| CPI | 3 |
 | IUML | 2 |
 | VCK | 2 |
-| CPI | 2 |
+| BJP | 2 |
+| CPI(M) | 2 |
 | DMDK | 1 |
 | AMMK | 1 |
-| CPI(M) | 1 |
 | **Total** | **234** |
 
 ### Alliance Breakdown
 | Alliance | Parties | Seats |
 |---|---|---|
 | TVK (Solo) | TVK | 107 |
-| DMK Alliance | DMK+INC+VCK+CPI+CPI(M)+IUML | 71 |
+| DMK Alliance | DMK+INC+VCK+CPI+CPI(M)+IUML | 72 |
 | ADMK (Solo) | ADMK | 47 |
 | Others | PMK+DMDK+AMMK | 6 |
-| BJP | BJP | 3 |
+| BJP | BJP | 2 |
 
-**Note**: TVK surged to 107 seats (up from earlier round's 103), now 11 short of majority. DMK Alliance at 71 (DMK 59+INC 5+VCK 2+CPI 2+CPI(M) 1+IUML 2).
+**Note**: TVK at 107 seats, 11 short of majority. DMK Alliance at 72 (DMK 58+INC 5+VCK 2+CPI 3+CPI(M) 2+IUML 2). BJP dropped to 2. CPI up to 3, CPI(M) up to 2.
+**Note on TVK leading link**: URL changed from `partywiseleadresult-3679S22.htm` → also check `partywisewinresult-3679S22.htm` for declared wins. Use leads page for all 107.
 
 ### TVK Constituency Status (All 234 — live latest round)
 | Status | Count | Description |
 |---|---|---|
 | Safe Lead (>5K margin) | 75 | Dominant lead |
-| Close Lead (<5K margin) | 32 | At risk: <1K(10), 1K-3K(12), 3K-5K(9) |
-| Close Loss (<5K behind) | 34 | Lost but could have swung |
-| Not Competitive (trailing >5K or not in top 2) | 93 | Wide loss or not in top-2 |
+| Close Lead (<5K margin) | 32 | At risk: <1K(8), 1K-3K(17), 3K-5K(7) |
+| Close Loss (<5K behind) | 31 | Lost but could have swung |
+| Not Competitive (trailing >5K or not in top 2) | 96 | Wide loss or not in top-2 |
 
-### TVK Who's Beating TVK (70 seats TVK is in 2nd place — live latest round)
+### TVK Who's Beating TVK (69 seats TVK is in 2nd place — live latest round)
 | Party | Seats |
 |---|---|
-| DMK | 35 |
+| DMK | 33 |
 | ADMK | 22 |
 | INC | 4 |
 | PMK | 2 |
-| CPI | 2 |
+| CPI(M) | 2 |
 | IUML | 2 |
-| CPI(M) | 1 |
+| CPI | 2 |
 | DMDK | 1 |
 | BJP | 1 |
 
-### Top 15 Closest TVK Losses (Latest Round — May 4, 2026)
+### Top 15 Closest TVK Losses (Latest Round — May 4, 2026 afternoon)
 | Constituency | Won By | Margin |
 |---|---|---|
 | Kumbakonam | DMK | 86 |
-| Killiyoor | INC | 143 |
-| Srivaikuntam | ADMK | 207 |
+| Srivaikuntam | ADMK | 136 |
+| Katpadi | ADMK | 141 |
 | Tiruvannamalai | DMK | 291 |
-| Nilakkottai | DMK | 520 |
-| Senthamangalam | ADMK | 792 |
-| Tittakudi | DMK | 1,004 |
-| Lalgudi | ADMK | 1,174 |
-| Coimbatore South | DMK | 1,198 |
+| Tittakudi | DMK | 530 |
+| Kilvelur | CPI(M) | 663 |
+| Vikravandi | PMK | 730 |
+| Killiyoor | INC | 910 |
+| Paramakudi | DMK | 1,132 |
+| Coimbatore South | DMK | 1,231 |
 | Udhagamandalam | BJP | 1,231 |
-| Katpadi | ADMK | 1,313 |
-| Paramakudi | DMK | 1,341 |
-| Ranipet | DMK | 1,569 |
-| Dindigul | DMK | 1,739 |
-| Viluppuram | DMK | 1,745 |
+| Lalgudi | ADMK | 1,368 |
+| Dindigul | DMK | 1,471 |
+| Viluppuram | DMK | 1,491 |
+| Pudukkottai | DMK | 2,376 |
+
+**Note**: Senthamangalam and Ranipet flipped from losses to TVK wins vs previous round! Nilakkottai is now a TVK lead (was a loss).
 
 ### TVK Wins at Risk (10 Slimmest TVK Leading Margins — latest round)
 | Constituency | TVK Lead (votes) |
 |---|---|
-| Manapparai | 31 |
-| Vikravandi | 169 |
-| Bhavanisagar | 276 |
-| Tiruvadanai | 345 |
-| Kilvelur | 425 |
+| Nilakkottai | 16 |
+| Ambur | 275 |
+| Manapparai | 369 |
 | Sholingur | 437 |
-| Namakkal | 446 |
-| Mettuppalayam | 637 |
-| Sholavandan | 701 |
-| Tirukkoyilur | 972 |
+| Sholavandan | 628 |
+| Senthamangalam | 760 |
+| Ranipet | 843 |
+| Bargur | 954 |
+| Polur | 1,085 |
+| Yercaud | 1,190 |
 
-### TVK Winning Margin Breakdown (106 leading + 1 won = 107 seats — live updated)
+### TVK Winning Margin Breakdown (105 leading + 2 won = 107 seats — live updated)
 | Margin Range | Seats |
 |---|---|
-| <1,000 (at risk) | 10 |
-| 1K–3K | 12 |
-| 3K–5K | 9 |
-| 5K–10K | 18 |
-| 10K–20K | 28 |
-| >20K | 29 |
-| **Total** | **106 leading** (+ 1 declared won) |
-| Avg margin | 14,563 votes |
-| Highest | Madavaram 86,155 |
-| Lowest (leading) | Manapparai 31 |
+| <1,000 (at risk) | 8 |
+| 1K–3K | 17 |
+| 3K–5K | 7 |
+| 5K–10K | 13 |
+| 10K–20K | 30 |
+| >20K | 32 |
+| **Total** | **107** |
+| Avg margin | 15,552 votes |
+| Highest | Madavaram 91,600 |
+| Lowest (leading) | Nilakkottai 16 |
 
 ### What-If Scenarios
 | Scenario | Seats | vs Majority (118) |
 |---|---|---|
 | Current (live) | 107 | -11 |
-| If won all <1K losses (6 seats) | 113 | -5 |
-| If won all <5K losses (34 seats) | 141 | +23 |
+| If won all <1K losses (8 seats) | 115 | -3 |
+| If won all <5K losses (31 seats) | 138 | +20 |
 
-### Close Losses by Winning Party (34 seats, <5K margin)
+### Close Losses by Winning Party (31 seats, <5K margin)
 | Party | Seats |
 |---|---|
-| DMK | 18 |
-| ADMK | 9 |
-| INC | 2 |
+| DMK | 15 |
+| ADMK | 7 |
+| INC | 3 |
 | BJP | 1 |
 | PMK | 1 |
+| CPI(M) | 1 |
 | CPI | 1 |
 | IUML | 1 |
 | DMDK | 1 |

@@ -20,27 +20,27 @@ const TVK_WIN_STATUS = [
   { name: 'Not Leading', value: 127, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 106 TVK-leading constituencies (from ECI all-constituencies fetch; +1 already declared won)
+// Margin breakdown for 107 TVK constituencies (from ECI constituency fetch — latest round)
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 10, fill: '#facc15' },
-  { range: '1K–3K', seats: 12, fill: '#86efac' },
-  { range: '3K–5K', seats: 9, fill: '#4ade80' },
-  { range: '5K–10K', seats: 18, fill: '#22c55e' },
-  { range: '10K–20K', seats: 28, fill: '#16a34a' },
-  { range: '>20K', seats: 29, fill: '#15803d' },
+  { range: '<1K', seats: 8, fill: '#facc15' },
+  { range: '1K–3K', seats: 17, fill: '#86efac' },
+  { range: '3K–5K', seats: 7, fill: '#4ade80' },
+  { range: '5K–10K', seats: 13, fill: '#22c55e' },
+  { range: '10K–20K', seats: 30, fill: '#16a34a' },
+  { range: '>20K', seats: 32, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
   { party: 'TVK', seats: 107, fill: '#e855a8' },
-  { party: 'DMK', seats: 59, fill: '#22c55e' },
+  { party: 'DMK', seats: 58, fill: '#22c55e' },
   { party: 'ADMK', seats: 47, fill: '#a3731a' },
   { party: 'INC', seats: 5, fill: '#3b82f6' },
   { party: 'PMK', seats: 4, fill: '#65a30d' },
-  { party: 'BJP', seats: 3, fill: '#f97316' },
-  { party: 'CPI', seats: 2, fill: '#dc2626' },
+  { party: 'CPI', seats: 3, fill: '#dc2626' },
   { party: 'IUML', seats: 2, fill: '#0284c7' },
   { party: 'VCK', seats: 2, fill: '#7c3aed' },
-  { party: 'CPI(M)', seats: 1, fill: '#b91c1c' },
+  { party: 'BJP', seats: 2, fill: '#f97316' },
+  { party: 'CPI(M)', seats: 2, fill: '#b91c1c' },
   { party: 'DMDK', seats: 1, fill: '#d97706' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
 ];
@@ -63,16 +63,16 @@ const VOTE_SHARE = [
 
 // 10 TVK-leading seats with smallest margins (most at risk of flipping) — live May 4 latest round
 const TVK_WINS_AT_RISK = [
-  { name: 'Manapparai', margin: 31, fill: '#ef4444' },
-  { name: 'Vikravandi', margin: 169, fill: '#ef4444' },
-  { name: 'Bhavanisagar', margin: 276, fill: '#ef4444' },
-  { name: 'Tiruvadanai', margin: 345, fill: '#ef4444' },
-  { name: 'Kilvelur', margin: 425, fill: '#fbbf24' },
-  { name: 'Sholingur', margin: 437, fill: '#fbbf24' },
-  { name: 'Namakkal', margin: 446, fill: '#fbbf24' },
-  { name: 'Mettuppalayam', margin: 637, fill: '#fbbf24' },
-  { name: 'Sholavandan', margin: 701, fill: '#d97706' },
-  { name: 'Tirukkoyilur', margin: 972, fill: '#d97706' },
+  { name: 'Nilakkottai', margin: 16, fill: '#ef4444' },
+  { name: 'Ambur', margin: 275, fill: '#ef4444' },
+  { name: 'Manapparai', margin: 369, fill: '#ef4444' },
+  { name: 'Sholingur', margin: 437, fill: '#ef4444' },
+  { name: 'Sholavandan', margin: 628, fill: '#fbbf24' },
+  { name: 'Senthamangalam', margin: 760, fill: '#fbbf24' },
+  { name: 'Ranipet', margin: 843, fill: '#fbbf24' },
+  { name: 'Bargur', margin: 954, fill: '#fbbf24' },
+  { name: 'Polur', margin: 1085, fill: '#d97706' },
+  { name: 'Yercaud', margin: 1190, fill: '#d97706' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -128,7 +128,7 @@ export function TvkWinLossChart() {
 
 export function TvkMarginChart() {
   return (
-    <ChartCard title="TVK Winning Margins — 103 Seats (live)">
+    <ChartCard title="TVK Winning Margins — 107 Seats (live)">
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={TVK_MARGIN_DIST} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -143,7 +143,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Avg margin: 14,563 · Highest: 86,155 (Madavaram) · 10 seats leading by &lt;1,000 votes
+        Avg margin: 15,552 · Highest: 91,600 (Madavaram) · 8 seats leading by &lt;1,000 votes
       </p>
     </ChartCard>
   );
@@ -173,7 +173,7 @@ export function TvkWinsAtRiskChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Red = extreme risk (&lt;500 votes) · Orange = high risk (&lt;1K) · Manapparai leads by only 31!
+        Red = extreme risk (&lt;500 votes) · Orange = high risk (&lt;1K) · Nilakkottai leads by only 16!
       </p>
     </ChartCard>
   );

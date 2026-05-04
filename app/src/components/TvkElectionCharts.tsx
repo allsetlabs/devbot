@@ -12,22 +12,24 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// ECI count — May 4, 2026 (5 PM refresh)
+// ECI count — May 4, 2026 (latest round refresh)
 // Source: results.eci.gov.in/ResultAcGenMay2026/partywiseresult-S22.htm
+// TVK: 15 Won + 94 Leading = 109 | BJP: 3→2 | CPI: 1→2 | DMK Alliance: 70→71
 
 const TVK_WIN_STATUS = [
   { name: 'TVK Leading/Won', value: 109, color: '#e855a8' },
   { name: 'Not Leading', value: 125, color: '#e2e8f0' },
 ];
 
-// Margin breakdown for 99 TVK leading constituencies (5 PM May 4 — 10 officially Won not included)
+// Margin breakdown for 94 TVK leading constituencies (latest round — 15 officially Won not included)
+// Kumbakonam & Palani flipped from close losses to TVK leads · Cumbum & Bargur now officially Won
 const TVK_MARGIN_DIST = [
-  { range: '<1K', seats: 4, fill: '#facc15' },
-  { range: '1K–3K', seats: 12, fill: '#86efac' },
+  { range: '<1K', seats: 6, fill: '#facc15' },
+  { range: '1K–3K', seats: 7, fill: '#86efac' },
   { range: '3K–5K', seats: 7, fill: '#4ade80' },
   { range: '5K–10K', seats: 15, fill: '#22c55e' },
-  { range: '10K–20K', seats: 28, fill: '#16a34a' },
-  { range: '>20K', seats: 33, fill: '#15803d' },
+  { range: '10K–20K', seats: 25, fill: '#16a34a' },
+  { range: '>20K', seats: 34, fill: '#15803d' },
 ];
 
 const ALL_PARTIES = [
@@ -36,11 +38,11 @@ const ALL_PARTIES = [
   { party: 'ADMK', seats: 45, fill: '#a3731a' },
   { party: 'PMK', seats: 5, fill: '#65a30d' },
   { party: 'INC', seats: 5, fill: '#3b82f6' },
-  { party: 'BJP', seats: 3, fill: '#f97316' },
+  { party: 'BJP', seats: 2, fill: '#f97316' },
   { party: 'IUML', seats: 2, fill: '#0284c7' },
   { party: 'CPI(M)', seats: 2, fill: '#b91c1c' },
   { party: 'VCK', seats: 1, fill: '#7c3aed' },
-  { party: 'CPI', seats: 1, fill: '#dc2626' },
+  { party: 'CPI', seats: 2, fill: '#dc2626' },
   { party: 'DMDK', seats: 1, fill: '#d97706' },
   { party: 'AMMK', seats: 1, fill: '#64748b' },
 ];
@@ -61,18 +63,19 @@ const VOTE_SHARE = [
   { party: 'IUML', share: 0.36, fill: '#0284c7' },
 ];
 
-// 10 TVK-leading seats with smallest margins (most at risk) — May 4, 5 PM
+// 10 TVK-leading seats with smallest margins (most at risk) — latest round
+// Cumbum (122) & Bargur (442) now officially Won · Sholavandan crashed to 40 · Kumbakonam/Palani flipped from loss to lead
 const TVK_WINS_AT_RISK = [
-  { name: 'Cumbum', margin: 122, fill: '#ef4444' },
-  { name: 'Bargur', margin: 442, fill: '#ef4444' },
-  { name: 'Polur', margin: 491, fill: '#ef4444' },
-  { name: 'Sholavandan', margin: 727, fill: '#fbbf24' },
-  { name: 'Srivilliputhur', margin: 1192, fill: '#d97706' },
+  { name: 'Sholavandan', margin: 40, fill: '#ef4444' },
+  { name: 'Polur', margin: 316, fill: '#ef4444' },
+  { name: 'Kumbakonam', margin: 432, fill: '#ef4444' },
+  { name: 'Palani', margin: 482, fill: '#ef4444' },
+  { name: 'Tiruvadanai', margin: 678, fill: '#fbbf24' },
+  { name: 'Yercaud', margin: 975, fill: '#fbbf24' },
+  { name: 'Kallakurichi', margin: 1278, fill: '#d97706' },
+  { name: 'Kulithalai', margin: 1318, fill: '#d97706' },
   { name: 'Namakkal', margin: 1325, fill: '#d97706' },
-  { name: 'Manapparai', margin: 1360, fill: '#d97706' },
-  { name: 'Yercaud', margin: 1691, fill: '#d97706' },
-  { name: 'Kulithalai', margin: 1748, fill: '#d97706' },
-  { name: 'Usilampatti', margin: 1973, fill: '#d97706' },
+  { name: 'Manapparai', margin: 1803, fill: '#d97706' },
 ];
 
 export function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -120,7 +123,7 @@ export function TvkWinLossChart() {
         ))}
       </div>
       <div className="mt-2 rounded-lg bg-destructive/10 px-3 py-1.5 text-center text-xs text-destructive">
-        Majority needs <strong>118</strong> — TVK is <strong>9 seats short</strong> (counting live)
+        Majority needs <strong>118</strong> — TVK is <strong>9 seats short</strong> (15 Won + 94 Leading)
       </div>
     </ChartCard>
   );
@@ -128,7 +131,7 @@ export function TvkWinLossChart() {
 
 export function TvkMarginChart() {
   return (
-    <ChartCard title="TVK Winning Margins — 99 Leading Seats (5 PM)">
+    <ChartCard title="TVK Winning Margins — 94 Leading Seats (latest round)">
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={TVK_MARGIN_DIST} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -143,7 +146,7 @@ export function TvkMarginChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Highest: 94,985 (Madavaram) · 4 leading seats by &lt;1,000 votes · 10 officially Won not shown
+        Highest: 94,985 (Madavaram) · 6 leading seats by &lt;1,000 votes · 15 officially Won not shown
       </p>
     </ChartCard>
   );
@@ -151,7 +154,7 @@ export function TvkMarginChart() {
 
 export function TvkWinsAtRiskChart() {
   return (
-    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads">
+    <ChartCard title="TVK Wins at Risk — 10 Slimmest Leads (latest round)">
       <ResponsiveContainer width="100%" height={260}>
         <BarChart
           data={TVK_WINS_AT_RISK}
@@ -173,7 +176,7 @@ export function TvkWinsAtRiskChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        Red = extreme risk (&lt;500 votes) · Yellow = high risk (500–1K) · Cumbum leads by only 122!
+        Red = extreme risk (&lt;500) · Yellow = high risk (500–1K) · Sholavandan leads by only 40! · Cumbum/Bargur now Won
       </p>
     </ChartCard>
   );

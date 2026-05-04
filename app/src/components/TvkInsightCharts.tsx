@@ -13,28 +13,28 @@ import {
 } from 'recharts';
 import { ChartCard } from './TvkElectionCharts';
 
-// Alliance groupings — Tamil Nadu 2026 (May 4, 5 PM)
-// TVK contested solo. DMK, ADMK contested with allies.
+// Alliance groupings — Tamil Nadu 2026 (latest round)
+// TVK contested solo. DMK Alliance gained 1 (CPI 1→2). BJP dropped from 3→2.
 const ALLIANCE_DATA = [
   { name: 'TVK\n(Solo)', seats: 109, fill: '#e855a8', label: 'TVK' },
-  { name: 'DMK\nAlliance', seats: 70, fill: '#22c55e', label: 'DMK(59)+INC(5)+VCK(1)+CPI(1)+CPI(M)(2)+IUML(2)' },
+  { name: 'DMK\nAlliance', seats: 71, fill: '#22c55e', label: 'DMK(59)+INC(5)+VCK(1)+CPI(2)+CPI(M)(2)+IUML(2)' },
   { name: 'ADMK\n(Solo)', seats: 45, fill: '#a3731a', label: 'ADMK' },
   { name: 'PMK &\nOthers', seats: 7, fill: '#94a3b8', label: 'PMK(5)+DMDK(1)+AMMK(1)' },
-  { name: 'BJP', seats: 3, fill: '#f97316', label: 'BJP' },
+  { name: 'BJP', seats: 2, fill: '#f97316', label: 'BJP' },
 ];
 
 // Pie data for alliance share of 234 seats
 const ALLIANCE_PIE = [
   { name: 'TVK (Solo)', value: 109, color: '#e855a8' },
-  { name: 'DMK Alliance', value: 70, color: '#22c55e' },
+  { name: 'DMK Alliance', value: 71, color: '#22c55e' },
   { name: 'ADMK (Solo)', value: 45, color: '#a3731a' },
   { name: 'PMK & Others', value: 7, color: '#94a3b8' },
-  { name: 'BJP', value: 3, color: '#f97316' },
+  { name: 'BJP', value: 2, color: '#f97316' },
 ];
 
-// 29 seats TVK lost by <5K — breakdown by winning party (May 4, 5 PM — Srivilliputhur flipped to TVK)
+// ~27 seats TVK lost by <5K — breakdown by winning party (latest round — Kumbakonam/Palani flipped to TVK)
 const CLOSE_LOSS_BY_PARTY = [
-  { party: 'DMK', seats: 16, fill: '#22c55e' },
+  { party: 'DMK', seats: 14, fill: '#22c55e' },
   { party: 'ADMK', seats: 4, fill: '#a3731a' },
   { party: 'INC', seats: 3, fill: '#3b82f6' },
   { party: 'PMK', seats: 2, fill: '#65a30d' },
@@ -80,7 +80,7 @@ export function TvkAlliancePieChart() {
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        TVK contested ALL 234 seats solo — unprecedented debut · DMK Alliance: 70 · ADMK: 45
+        TVK contested ALL 234 seats solo — unprecedented debut · DMK Alliance: 71 · ADMK: 45 · BJP: 2
       </p>
     </ChartCard>
   );
@@ -115,7 +115,7 @@ export function TvkAllianceBarChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        DMK Alliance = DMK(59)+INC(5)+VCK(1)+CPI(1)+CPI(M)(2)+IUML(2) = 70
+        DMK Alliance = DMK(59)+INC(5)+VCK(1)+CPI(2)+CPI(M)(2)+IUML(2) = 71 · BJP: 3→2
       </p>
     </ChartCard>
   );
@@ -125,8 +125,8 @@ export function TvkMajorityPathChart() {
   const data = [
     { label: 'TVK Won', seats: 109, fill: '#e855a8' },
     { label: 'Majority', seats: 118, fill: '#94a3b8' },
-    { label: '+<1K Losses', seats: 112, fill: '#fbbf24' },
-    { label: '+All Close', seats: 138, fill: '#f97316' },
+    { label: '+<1K Losses', seats: 110, fill: '#fbbf24' },
+    { label: '+All Close', seats: 136, fill: '#f97316' },
   ];
   return (
     <ChartCard title="TVK Path to Majority — What-If Scenarios">
@@ -151,12 +151,12 @@ export function TvkMajorityPathChart() {
       </ResponsiveContainer>
       <div className="mt-2 space-y-1 text-xs text-muted-foreground">
         <p>
-          <span className="font-medium text-foreground">+&lt;1K Losses:</span> If TVK had won 3
-          seats lost by &lt;1,000 votes → 112 (still 6 short of majority)
+          <span className="font-medium text-foreground">+&lt;1K Losses:</span> If TVK had won seats
+          lost by &lt;1,000 votes → 110 (still 8 short of majority)
         </p>
         <p>
-          <span className="font-medium text-foreground">+All Close:</span> If TVK had won all 29
-          seats lost by &lt;5,000 votes → 138 (20 over majority)
+          <span className="font-medium text-foreground">+All Close:</span> If TVK had won all ~27
+          seats lost by &lt;5,000 votes → 136 (18 over majority)
         </p>
       </div>
     </ChartCard>
@@ -165,7 +165,7 @@ export function TvkMajorityPathChart() {
 
 export function TvkCloseLossByPartyChart() {
   return (
-    <ChartCard title="Close Losses by Winning Party (30 seats, <5K margin)">
+    <ChartCard title="Close Losses by Winning Party (~27 seats, <5K margin)">
       <ResponsiveContainer width="100%" height={180}>
         <BarChart data={CLOSE_LOSS_BY_PARTY} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -183,7 +183,7 @@ export function TvkCloseLossByPartyChart() {
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-center text-xs text-muted-foreground">
-        DMK+ADMK together denied TVK majority — 20 of 29 close losses
+        DMK+ADMK together denied TVK majority — 18 of ~27 close losses
       </p>
     </ChartCard>
   );

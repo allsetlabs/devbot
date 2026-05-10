@@ -197,9 +197,6 @@ export function InteractiveChatView({
     toggleAutoScroll,
   } = useSettings();
 
-  // Favorites
-  const { isFavorite, toggleFavorite } = useFavorites();
-
   // Delete/archive mutations for settings drawer
   const deleteChatMutation = useDeleteChat();
   const archiveChatMutation = useArchiveChat();
@@ -262,6 +259,9 @@ export function InteractiveChatView({
     enabled: !!chatId,
     refetchInterval: () => (isRunningRef.current ? POLL_INTERVALS.chatRunning : false),
   });
+
+  // Favorites
+  const { isFavorite, toggleFavorite } = useFavorites(chat ? [chat] : []);
 
   // Slash command picker — must be after chat query so workingDir is available
   const { data: commands = [] } = useCommands(chat?.workingDir);

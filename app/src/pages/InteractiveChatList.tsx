@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { X } from 'lucide-react';
@@ -27,7 +27,6 @@ export function InteractiveChatList() {
   const [newChatWorkingDir, setNewChatWorkingDir] = useState('');
   const [dirValidationError, setDirValidationError] = useState('');
   const validateAndSaveDir = useValidateAndSaveDir();
-  const { isFavorite, toggleFavorite } = useFavorites();
 
   const searchQuery = searchParams.get('q') ?? '';
   const selectedType = searchParams.get('type') ?? null;
@@ -116,6 +115,9 @@ export function InteractiveChatList() {
     isLoading: archiveLoading,
     error: archiveQueryError,
   } = chatHooks.useGetArchivedChats({ type: selectedType, q: searchMode === 'chats' ? searchQuery : '' });
+
+  const allChats = useMemo(() => [...chats, ...archivedChats], [chats, archivedChats]);
+  const { isFavorite, toggleFavorite } = useFavorites(allChats);
 
   const createMutation = chatHooks.useCreateChat();
   const deleteMutation = chatHooks.useDeleteChat();

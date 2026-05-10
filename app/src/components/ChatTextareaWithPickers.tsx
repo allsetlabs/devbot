@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp } from 'lucide-react';
+import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp, X } from 'lucide-react';
 import { ChatOcrMenu } from './ChatOcrMenu';
 import { toast } from 'sonner';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
@@ -363,6 +363,17 @@ export function ChatTextareaWithPickers({
                   )}
                   <Mic className="h-5 w-5" />
                 </Button>
+                {input && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    onMouseDown={(e) => { e.preventDefault(); onInputChange(''); }}
+                    title="Clear text"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
               {/* Right: pause/stop/send */}
               <div className="flex items-center gap-1">

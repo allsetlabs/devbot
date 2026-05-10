@@ -196,6 +196,7 @@ export interface InteractiveChat {
   workingDir: string | null;
   allowedTools: string[] | null;
   fastMode: boolean;
+  starred: boolean;
 }
 
 export interface ChatMessage {

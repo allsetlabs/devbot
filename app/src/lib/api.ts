@@ -282,6 +282,13 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${id}/unarchive`, { method: 'POST' });
   },
 
+  starInteractiveChat: (id: string, starred: boolean): Promise<InteractiveChat> => {
+    return fetchApi(`/api/interactive-chats/${id}/star`, {
+      method: 'POST',
+      body: JSON.stringify({ starred }),
+    });
+  },
+
   changeChatMode: (id: string, permissionMode: PermissionMode): Promise<InteractiveChat> => {
     return fetchApi(`/api/interactive-chats/${id}/mode`, {
       method: 'POST',

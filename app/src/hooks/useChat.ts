@@ -303,6 +303,29 @@ export function useStopChat() {
   });
 }
 
+export function useStarChat() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, starred }: { id: string; starred: boolean }) =>
+      api.starInteractiveChat(id, starred),
+    onMutate: async ({ id, starred }) => {
+      await queryClient.cancelQueries({ queryKey: chatKeys.lists() });
+      await queryClient.cancelQueries({ queryKey: chatKeys.archivedLists() });
+      const patchChat = (c: InteractiveChat) => (c.id === id ? { ...c, starred } : c);
+      const prevLists = queryClient.getQueriesData<InteractiveChat[]>({ queryKey: chatKeys.lists() });
+      const prevArchived = queryClient.getQueriesData<InteractiveChat[]>({ queryKey: chatKeys.archivedLists() });
+      queryClient.setQueriesData<InteractiveChat[]>({ queryKey: chatKeys.lists() }, (prev) => prev?.map(patchChat));
+      queryClient.setQueriesData<InteractiveChat[]>({ queryKey: chatKeys.archivedLists() }, (prev) => prev?.map(patchChat));
+      return { prevLists, prevArchived };
+    },
+    onError: (_err, _vars, context) => {
+      if (!context) return;
+      for (const [key, data] of context.prevLists) queryClient.setQueryData(key, data);
+      for (const [key, data] of context.prevArchived) queryClient.setQueryData(key, data);
+    },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Namespace export
 // ---------------------------------------------------------------------------
@@ -321,4 +344,5 @@ export const chatHooks = {
   useRenameChat,
   useSendMessage,
   useStopChat,
+  useStarChat,
 };

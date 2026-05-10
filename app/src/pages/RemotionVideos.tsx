@@ -10,6 +10,18 @@ import { api } from '../lib/api';
 import { RemotionVideoListItem } from '../components/RemotionVideoListItem';
 import { useNav } from '../hooks/useNav';
 import { VideoPlayerOverlay } from '../components/VideoPlayerOverlay';
+import type { RemotionVideo } from '../types';
+
+const LOCAL_VIDEOS: RemotionVideo[] = [
+  {
+    id: 'local__die-with-a-smile',
+    name: 'Die With A Smile',
+    videoPath: '/video_die_with_a_smile.mp4',
+    chatId: '',
+    status: 'completed',
+    createdAt: new Date().toISOString(),
+  },
+];
 
 const REMOTION_SYSTEM_PROMPT = `You are a Remotion video creator assistant. You work with the Remotion project located at modules/devbot/intro-video/.
 
@@ -93,7 +105,8 @@ export function RemotionVideos() {
 
   const handlePlay = (videoId: string) => {
     setPlayingId(videoId);
-    setVideoUrl(api.getRemotionVideoStreamUrl(videoId));
+    const local = LOCAL_VIDEOS.find((v) => v.id === videoId);
+    setVideoUrl(local ? local.videoPath : api.getRemotionVideoStreamUrl(videoId));
   };
 
   const handleClosePlayer = () => {
@@ -151,20 +164,20 @@ export function RemotionVideos() {
         <DataFetchWrapper
           isLoading={isLoading && videos.length === 0}
           error={null}
-          isEmpty={videos.length === 0}
+          isEmpty={false}
           emptyTitle="No Videos Yet"
           emptyMessage="Create a video using Remotion and Claude"
           emptyIcon={<Video className="h-16 w-16 text-muted-foreground/50" />}
           loadingMessage="Loading videos..."
         >
           <div className="divide-y divide-border">
-            {videos.map((video) => (
+            {[...LOCAL_VIDEOS, ...videos].map((video) => (
               <RemotionVideoListItem
                 key={video.id}
                 video={video}
                 onPlay={handlePlay}
-                onEdit={(chatId) => navigate(`/chat/${chatId}`)}
-                onDelete={(id) => deleteMutation.mutate(id)}
+                onEdit={(chatId) => { if (chatId) navigate(`/chat/${chatId}`); }}
+                onDelete={(id) => { if (!id.startsWith('local__')) deleteMutation.mutate(id); }}
               />
             ))}
           </div>
@@ -175,7 +188,7 @@ export function RemotionVideos() {
         <VideoPlayerOverlay
           videoId={playingId}
           videoUrl={videoUrl}
-          videos={videos}
+          videos={[...LOCAL_VIDEOS, ...videos]}
           onClose={handleClosePlayer}
           onDownload={handleDownload}
         />

@@ -39,6 +39,7 @@ interface InteractiveChat {
   workingDir: string | null;
   allowedTools: string[] | null;
   fastMode: boolean;
+  starred: boolean;
 }
 
 interface ChatMessageResponse {
@@ -71,6 +72,7 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     effort: typeof settings.effort === 'string' ? settings.effort : null,
     allowedTools: Array.isArray(settings.allowedTools) ? (settings.allowedTools as string[]) : null,
     fastMode: settings.fastMode === true,
+    starred: settings.starred === true,
   };
 }
 
@@ -1051,6 +1053,85 @@ router.post(
   asyncHandler(async (req, res) => {
     await updateChatField(req.params.id, { archived_at: null }, res);
   }, 'unarchive chat')
+);
+
+// Star / unstar a chat
+router.post(
+  '/:id/star',
+  asyncHandler(async (req, res) => {
+    const { starred } = req.body;
+    if (typeof starred !== 'boolean') {
+      sendBadRequest(res, 'starred must be a boolean');
+      return;
+    }
+
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    await updateChatField(
+      req.params.id,
+      { settings: { ...existingSettings, starred } },
+      res
+    );
+  }, 'star chat')
+);
+
+// Star / unstar a chat
+router.post(
+  '/:id/star',
+  asyncHandler(async (req, res) => {
+    const { starred } = req.body;
+    if (typeof starred !== 'boolean') {
+      sendBadRequest(res, 'starred must be a boolean');
+      return;
+    }
+
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    await updateChatField(req.params.id, { settings: { ...existingSettings, starred } }, res);
+  }, 'star chat')
+);
+
+// Star / unstar a chat
+router.post(
+  '/:id/star',
+  asyncHandler(async (req, res) => {
+    const { starred } = req.body;
+    if (typeof starred !== 'boolean') {
+      sendBadRequest(res, 'starred must be a boolean');
+      return;
+    }
+
+    const chatRows = await coreDb
+      .select()
+      .from(interactive_chats)
+      .where(eq(interactive_chats.id, req.params.id));
+
+    if (!chatRows.length) {
+      sendNotFound(res, 'Chat');
+      return;
+    }
+
+    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
+    await updateChatField(req.params.id, { settings: { ...existingSettings, starred } }, res);
+  }, 'star chat')
 );
 
 // List branches for a chat

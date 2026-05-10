@@ -27,6 +27,7 @@ import { gitStatusRouter } from './routes/git-status.js';
 import { memoriesRouter } from './routes/memories.js';
 import { claudeMdRouter } from './routes/claude-md.js';
 import { worktreesRouter } from './routes/worktrees.js';
+import { ocrRouter } from './routes/ocr.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -156,12 +157,12 @@ app.get('/api/doctor', (_req, res) => {
 });
 
 // Serve uploaded files (photos, documents, etc.)
-const uploadsDir = path.join(
-  DEVBOT_PROJECTS_DIR,
-  '.tmp',
-  'devbot-uploads'
-);
+const uploadsDir = path.join(DEVBOT_PROJECTS_DIR, '.tmp', 'devbot-uploads');
 app.use('/uploads', express.static(uploadsDir));
+
+// Serve OCR images
+const ocrUploadsDir = path.join(DEVBOT_PROJECTS_DIR, '.tmp', 'ocr-uploads');
+app.use('/ocr-uploads', express.static(ocrUploadsDir));
 
 // Routes
 app.use('/api/sessions', sessionsRouter);
@@ -184,6 +185,7 @@ app.use('/api/git-status', gitStatusRouter);
 app.use('/api/memories', memoriesRouter);
 app.use('/api/claude-md', claudeMdRouter);
 app.use('/api/worktrees', worktreesRouter);
+app.use('/api/ocr', ocrRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

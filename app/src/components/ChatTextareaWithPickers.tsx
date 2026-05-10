@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp } from 'lucide-react';
+import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp, X } from 'lucide-react';
+import { ChatOcrMenu } from './ChatOcrMenu';
 import { toast } from 'sonner';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
@@ -88,6 +89,7 @@ interface ChatTextareaWithPickersProps {
   onPasteFiles?: (files: File[]) => void;
   onBrowseFiles?: () => void;
   onQueue?: () => void;
+  onOcrText?: (text: string) => void;
   acceptedExtensions: string;
 }
 
@@ -125,6 +127,7 @@ export function ChatTextareaWithPickers({
   onPasteFiles,
   onBrowseFiles,
   onQueue,
+  onOcrText,
   acceptedExtensions,
 }: ChatTextareaWithPickersProps) {
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
@@ -322,12 +325,21 @@ export function ChatTextareaWithPickers({
                   variant="outline"
                   size="icon"
                   className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                  onClick={() => fileInputRef.current?.click()}
                   disabled={anyUploading}
                   title="Attach file"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
                 >
                   <Plus className="h-5 w-5" />
                 </Button>
+                <ChatOcrMenu
+                  disabled={anyUploading}
+                  onOcrText={(text) => {
+                    onOcrText?.(text);
+                    onInputChange(input + text);
+                  }}
+                />
                 {onBrowseFiles && (
                   <Button
                     variant="outline"
@@ -351,6 +363,17 @@ export function ChatTextareaWithPickers({
                   )}
                   <Mic className="h-5 w-5" />
                 </Button>
+                {input && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                    onMouseDown={(e) => { e.preventDefault(); onInputChange(''); }}
+                    title="Clear text"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
               {/* Right: pause/stop/send */}
               <div className="flex items-center gap-1">

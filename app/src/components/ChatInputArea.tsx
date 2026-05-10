@@ -61,6 +61,7 @@ interface ChatInputAreaProps {
   onOpenAllowedTools: () => void;
   onOpenMaxTurns?: (currentMaxTurns: number | null) => void;
   onQueue?: () => void;
+  onOcrText?: (text: string) => void;
   queuedMessages?: QueuedMessage[];
   onRemoveQueued?: (queueId: string) => void;
   acceptedExtensions: string;
@@ -107,6 +108,7 @@ export function ChatInputArea({
   onOpenAllowedTools,
   onOpenMaxTurns,
   onQueue,
+  onOcrText,
   queuedMessages,
   onRemoveQueued,
   acceptedExtensions,
@@ -186,6 +188,7 @@ export function ChatInputArea({
         onPasteFiles={onPasteFiles}
         onBrowseFiles={onBrowseFiles}
         onQueue={onQueue}
+        onOcrText={onOcrText}
         acceptedExtensions={acceptedExtensions}
       />
 

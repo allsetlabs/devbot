@@ -1,31 +1,22 @@
 import { useCallback } from 'react';
-import { useLocalStorageMap } from './useLocalStorageMap';
+import { chatHooks } from './useChat';
+import type { InteractiveChat } from '../types';
 
-const FAVORITES_KEY = 'devbot-chat-favorites';
+export function useFavorites(allChats: InteractiveChat[]) {
+  const starMutation = chatHooks.useStarChat();
 
-/**
- * Hook to manage favorite chats using localStorage.
- */
-export function useFavorites() {
-  const { data: favorites, set, remove } = useLocalStorageMap<boolean>(FAVORITES_KEY);
+  const isFavorite = useCallback(
+    (chatId: string): boolean => allChats.find((c) => c.id === chatId)?.starred ?? false,
+    [allChats]
+  );
 
   const toggleFavorite = useCallback(
     (chatId: string) => {
-      if (favorites[chatId]) {
-        remove(chatId);
-      } else {
-        set(chatId, true);
-      }
+      const chat = allChats.find((c) => c.id === chatId);
+      starMutation.mutate({ id: chatId, starred: !(chat?.starred ?? false) });
     },
-    [favorites, set, remove]
+    [allChats, starMutation]
   );
 
-  const isFavorite = useCallback(
-    (chatId: string): boolean => favorites[chatId] ?? false,
-    [favorites]
-  );
-
-  const clearFavorite = useCallback((chatId: string) => remove(chatId), [remove]);
-
-  return { favorites, toggleFavorite, isFavorite, clearFavorite };
+  return { isFavorite, toggleFavorite };
 }

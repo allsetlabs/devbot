@@ -10,9 +10,8 @@ import { ArchivedChatItem } from '../components/ArchivedChatItem';
 
 export function ArchivedChatsPage() {
   const navigate = useNavigate();
-  const { isFavorite, toggleFavorite } = useFavorites();
-
   const { data: archivedChats = [], isLoading } = chatHooks.useGetArchivedChats({});
+  const { isFavorite, toggleFavorite } = useFavorites(archivedChats);
   const unarchiveMutation = chatHooks.useUnarchiveChat();
   const deleteMutation = chatHooks.useDeleteChat();
   const duplicateMutation = chatHooks.useDuplicateChat();

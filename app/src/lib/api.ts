@@ -239,6 +239,14 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/queue/${queueId}`, { method: 'DELETE' });
   },
 
+  sendQueuedMessage: (chatId: string, queueId: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/queue/${queueId}/send`, { method: 'POST' });
+  },
+
+  sendAllQueuedMessages: (chatId: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/queue/send-all`, { method: 'POST' });
+  },
+
   getChatMessages: (chatId: string, afterSequence = 0, branch = 'main'): Promise<ChatMessage[]> => {
     const params = new URLSearchParams();
     if (afterSequence > 0) params.set('afterSequence', String(afterSequence));

@@ -496,6 +496,12 @@ export function InteractiveChatView({
     [['chat-queue', chatId]],
   );
 
+  // Send all queued messages immediately
+  const sendAllQueuedMutation = useCrudMutation(
+    () => api.sendAllQueuedMessages(chatId!),
+    [['chat-queue', chatId]],
+  );
+
   // Stop chat mutation
   const stopMutation = useCrudMutation(() => api.stopChat(chatId!), [['chat-status', chatId]], {
     onSuccess: () => {
@@ -1636,6 +1642,7 @@ export function InteractiveChatView({
         onOcrText={(text) => setInput((prev) => prev + text)}
         queuedMessages={queuedMessages}
         onRemoveQueued={(queueId) => removeQueueMutation.mutate(queueId)}
+        onSendAllQueued={() => sendAllQueuedMutation.mutate()}
       />
     </div>
   );

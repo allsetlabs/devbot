@@ -1296,4 +1296,89 @@ router.delete(
   }, 'remove queued message')
 );
 
+// Send a single queued message immediately (bypasses auto-queue processing)
+router.post(
+  '/:id/queue/send-all',
+  asyncHandler(async (req, res) => {
+    const chatId = req.params.id;
+
+    const entries = coreDb
+      .select()
+      .from(chat_message_queue)
+      .where(eq(chat_message_queue.chat_id, chatId))
+      .orderBy(asc(chat_message_queue.position))
+      .all();
+
+    if (entries.length === 0) {
+      res.status(400).json({ error: 'No queued messages' });
+      return;
+    }
+
+    coreDb
+      .delete(chat_message_queue)
+      .where(eq(chat_message_queue.chat_id, chatId))
+      .run();
+
+    if (isChatExecuting(chatId)) {
+      stopChatExecution(chatId);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
+    const combined = entries.map((m) => m.prompt).join('\n\n');
+    const branchId = entries[0].branch_id;
+
+    sendMessage(chatId, combined, branchId).catch((err) => {
+      console.error(`[InteractiveChat] Error sending all queued messages for chat ${chatId}:`, err);
+    });
+
+    res.json({ success: true });
+  }, 'send all queued messages')
+);
+
+// Send a single specific queued message immediately
+router.post(
+  '/:id/queue/:queueId/send',
+  asyncHandler(async (req, res) => {
+    const chatId = req.params.id;
+    const queueId = req.params.queueId;
+
+    const entry = coreDb
+      .select()
+      .from(chat_message_queue)
+      .where(
+        and(
+          eq(chat_message_queue.chat_id, chatId),
+          eq(chat_message_queue.id, queueId)
+        )
+      )
+      .get();
+
+    if (!entry) {
+      res.status(404).json({ error: 'Queued message not found' });
+      return;
+    }
+
+    coreDb
+      .delete(chat_message_queue)
+      .where(
+        and(
+          eq(chat_message_queue.chat_id, chatId),
+          eq(chat_message_queue.id, queueId)
+        )
+      )
+      .run();
+
+    if (isChatExecuting(chatId)) {
+      stopChatExecution(chatId);
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
+    sendMessage(chatId, entry.prompt, entry.branch_id).catch((err) => {
+      console.error(`[InteractiveChat] Error sending queued message for chat ${chatId}:`, err);
+    });
+
+    res.json({ success: true });
+  }, 'send single queued message')
+);
+
 export { router as interactiveChatRouter };

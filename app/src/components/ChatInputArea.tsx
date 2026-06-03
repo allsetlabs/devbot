@@ -6,7 +6,7 @@ import {
   type FileIntellisensePickerHandle,
   type FileIntellisenseItem,
 } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
-import { RotateCcw, Clock, X } from 'lucide-react';
+import { RotateCcw, Clock, X, ArrowUp } from 'lucide-react';
 import { Button } from '@allsetlabs/reusable/components/ui/button';
 import { ChatInputToolbar } from './ChatInputToolbar';
 import { ChatAttachedFiles } from './ChatAttachedFiles';
@@ -64,6 +64,7 @@ interface ChatInputAreaProps {
   onOcrText?: (text: string) => void;
   queuedMessages?: QueuedMessage[];
   onRemoveQueued?: (queueId: string) => void;
+  onSendAllQueued?: () => void;
   acceptedExtensions: string;
 }
 
@@ -111,6 +112,7 @@ export function ChatInputArea({
   onOcrText,
   queuedMessages,
   onRemoveQueued,
+  onSendAllQueued,
   acceptedExtensions,
 }: ChatInputAreaProps) {
   return (
@@ -128,11 +130,26 @@ export function ChatInputArea({
 
       {/* Queued messages */}
       {queuedMessages && queuedMessages.length > 0 && (
-        <div className="flex flex-col gap-1">
+        <div className="group flex flex-col gap-1">
+          {/* Send all queued — icon-only with tooltip */}
+          <div className="flex items-center justify-end">
+            {onSendAllQueued && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-muted-foreground transition-opacity hover:text-primary opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                onClick={onSendAllQueued}
+                title={`Send ${queuedMessages.length} queued message${queuedMessages.length !== 1 ? 's' : ''} immediately`}
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </div>
+
           {queuedMessages.map((qm) => (
             <div
               key={qm.id}
-              className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5 text-xs"
+              className="group/chip flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5 text-xs"
             >
               <Clock className="h-3 w-3 shrink-0 text-muted-foreground" />
               <span className="min-w-0 flex-1 truncate text-secondary-foreground">

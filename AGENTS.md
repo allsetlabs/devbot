@@ -1,14 +1,14 @@
 # DevBot
 
-## Goal
+## Purpose
 
 Personal assistant mobile app that acts as a Claude Code terminal proxy — trigger development tasks from your phone anywhere.
 
-## Description
+## Mental Model
 
 Users open the DevBot mobile app to launch a web-based terminal (xterm.js) connected to a Node.js backend that manages Claude Code sessions via tmux. The backend supports a plugin system where each plugin (baby-logs, lawn-care, etc.) is self-contained with its own SQLite database, routes, and schema. Sessions are persisted via Supabase.
 
-## Architecture
+## Where Things Go
 
 ```
 devbot/
@@ -22,9 +22,22 @@ devbot/
 
 Stack: Vite + React + TypeScript (app), Node.js + TypeScript + Express (backend), Drizzle ORM + SQLite (per-plugin DBs), Supabase (session storage).
 
-## Progress
+## Development Commands
+
+- `make setup` — install/check system dependencies
+- `make install` — install app, backend, plugin, reusable, and intro-video dependencies
+- `make start` — start DevBot through the managed tmux entry point
+- `make stop` — stop DevBot only when explicitly approved
+- `npm run type-check` from `app/`, `backend/`, and `reusables/` — verify TypeScript changes
+- `npm run test` from `app/` — run app tests
+
+## Current Capabilities
 
 Core terminal proxy is functional. Plugin system is live with baby-logs and lawn-care. Scheduler system runs automated Claude tasks. Interactive chats with message queuing are implemented.
+
+## Testing Expectations
+
+Run the relevant package `type-check` command after code changes. For app UI changes, visually test the affected page and check the browser console. For backend/session changes, do not restart the running DevBot process unless the user approves it.
 
 ## Autonomy
 

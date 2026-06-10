@@ -14,7 +14,6 @@ Users open the DevBot mobile app to launch a web-based terminal (xterm.js) conne
 devbot/
 ├── app/         # Web app (Vite + React + xterm.js terminal UI)
 ├── backend/     # Node.js session manager (xterm-ws + tmux + Claude Code runner)
-├── reusables/   # Shared component library (@allsetlabs/reusable symlink)
 ├── supabase/    # Local Supabase (session persistence + migrations)
 ├── intro-video/ # Remotion intro video project
 └── plugins/     # Plugin modules (baby-logs, lawn-care, etc.)
@@ -25,10 +24,10 @@ Stack: Vite + React + TypeScript (app), Node.js + TypeScript + Express (backend)
 ## Development Commands
 
 - `make setup` — install/check system dependencies
-- `make install` — install app, backend, plugin, reusable, and intro-video dependencies
+- `make install` — install app, backend, plugin, and intro-video dependencies
 - `make start` — start DevBot through the managed tmux entry point
 - `make stop` — stop DevBot only when explicitly approved
-- `npm run type-check` from `app/`, `backend/`, and `reusables/` — verify TypeScript changes
+- `npm run type-check` from `app/` and `backend/` — verify TypeScript changes
 - `npm run test` from `app/` — run app tests
 
 ## Current Capabilities

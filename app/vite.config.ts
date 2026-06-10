@@ -15,7 +15,7 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        '@allsetlabs/reusable': path.resolve(__dirname, '../reusables/src'),
+        '@allsetlabs/reusable': path.resolve(__dirname, '../../forge/src'),
         '@devbot/app': path.resolve(__dirname, 'src'),
         '@devbot/plugin-baby-logs/frontend': path.resolve(
           __dirname,

@@ -10,9 +10,8 @@ NC := \033[0m
 
 APP_PORT := 4005
 BACKEND_PORT := 3100
-DEVBOT_PROJECTS := $(CURDIR)/../devbot-projects
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills create-devbot-projects
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -31,19 +30,8 @@ setup:
 	@$(MAKE) setup-claude
 	@$(MAKE) setup-mcp
 	@$(MAKE) setup-skills
-	@$(MAKE) create-devbot-projects
 	@echo ""
 	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
-
-create-devbot-projects:
-	@if [ -d "$(DEVBOT_PROJECTS)" ]; then \
-		echo "$(YELLOW)$(DEVBOT_PROJECTS) already exists. Skipping.$(NC)"; \
-	else \
-		echo "$(BLUE)Creating empty devbot-projects at $(DEVBOT_PROJECTS)...$(NC)"; \
-		mkdir -p "$(DEVBOT_PROJECTS)"; \
-		: > "$(DEVBOT_PROJECTS)/.gitmodules"; \
-		echo "$(GREEN)Created devbot-projects at $(DEVBOT_PROJECTS)$(NC)"; \
-	fi
 
 setup-brew:
 	@echo "$(BLUE)Installing Homebrew...$(NC)"
@@ -176,13 +164,11 @@ setup-skills:
 	@echo "$(GREEN)✅ No global skill setup — everything is in the super repo$(NC)"
 
 install:
-	@echo "$(BLUE)🔄 Syncing git submodules (component)...$(NC)"
-	@git submodule update --init --recursive
-	@echo "$(BLUE)📦 Installing workspace (reusables, app, backend, plugins)...$(NC)"
+	@echo "$(BLUE)📦 Installing workspace (app, backend, plugins)...$(NC)"
 	npm install --force
 	@echo "$(GREEN)✅ Workspace ready!$(NC)"
 
-start: create-devbot-projects
+start:
 	@echo "$(BLUE)🚀 Starting DevBot services in tmux session 'devbot'...$(NC)"
 	@if tmux has-session -t devbot 2>/dev/null; then \
 		echo "$(YELLOW)⚠️  Tmux session 'devbot' already exists. Killing it first...$(NC)"; \
@@ -194,11 +180,15 @@ start: create-devbot-projects
 	@for port in $$(seq 7750 7799); do lsof -ti:$$port 2>/dev/null | xargs kill -9 2>/dev/null || true; done
 	@echo "$(GREEN)Creating tmux session 'devbot'...$(NC)"
 	@mkdir -p logs
-	@# Compute dynamic values (passed as env vars, not written to .env)
-	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
-	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
-	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) DEVBOT_PROJECTS_DIR=$(WORK_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR))
-	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, DEVBOT_PROJECTS_DIR=$(WORK_DIR)$(NC)"
+	@touch .env
+	@if ! grep -q '^API_KEY=.\+' .env; then \
+		echo "$(BLUE)Generating and persisting API_KEY to .env...$(NC)"; \
+		echo "API_KEY=$$(openssl rand -hex 32)" >> .env; \
+	fi
+	$(eval API_KEY := $(shell grep '^API_KEY=' .env | cut -d= -f2))
+	$(eval WORK_DIR := $(abspath $(CURDIR)/../..))
+	$(eval DYNAMIC_ENV := VITE_API_KEY=$(API_KEY) DEVBOT_PROJECTS_DIR=$(WORK_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR))
+	@echo "$(GREEN)Dynamic env: DEVBOT_PROJECTS_DIR=$(WORK_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)
 	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && export $(DYNAMIC_ENV) && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m
 	@sleep 2

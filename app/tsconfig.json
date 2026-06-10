@@ -18,7 +18,7 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@allsetlabs/reusable/*": ["../reusables/src/*"],
+      "@allsetlabs/reusable/*": ["../../forge/src/*"],
       "@devbot/app/*": ["./src/*"],
       "@devbot/plugin-baby-logs/frontend/*": ["../plugins/baby-logs/frontend/*"],
       "@devbot/plugin-baby-logs/backend/*": ["../plugins/baby-logs/backend/*"],

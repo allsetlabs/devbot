@@ -12,7 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@allsetlabs/reusable": "file:../reusables",
+    "@allsetlabs/reusable": "file:../../forge",
     "@tanstack/react-query": "5.71.10",
     "@tanstack/react-virtual": "3.13.22",
     "@xterm/addon-attach": "0.11.0",
@@ -29,6 +29,7 @@
     "react-syntax-highlighter": "15.6.1",
     "recharts": "2.15.3",
     "remark-gfm": "4.0.0",
+    "sonner": "2.0.7",
     "tesseract.js": "5.1.1",
     "xlsx": "0.18.5"
   },

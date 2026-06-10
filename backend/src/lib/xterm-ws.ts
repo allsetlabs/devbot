@@ -4,7 +4,8 @@ import { IncomingMessage } from 'http';
 import http from 'http';
 import https from 'https';
 
-import { XTERM_BASE_PORT, XTERM_MAX_PORT, DEVBOT_PROJECTS_DIR } from './env.js';
+import { DEVBOT_PROJECTS_DIR } from './env.js';
+import { XTERM_BASE_PORT, XTERM_MAX_PORT } from './constants.js';
 import { loadDevCert } from './https-cert.js';
 
 const BASE_PORT = XTERM_BASE_PORT;

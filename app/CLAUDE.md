@@ -19,7 +19,7 @@ src/
 
 ## Key Patterns
 
-- **Shared components from `@allsetlabs/reusable`** — never re-implement buttons, dialogs, inputs, etc. Import from the reusables workspace.
+- **Shared components from `@allsetlabs/reusable`** — never re-implement buttons, dialogs, inputs, etc. Import from `../../forge` (the `forge-modules/forge` component library).
 - **Pages stay thin** — page files under `src/pages/` are capped at ~200 lines (enforced by `devbot-page-size-guard` skill). Extract heavy logic into components or hooks.
 - **Xterm connection** — `XtermTerminal.tsx` attaches to a backend WebSocket on ports `7750–7799` (one per session). The backend picks the port; the app receives it from the session API.
 - **Plugin frontends** — plugin UIs live in the plugin workspace (e.g. `plugins/baby-logs/frontend`) and are imported by this app. Don't duplicate plugin pages here.

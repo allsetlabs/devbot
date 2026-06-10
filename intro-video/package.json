@@ -16,7 +16,6 @@
     "remotion": "4.0.419"
   },
   "devDependencies": {
-    "@remotion/eslint-config": "4.0.419",
     "@types/react": "19.0.8",
     "typescript": "5.7.3"
   }

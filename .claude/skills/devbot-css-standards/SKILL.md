@@ -37,7 +37,7 @@ Auto-trigger when editing any `.tsx` file in `app/src/`.
 
 ### 2. No Default Tailwind Colors
 
-**NEVER** use default Tailwind color utilities. Only use custom theme colors from `reusables/src/styles/styles.md`.
+**NEVER** use default Tailwind color utilities. Only use custom theme colors from `../forge/src/styles/styles.md`.
 
 ```
 FORBIDDEN: bg-blue-500, text-red-600, border-gray-300, bg-slate-100, etc.
@@ -75,7 +75,7 @@ Before creating any new UI element, check if it exists in `@allsetlabs/reusable`
 - `DataFetchWrapper` - Loading/error states
 - `Tabs`, `Accordion` - Layout
 
-If a needed component or variant doesn't exist, create it first in `reusables/`, then use it.
+If a needed component or variant doesn't exist, create it first in `../forge/`, then use it.
 
 ## Verification Checklist
 

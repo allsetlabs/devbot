@@ -27,12 +27,3 @@ export const DEVBOT_PROJECTS_DIR = required('DEVBOT_PROJECTS_DIR');
 export const BACKEND_PORT = requiredInt('BACKEND_PORT');
 export const BACKEND_HOST = required('BACKEND_HOST');
 export const API_KEY: string | undefined = process.env.API_KEY;
-
-// Database paths
-export const DB_CORE_PATH = required('DB_CORE_PATH');
-export const DB_BABY_LOGS_PATH = required('DB_BABY_LOGS_PATH');
-export const DB_LAWN_CARE_PATH = required('DB_LAWN_CARE_PATH');
-
-// Terminal port ranges
-export const XTERM_BASE_PORT = requiredInt('XTERM_BASE_PORT');
-export const XTERM_MAX_PORT = requiredInt('XTERM_MAX_PORT');

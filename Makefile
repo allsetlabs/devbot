@@ -157,57 +157,23 @@ setup-mcp:
 	claude mcp add playwright --scope user -- npx -y @anthropic-ai/mcp-server-playwright; \
 	echo "$(GREEN)MCP servers added!$(NC)"
 
+# Skills, commands, and agents live in the super repo (.agents/skills, .claude/) —
+# nothing is installed globally anymore. This target only removes leftovers from
+# the old .global symlink mechanism.
 setup-skills:
-	@echo "$(BLUE)Cleaning up legacy devbot command symlink...$(NC)"
+	@echo "$(BLUE)Cleaning up legacy global symlinks (skills now live in the super repo)...$(NC)"
 	@rm -f ~/.claude/commands/devbot
-	@mkdir -p ~/.claude/skills ~/.claude/commands ~/.claude/agents
-	@echo "$(BLUE)Removing stale devbot skill directories from ~/.claude/skills (now local-only)...$(NC)"
-	@for skill in devbot-backend devbot-backend-crud-patterns devbot-code-review devbot-commit devbot-css-standards devbot-page-size-guard devbot-plugin-install devbot-worker-patterns; do \
-		if [ -e ~/.claude/skills/$$skill ] && [ ! -L ~/.claude/skills/$$skill ]; then \
-			rm -rf ~/.claude/skills/$$skill; \
-			echo "  ✗ removed stale dir ~/.claude/skills/$$skill"; \
-		fi; \
+	@for dir in ~/.claude/skills ~/.claude/commands ~/.claude/agents; do \
+		[ -d "$$dir" ] || continue; \
+		find "$$dir" -maxdepth 1 -type l | while read -r link; do \
+			case "$$(readlink "$$link")" in \
+				*/devbot/.global/*) \
+					rm -f "$$link"; \
+					echo "  ✗ removed legacy symlink $$link"; ;; \
+			esac; \
+		done; \
 	done
-	@echo "$(BLUE)Removing stale command copies in ~/.claude/commands that are now global...$(NC)"
-	@for f in $(CURDIR)/.global/commands/*.md; do \
-		name=$$(basename "$$f"); \
-		if [ -e ~/.claude/commands/$$name ] && [ ! -L ~/.claude/commands/$$name ]; then \
-			rm -f ~/.claude/commands/$$name; \
-			echo "  ✗ removed stale file ~/.claude/commands/$$name"; \
-		fi; \
-	done
-	@echo "$(BLUE)Symlinking global skills from .global/skills to ~/.claude/skills...$(NC)"
-	@for d in $(CURDIR)/.global/skills/*/; do \
-		skill=$$(basename "$$d"); \
-		rm -f ~/.claude/skills/$$skill; \
-		ln -sf "$$d" ~/.claude/skills/$$skill; \
-		echo "  ✓ ~/.claude/skills/$$skill → $$d"; \
-	done
-	@echo "$(BLUE)Symlinking global commands from .global/commands to ~/.claude/commands...$(NC)"
-	@for f in $(CURDIR)/.global/commands/*.md; do \
-		name=$$(basename "$$f"); \
-		rm -f ~/.claude/commands/$$name; \
-		ln -sf "$$f" ~/.claude/commands/$$name; \
-		echo "  ✓ ~/.claude/commands/$$name → $$f"; \
-	done
-	@echo "$(BLUE)Symlinking global agents from .global/agents to ~/.claude/agents...$(NC)"
-	@for f in $(CURDIR)/.global/agents/*.md; do \
-		name=$$(basename "$$f"); \
-		rm -f ~/.claude/agents/$$name; \
-		ln -sf "$$f" ~/.claude/agents/$$name; \
-		echo "  ✓ ~/.claude/agents/$$name → $$f"; \
-	done
-	@echo "$(GREEN)✅ Global skills/commands/agents symlinked into ~/.claude/$(NC)"
-	@echo "$(BLUE)Installing public skills globally via npx...$(NC)"
-	@npx -y @anthropic-ai/claude-code-skills add find-skills --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-query-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-router-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-start-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-integration-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add vercel-react-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add vercel-react-native-skills --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add vercel-composition-patterns --global 2>/dev/null || true
-	@echo "$(GREEN)✅ Public skills installed globally$(NC)"
+	@echo "$(GREEN)✅ No global skill setup — everything is in the super repo$(NC)"
 
 install:
 	@echo "$(BLUE)🔄 Syncing git submodules (component)...$(NC)"

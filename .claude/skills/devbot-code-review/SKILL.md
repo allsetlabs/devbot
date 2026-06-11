@@ -11,7 +11,7 @@ Auto-trigger when:
 
 - User asks to review code, a PR, or a diff
 - Completing a feature implementation (final check before commit)
-- Running `/dedup` or `/discover-skills` audit phases
+- Running `/dedup` or `/find-skills` audit phases
 
 ## Context
 

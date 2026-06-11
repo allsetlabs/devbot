@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/forge/components/ui/button';
+import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
 import { ArrowLeft, User, TrendingUp, X, Send } from 'lucide-react';
 import { companyHooks } from '../hooks/useCompany';
 import { chatHooks } from '../hooks/useChat';

@@ -4,7 +4,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 import { formatTokens, formatCost, formatDuration, type UsageData } from './SystemMessage';
 
 interface SessionCostDrawerProps {

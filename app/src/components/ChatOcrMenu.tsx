@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { ScanLine, Loader2 } from 'lucide-react';
 import { createWorker } from 'tesseract.js';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { toast } from 'sonner';
 // Vite resolves this at build time to a local asset URL — avoids CDN dependency
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';

@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   X,
   Pencil,

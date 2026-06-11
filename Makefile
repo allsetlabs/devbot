@@ -210,9 +210,7 @@ setup-skills:
 	@echo "$(GREEN)✅ Public skills installed globally$(NC)"
 
 install:
-	@echo "$(BLUE)🔄 Syncing git submodules (component)...$(NC)"
-	@git submodule update --init --recursive
-	@echo "$(BLUE)📦 Installing workspace (reusables, app, backend, plugins)...$(NC)"
+	@echo "$(BLUE)📦 Installing workspace (app, backend, plugins)...$(NC)"
 	npm install --force
 	@echo "$(GREEN)✅ Workspace ready!$(NC)"
 

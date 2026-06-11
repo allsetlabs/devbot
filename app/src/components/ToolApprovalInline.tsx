@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ShieldCheck, ShieldAlert, ShieldOff, Square, ChevronDown, ChevronRight, Code, Bot } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { ClaudeMessageContent, PermissionMode } from '../types';
 
 interface ToolApprovalInlineProps {

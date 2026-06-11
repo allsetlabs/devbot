@@ -1,10 +1,10 @@
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@allsetlabs/reusable/components/ui/tooltip';
+} from '@allsetlabs/forge/components/ui/tooltip';
 import {
   ArrowUp,
   ArrowDown,

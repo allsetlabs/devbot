@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Settings, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../hooks/useSettings';

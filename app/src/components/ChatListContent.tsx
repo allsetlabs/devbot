@@ -4,7 +4,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { MessageCircle, Search } from 'lucide-react';
 import { EmptyState } from './EmptyState';
 import { ChatListItem } from './ChatListItem';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
 import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';

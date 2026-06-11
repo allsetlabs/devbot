@@ -1,11 +1,11 @@
 import { Eye, CheckCircle, Zap } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { PermissionMode } from '../types';
 

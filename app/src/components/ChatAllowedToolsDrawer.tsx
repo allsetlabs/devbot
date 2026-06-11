@@ -1,12 +1,12 @@
 import { Wrench } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 
 const CLAUDE_TOOLS = [
   { name: 'Read', description: 'Read files from the filesystem' },

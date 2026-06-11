@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal, ListTodo, CheckCircle2, XCircle, Circle, BookOpen } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
 import { copyToClipboard } from '../lib/clipboard';
 import { useTemporaryStatus } from '../hooks/useTemporaryStatus';

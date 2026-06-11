@@ -1,4 +1,4 @@
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Terminal, Trash2 } from 'lucide-react';
 import type { Session } from '../types';
 import { formatDateTime } from '../lib/format';

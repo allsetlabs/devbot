@@ -1,5 +1,5 @@
 import { Sparkles, Cpu, Rabbit } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { MODEL_CONFIG } from '../lib/model-config';
 import type { ClaudeModel } from '../types';
 

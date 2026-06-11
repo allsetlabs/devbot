@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ScanLine, Menu, Camera, Upload, Trash2, FileText } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { toast } from 'sonner';
 import { useNav } from '../hooks/useNav';
 import { listOcrDocuments, uploadOcrImage, deleteOcrDocument } from '../lib/api';

@@ -4,9 +4,9 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
-import { Checkbox } from '@allsetlabs/reusable/components/ui/checkbox';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+} from '@allsetlabs/forge/components/ui/drawer';
+import { Checkbox } from '@allsetlabs/forge/components/ui/checkbox';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { DevBotSettings } from '../hooks/useSettings';
 
 interface SettingsDrawerProps {

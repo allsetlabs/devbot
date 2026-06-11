@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/forge/components/ui/button';
+import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@allsetlabs/reusable/components/ui/dialog';
+} from '@allsetlabs/forge/components/ui/dialog';
 
 interface EditMessageDialogProps {
   open: boolean;

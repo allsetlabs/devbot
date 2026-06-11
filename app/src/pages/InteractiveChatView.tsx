@@ -7,7 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { notifyTaskComplete, notifyTaskFailed, setNotificationSettings } from '../lib/notification';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { ArrowLeft, Loader2, MessageCircle, Upload, GitBranch } from 'lucide-react';
 import { api, uploadFiles } from '../lib/api';
 import { copyToClipboard } from '../lib/clipboard';
@@ -37,8 +37,8 @@ import { HelpModal } from '../components/HelpModal';
 import {
   type SlashCommandPickerHandle,
   type SlashCommandGroup,
-} from '@allsetlabs/reusable/components/ui/slash-command-picker';
-import { type FileIntellisensePickerHandle } from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
+} from '@allsetlabs/forge/components/ui/slash-command-picker';
+import { type FileIntellisensePickerHandle } from '@allsetlabs/forge/components/ui/file-intellisense-picker';
 import { useFileIntellisense } from '../hooks/useFileIntellisense';
 import { useCommands } from '../hooks/useCommands';
 import { useGitStatus } from '../hooks/useGitStatus';

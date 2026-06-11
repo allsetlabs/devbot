@@ -1,12 +1,12 @@
 import { AlertTriangle, Copy, Check } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@allsetlabs/reusable/components/ui/dialog';
+} from '@allsetlabs/forge/components/ui/dialog';
 import { useState } from 'react';
 
 interface ToolUseDialogProps {

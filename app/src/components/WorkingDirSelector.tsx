@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, AlertTriangle, Shield } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { useWorkingDirectories, useCreateWorkingDirectory } from '../hooks/useWorkingDirectories';
 import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 

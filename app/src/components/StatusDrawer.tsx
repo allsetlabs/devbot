@@ -4,7 +4,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 import { MODEL_CONFIG } from '../lib/model-config';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ClaudeModel, PermissionMode } from '../types';

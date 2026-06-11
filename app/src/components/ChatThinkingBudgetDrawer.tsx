@@ -1,11 +1,11 @@
 import { Brain } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 
 export type EffortLevel = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
 

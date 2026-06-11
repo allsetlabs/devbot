@@ -8,7 +8,7 @@ import {
   ArrowUpFromLine,
   RotateCcw,
 } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { ClaudeMessageContent } from '../types';
 
 // This file exports both utility functions and components — fast-refresh limitation is intentional

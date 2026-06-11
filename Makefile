@@ -12,7 +12,7 @@ APP_PORT := 4005
 BACKEND_PORT := 3100
 DEVBOT_PROJECTS := $(CURDIR)/../devbot-projects
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills create-devbot-projects
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -31,19 +31,8 @@ setup:
 	@$(MAKE) setup-claude
 	@$(MAKE) setup-mcp
 	@$(MAKE) setup-skills
-	@$(MAKE) create-devbot-projects
 	@echo ""
 	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
-
-create-devbot-projects:
-	@if [ -d "$(DEVBOT_PROJECTS)" ]; then \
-		echo "$(YELLOW)$(DEVBOT_PROJECTS) already exists. Skipping.$(NC)"; \
-	else \
-		echo "$(BLUE)Creating empty devbot-projects at $(DEVBOT_PROJECTS)...$(NC)"; \
-		mkdir -p "$(DEVBOT_PROJECTS)"; \
-		: > "$(DEVBOT_PROJECTS)/.gitmodules"; \
-		echo "$(GREEN)Created devbot-projects at $(DEVBOT_PROJECTS)$(NC)"; \
-	fi
 
 setup-brew:
 	@echo "$(BLUE)Installing Homebrew...$(NC)"
@@ -214,7 +203,7 @@ install:
 	npm install --force
 	@echo "$(GREEN)✅ Workspace ready!$(NC)"
 
-start: create-devbot-projects
+start:
 	@echo "$(BLUE)🚀 Starting DevBot services in tmux session 'devbot'...$(NC)"
 	@if tmux has-session -t devbot 2>/dev/null; then \
 		echo "$(YELLOW)⚠️  Tmux session 'devbot' already exists. Killing it first...$(NC)"; \

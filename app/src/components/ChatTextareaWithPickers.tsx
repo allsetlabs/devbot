@@ -2,18 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp, X } from 'lucide-react';
 import { ChatOcrMenu } from './ChatOcrMenu';
 import { toast } from 'sonner';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/forge/components/ui/button';
+import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
 import {
   SlashCommandPicker,
   type SlashCommandPickerHandle,
   type SlashCommandGroup,
-} from '@allsetlabs/reusable/components/ui/slash-command-picker';
+} from '@allsetlabs/forge/components/ui/slash-command-picker';
 import {
   FileIntellisensePicker,
   type FileIntellisensePickerHandle,
   type FileIntellisenseItem,
-} from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
+} from '@allsetlabs/forge/components/ui/file-intellisense-picker';
 import type { AttachedFile } from './ChatInputArea';
 
 // Minimal types for Web Speech API (not in standard TS lib)

@@ -13,15 +13,15 @@ Auto-trigger when editing any `.tsx` file in `app/src/`.
 
 ### 1. No Raw HTML Elements
 
-**NEVER** use raw HTML elements for UI. Always use the shared component library `@allsetlabs/reusable`.
+**NEVER** use raw HTML elements for UI. Always use the shared component library `@allsetlabs/forge`.
 
 | Forbidden    | Required Replacement                                                |
 | ------------ | ------------------------------------------------------------------- |
-| `<button>`   | `<Button>` from `@allsetlabs/reusable/components/ui/button`         |
-| `<input>`    | `<Input>` from `@allsetlabs/reusable/components/ui/input`           |
-| `<textarea>` | `<Textarea>` from `@allsetlabs/reusable/components/ui/textarea`     |
-| `<select>`   | `<Select>` from `@allsetlabs/reusable/components/ui/select`         |
-| `<dialog>`   | `<Dialog>` or `<Drawer>` from `@allsetlabs/reusable/components/ui/` |
+| `<button>`   | `<Button>` from `@allsetlabs/forge/components/ui/button`         |
+| `<input>`    | `<Input>` from `@allsetlabs/forge/components/ui/input`           |
+| `<textarea>` | `<Textarea>` from `@allsetlabs/forge/components/ui/textarea`     |
+| `<select>`   | `<Select>` from `@allsetlabs/forge/components/ui/select`         |
+| `<dialog>`   | `<Dialog>` or `<Drawer>` from `@allsetlabs/forge/components/ui/` |
 
 **Current violations (22 total):**
 
@@ -37,7 +37,7 @@ Auto-trigger when editing any `.tsx` file in `app/src/`.
 
 ### 2. No Default Tailwind Colors
 
-**NEVER** use default Tailwind color utilities. Only use custom theme colors from `reusables/src/styles/styles.md`.
+**NEVER** use default Tailwind color utilities. Only use custom theme colors from `forge-modules/forge/src/styles/styles.md`.
 
 ```
 FORBIDDEN: bg-blue-500, text-red-600, border-gray-300, bg-slate-100, etc.
@@ -50,7 +50,7 @@ CORRECT: border-border, border-input
 
 ### 3. No dark: Prefixes
 
-Theme switching is handled automatically by `InitializeReusableChunks` in `App.tsx`. Never use `dark:` Tailwind prefixes.
+Theme switching is handled automatically by `InitializeForgeChunks` in `App.tsx`. Never use `dark:` Tailwind prefixes.
 
 ```
 FORBIDDEN: dark:bg-gray-900, dark:text-white
@@ -67,7 +67,7 @@ Use Tailwind classes instead of `style={{}}`. Exceptions:
 
 ### 5. Component Library First
 
-Before creating any new UI element, check if it exists in `@allsetlabs/reusable`:
+Before creating any new UI element, check if it exists in `@allsetlabs/forge`:
 
 - `Button`, `Input`, `Textarea`, `Select` - Form controls
 - `Dialog`, `Drawer`, `Sheet` - Overlays
@@ -75,7 +75,7 @@ Before creating any new UI element, check if it exists in `@allsetlabs/reusable`
 - `DataFetchWrapper` - Loading/error states
 - `Tabs`, `Accordion` - Layout
 
-If a needed component or variant doesn't exist, create it first in `reusables/`, then use it.
+If a needed component or variant doesn't exist, create it first in `forge-modules/forge`, then use it.
 
 ## Verification Checklist
 
@@ -85,4 +85,4 @@ Before completing any edit to a `.tsx` file:
 - [ ] No `bg-blue`, `text-red`, `border-gray` or similar default colors
 - [ ] No `[#hex]` arbitrary color values
 - [ ] No `dark:` prefixes
-- [ ] All new UI elements use `@allsetlabs/reusable` components
+- [ ] All new UI elements use `@allsetlabs/forge` components

@@ -1,5 +1,5 @@
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 
 interface MessageReactionsProps {

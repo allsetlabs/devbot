@@ -1,12 +1,12 @@
 import { ArrowLeft, Coins, Ellipsis, Eye, EyeOff, FolderRoot, GitBranch, History, MessageCircle, Pencil, Pin, Search, Settings } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@allsetlabs/reusable/components/ui/dropdown-menu';
+} from '@allsetlabs/forge/components/ui/dropdown-menu';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, GitStatus, InteractiveChat } from '../types';
 

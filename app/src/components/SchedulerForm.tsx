@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
+import { Button } from '@allsetlabs/forge/components/ui/button';
+import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
 import { X, Infinity as InfinityIcon } from 'lucide-react';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
 import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';

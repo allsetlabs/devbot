@@ -7,7 +7,7 @@
     "./backend/*": "./backend/*"
   },
   "peerDependencies": {
-    "@allsetlabs/reusable": "*",
+    "@allsetlabs/forge": "*",
     "@tanstack/react-query": "*",
     "better-sqlite3": "*",
     "drizzle-orm": "*",

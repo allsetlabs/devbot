@@ -9,7 +9,7 @@ import {
   Wrench,
   Repeat2,
 } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
 import { estimateTokens } from '../lib/format';

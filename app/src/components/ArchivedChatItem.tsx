@@ -1,12 +1,12 @@
 import { Archive, ArchiveRestore, Star, Copy, Trash2, MoreVertical } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@allsetlabs/reusable/components/ui/dropdown-menu';
+} from '@allsetlabs/forge/components/ui/dropdown-menu';
 import { formatRelativeTime } from '../lib/format';
 import type { InteractiveChat } from '../types';
 

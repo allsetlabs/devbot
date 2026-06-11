@@ -4,7 +4,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 import { WorkingDirSelector } from './WorkingDirSelector';
 
 interface ChatWorkingDirDrawerProps {

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { X } from 'lucide-react';
 import { chatHooks } from '../hooks/useChat';
 import { WorkingDirSelector, useValidateAndSaveDir } from '../components/WorkingDirSelector';

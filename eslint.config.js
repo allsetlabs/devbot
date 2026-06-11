@@ -17,7 +17,6 @@ export default tseslint.config(
       '**/vite.config.*.ts',
       '**/remotion.config.ts',
       '.claude/**',
-      'reusables/**',
     ],
   },
   {

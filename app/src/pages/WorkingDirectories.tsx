@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Trash2, Plus, X, FolderOpen, Shield, AlertTriangle } from 'lucide-react';
 import {
   useWorkingDirectories,

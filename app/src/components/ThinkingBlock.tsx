@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Brain, ChevronDown, ChevronRight } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { scrollHeaderToTop } from '../lib/chat-message-utils';
 
 function extractSummary(text: string): string {

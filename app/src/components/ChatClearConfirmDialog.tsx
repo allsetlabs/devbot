@@ -4,8 +4,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@allsetlabs/reusable/components/ui/dialog';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+} from '@allsetlabs/forge/components/ui/dialog';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 
 interface ChatClearConfirmDialogProps {
   open: boolean;

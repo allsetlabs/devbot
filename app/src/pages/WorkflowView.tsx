@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { useIncrementalMessages } from '../hooks/useIncrementalMessages';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { api } from '../lib/api';
 import { POLL_INTERVALS } from '../lib/constants';
 import { WorkflowViewHeader } from '../components/WorkflowViewHeader';

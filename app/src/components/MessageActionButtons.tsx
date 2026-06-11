@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Copy, Check, Pin, Edit } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 
 /** Copy-to-clipboard button for individual messages */

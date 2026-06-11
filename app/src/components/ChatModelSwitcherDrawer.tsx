@@ -1,11 +1,11 @@
 import { Sparkles, Cpu, Rabbit, Coins } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
+} from '@allsetlabs/forge/components/ui/drawer';
 import { MODEL_CONFIG } from '../lib/model-config';
 import { formatModelPricing } from '../lib/format';
 import type { ClaudeModel } from '../types';

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Pin, ArrowLeft, MessageCircle, X, Loader2 } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { api } from '../lib/api';
 import { extractTextContent, extractThinkingContent } from '../components/ChatMessage';
 import type { ChatMessage } from '../types';

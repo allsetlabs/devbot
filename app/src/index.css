@@ -1,4 +1,4 @@
-@import '@allsetlabs/reusable/styles';
+@import '@allsetlabs/forge/styles';
 @import '@xterm/xterm/css/xterm.css';
 
 /* Root elements take full viewport */

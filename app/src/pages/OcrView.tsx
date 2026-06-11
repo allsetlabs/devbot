@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, RefreshCw, Copy, Check } from 'lucide-react';
 import { createWorker } from 'tesseract.js';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { toast } from 'sonner';
 import { getOcrDocument, saveOcrText } from '../lib/api';
 import { VITE_BACKEND_PORT } from '../lib/env';

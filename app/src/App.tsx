@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from '@allsetlabs/reusable/components/ui/sonner';
-import { InitializeReusableChunks } from '@allsetlabs/reusable/initializeReusableChunks';
+import { Toaster } from '@allsetlabs/forge/components/ui/sonner';
+import { InitializeForgeChunks } from '@allsetlabs/forge/initializeForgeChunks';
 import { ChatList } from './pages/ChatList';
 import { ChatView } from './pages/ChatView';
 import { SchedulerList } from './pages/SchedulerList';
@@ -30,7 +30,7 @@ import { AppLayout } from './components/AppLayout';
 
 function App() {
   return (
-    <InitializeReusableChunks applyToBody defaultMuted>
+    <InitializeForgeChunks applyToBody defaultMuted>
       <div className="overflow-hidden bg-background">
         <TextSelectionProvider>
           <AppLayout>
@@ -68,7 +68,7 @@ function App() {
         </TextSelectionProvider>
       </div>
       <Toaster position="bottom-center" />
-    </InitializeReusableChunks>
+    </InitializeForgeChunks>
   );
 }
 

@@ -1,13 +1,13 @@
 import {
   type SlashCommandPickerHandle,
   type SlashCommandGroup,
-} from '@allsetlabs/reusable/components/ui/slash-command-picker';
+} from '@allsetlabs/forge/components/ui/slash-command-picker';
 import {
   type FileIntellisensePickerHandle,
   type FileIntellisenseItem,
-} from '@allsetlabs/reusable/components/ui/file-intellisense-picker';
+} from '@allsetlabs/forge/components/ui/file-intellisense-picker';
 import { RotateCcw, Clock, X, ArrowUp } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import { ChatInputToolbar } from './ChatInputToolbar';
 import { ChatAttachedFiles } from './ChatAttachedFiles';
 import { ChatTextareaWithPickers } from './ChatTextareaWithPickers';

@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Brain, Trash2, AlertCircle, ChevronDown, ChevronRight, Pencil, X, Check } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-} from '@allsetlabs/reusable/components/ui/drawer';
-import { Textarea } from '@allsetlabs/reusable/components/ui/textarea';
+} from '@allsetlabs/forge/components/ui/drawer';
+import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
 import { api } from '../lib/api';
 import type { MemoryFile } from '../types';
 

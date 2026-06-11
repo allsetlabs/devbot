@@ -1,5 +1,5 @@
 import { ChevronDown, CheckCircle, XCircle, Loader2 } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { TaskRun } from '../types';
 import { formatDateTime } from '../lib/format';
 

@@ -9,14 +9,14 @@ import {
   MoreVertical,
   Play,
 } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@allsetlabs/reusable/components/ui/dropdown-menu';
+} from '@allsetlabs/forge/components/ui/dropdown-menu';
 import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { formatRelativeTime } from '../lib/format';
 import { MODE_CONFIG } from '../lib/mode-config';

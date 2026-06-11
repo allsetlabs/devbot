@@ -1,6 +1,6 @@
 import { Search, X, MessageSquare, MessagesSquare } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
-import { Input } from '@allsetlabs/reusable/components/ui/input';
+import { Button } from '@allsetlabs/forge/components/ui/button';
+import { Input } from '@allsetlabs/forge/components/ui/input';
 
 interface ChatListFiltersProps {
   searchQuery: string;

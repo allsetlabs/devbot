@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, XCircle, CheckCircle, GitBranch, RotateCcw } from 'lucide-react';
-import { Button } from '@allsetlabs/reusable/components/ui/button';
+import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 import { MessageReactions } from './MessageReactions';
 import type { TaskMessage, ClaudeContentBlock, ClaudeMessageContent, PermissionMode } from '../types';

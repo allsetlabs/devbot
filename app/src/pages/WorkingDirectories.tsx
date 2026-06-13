@@ -115,8 +115,8 @@ export function WorkingDirectories() {
             {dirs.map((dir) => (
               <div key={dir.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium text-foreground">{dir.path}</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="break-all text-sm font-medium text-foreground">{dir.path}</span>
                     {dir.isDefault && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                         <Shield className="h-3 w-3" />

@@ -81,7 +81,7 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
               className="flex h-auto w-full items-center justify-start gap-2 px-3 py-2.5 text-left hover:bg-muted"
             >
               <div className="flex-1 min-w-0">
-                <span className="truncate text-sm text-foreground block">{dir.path}</span>
+                <span className="whitespace-normal break-all text-sm text-foreground block">{dir.path}</span>
                 {dir.label && <span className="text-xs text-muted-foreground">{dir.label}</span>}
               </div>
               {dir.isDefault && <Shield className="h-3.5 w-3.5 shrink-0 text-primary" />}

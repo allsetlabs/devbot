@@ -3,11 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { eq } from 'drizzle-orm';
 import { coreDb, working_directories } from '../lib/db/core.js';
-import {
-  asyncHandler,
-  sendBadRequest,
-  generateId,
-} from '../lib/route-helpers.js';
+import { asyncHandler, sendBadRequest, generateId } from '../lib/route-helpers.js';
 import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 const router = Router();
@@ -24,20 +20,34 @@ interface WorkingDirectory {
 
 type WorkingDirectoryRow = typeof working_directories.$inferSelect;
 
-interface WorkingDirectorySettings {
-  isRootDirectory?: boolean;
+/**
+ * The repo root `make start` runs from (one directory above the backend's CWD).
+ * A directory matching this path is flagged as the root directory.
+ */
+function getRootDirectory(): string {
+  return path.resolve(process.cwd(), '..');
 }
 
-function rowToWorkingDir(row: WorkingDirectoryRow): WorkingDirectory {
-  const settings: WorkingDirectorySettings =
-    typeof row.settings === 'object' && row.settings ? (row.settings as WorkingDirectorySettings) : {};
+/**
+ * The configured projects directory (DEVBOT_PROJECTS_DIR).
+ * A directory matching this path is flagged as the default directory.
+ */
+function getDefaultDirectory(): string {
+  return path.resolve(DEVBOT_PROJECTS_DIR);
+}
+
+function rowToWorkingDir(
+  row: WorkingDirectoryRow,
+  rootDir: string,
+  defaultDir: string
+): WorkingDirectory {
   return {
     id: row.id,
     path: row.path,
     label: row.label,
     source: row.source,
-    isDefault: !!row.is_default,
-    isRootDirectory: !!settings.isRootDirectory,
+    isDefault: row.path === defaultDir,
+    isRootDirectory: row.path === rootDir,
     createdAt: row.created_at,
   };
 }
@@ -47,7 +57,9 @@ router.get(
   '/',
   asyncHandler(async (_req, res) => {
     const rows = await coreDb.select().from(working_directories).all();
-    res.json(rows.map(rowToWorkingDir));
+    const rootDir = getRootDirectory();
+    const defaultDir = getDefaultDirectory();
+    res.json(rows.map((row) => rowToWorkingDir(row, rootDir, defaultDir)));
   }, 'list working directories')
 );
 
@@ -86,6 +98,9 @@ router.post(
       return;
     }
 
+    const rootDir = getRootDirectory();
+    const defaultDir = getDefaultDirectory();
+
     // Check if already exists
     const existing = await coreDb
       .select()
@@ -94,7 +109,7 @@ router.post(
       .get();
 
     if (existing) {
-      res.json(rowToWorkingDir(existing));
+      res.json(rowToWorkingDir(existing, rootDir, defaultDir));
       return;
     }
 
@@ -105,17 +120,16 @@ router.post(
         path: resolved,
         label: label && typeof label === 'string' ? label.trim() : null,
         source: 'user',
-        is_default: false,
         created_by: 'user',
         updated_by: 'user',
       })
       .returning();
 
-    res.status(201).json(rowToWorkingDir(result[0]));
+    res.status(201).json(rowToWorkingDir(result[0], rootDir, defaultDir));
   }, 'create working directory')
 );
 
-// Delete a working directory (blocks default directories)
+// Delete a working directory (blocks the default/root directories)
 router.delete(
   '/:id',
   asyncHandler(async (req, res) => {
@@ -130,7 +144,7 @@ router.delete(
       return;
     }
 
-    if (row.is_default) {
+    if (row.path === getDefaultDirectory() || row.path === getRootDirectory()) {
       sendBadRequest(res, 'Cannot delete a default directory');
       return;
     }
@@ -160,20 +174,19 @@ function resolvePath(p: string): string {
  */
 export async function seedDefaultWorkingDirectories(): Promise<void> {
   // 1. From .env DEVBOT_PROJECTS_DIR
-  await upsertDefault(DEVBOT_PROJECTS_DIR, 'Default (env)', 'env', {});
+  await upsertDefault(DEVBOT_PROJECTS_DIR, 'Default (env)', 'env');
 
   // 2. One directory above backend CWD (the devbot repo root — where `make start` runs)
-  const autoDir = path.resolve(process.cwd(), '..');
+  const autoDir = getRootDirectory();
   if (fs.existsSync(autoDir) && fs.statSync(autoDir).isDirectory()) {
-    await upsertDefault(autoDir, 'Root', 'auto', { isRootDirectory: true });
+    await upsertDefault(autoDir, 'Root', 'auto');
   }
 }
 
 async function upsertDefault(
   dirPath: string,
   label: string,
-  source: 'env' | 'auto',
-  settings: WorkingDirectorySettings
+  source: 'env' | 'auto'
 ): Promise<void> {
   const resolved = path.resolve(dirPath);
   if (!fs.existsSync(resolved)) return;
@@ -190,19 +203,10 @@ async function upsertDefault(
       path: resolved,
       label,
       source,
-      is_default: true,
-      settings,
       created_by: 'system',
       updated_by: 'system',
     });
     console.log(`[WorkingDirs] Seeded: ${resolved} (${source})`);
-  } else if (!existing.is_default) {
-    // Upgrade existing row to default
-    await coreDb
-      .update(working_directories)
-      .set({ is_default: true, settings, label, source, updated_by: 'system' })
-      .where(eq(working_directories.id, existing.id));
-    console.log(`[WorkingDirs] Upgraded to default: ${resolved} (${source})`);
   }
 }
 

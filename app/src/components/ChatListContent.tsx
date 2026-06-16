@@ -10,9 +10,7 @@ import { toast } from 'sonner';
 import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 import type { InteractiveChat } from '../types';
 
-type ChatRow =
-  | { type: 'header'; label: string }
-  | { type: 'chat'; chat: InteractiveChat };
+type ChatRow = { type: 'header'; label: string } | { type: 'chat'; chat: InteractiveChat };
 
 const GROUP_ORDER = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'] as const;
 
@@ -27,8 +25,7 @@ function getChatDateGroup(iso: string): string {
   if (chatDay >= today) return 'Today';
   if (chatDay >= yesterday) return 'Yesterday';
   if (chatDay >= weekAgo) return 'This Week';
-  if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear())
-    return 'This Month';
+  if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) return 'This Month';
   return 'Older';
 }
 
@@ -91,6 +88,7 @@ export function ChatListContent({
   onResumeSession,
 }: ChatListContentProps) {
   const parentRef = useRef<HTMLDivElement>(null);
+  const [animateRearrange, setAnimateRearrange] = useState(false);
 
   const rows = useMemo(() => buildGroupedRows(filteredChats), [filteredChats]);
 
@@ -190,100 +188,108 @@ export function ChatListContent({
           <div className="h-px flex-1 bg-border/40" />
         </div>
       )}
-    <div ref={parentRef} className="h-full overflow-y-auto">
-      <div
-        style={{
-          height: `${virtualizer.getTotalSize()}px`,
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        {virtualizer.getVirtualItems().map((virtualItem) => {
-          const row = rows[virtualItem.index];
-          if (!row) return null;
+      <div ref={parentRef} className="h-full overflow-y-auto">
+        <div
+          style={{
+            height: `${virtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const row = rows[virtualItem.index];
+            if (!row) return null;
 
-          if (row.type === 'header') {
+            if (row.type === 'header') {
+              return (
+                <div
+                  key={`header-${row.label}`}
+                  ref={virtualizer.measureElement}
+                  data-index={virtualItem.index}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualItem.start}px)`,
+                    transition: animateRearrange ? 'transform 0.22s ease' : undefined,
+                  }}
+                >
+                  <div className="flex items-center gap-2 border-b border-border/50 bg-background px-4 py-2">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {row.label}
+                    </span>
+                    <div className="h-px flex-1 bg-border/40" />
+                  </div>
+                </div>
+              );
+            }
+
+            const chat = row.chat;
+            const rowIndex = virtualItem.index;
+            const nextRow = rows[rowIndex + 1];
+            const showBorder = nextRow?.type === 'chat';
+
             return (
               <div
-                key={`${virtualItem.index}-header-${row.label}`}
+                key={chat.id}
                 ref={virtualizer.measureElement}
                 data-index={virtualItem.index}
+                className={showBorder ? 'border-b border-border' : ''}
                 style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   width: '100%',
                   transform: `translateY(${virtualItem.start}px)`,
+                  transition: animateRearrange ? 'transform 0.22s ease' : undefined,
                 }}
               >
-                <div className="flex items-center gap-2 border-b border-border/50 bg-background px-4 py-2">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    {row.label}
-                  </span>
-                  <div className="h-px flex-1 bg-border/40" />
-                </div>
+                <ChatListItem
+                  chat={chat}
+                  isFavorited={isFavorite(chat.id)}
+                  onSelect={() => onSelect(chat)}
+                  onToggleFavorite={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(chat.id);
+                  }}
+                  onDuplicate={(e) => {
+                    e.stopPropagation();
+                    onDuplicate(chat.id);
+                  }}
+                  onArchive={(e?) => {
+                    e?.stopPropagation();
+                    setAnimateRearrange(true);
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(() => {
+                        onArchive(chat.id);
+                        setTimeout(() => setAnimateRearrange(false), 280);
+                      });
+                    });
+                  }}
+                  onDelete={(e) => {
+                    e.stopPropagation();
+                    onDelete(chat.id);
+                  }}
+                  hasResumeSession={!!chat.claudeSessionId && !chat.isRunning}
+                  onResumeSession={() => onResumeSession(chat)}
+                  hasCopyCommand={!!chat.claudeSessionId}
+                  onCopyCommand={
+                    chat.claudeSessionId
+                      ? () => {
+                          copyToClipboard(
+                            `cd ${VITE_DEVBOT_PROJECTS_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
+                          );
+                          toast.success('Command copied!');
+                        }
+                      : undefined
+                  }
+                />
               </div>
             );
-          }
-
-          const chat = row.chat;
-          const rowIndex = virtualItem.index;
-          const nextRow = rows[rowIndex + 1];
-          const showBorder = nextRow?.type === 'chat';
-
-          return (
-            <div
-              key={`${virtualItem.index}-${chat.id}`}
-              ref={virtualizer.measureElement}
-              data-index={virtualItem.index}
-              className={showBorder ? 'border-b border-border' : ''}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                transform: `translateY(${virtualItem.start}px)`,
-              }}
-            >
-              <ChatListItem
-                chat={chat}
-                isFavorited={isFavorite(chat.id)}
-                onSelect={() => onSelect(chat)}
-                onToggleFavorite={(e) => {
-                  e.stopPropagation();
-                  onToggleFavorite(chat.id);
-                }}
-                onDuplicate={(e) => {
-                  e.stopPropagation();
-                  onDuplicate(chat.id);
-                }}
-                onArchive={(e) => {
-                  e.stopPropagation();
-                  onArchive(chat.id);
-                }}
-                onDelete={(e) => {
-                  e.stopPropagation();
-                  onDelete(chat.id);
-                }}
-                hasResumeSession={!!chat.claudeSessionId && !chat.isRunning}
-                onResumeSession={() => onResumeSession(chat)}
-                hasCopyCommand={!!chat.claudeSessionId}
-                onCopyCommand={
-                  chat.claudeSessionId
-                    ? () => {
-                        copyToClipboard(
-                          `cd ${VITE_DEVBOT_PROJECTS_DIR} && claude --dangerously-skip-permissions --chrome --resume ${chat.claudeSessionId}`
-                        );
-                        toast.success('Command copied!');
-                      }
-                    : undefined
-                }
-              />
-            </div>
-          );
-        })}
+          })}
+        </div>
       </div>
-    </div>
     </div>
   );
 }

@@ -143,7 +143,6 @@ router.post(
         permission_mode: 'dangerous',
         model: 'sonnet',
         system_prompt: null,
-        max_turns: null,
         settings: { workingDir: DEVBOT_PROJECTS_DIR },
         created_by: 'user',
         updated_by: 'user',

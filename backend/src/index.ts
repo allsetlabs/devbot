@@ -290,7 +290,6 @@ Research the USDA climate zone for this zip code. Create a seasonal plan with 3-
         model: 'sonnet',
         outputSchema: schema,
         timeoutMs: 120_000,
-        maxTurns: 3,
       });
     },
   })

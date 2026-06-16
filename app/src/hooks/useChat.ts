@@ -103,7 +103,6 @@ export function useCreateChat() {
         systemPrompt: params.systemPrompt,
         permissionMode: params.mode,
         model: params.model,
-        maxTurns: params.maxTurns,
         workingDir: params.workingDir,
         ...(params.type ? { type: params.type } : {}),
       });

@@ -97,10 +97,8 @@ export function InteractiveChatList() {
 
   const { data: chatTypes = [] } = chatHooks.useGetChatTypes();
 
-  const {
-    data: messageSearchResults = [],
-    isFetching: messageSearchFetching,
-  } = chatHooks.useSearchMessages(searchQuery, searchMode === 'messages' && searchQuery.length >= 2);
+  const { data: messageSearchResults = [], isFetching: messageSearchFetching } =
+    chatHooks.useSearchMessages(searchQuery, searchMode === 'messages' && searchQuery.length >= 2);
 
   const {
     data: chats = [],
@@ -114,7 +112,10 @@ export function InteractiveChatList() {
     data: archivedChats = [],
     isLoading: archiveLoading,
     error: archiveQueryError,
-  } = chatHooks.useGetArchivedChats({ type: selectedType, q: searchMode === 'chats' ? searchQuery : '' });
+  } = chatHooks.useGetArchivedChats({
+    type: selectedType,
+    q: searchMode === 'chats' ? searchQuery : '',
+  });
 
   const allChats = useMemo(() => [...chats, ...archivedChats], [chats, archivedChats]);
   const { isFavorite, toggleFavorite } = useFavorites(allChats);
@@ -267,7 +268,6 @@ export function InteractiveChatList() {
             onDeleteArchived={handleDeleteArchived}
             onUnarchive={handleUnarchive}
             onCreate={handleCreate}
-            onResumeSession={handleSelect}
             onClearFilters={() => {
               setShowFavorites(false);
               setSearchParams((p) => {

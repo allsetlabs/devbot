@@ -8,7 +8,6 @@ import {
   Copy,
   Terminal,
   MoreVertical,
-  Play,
 } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
@@ -37,8 +36,6 @@ interface ChatListItemProps {
   onDelete: (e: React.MouseEvent) => void;
   hasCopyCommand?: boolean;
   onCopyCommand?: () => void;
-  hasResumeSession?: boolean;
-  onResumeSession?: () => void;
 }
 
 export function ChatListItem({
@@ -51,8 +48,6 @@ export function ChatListItem({
   onDelete,
   hasCopyCommand = false,
   onCopyCommand,
-  hasResumeSession = false,
-  onResumeSession,
 }: ChatListItemProps) {
   const { pinnedIds } = usePinnedMessages(chat.id);
   const pinnedCount = pinnedIds.length;
@@ -182,28 +177,10 @@ export function ChatListItem({
           </div>
           <p className="text-xs text-muted-foreground">
             {chat.isRunning ? 'Running...' : formatRelativeTime(chat.updatedAt)}
-            {hasResumeSession && !chat.isRunning && (
-              <span className="ml-1.5 text-primary">· Resumable</span>
-            )}
           </p>
         </div>
         {/* Desktop: all actions inline */}
         <div className="hidden flex-shrink-0 items-center gap-1 lg:flex">
-          {hasResumeSession && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 hover:bg-primary/20"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onResumeSession?.();
-              }}
-              title="Resume session"
-            >
-              <Play className="h-4 w-4 text-primary" />
-            </Button>
-          )}
           <Button
             variant="ghost"
             size="icon"
@@ -291,17 +268,6 @@ export function ChatListItem({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {hasResumeSession && (
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onResumeSession?.();
-                  }}
-                >
-                  <Play className="h-4 w-4 text-primary" />
-                  Resume session
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem onClick={onToggleFavorite}>
                 <Star className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : ''}`} />
                 {isFavorited ? 'Remove from favorites' : 'Add to favorites'}

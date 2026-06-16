@@ -1,14 +1,27 @@
 import { Router } from 'express';
 import fs from 'fs';
 import { eq, desc, gt, isNull, isNotNull, and, lte, inArray, sql, asc } from 'drizzle-orm';
-import { coreDb, interactive_chats, chat_messages, chat_uploads, chat_message_queue } from '../lib/db/core.js';
+import {
+  coreDb,
+  interactive_chats,
+  chat_messages,
+  chat_uploads,
+  chat_message_queue,
+} from '../lib/db/core.js';
 import type {
   InteractiveChatRow,
   ChatMessageRow,
   PermissionMode,
   ClaudeModel,
 } from '../lib/db/types.js';
-import { sendMessage, stopChatExecution, pauseChatExecution, resumeChatExecution, isChatPaused, isChatExecuting } from '../lib/interactive-chat-worker.js';
+import {
+  sendMessage,
+  stopChatExecution,
+  pauseChatExecution,
+  resumeChatExecution,
+  isChatPaused,
+  isChatExecuting,
+} from '../lib/interactive-chat-worker.js';
 import {
   asyncHandler,
   sendNotFound,
@@ -30,14 +43,12 @@ interface InteractiveChat {
   permissionMode: PermissionMode;
   model: ClaudeModel;
   systemPrompt: string | null;
-  maxTurns: number | null;
   effort: string | null;
   isRunning: boolean;
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;
   workingDir: string | null;
-  allowedTools: string[] | null;
   fastMode: boolean;
   starred: boolean;
 }
@@ -63,14 +74,12 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     permissionMode: row.permission_mode,
     model: row.model,
     systemPrompt: row.system_prompt,
-    maxTurns: row.max_turns,
     isRunning: row.is_executing ?? false,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     archivedAt: row.archived_at,
     workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
     effort: typeof settings.effort === 'string' ? settings.effort : null,
-    allowedTools: Array.isArray(settings.allowedTools) ? (settings.allowedTools as string[]) : null,
     fastMode: settings.fastMode === true,
     starred: settings.starred === true,
   };
@@ -325,9 +334,13 @@ router.post(
       .where(inArray(chat_messages.id, allMessageIds));
 
     const chatIds = [...new Set(messageRows.map((m) => m.chat_id))];
-    const chatRows = chatIds.length > 0
-      ? await coreDb.select().from(interactive_chats).where(inArray(interactive_chats.id, chatIds))
-      : [];
+    const chatRows =
+      chatIds.length > 0
+        ? await coreDb
+            .select()
+            .from(interactive_chats)
+            .where(inArray(interactive_chats.id, chatIds))
+        : [];
 
     const chatMap = Object.fromEntries(chatRows.map((c) => [c.id, c.name]));
 
@@ -397,7 +410,10 @@ router.get(
   '/search-messages',
   asyncHandler(async (req, res) => {
     const q = ((req.query.q as string | undefined) ?? '').trim();
-    if (q.length < 2) { res.json([]); return; }
+    if (q.length < 2) {
+      res.json([]);
+      return;
+    }
 
     const rows = coreDb
       .select({
@@ -488,11 +504,6 @@ router.post(
         ? req.body.systemPrompt.trim()
         : null;
 
-    const maxTurns: number | null =
-      req.body?.maxTurns && typeof req.body.maxTurns === 'number' && req.body.maxTurns > 0
-        ? req.body.maxTurns
-        : null;
-
     const chatType: string =
       req.body?.type && typeof req.body.type === 'string' ? req.body.type.trim() : 'Manual';
 
@@ -514,7 +525,6 @@ router.post(
         permission_mode: permissionMode,
         model,
         system_prompt: systemPrompt,
-        max_turns: maxTurns,
         settings: workingDir ? { workingDir } : {},
         created_by: 'user',
         updated_by: 'user',
@@ -557,7 +567,6 @@ router.post(
         permission_mode: sourceChat.permission_mode,
         model: sourceChat.model,
         system_prompt: sourceChat.system_prompt,
-        max_turns: sourceChat.max_turns,
         created_by: 'user',
         updated_by: 'user',
       })
@@ -812,6 +821,7 @@ router.post(
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const content = firstUserMsg[0].content as Record<string, any>;
     const blocks: Array<{ type: string; text?: string }> =
       content?.message?.content ?? content?.content ?? [];
@@ -896,28 +906,6 @@ router.post(
   }, 'update system prompt')
 );
 
-// Change max turns
-router.post(
-  '/:id/max-turns',
-  asyncHandler(async (req, res) => {
-    const { maxTurns } = req.body;
-
-    const value =
-      maxTurns === null || maxTurns === undefined || maxTurns === 0
-        ? null
-        : typeof maxTurns === 'number' && maxTurns > 0 && Number.isInteger(maxTurns)
-          ? maxTurns
-          : undefined;
-
-    if (value === undefined) {
-      sendBadRequest(res, 'maxTurns must be a positive integer or null');
-      return;
-    }
-
-    await updateChatField(req.params.id, { max_turns: value }, res);
-  }, 'change max turns')
-);
-
 // Change effort level
 router.post(
   '/:id/effort',
@@ -971,39 +959,6 @@ router.post(
 
     await updateChatField(req.params.id, { settings: newSettings }, res);
   }, 'toggle fast mode')
-);
-
-// Change allowed tools
-router.post(
-  '/:id/allowed-tools',
-  asyncHandler(async (req, res) => {
-    const { allowedTools } = req.body;
-
-    if (allowedTools !== null && !Array.isArray(allowedTools)) {
-      sendBadRequest(res, 'allowedTools must be an array of tool names or null');
-      return;
-    }
-
-    const chatRows = await coreDb
-      .select()
-      .from(interactive_chats)
-      .where(eq(interactive_chats.id, req.params.id));
-
-    if (!chatRows.length) {
-      sendNotFound(res, 'Chat');
-      return;
-    }
-
-    const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
-    const newSettings = { ...existingSettings };
-    if (allowedTools === null) {
-      delete newSettings.allowedTools;
-    } else {
-      newSettings.allowedTools = allowedTools;
-    }
-
-    await updateChatField(req.params.id, { settings: newSettings }, res);
-  }, 'change allowed tools')
 );
 
 // Change working directory
@@ -1076,11 +1031,7 @@ router.post(
     }
 
     const existingSettings = (chatRows[0].settings as Record<string, unknown>) ?? {};
-    await updateChatField(
-      req.params.id,
-      { settings: { ...existingSettings, starred } },
-      res
-    );
+    await updateChatField(req.params.id, { settings: { ...existingSettings, starred } }, res);
   }, 'star chat')
 );
 
@@ -1314,10 +1265,7 @@ router.post(
       return;
     }
 
-    coreDb
-      .delete(chat_message_queue)
-      .where(eq(chat_message_queue.chat_id, chatId))
-      .run();
+    coreDb.delete(chat_message_queue).where(eq(chat_message_queue.chat_id, chatId)).run();
 
     if (isChatExecuting(chatId)) {
       stopChatExecution(chatId);
@@ -1345,12 +1293,7 @@ router.post(
     const entry = coreDb
       .select()
       .from(chat_message_queue)
-      .where(
-        and(
-          eq(chat_message_queue.chat_id, chatId),
-          eq(chat_message_queue.id, queueId)
-        )
-      )
+      .where(and(eq(chat_message_queue.chat_id, chatId), eq(chat_message_queue.id, queueId)))
       .get();
 
     if (!entry) {
@@ -1360,12 +1303,7 @@ router.post(
 
     coreDb
       .delete(chat_message_queue)
-      .where(
-        and(
-          eq(chat_message_queue.chat_id, chatId),
-          eq(chat_message_queue.id, queueId)
-        )
-      )
+      .where(and(eq(chat_message_queue.chat_id, chatId), eq(chat_message_queue.id, queueId)))
       .run();
 
     if (isChatExecuting(chatId)) {

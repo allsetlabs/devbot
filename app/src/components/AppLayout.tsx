@@ -8,9 +8,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
   return (
     <>
       <SlideNav isOpen={isNavOpen} onClose={closeNav} />
-      <div className="flex h-dvh flex-col">
-        {children}
-      </div>
+      <div className="flex h-dvh flex-col">{children}</div>
     </>
   );
 }

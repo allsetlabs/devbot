@@ -91,7 +91,9 @@ export async function parseStreamLine(
           content: data,
           created_by: 'system',
           updated_by: 'system',
-          ...(config.tableName === 'chat_messages' && config.branchId ? { branch_id: config.branchId } : {}),
+          ...(config.tableName === 'chat_messages' && config.branchId
+            ? { branch_id: config.branchId }
+            : {}),
         } as ChatMessageInsert | TaskMessageInsert;
         if (config.tableName === 'chat_messages') {
           await coreDb.insert(chat_messages).values(values as ChatMessageInsert);

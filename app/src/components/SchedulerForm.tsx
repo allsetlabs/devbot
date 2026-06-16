@@ -11,7 +11,14 @@ import type { ClaudeModel } from '../types';
 interface SchedulerFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (prompt: string, intervalMinutes: number, maxRuns: number | null, workingDir: string, model: ClaudeModel, name?: string) => Promise<void>;
+  onSubmit: (
+    prompt: string,
+    intervalMinutes: number,
+    maxRuns: number | null,
+    workingDir: string,
+    model: ClaudeModel,
+    name?: string
+  ) => Promise<void>;
 }
 
 export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps) {
@@ -28,7 +35,14 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
   const submitMutation = useMutation({
     mutationFn: async () => {
       await validateAndSaveDir(workingDir);
-      return onSubmit(prompt.trim(), intervalMinutes, isInfinite ? null : maxRuns, workingDir, model, name.trim() || undefined);
+      return onSubmit(
+        prompt.trim(),
+        intervalMinutes,
+        isInfinite ? null : maxRuns,
+        workingDir,
+        model,
+        name.trim() || undefined
+      );
     },
     onSuccess: () => {
       setName('');
@@ -94,105 +108,105 @@ export function SchedulerForm({ isOpen, onClose, onSubmit }: SchedulerFormProps)
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="-mr-4 flex-1 space-y-4 overflow-y-auto pr-4">
-          {/* Name (optional) */}
-          <div>
-            <span className="mb-2 block text-sm font-medium text-foreground">Name</span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Optional — auto-generated if left empty"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-
-          {/* Interval Selection */}
-          <div>
-            <span className="mb-2 block text-sm font-medium text-foreground">Run every</span>
-            <div className="grid grid-cols-4 gap-2" role="group" aria-label="Run interval">
-              {INTERVAL_OPTIONS.map((opt) => (
-                <Button
-                  key={opt.value}
-                  variant="outline"
-                  type="button"
-                  onClick={() => setIntervalMinutes(opt.value)}
-                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
-                    intervalMinutes === opt.value
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {opt.label}
-                </Button>
-              ))}
+            {/* Name (optional) */}
+            <div>
+              <span className="mb-2 block text-sm font-medium text-foreground">Name</span>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Optional — auto-generated if left empty"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              />
             </div>
-          </div>
 
-          {/* Max Runs Selection */}
-          <div>
-            <span className="mb-2 block text-sm font-medium text-foreground">Maximum runs</span>
-            <div className="flex items-center gap-2" role="group" aria-label="Maximum runs">
-              <div className="grid flex-1 grid-cols-4 gap-2">
-                {MAX_RUNS_PRESETS.map((opt) => (
+            {/* Interval Selection */}
+            <div>
+              <span className="mb-2 block text-sm font-medium text-foreground">Run every</span>
+              <div className="grid grid-cols-4 gap-2" role="group" aria-label="Run interval">
+                {INTERVAL_OPTIONS.map((opt) => (
                   <Button
                     key={opt.value}
                     variant="outline"
                     type="button"
-                    disabled={isInfinite}
-                    onClick={() => setMaxRuns(opt.value)}
+                    onClick={() => setIntervalMinutes(opt.value)}
                     className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
-                      !isInfinite && maxRuns === opt.value
+                      intervalMinutes === opt.value
                         ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border text-foreground hover:bg-muted disabled:opacity-50'
+                        : 'border-border text-foreground hover:bg-muted'
                     }`}
                   >
                     {opt.label}
                   </Button>
                 ))}
               </div>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={handleInfiniteToggle}
-                className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                  isInfinite
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border text-foreground hover:bg-muted'
-                }`}
-              >
-                <InfinityIcon className="h-3.5 w-3.5" />
-              </Button>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {isInfinite
-                ? 'Task will run indefinitely until paused'
-                : maxRuns === 1
-                  ? 'Task will run once and stop'
-                  : `Task will run ${maxRuns} times and stop`}
-            </p>
-          </div>
 
-          {/* Task Prompt */}
-          <div>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label className="mb-2 block text-sm font-medium text-foreground">Task Prompt</label>
-            <Textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Enter the task for Claude to execute..."
-              rows={5}
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              This prompt will be sent to Claude Code at the specified interval
-            </p>
-          </div>
+            {/* Max Runs Selection */}
+            <div>
+              <span className="mb-2 block text-sm font-medium text-foreground">Maximum runs</span>
+              <div className="flex items-center gap-2" role="group" aria-label="Maximum runs">
+                <div className="grid flex-1 grid-cols-4 gap-2">
+                  {MAX_RUNS_PRESETS.map((opt) => (
+                    <Button
+                      key={opt.value}
+                      variant="outline"
+                      type="button"
+                      disabled={isInfinite}
+                      onClick={() => setMaxRuns(opt.value)}
+                      className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
+                        !isInfinite && maxRuns === opt.value
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border text-foreground hover:bg-muted disabled:opacity-50'
+                      }`}
+                    >
+                      {opt.label}
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={handleInfiniteToggle}
+                  className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                    isInfinite
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <InfinityIcon className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {isInfinite
+                  ? 'Task will run indefinitely until paused'
+                  : maxRuns === 1
+                    ? 'Task will run once and stop'
+                    : `Task will run ${maxRuns} times and stop`}
+              </p>
+            </div>
 
-          {/* Model */}
-          <ModelPicker value={model} onChange={setModel} />
+            {/* Task Prompt */}
+            <div>
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label className="mb-2 block text-sm font-medium text-foreground">Task Prompt</label>
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter the task for Claude to execute..."
+                rows={5}
+                className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                This prompt will be sent to Claude Code at the specified interval
+              </p>
+            </div>
 
-          {/* Working Directory */}
-          <WorkingDirSelector value={workingDir} onChange={setWorkingDir} />
+            {/* Model */}
+            <ModelPicker value={model} onChange={setModel} />
+
+            {/* Working Directory */}
+            <WorkingDirSelector value={workingDir} onChange={setWorkingDir} />
           </div>
 
           {/* Actions */}

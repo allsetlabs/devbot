@@ -41,7 +41,8 @@ function OcrDocItem({
         <p className="truncate text-sm font-medium text-foreground">{doc.original_name}</p>
         <p className="mt-0.5 text-xs text-muted-foreground">
           {doc.status === 'completed' && doc.extracted_text
-            ? doc.extracted_text.slice(0, 80).replace(/\s+/g, ' ').trim() + (doc.extracted_text.length > 80 ? '…' : '')
+            ? doc.extracted_text.slice(0, 80).replace(/\s+/g, ' ').trim() +
+              (doc.extracted_text.length > 80 ? '…' : '')
             : doc.status === 'pending'
               ? 'Not yet processed'
               : doc.status === 'processing'
@@ -123,10 +124,7 @@ export function OcrList() {
           >
             <Upload className="h-5 w-5" />
           </Button>
-          <Button
-            onClick={() => cameraInputRef.current?.click()}
-            disabled={uploading}
-          >
+          <Button onClick={() => cameraInputRef.current?.click()} disabled={uploading}>
             <Camera className="mr-1 h-4 w-4" />
             {uploading ? 'Uploading…' : 'Capture'}
           </Button>

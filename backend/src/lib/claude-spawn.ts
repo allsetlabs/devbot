@@ -77,12 +77,8 @@ export interface ClaudeSpawnOptions {
   systemPrompts?: string[];
   /** Resume an existing Claude session */
   sessionId?: string;
-  /** Max agentic turns */
-  maxTurns?: number;
   /** Effort level for thinking budget */
   effort?: string;
-  /** Allowed tools list */
-  allowedTools?: string[];
   /** Working directory (defaults to DEVBOT_PROJECTS_DIR || cwd) */
   workDir?: string;
   /** Enable --chrome flag (default: false) */
@@ -153,9 +149,7 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
     model = 'sonnet',
     systemPrompts = [],
     sessionId,
-    maxTurns,
     effort,
-    allowedTools,
     workDir = DEVBOT_PROJECTS_DIR,
     chrome = false,
     timeoutMs = 30_000,
@@ -191,10 +185,8 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
   ];
 
   if (effort) args.push('--effort', effort);
-  if (allowedTools && allowedTools.length > 0) args.push('--allowedTools', allowedTools.join(','));
   if (chrome) args.push('--chrome');
   if (sessionId) args.push('--resume', sessionId);
-  if (maxTurns && maxTurns > 0) args.push('--max-turns', String(maxTurns));
   for (const sp of systemPrompts) {
     args.push('--append-system-prompt', sp);
   }

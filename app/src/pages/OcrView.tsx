@@ -75,8 +75,8 @@ export function OcrView() {
     if (doc && doc.status === 'pending' && !isProcessing) {
       void runOcr();
     }
-  // Only trigger on initial doc load
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only trigger on initial doc load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc?.id, doc?.status]);
 
   const handleCopy = () => {

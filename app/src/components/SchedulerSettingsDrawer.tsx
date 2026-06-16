@@ -26,7 +26,14 @@ interface SchedulerSettingsDrawerProps {
   onClose: () => void;
   onSave: (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null }
+    data: {
+      prompt?: string;
+      intervalMinutes?: number;
+      maxRuns?: number | null;
+      name?: string;
+      model?: ClaudeModel;
+      workingDir?: string | null;
+    }
   ) => Promise<void>;
 }
 
@@ -47,8 +54,14 @@ export function SchedulerSettingsDrawer({
   const validateAndSaveDir = useValidateAndSaveDir();
 
   const saveMutation = useMutation({
-    mutationFn: (updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null }) =>
-      onSave(task!.id, updates),
+    mutationFn: (updates: {
+      prompt?: string;
+      intervalMinutes?: number;
+      maxRuns?: number | null;
+      name?: string;
+      model?: ClaudeModel;
+      workingDir?: string | null;
+    }) => onSave(task!.id, updates),
     onSuccess: () => onClose(),
   });
 
@@ -57,7 +70,7 @@ export function SchedulerSettingsDrawer({
     if (task) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(task.name ?? '');
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setPrompt(task.prompt);
 
       setIntervalMinutes(task.intervalMinutes);
@@ -65,9 +78,9 @@ export function SchedulerSettingsDrawer({
       setMaxRuns(task.maxRuns);
 
       setIsInfinite(task.maxRuns === null);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setModel(task.model);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+
       setWorkingDir(task.workingDir ?? '');
       saveMutation.reset();
     }
@@ -86,7 +99,14 @@ export function SchedulerSettingsDrawer({
   const handleSave = async () => {
     if (!task || !prompt.trim()) return;
 
-    const updates: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null } = {};
+    const updates: {
+      prompt?: string;
+      intervalMinutes?: number;
+      maxRuns?: number | null;
+      name?: string;
+      model?: ClaudeModel;
+      workingDir?: string | null;
+    } = {};
     if (name.trim() !== (task.name ?? '')) updates.name = name.trim();
     if (prompt.trim() !== task.prompt) updates.prompt = prompt.trim();
     if (intervalMinutes !== task.intervalMinutes) updates.intervalMinutes = intervalMinutes;
@@ -230,10 +250,7 @@ export function SchedulerSettingsDrawer({
 
           {/* Working Directory */}
           <div className="mb-6">
-            <WorkingDirSelector
-              value={workingDir}
-              onChange={setWorkingDir}
-            />
+            <WorkingDirSelector value={workingDir} onChange={setWorkingDir} />
           </div>
 
           {/* Actions */}
@@ -253,9 +270,13 @@ export function SchedulerSettingsDrawer({
                     <Button
                       onClick={handleSave}
                       className="w-full"
-                      disabled={saveMutation.isPending || !hasChanges || !prompt.trim() || task?.isSystem}
+                      disabled={
+                        saveMutation.isPending || !hasChanges || !prompt.trim() || task?.isSystem
+                      }
                     >
-                      {saveMutation.isPending ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+                      {saveMutation.isPending ? (
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      ) : null}
                       {saveMutation.isPending ? 'Saving...' : 'Save'}
                     </Button>
                   </span>

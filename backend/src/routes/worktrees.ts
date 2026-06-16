@@ -38,11 +38,7 @@ router.get(
       return;
     }
 
-    const { stdout } = await execFileAsync(
-      'git',
-      ['worktree', 'list', '--porcelain'],
-      opts
-    );
+    const { stdout } = await execFileAsync('git', ['worktree', 'list', '--porcelain'], opts);
 
     const worktrees: WorktreeInfo[] = [];
     const blocks = stdout.split('\n\n').filter((b) => b.trim());
@@ -86,7 +82,12 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req, res) => {
-    const { dir, path: wtPath, branch, newBranch } = req.body as {
+    const {
+      dir,
+      path: wtPath,
+      branch,
+      newBranch,
+    } = req.body as {
       dir?: string;
       path?: string;
       branch?: string;

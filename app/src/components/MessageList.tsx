@@ -195,9 +195,7 @@ export const MessageList = forwardRef<
                 message={msg}
                 isLast={virtualItem.index === lastContentIndex}
                 onRetry={virtualItem.index === lastAssistantIndex ? onRetry : undefined}
-                onRegenerate={
-                  virtualItem.index === lastAssistantIndex ? onRegenerate : undefined
-                }
+                onRegenerate={virtualItem.index === lastAssistantIndex ? onRegenerate : undefined}
                 onEdit={onEdit}
                 isPinned={pinnedIds.includes(msg.id)}
                 onTogglePin={onTogglePin}

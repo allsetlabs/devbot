@@ -99,10 +99,7 @@ export function DirectoryBrowserSidebar({
             ) : (
               <div className="divide-y divide-border">
                 {sortedFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left"
-                  >
+                  <div key={file.id} className="flex w-full items-center gap-3 px-4 py-3 text-left">
                     {file.type === 'directory' ? (
                       <Folder className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                     ) : (

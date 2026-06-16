@@ -16,16 +16,36 @@ interface CommandRecord {
 const BUILTIN_COMMANDS: CommandRecord[] = [
   { id: '/help', name: 'help', description: 'Get help with using Claude Code', type: 'builtin' },
   { id: '/clear', name: 'clear', description: 'Clear conversation history', type: 'builtin' },
-  { id: '/compact', name: 'compact', description: 'Compact conversation to save context', type: 'builtin' },
+  {
+    id: '/compact',
+    name: 'compact',
+    description: 'Compact conversation to save context',
+    type: 'builtin',
+  },
   { id: '/cost', name: 'cost', description: 'Show token usage and cost', type: 'builtin' },
-  { id: '/doctor', name: 'doctor', description: 'Check Claude Code installation health', type: 'builtin' },
+  {
+    id: '/doctor',
+    name: 'doctor',
+    description: 'Check Claude Code installation health',
+    type: 'builtin',
+  },
   { id: '/exit', name: 'exit', description: 'Exit the current session', type: 'builtin' },
   { id: '/init', name: 'init', description: 'Initialize a new CLAUDE.md file', type: 'builtin' },
   { id: '/login', name: 'login', description: 'Log in to your Anthropic account', type: 'builtin' },
-  { id: '/logout', name: 'logout', description: 'Log out of your Anthropic account', type: 'builtin' },
+  {
+    id: '/logout',
+    name: 'logout',
+    description: 'Log out of your Anthropic account',
+    type: 'builtin',
+  },
   { id: '/model', name: 'model', description: 'Switch the AI model', type: 'builtin' },
   { id: '/pr_comments', name: 'pr_comments', description: 'Review PR comments', type: 'builtin' },
-  { id: '/release-notes', name: 'release-notes', description: 'Generate release notes', type: 'builtin' },
+  {
+    id: '/release-notes',
+    name: 'release-notes',
+    description: 'Generate release notes',
+    type: 'builtin',
+  },
   { id: '/review', name: 'review', description: 'Review code changes', type: 'builtin' },
   { id: '/status', name: 'status', description: 'Show current session status', type: 'builtin' },
   { id: '/terminal', name: 'terminal', description: 'Open a terminal session', type: 'builtin' },
@@ -53,13 +73,19 @@ function readSkills(skillsDir: string): CommandRecord[] {
   for (const entry of entries) {
     // Support symlinked skill directories (e.g. ~/.claude/skills -> module's .claude/skills)
     const entryPath = path.join(skillsDir, entry.name);
-    if (!entry.isDirectory() && !(entry.isSymbolicLink() && fs.statSync(entryPath).isDirectory())) continue;
+    if (!entry.isDirectory() && !(entry.isSymbolicLink() && fs.statSync(entryPath).isDirectory()))
+      continue;
     const skillMdPath = path.join(entryPath, 'SKILL.md');
     if (!fs.existsSync(skillMdPath)) continue;
     const content = fs.readFileSync(skillMdPath, 'utf-8');
     const parsed = parseSkillFrontmatter(content);
     if (!parsed) continue;
-    skills.push({ id: `/${parsed.name}`, name: parsed.name, description: parsed.description, type: 'skill' });
+    skills.push({
+      id: `/${parsed.name}`,
+      name: parsed.name,
+      description: parsed.description,
+      type: 'skill',
+    });
   }
   return skills;
 }
@@ -143,9 +169,10 @@ function scanCommands(workDir: string): CommandRecord[] {
 // GET /api/commands?dir=/path/to/project — scan filesystem for slash commands
 commandsRouter.get('/', (req, res) => {
   try {
-    const dir = typeof req.query.dir === 'string' && req.query.dir.trim()
-      ? req.query.dir.trim()
-      : DEVBOT_PROJECTS_DIR;
+    const dir =
+      typeof req.query.dir === 'string' && req.query.dir.trim()
+        ? req.query.dir.trim()
+        : DEVBOT_PROJECTS_DIR;
 
     // Validate directory exists
     if (!fs.existsSync(dir)) {

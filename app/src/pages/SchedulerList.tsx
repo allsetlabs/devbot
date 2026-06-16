@@ -99,7 +99,14 @@ export function SchedulerList() {
 
   const handleSaveSettings = async (
     taskId: string,
-    data: { prompt?: string; intervalMinutes?: number; maxRuns?: number | null; name?: string; model?: ClaudeModel; workingDir?: string | null }
+    data: {
+      prompt?: string;
+      intervalMinutes?: number;
+      maxRuns?: number | null;
+      name?: string;
+      model?: ClaudeModel;
+      workingDir?: string | null;
+    }
   ) => {
     await api.updateScheduledTask(taskId, data);
     void queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });

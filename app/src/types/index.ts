@@ -187,14 +187,12 @@ export interface InteractiveChat {
   permissionMode: PermissionMode;
   model: ClaudeModel;
   systemPrompt: string | null;
-  maxTurns: number | null;
   effort: string | null;
   isRunning: boolean;
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;
   workingDir: string | null;
-  allowedTools: string[] | null;
   fastMode: boolean;
   starred: boolean;
 }
@@ -358,33 +356,6 @@ export interface FileBrowseItem {
   path: string;
   type: 'file' | 'directory';
   size?: number;
-}
-
-export interface McpServerConfig {
-  command: string;
-  args?: string[];
-  env?: Record<string, string>;
-  cwd?: string;
-}
-
-export interface McpServersResponse {
-  servers: Record<string, McpServerConfig>;
-  settingsPath: string;
-}
-
-export interface HookEntry {
-  type: 'command';
-  command: string;
-}
-
-export interface HookMatcher {
-  matcher: string;
-  hooks: HookEntry[];
-}
-
-export interface HooksResponse {
-  hooks: Record<string, HookMatcher[]>;
-  settingsPath: string;
 }
 
 export interface MemoryFile {

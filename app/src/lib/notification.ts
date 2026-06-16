@@ -56,7 +56,14 @@ function getSoundStyle(): SoundStyle {
   return currentSettings.notificationSound || 'chime';
 }
 
-function playTone(ctx: AudioContext, freq: number, type: OscillatorType, vol: number, start: number, dur: number) {
+function playTone(
+  ctx: AudioContext,
+  freq: number,
+  type: OscillatorType,
+  vol: number,
+  start: number,
+  dur: number
+) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = type;

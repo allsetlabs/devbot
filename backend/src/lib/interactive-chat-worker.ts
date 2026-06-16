@@ -1,5 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { coreDb, interactive_chats, chat_messages, chat_message_queue, remotion_videos } from './db/core.js';
+import {
+  coreDb,
+  interactive_chats,
+  chat_messages,
+  chat_message_queue,
+  remotion_videos,
+} from './db/core.js';
 import { sql, eq, and, asc } from 'drizzle-orm';
 import type { StreamParserConfig } from './stream-parser.js';
 import type { ChatSettings } from './db/types.js';
@@ -139,10 +145,7 @@ function processQueue(chatId: string): void {
 
     if (all.length === 0) return;
 
-    coreDb
-      .delete(chat_message_queue)
-      .where(eq(chat_message_queue.chat_id, chatId))
-      .run();
+    coreDb.delete(chat_message_queue).where(eq(chat_message_queue.chat_id, chatId)).run();
 
     const combined = all.map((m) => m.prompt).join('\n\n');
     const branch_id = all[0].branch_id;
@@ -173,7 +176,11 @@ function markChatNotExecuting(chatId: string): void {
  * Send a message in an interactive chat session.
  * Uses the unified spawnClaude API.
  */
-export async function sendMessage(chatId: string, prompt: string, branchId: string = 'main'): Promise<void> {
+export async function sendMessage(
+  chatId: string,
+  prompt: string,
+  branchId: string = 'main'
+): Promise<void> {
   const chat = coreDb
     .select()
     .from(interactive_chats)
@@ -269,11 +276,7 @@ export async function sendMessage(chatId: string, prompt: string, branchId: stri
     systemPrompts,
     workDir: workingDir,
     sessionId: (chat.claude_session_id as string) || undefined,
-    maxTurns: (chat.max_turns as number) || undefined,
     effort: ((chat.settings as Record<string, unknown>)?.effort as string) || undefined,
-    allowedTools: Array.isArray((chat.settings as Record<string, unknown>)?.allowedTools)
-      ? ((chat.settings as Record<string, unknown>).allowedTools as string[])
-      : undefined,
     chrome: true,
     timeoutMs: 30 * 60 * 1000,
     trackAs: chatId,

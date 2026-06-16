@@ -194,7 +194,9 @@ router.post(
         status: 'active',
         max_runs: maxRuns ?? null,
         settings: {
-          ...(workingDir && typeof workingDir === 'string' ? { workingDir: workingDir.trim() } : {}),
+          ...(workingDir && typeof workingDir === 'string'
+            ? { workingDir: workingDir.trim() }
+            : {}),
           ...(model && typeof model === 'string' ? { model } : {}),
         },
         created_by: 'user',
@@ -296,9 +298,14 @@ router.put(
         sendBadRequest(res, 'workingDir must be a non-empty string or null');
         return;
       }
-      const currentSettings = (updates.settings as Record<string, unknown>) || (existing[0]?.settings as Record<string, unknown>) || {};
+      const currentSettings =
+        (updates.settings as Record<string, unknown>) ||
+        (existing[0]?.settings as Record<string, unknown>) ||
+        {};
       if (workingDir === null) {
-        const { workingDir: _removed, ...rest } = currentSettings as Record<string, unknown> & { workingDir?: unknown };
+        const { workingDir: _removed, ...rest } = currentSettings as Record<string, unknown> & {
+          workingDir?: unknown;
+        };
         void _removed;
         updates.settings = rest;
       } else {

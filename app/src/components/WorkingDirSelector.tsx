@@ -11,7 +11,11 @@ interface WorkingDirSelectorProps {
   onValidationError?: (error: string) => void;
 }
 
-export function WorkingDirSelector({ value, onChange, onValidationError }: WorkingDirSelectorProps) {
+export function WorkingDirSelector({
+  value,
+  onChange,
+  onValidationError,
+}: WorkingDirSelectorProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -80,12 +84,14 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
               onClick={() => handleSelectDir(dir.path)}
               className="flex h-auto w-full items-center justify-start gap-2 px-3 py-2.5 text-left hover:bg-muted"
             >
-              <div className="flex-1 min-w-0">
-                <span className="whitespace-normal break-all text-sm text-foreground block">{dir.path}</span>
+              <div className="min-w-0 flex-1">
+                <span className="block truncate text-sm text-foreground">{dir.path}</span>
                 {dir.label && <span className="text-xs text-muted-foreground">{dir.label}</span>}
               </div>
               {dir.isDefault && <Shield className="h-3.5 w-3.5 shrink-0 text-primary" />}
-              {dir.isRootDirectory && <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warning" />}
+              {dir.isRootDirectory && (
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warning" />
+              )}
             </Button>
           ))}
         </div>
@@ -96,8 +102,8 @@ export function WorkingDirSelector({ value, onChange, onValidationError }: Worki
           <div>
             <p className="text-sm font-medium text-warning">Danger: Root Directory</p>
             <p className="text-xs text-warning/80">
-              This is DevBot&apos;s own source code directory. Changes made here will modify the code
-              that DevBot is currently running. Proceed with extreme caution.
+              This is DevBot&apos;s own source code directory. Changes made here will modify the
+              code that DevBot is currently running. Proceed with extreme caution.
             </p>
           </div>
         </div>

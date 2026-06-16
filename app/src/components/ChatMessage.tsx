@@ -1,9 +1,21 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, XCircle, CheckCircle, GitBranch, RotateCcw } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  XCircle,
+  CheckCircle,
+  GitBranch,
+  RotateCcw,
+} from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { ReactionType } from '../hooks/useMessageReactions';
 import { MessageReactions } from './MessageReactions';
-import type { TaskMessage, ClaudeContentBlock, ClaudeMessageContent, PermissionMode } from '../types';
+import type {
+  TaskMessage,
+  ClaudeContentBlock,
+  ClaudeMessageContent,
+  PermissionMode,
+} from '../types';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import {
   formatMessageTime,
@@ -15,7 +27,19 @@ import {
 } from '../lib/chat-message-utils';
 import { ThinkingBlock } from './ThinkingBlock';
 import { CopyMessageButton, PinMessageButton, EditMessageButton } from './MessageActionButtons';
-import { ToolUseMessage, ToolsGroup, EditDiffView, MultiEditDiffView, WriteContentView, AgentSubagentView, GrepResultView, ReadResultView, GlobResultView, BashResultView, TodoWriteView } from './ToolUseMessage';
+import {
+  ToolUseMessage,
+  ToolsGroup,
+  EditDiffView,
+  MultiEditDiffView,
+  WriteContentView,
+  AgentSubagentView,
+  GrepResultView,
+  ReadResultView,
+  GlobResultView,
+  BashResultView,
+  TodoWriteView,
+} from './ToolUseMessage';
 import { ToolApprovalInline } from './ToolApprovalInline';
 import { SystemMessage } from './SystemMessage';
 
@@ -236,8 +260,12 @@ export function ChatMessage({
     const displayText = expanded ? text : truncated;
 
     const imageBlocks = (content.message?.content || []).filter(
-      (block): block is ClaudeContentBlock & { type: 'image'; source: { type: 'base64'; media_type: string; data: string } } =>
-        block.type === 'image' && !!block.source && block.source.type === 'base64'
+      (
+        block
+      ): block is ClaudeContentBlock & {
+        type: 'image';
+        source: { type: 'base64'; media_type: string; data: string };
+      } => block.type === 'image' && !!block.source && block.source.type === 'base64'
     );
 
     const toolUseBlocks = (content.message?.content || []).filter(
@@ -274,7 +302,7 @@ export function ChatMessage({
                 <img
                   key={`img-${idx}`}
                   src={`data:${block.source.media_type};base64,${block.source.data}`}
-                  alt="Generated image"
+                  alt="Generated content"
                   className="max-w-full rounded-lg"
                   style={{ maxHeight: 400 }}
                 />
@@ -288,13 +316,38 @@ export function ChatMessage({
                   const block = toolUseBlocks[0];
                   const toolInput = block.input || {};
                   if (block.name === 'Agent')
-                    return <AgentSubagentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} hasResult={!isLast} />;
+                    return (
+                      <AgentSubagentView
+                        key={block.id || block.name}
+                        toolInput={toolInput}
+                        permissionMode={permissionMode}
+                        hasResult={!isLast}
+                      />
+                    );
                   if (block.name === 'Edit')
-                    return <EditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
+                    return (
+                      <EditDiffView
+                        key={block.id || block.name}
+                        toolInput={toolInput}
+                        permissionMode={permissionMode}
+                      />
+                    );
                   if (block.name === 'MultiEdit')
-                    return <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
+                    return (
+                      <MultiEditDiffView
+                        key={block.id || block.name}
+                        toolInput={toolInput}
+                        permissionMode={permissionMode}
+                      />
+                    );
                   if (block.name === 'Write')
-                    return <WriteContentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
+                    return (
+                      <WriteContentView
+                        key={block.id || block.name}
+                        toolInput={toolInput}
+                        permissionMode={permissionMode}
+                      />
+                    );
                   return (
                     <ToolUseMessage
                       key={block.id || block.name}
@@ -310,19 +363,40 @@ export function ChatMessage({
                   {toolUseBlocks.map((block) => {
                     const toolInput = block.input || {};
                     if (block.name === 'Agent') {
-                      return <AgentSubagentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} hasResult={!isLast} />;
+                      return (
+                        <AgentSubagentView
+                          key={block.id || block.name}
+                          toolInput={toolInput}
+                          permissionMode={permissionMode}
+                          hasResult={!isLast}
+                        />
+                      );
                     }
                     if (block.name === 'Edit') {
-                      return <EditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />;
+                      return (
+                        <EditDiffView
+                          key={block.id || block.name}
+                          toolInput={toolInput}
+                          permissionMode={permissionMode}
+                        />
+                      );
                     }
                     if (block.name === 'MultiEdit') {
                       return (
-                        <MultiEditDiffView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />
+                        <MultiEditDiffView
+                          key={block.id || block.name}
+                          toolInput={toolInput}
+                          permissionMode={permissionMode}
+                        />
                       );
                     }
                     if (block.name === 'Write') {
                       return (
-                        <WriteContentView key={block.id || block.name} toolInput={toolInput} permissionMode={permissionMode} />
+                        <WriteContentView
+                          key={block.id || block.name}
+                          toolInput={toolInput}
+                          permissionMode={permissionMode}
+                        />
                       );
                     }
                     return (
@@ -383,11 +457,7 @@ export function ChatMessage({
 
   if (type === 'tool_use') {
     return (
-      <ToolApprovalInline
-        content={content}
-        permissionMode={permissionMode}
-        onDeny={onStopChat}
-      />
+      <ToolApprovalInline content={content} permissionMode={permissionMode} onDeny={onStopChat} />
     );
   }
 

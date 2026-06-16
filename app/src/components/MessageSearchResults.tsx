@@ -10,7 +10,9 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="rounded-sm bg-yellow-400/30 text-foreground">{text.slice(idx, idx + query.length)}</mark>
+      <mark className="rounded-sm bg-yellow-400/30 text-foreground">
+        {text.slice(idx, idx + query.length)}
+      </mark>
       {text.slice(idx + query.length)}
     </>
   );
@@ -37,7 +39,9 @@ export function MessageSearchResults({ results, query, loading }: MessageSearchR
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
         <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
-        <p className="text-sm text-muted-foreground">Type at least 2 characters to search messages across all chats</p>
+        <p className="text-sm text-muted-foreground">
+          Type at least 2 characters to search messages across all chats
+        </p>
       </div>
     );
   }
@@ -47,7 +51,7 @@ export function MessageSearchResults({ results, query, loading }: MessageSearchR
       <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
         <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
         <p className="text-sm text-muted-foreground">
-          No messages match <span className="font-medium">"{query}"</span>
+          No messages match <span className="font-medium">&quot;{query}&quot;</span>
         </p>
       </div>
     );

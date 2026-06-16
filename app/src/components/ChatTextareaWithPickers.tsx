@@ -1,5 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Loader2, Send, Square, Plus, FolderOpen, Pause, Play, Mic, ArrowUp, X } from 'lucide-react';
+import {
+  Loader2,
+  Send,
+  Square,
+  Plus,
+  FolderOpen,
+  Pause,
+  Play,
+  Mic,
+  ArrowUp,
+  X,
+} from 'lucide-react';
 import { ChatOcrMenu } from './ChatOcrMenu';
 import { toast } from 'sonner';
 import { Button } from '@allsetlabs/forge/components/ui/button';
@@ -225,7 +236,9 @@ export function ChatTextareaWithPickers({
             ref={filePickerRef}
             items={fileIntellisenseFiles}
             filter={fileIntellisenseFilter}
-            open={fileIntellisenseOpen && !fileIntellisenseLoading && fileIntellisenseFiles.length > 0}
+            open={
+              fileIntellisenseOpen && !fileIntellisenseLoading && fileIntellisenseFiles.length > 0
+            }
             loading={fileIntellisenseLoading}
             loadingMore={fileIntellisenseLoadingMore}
             hasMore={fileIntellisenseHasMore}
@@ -307,7 +320,7 @@ export function ChatTextareaWithPickers({
                     : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
               }
               rows={2}
-              className="w-full resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:outline-none"
+              className="w-full resize-none border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0"
               style={{ overflow: 'auto' }}
             />
             {/* Interim voice transcript preview */}
@@ -368,7 +381,10 @@ export function ChatTextareaWithPickers({
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                    onMouseDown={(e) => { e.preventDefault(); onInputChange(''); }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onInputChange('');
+                    }}
                     title="Clear text"
                   >
                     <X className="h-4 w-4" />
@@ -383,7 +399,7 @@ export function ChatTextareaWithPickers({
                       onClick={isPaused ? onResume : onPause}
                       disabled={interrupting}
                       size="icon"
-                      className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'bg-warning text-warning-foreground hover:bg-warning/90'}`}
+                      className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-warning-foreground bg-warning hover:bg-warning/90'}`}
                     >
                       {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                     </Button>
@@ -401,7 +417,10 @@ export function ChatTextareaWithPickers({
                   <Button
                     onClick={onQueue}
                     disabled={
-                      (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
+                      (!input.trim() && readyFiles.length === 0) ||
+                      sending ||
+                      anyUploading ||
+                      interrupting
                     }
                     size="icon"
                     className="h-8 w-8 bg-secondary text-secondary-foreground hover:bg-secondary/80 disabled:bg-muted disabled:text-muted-foreground"
@@ -413,7 +432,10 @@ export function ChatTextareaWithPickers({
                 <Button
                   onClick={onSend}
                   disabled={
-                    (!input.trim() && readyFiles.length === 0) || sending || anyUploading || interrupting
+                    (!input.trim() && readyFiles.length === 0) ||
+                    sending ||
+                    anyUploading ||
+                    interrupting
                   }
                   size="icon"
                   className="h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"

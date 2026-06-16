@@ -92,12 +92,12 @@ export function ClaudeMdDrawer({ open, onOpenChange, workingDirectory }: ClaudeM
                 placeholder="# Project Instructions&#10;&#10;Describe coding conventions, architecture, and rules for this project..."
                 className="min-h-[300px] font-mono text-sm"
               />
-              <Button
-                onClick={handleSave}
-                disabled={saving || !hasChanges}
-                className="gap-2"
-              >
-                {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              <Button onClick={handleSave} disabled={saving || !hasChanges} className="gap-2">
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
                 {exists ? 'Save Changes' : 'Create CLAUDE.md'}
               </Button>
             </>

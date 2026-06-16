@@ -18,7 +18,15 @@ const CACHE_TTL_MS = 10_000;
 
 const dirCache = new Map<string, { files: FileItem[]; timestamp: number }>();
 
-const SKIP_DIRS = new Set(['node_modules', '.git', '.next', 'dist', 'build', '__pycache__', '.cache']);
+const SKIP_DIRS = new Set([
+  'node_modules',
+  '.git',
+  '.next',
+  'dist',
+  'build',
+  '__pycache__',
+  '.cache',
+]);
 
 function listFilesRecursive(baseDir: string, currentDir: string, maxDepth: number): string[] {
   if (maxDepth <= 0) return [];
@@ -198,7 +206,11 @@ filesRouter.get('/read', (req, res) => {
 // PUT /api/files/write — write file contents
 filesRouter.put('/write', (req, res) => {
   try {
-    const { path: filePath, content, workingDir } = req.body as {
+    const {
+      path: filePath,
+      content,
+      workingDir,
+    } = req.body as {
       path: string;
       content: string;
       workingDir?: string;

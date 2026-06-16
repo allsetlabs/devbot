@@ -45,7 +45,12 @@ export function WorkingDirectories() {
           <Button variant="ghost" size="icon" onClick={openNav}>
             <span className="sr-only">Menu</span>
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </Button>
           <div className="flex items-center gap-2">
@@ -53,7 +58,15 @@ export function WorkingDirectories() {
             <h1 className="text-lg font-semibold text-foreground">Working Directories</h1>
           </div>
         </div>
-        <Button variant="default" size="sm" onClick={() => { setAddOpen(true); setError(''); setNewPath(''); }}>
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => {
+            setAddOpen(true);
+            setError('');
+            setNewPath('');
+          }}
+        >
           <Plus className="mr-1 h-4 w-4" />
           Add Directory
         </Button>
@@ -92,10 +105,20 @@ export function WorkingDirectories() {
                 </p>
               </div>
               <div className="flex gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => setAddOpen(false)} className="flex-1" disabled={createMutation.isPending}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAddOpen(false)}
+                  className="flex-1"
+                  disabled={createMutation.isPending}
+                >
                   Cancel
                 </Button>
-                <Button type="submit" className="flex-1" disabled={createMutation.isPending || !newPath.trim()}>
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={createMutation.isPending || !newPath.trim()}
+                >
                   {createMutation.isPending ? 'Adding...' : 'Add'}
                 </Button>
               </div>
@@ -107,16 +130,20 @@ export function WorkingDirectories() {
       {/* Directory list */}
       <main className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12 text-muted-foreground">Loading...</div>
+          <div className="flex items-center justify-center py-12 text-muted-foreground">
+            Loading...
+          </div>
         ) : dirs.length === 0 ? (
-          <div className="flex items-center justify-center py-12 text-muted-foreground">No working directories</div>
+          <div className="flex items-center justify-center py-12 text-muted-foreground">
+            No working directories
+          </div>
         ) : (
           <div className="divide-y divide-border">
             {dirs.map((dir) => (
               <div key={dir.id} className="flex items-center gap-3 px-4 py-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="break-all text-sm font-medium text-foreground">{dir.path}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate text-sm font-medium text-foreground">{dir.path}</span>
                     {dir.isDefault && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                         <Shield className="h-3 w-3" />
@@ -130,9 +157,7 @@ export function WorkingDirectories() {
                       </span>
                     )}
                   </div>
-                  {dir.label && (
-                    <p className="mt-0.5 text-xs text-muted-foreground">{dir.label}</p>
-                  )}
+                  {dir.label && <p className="mt-0.5 text-xs text-muted-foreground">{dir.label}</p>}
                 </div>
                 {!dir.isDefault && (
                   <Button

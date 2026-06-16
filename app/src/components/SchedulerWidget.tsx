@@ -43,7 +43,8 @@ export function SchedulerWidget({ tasks }: { tasks: ScheduledTask[] }) {
         {running.length > 0 && <span className="text-primary">{running.length} running now</span>}
         {nextRun?.nextRunAt && (
           <span className="truncate">
-            Next: {formatRelativeFuture(nextRun.nextRunAt)} ({formatInterval(nextRun.intervalMinutes)})
+            Next: {formatRelativeFuture(nextRun.nextRunAt)} (
+            {formatInterval(nextRun.intervalMinutes)})
           </span>
         )}
         {active.length === 0 && paused.length === 0 && <span>No tasks</span>}

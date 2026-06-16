@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState, useEffect } from 'react';
-// eslint-disable-next-line react-hooks/incompatible-library
+
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { MessageCircle, Search } from 'lucide-react';
 import { EmptyState } from './EmptyState';

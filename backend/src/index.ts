@@ -18,11 +18,11 @@ import { remotionVideosRouter } from './routes/remotion-videos.js';
 import { weatherRouter } from './routes/weather.js';
 import { commandsRouter } from './routes/commands.js';
 import { filesRouter } from './routes/files.js';
-import { workingDirectoriesRouter, seedDefaultWorkingDirectories } from './routes/working-directories.js';
+import {
+  workingDirectoriesRouter,
+  seedDefaultWorkingDirectories,
+} from './routes/working-directories.js';
 import { companiesRouter } from './routes/companies.js';
-import { mcpServersRouter } from './routes/mcp-servers.js';
-import { hooksRouter } from './routes/hooks.js';
-import { keybindingsRouter } from './routes/keybindings.js';
 import { gitStatusRouter } from './routes/git-status.js';
 import { memoriesRouter } from './routes/memories.js';
 import { claudeMdRouter } from './routes/claude-md.js';
@@ -84,7 +84,10 @@ app.get('/health', (_req, res) => {
 
 // Doctor — comprehensive backend diagnostics
 app.get('/api/doctor', (_req, res) => {
-  const checks: Record<string, { status: 'pass' | 'warn' | 'fail'; label: string; value?: string; detail?: string }> = {};
+  const checks: Record<
+    string,
+    { status: 'pass' | 'warn' | 'fail'; label: string; value?: string; detail?: string }
+  > = {};
 
   // Backend status
   const uptime = Math.floor(process.uptime());
@@ -92,14 +95,26 @@ app.get('/api/doctor', (_req, res) => {
   const m = Math.floor((uptime % 3600) / 60);
   const s = uptime % 60;
   const uptimeStr = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s}s` : `${s}s`;
-  checks.backend = { status: 'pass', label: 'Backend', value: 'Running', detail: `Uptime ${uptimeStr}` };
+  checks.backend = {
+    status: 'pass',
+    label: 'Backend',
+    value: 'Running',
+    detail: `Uptime ${uptimeStr}`,
+  };
 
   // Claude CLI version
   try {
-    const version = execSync('claude --version', { timeout: 3000, encoding: 'utf8' }).trim().split('\n')[0];
+    const version = execSync('claude --version', { timeout: 3000, encoding: 'utf8' })
+      .trim()
+      .split('\n')[0];
     checks.claudeCLI = { status: 'pass', label: 'Claude CLI', value: version };
   } catch {
-    checks.claudeCLI = { status: 'fail', label: 'Claude CLI', value: 'Not found', detail: 'claude CLI is not installed or not in PATH' };
+    checks.claudeCLI = {
+      status: 'fail',
+      label: 'Claude CLI',
+      value: 'Not found',
+      detail: 'claude CLI is not installed or not in PATH',
+    };
   }
 
   // Active sessions
@@ -116,12 +131,20 @@ app.get('/api/doctor', (_req, res) => {
       detail: DEVBOT_PROJECTS_DIR,
     };
   } catch {
-    checks.workingDirectory = { status: 'fail', label: 'Working Directory', value: 'Error', detail: DEVBOT_PROJECTS_DIR };
+    checks.workingDirectory = {
+      status: 'fail',
+      label: 'Working Directory',
+      value: 'Error',
+      detail: DEVBOT_PROJECTS_DIR,
+    };
   }
 
   // Disk space
   try {
-    const dfOut = execSync(`df -k "${DEVBOT_PROJECTS_DIR}" 2>/dev/null || df -k /`, { timeout: 3000, encoding: 'utf8' });
+    const dfOut = execSync(`df -k "${DEVBOT_PROJECTS_DIR}" 2>/dev/null || df -k /`, {
+      timeout: 3000,
+      encoding: 'utf8',
+    });
     const lines = dfOut.trim().split('\n');
     const parts = lines[lines.length - 1].trim().split(/\s+/);
     const totalKb = parseInt(parts[1], 10);
@@ -178,9 +201,6 @@ app.use('/api/commands', commandsRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
-app.use('/api/mcp-servers', mcpServersRouter);
-app.use('/api/hooks', hooksRouter);
-app.use('/api/keybindings', keybindingsRouter);
 app.use('/api/git-status', gitStatusRouter);
 app.use('/api/memories', memoriesRouter);
 app.use('/api/claude-md', claudeMdRouter);
@@ -189,10 +209,14 @@ app.use('/api/ocr', ocrRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
-app.use('/api/plugins/lawn-care', getLawnCareRouter({
-  generatePlan: async (_planId: string, profile: LawnProfile) => {
-    const addressParts = [profile.address, profile.city, profile.state, profile.zipCode].filter(Boolean);
-    const prompt = `You are a lawn care expert. Create a detailed annual lawn care plan for this property:
+app.use(
+  '/api/plugins/lawn-care',
+  getLawnCareRouter({
+    generatePlan: async (_planId: string, profile: LawnProfile) => {
+      const addressParts = [profile.address, profile.city, profile.state, profile.zipCode].filter(
+        Boolean
+      );
+      const prompt = `You are a lawn care expert. Create a detailed annual lawn care plan for this property:
 
 Address: ${addressParts.join(', ')}
 Grass Type: ${profile.grassType}
@@ -204,60 +228,77 @@ ${profile.notes ? `Special Notes: ${profile.notes}` : ''}
 
 Research the USDA climate zone for this zip code. Create a seasonal plan with 3-5 applications per year. For each application, recommend specific products available at Home Depot or Lowe's with real prices. Include spreader/sprayer settings specific to their equipment model. Calculate the per-application cost (product price divided by number of applications the bag covers for their lawn size).`;
 
-    const schema = {
-      name: 'lawn_care_plan',
-      schema: {
-        type: 'object',
-        required: ['summary', 'totalCost', 'store', 'applications'],
-        properties: {
-          summary: { type: 'string', description: 'Brief 1-2 sentence plan summary' },
-          totalCost: { type: 'number', description: 'Total annual cost' },
-          store: { type: 'string', description: 'Primary store for products' },
-          applications: {
-            type: 'array',
-            items: {
-              type: 'object',
-              required: ['order', 'date', 'name', 'description', 'product', 'amount', 'howToApply', 'applicationCost'],
-              properties: {
-                order: { type: 'number' },
-                date: { type: 'string', description: 'Date range like "Feb 28 – Mar 15"' },
-                name: { type: 'string', description: 'Short name like "Pre-Emergent + Fertilizer"' },
-                description: { type: 'string', description: 'Purpose of this application' },
-                product: { type: 'string', description: 'Specific product name' },
-                productUrl: { type: 'string', description: 'URL to product page' },
-                store: { type: 'string', description: 'Store name' },
-                productCovers: { type: 'number', description: 'Number of applications one bag covers for this lawn size' },
-                productPrice: { type: 'number', description: 'Full bag price' },
-                applicationCost: { type: 'number', description: 'Cost per application' },
-                howToApply: { type: 'string', description: 'Spreader/sprayer setting' },
-                walkingPace: { type: 'string' },
-                overlap: { type: 'string' },
-                amount: { type: 'string', description: 'Amount to apply' },
-                tips: { type: 'string' },
-                watering: { type: 'string', description: 'Watering instructions after application' },
-                warnings: { type: 'string', description: 'Important warnings' },
+      const schema = {
+        name: 'lawn_care_plan',
+        schema: {
+          type: 'object',
+          required: ['summary', 'totalCost', 'store', 'applications'],
+          properties: {
+            summary: { type: 'string', description: 'Brief 1-2 sentence plan summary' },
+            totalCost: { type: 'number', description: 'Total annual cost' },
+            store: { type: 'string', description: 'Primary store for products' },
+            applications: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: [
+                  'order',
+                  'date',
+                  'name',
+                  'description',
+                  'product',
+                  'amount',
+                  'howToApply',
+                  'applicationCost',
+                ],
+                properties: {
+                  order: { type: 'number' },
+                  date: { type: 'string', description: 'Date range like "Feb 28 – Mar 15"' },
+                  name: {
+                    type: 'string',
+                    description: 'Short name like "Pre-Emergent + Fertilizer"',
+                  },
+                  description: { type: 'string', description: 'Purpose of this application' },
+                  product: { type: 'string', description: 'Specific product name' },
+                  productUrl: { type: 'string', description: 'URL to product page' },
+                  store: { type: 'string', description: 'Store name' },
+                  productCovers: {
+                    type: 'number',
+                    description: 'Number of applications one bag covers for this lawn size',
+                  },
+                  productPrice: { type: 'number', description: 'Full bag price' },
+                  applicationCost: { type: 'number', description: 'Cost per application' },
+                  howToApply: { type: 'string', description: 'Spreader/sprayer setting' },
+                  walkingPace: { type: 'string' },
+                  overlap: { type: 'string' },
+                  amount: { type: 'string', description: 'Amount to apply' },
+                  tips: { type: 'string' },
+                  watering: {
+                    type: 'string',
+                    description: 'Watering instructions after application',
+                  },
+                  warnings: { type: 'string', description: 'Important warnings' },
+                },
               },
             },
           },
         },
-      },
-    };
+      };
 
-    return spawnClaudeStructured<LawnPlanData>({
-      prompt,
-      model: 'sonnet',
-      outputSchema: schema,
-      timeoutMs: 120_000,
-      maxTurns: 3,
-    });
-  },
-}));
+      return spawnClaudeStructured<LawnPlanData>({
+        prompt,
+        model: 'sonnet',
+        outputSchema: schema,
+        timeoutMs: 120_000,
+        maxTurns: 3,
+      });
+    },
+  })
+);
 
 // Start server (HTTPS if dev cert is present, otherwise plain HTTP)
 const devCert = loadDevCert();
-const httpServer = devCert
-  ? https.createServer(devCert, app)
-  : http.createServer(app);
+const httpServer = devCert ? https.createServer(devCert, app) : http.createServer(app);
 const scheme = devCert ? 'https' : 'http';
 
 const server = httpServer.listen(PORT, HOST, async () => {
@@ -314,4 +355,3 @@ const shutdown = () => {
 };
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
-

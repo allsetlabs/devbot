@@ -312,10 +312,19 @@ export function useStarChat() {
       await queryClient.cancelQueries({ queryKey: chatKeys.lists() });
       await queryClient.cancelQueries({ queryKey: chatKeys.archivedLists() });
       const patchChat = (c: InteractiveChat) => (c.id === id ? { ...c, starred } : c);
-      const prevLists = queryClient.getQueriesData<InteractiveChat[]>({ queryKey: chatKeys.lists() });
-      const prevArchived = queryClient.getQueriesData<InteractiveChat[]>({ queryKey: chatKeys.archivedLists() });
-      queryClient.setQueriesData<InteractiveChat[]>({ queryKey: chatKeys.lists() }, (prev) => prev?.map(patchChat));
-      queryClient.setQueriesData<InteractiveChat[]>({ queryKey: chatKeys.archivedLists() }, (prev) => prev?.map(patchChat));
+      const prevLists = queryClient.getQueriesData<InteractiveChat[]>({
+        queryKey: chatKeys.lists(),
+      });
+      const prevArchived = queryClient.getQueriesData<InteractiveChat[]>({
+        queryKey: chatKeys.archivedLists(),
+      });
+      queryClient.setQueriesData<InteractiveChat[]>({ queryKey: chatKeys.lists() }, (prev) =>
+        prev?.map(patchChat)
+      );
+      queryClient.setQueriesData<InteractiveChat[]>(
+        { queryKey: chatKeys.archivedLists() },
+        (prev) => prev?.map(patchChat)
+      );
       return { prevLists, prevArchived };
     },
     onError: (_err, _vars, context) => {

@@ -5,11 +5,7 @@ import { asyncHandler, sendBadRequest, sendNotFound } from '../lib/route-helpers
 
 const router = Router();
 
-const CLAUDE_PROJECTS_DIR = path.join(
-  process.env.HOME || '',
-  '.claude',
-  'projects'
-);
+const CLAUDE_PROJECTS_DIR = path.join(process.env.HOME || '', '.claude', 'projects');
 
 export interface MemoryFile {
   project: string;
@@ -25,7 +21,9 @@ export interface MemoriesResponse {
   basePath: string;
 }
 
-function parseMemoryFile(filePath: string): { name: string; description: string; type: string; content: string } | null {
+function parseMemoryFile(
+  filePath: string
+): { name: string; description: string; type: string; content: string } | null {
   try {
     const raw = fs.readFileSync(filePath, 'utf-8');
     const frontmatterMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);

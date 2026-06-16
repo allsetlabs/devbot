@@ -10,7 +10,14 @@ import { Button } from '@allsetlabs/forge/components/ui/button';
 import { api } from '../lib/api';
 import type { DoctorCheck, DoctorResponse } from '../types';
 
-const CHECK_ORDER = ['backend', 'claudeCLI', 'activeSessions', 'workingDirectory', 'diskSpace', 'memory'];
+const CHECK_ORDER = [
+  'backend',
+  'claudeCLI',
+  'activeSessions',
+  'workingDirectory',
+  'diskSpace',
+  'memory',
+];
 
 function StatusIcon({ status }: { status: DoctorCheck['status'] }) {
   if (status === 'pass') return <CheckCircle className="h-4 w-4 flex-shrink-0 text-success" />;
@@ -40,7 +47,9 @@ function CheckRow({ check }: { check: DoctorCheck }) {
           )}
         </div>
         {check.detail && (
-          <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">{check.detail}</p>
+          <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">
+            {check.detail}
+          </p>
         )}
       </div>
     </div>
@@ -80,9 +89,7 @@ export function DoctorDrawer({ open, onOpenChange }: DoctorDrawerProps) {
     onOpenChange(isOpen);
   };
 
-  const checks = data
-    ? CHECK_ORDER.map((key) => data.checks[key]).filter(Boolean)
-    : [];
+  const checks = data ? CHECK_ORDER.map((key) => data.checks[key]).filter(Boolean) : [];
   const failCount = checks.filter((c) => c.status === 'fail').length;
   const warnCount = checks.filter((c) => c.status === 'warn').length;
   const allPass = failCount === 0 && warnCount === 0;

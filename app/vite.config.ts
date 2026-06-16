@@ -21,18 +21,12 @@ export default defineConfig(() => {
           __dirname,
           '../plugins/baby-logs/frontend'
         ),
-        '@devbot/plugin-baby-logs/backend': path.resolve(
-          __dirname,
-          '../plugins/baby-logs/backend'
-        ),
+        '@devbot/plugin-baby-logs/backend': path.resolve(__dirname, '../plugins/baby-logs/backend'),
         '@devbot/plugin-lawn-care/frontend': path.resolve(
           __dirname,
           '../plugins/lawn-care/frontend'
         ),
-        '@devbot/plugin-lawn-care/backend': path.resolve(
-          __dirname,
-          '../plugins/lawn-care/backend'
-        ),
+        '@devbot/plugin-lawn-care/backend': path.resolve(__dirname, '../plugins/lawn-care/backend'),
       },
       dedupe: ['react', 'react-dom'],
     },

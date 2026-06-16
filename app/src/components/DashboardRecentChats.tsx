@@ -56,9 +56,7 @@ export function DashboardRecentChats({ chats }: { chats: InteractiveChat[] }) {
                 <span className="truncate text-sm font-medium text-foreground">
                   {chat.name || 'Untitled'}
                 </span>
-                {chat.fastMode && (
-                  <Zap className="h-3 w-3 flex-shrink-0 text-warning" />
-                )}
+                {chat.fastMode && <Zap className="h-3 w-3 flex-shrink-0 text-warning" />}
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {chat.isRunning ? (

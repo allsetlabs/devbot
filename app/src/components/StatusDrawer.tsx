@@ -1,4 +1,4 @@
-import { Activity, Brain, Cpu, DollarSign, FolderOpen, Wrench, Zap } from 'lucide-react';
+import { Activity, Brain, Cpu, DollarSign, FolderOpen, Zap } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -18,7 +18,6 @@ interface StatusDrawerProps {
   contextLimit: number;
   totalCost: number;
   workingDir: string | null | undefined;
-  allowedTools: string[] | null | undefined;
   fastMode: boolean | undefined;
   effort: string | null | undefined;
 }
@@ -61,15 +60,12 @@ export function StatusDrawer({
   contextLimit,
   totalCost,
   workingDir,
-  allowedTools,
   fastMode,
   effort,
 }: StatusDrawerProps) {
   const modelInfo = model ? MODEL_CONFIG[model] : null;
   const modeInfo = permissionMode ? MODE_CONFIG[permissionMode] : null;
   const usagePct = contextLimit > 0 ? Math.round((totalTokens / contextLimit) * 100) : 0;
-  const toolLabel =
-    allowedTools && allowedTools.length > 0 ? `${allowedTools.length} tools` : 'All tools';
   const effortLabel = effort ? (EFFORT_LABELS[effort] ?? effort) : 'High (default)';
   const dir = workingDir ? workingDir.replace(/^\/Users\/[^/]+/, '~') : '—';
 
@@ -108,7 +104,6 @@ export function StatusDrawer({
               value={totalCost > 0 ? `$${totalCost.toFixed(4)}` : '$0.0000'}
             />
             <StatusRow icon={FolderOpen} label="Working directory" value={dir} />
-            <StatusRow icon={Wrench} label="Active tools" value={toolLabel} />
             <StatusRow
               icon={Zap}
               label="Fast mode"

@@ -14,9 +14,7 @@ export function NavProvider({ children }: { children: ReactNode }) {
   const closeNav = useCallback(() => setIsNavOpen(false), []);
 
   return (
-    <NavContext.Provider value={{ isNavOpen, openNav, closeNav }}>
-      {children}
-    </NavContext.Provider>
+    <NavContext.Provider value={{ isNavOpen, openNav, closeNav }}>{children}</NavContext.Provider>
   );
 }
 

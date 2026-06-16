@@ -39,9 +39,7 @@ export async function startXtermWs(port: number, tmuxSessionName: string): Promi
   return new Promise((resolve, reject) => {
     try {
       const devCert = loadDevCert();
-      const httpServer = devCert
-        ? https.createServer(devCert)
-        : http.createServer();
+      const httpServer = devCert ? https.createServer(devCert) : http.createServer();
       const wss = new WebSocketServer({ server: httpServer });
 
       const session: XtermSession = {

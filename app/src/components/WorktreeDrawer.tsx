@@ -129,7 +129,9 @@ export function WorktreeDrawer({ open, onOpenChange, workingDirectory }: Worktre
                 <GitBranch className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{wt.branch || '(detached)'}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {wt.branch || '(detached)'}
+                    </p>
                     {wt.isMain && (
                       <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                         main
@@ -190,11 +192,7 @@ export function WorktreeDrawer({ open, onOpenChange, workingDirectory }: Worktre
                 >
                   {adding ? 'Creating...' : 'Create Worktree'}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAddForm(false)}
-                >
+                <Button variant="outline" size="sm" onClick={() => setShowAddForm(false)}>
                   Cancel
                 </Button>
               </div>

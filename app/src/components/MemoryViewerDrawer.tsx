@@ -1,5 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Brain, Trash2, AlertCircle, ChevronDown, ChevronRight, Pencil, X, Check } from 'lucide-react';
+import {
+  Brain,
+  Trash2,
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+  Pencil,
+  X,
+  Check,
+} from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
   Drawer,
@@ -141,10 +150,7 @@ export function MemoryViewerDrawer({ open, onOpenChange }: MemoryViewerDrawerPro
                   const isEditing = editingKey === key;
 
                   return (
-                    <div
-                      key={key}
-                      className="rounded-lg border border-border bg-card"
-                    >
+                    <div key={key} className="rounded-lg border border-border bg-card">
                       <button
                         type="button"
                         className="flex w-full items-start gap-2 p-3 text-left"
@@ -161,7 +167,9 @@ export function MemoryViewerDrawer({ open, onOpenChange }: MemoryViewerDrawerPro
                               {m.name || m.filename}
                             </p>
                             {m.type && (
-                              <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TYPE_COLORS[m.type] || 'bg-muted text-muted-foreground'}`}>
+                              <span
+                                className={`inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TYPE_COLORS[m.type] || 'bg-muted text-muted-foreground'}`}
+                              >
                                 {m.type}
                               </span>
                             )}

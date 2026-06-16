@@ -115,7 +115,6 @@ export const interactive_chats = sqliteTable('interactive_chats', {
     .default('sonnet'),
   system_prompt: text('system_prompt'),
   is_executing: integer('is_executing', { mode: 'boolean' }).notNull().default(false),
-  max_turns: integer('max_turns'),
   archived_at: text('archived_at'),
   created_by: text('created_by').notNull().default('user'),
   created_at: text('created_at')

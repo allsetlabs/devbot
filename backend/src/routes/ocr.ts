@@ -56,10 +56,7 @@ const upload = multer({
 // GET / — list all OCR documents newest first
 router.get('/', async (_req, res) => {
   try {
-    const docs = await coreDb
-      .select()
-      .from(ocr_documents)
-      .orderBy(desc(ocr_documents.created_at));
+    const docs = await coreDb.select().from(ocr_documents).orderBy(desc(ocr_documents.created_at));
     res.json(docs);
   } catch (error) {
     sendInternalError(res, error, 'list OCR documents');

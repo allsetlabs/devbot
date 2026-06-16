@@ -34,14 +34,24 @@ router.get(
     try {
       await execFileAsync('git', ['rev-parse', '--git-dir'], opts);
     } catch {
-      res.json({ isGitRepo: false, branch: null, dirtyCount: 0, ahead: 0, behind: 0 } satisfies GitStatusResponse);
+      res.json({
+        isGitRepo: false,
+        branch: null,
+        dirtyCount: 0,
+        ahead: 0,
+        behind: 0,
+      } satisfies GitStatusResponse);
       return;
     }
 
     const [branchResult, statusResult, aheadBehindResult] = await Promise.all([
       execFileAsync('git', ['branch', '--show-current'], opts).catch(() => ({ stdout: '' })),
       execFileAsync('git', ['status', '--porcelain'], opts).catch(() => ({ stdout: '' })),
-      execFileAsync('git', ['rev-list', '--left-right', '--count', '@{upstream}...HEAD'], opts).catch(() => ({ stdout: '' })),
+      execFileAsync(
+        'git',
+        ['rev-list', '--left-right', '--count', '@{upstream}...HEAD'],
+        opts
+      ).catch(() => ({ stdout: '' })),
     ]);
 
     const branch = branchResult.stdout.trim() || 'HEAD';

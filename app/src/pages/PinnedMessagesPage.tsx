@@ -81,9 +81,7 @@ export function PinnedMessagesPage() {
     setGroups((prev) =>
       prev
         .map((g) =>
-          g.chatId === chatId
-            ? { ...g, messages: g.messages.filter((m) => m.id !== messageId) }
-            : g
+          g.chatId === chatId ? { ...g, messages: g.messages.filter((m) => m.id !== messageId) } : g
         )
         .filter((g) => g.messages.length > 0)
     );
@@ -152,7 +150,11 @@ export function PinnedMessagesPage() {
 
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="font-medium">
-                          {msg.type === 'user' ? 'You' : msg.type === 'assistant' ? 'Assistant' : msg.type}
+                          {msg.type === 'user'
+                            ? 'You'
+                            : msg.type === 'assistant'
+                              ? 'Assistant'
+                              : msg.type}
                         </span>
                         {msg.createdAt && (
                           <span>

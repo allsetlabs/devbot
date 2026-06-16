@@ -1,4 +1,16 @@
-import { Settings, Share2, ScrollText, HelpCircle, Terminal, Archive, Trash2, Star, Server, Webhook, Brain, FileText, FolderTree, Keyboard } from 'lucide-react';
+import {
+  Settings,
+  Share2,
+  ScrollText,
+  HelpCircle,
+  Terminal,
+  Archive,
+  Trash2,
+  Star,
+  Brain,
+  FileText,
+  FolderTree,
+} from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -28,12 +40,9 @@ interface SettingsDrawerProps {
   onDelete?: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
-  onMcpServers?: () => void;
-  onHooks?: () => void;
   onMemories?: () => void;
   onClaudeMd?: () => void;
   onWorktrees?: () => void;
-  onKeybindings?: () => void;
 }
 
 export function SettingsDrawer({
@@ -55,12 +64,9 @@ export function SettingsDrawer({
   onDelete,
   isFavorite = false,
   onToggleFavorite,
-  onMcpServers,
-  onHooks,
   onMemories,
   onClaudeMd,
   onWorktrees,
-  onKeybindings,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -122,37 +128,9 @@ export function SettingsDrawer({
             )}
           </div>
 
-          {/* MCP Servers, Hooks, Memories & CLAUDE.md */}
-          {(onMcpServers || onHooks || onMemories || onClaudeMd || onWorktrees || onKeybindings) && (
+          {/* Memories, CLAUDE.md & Worktrees */}
+          {(onMemories || onClaudeMd || onWorktrees) && (
             <div className="flex flex-wrap gap-2">
-              {onMcpServers && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-2"
-                  onClick={() => {
-                    onOpenChange(false);
-                    setTimeout(() => onMcpServers(), 300);
-                  }}
-                >
-                  <Server className="h-4 w-4" />
-                  MCP Servers
-                </Button>
-              )}
-              {onHooks && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-2"
-                  onClick={() => {
-                    onOpenChange(false);
-                    setTimeout(() => onHooks(), 300);
-                  }}
-                >
-                  <Webhook className="h-4 w-4" />
-                  Hooks
-                </Button>
-              )}
               {onMemories && (
                 <Button
                   variant="outline"
@@ -193,20 +171,6 @@ export function SettingsDrawer({
                 >
                   <FolderTree className="h-4 w-4" />
                   Worktrees
-                </Button>
-              )}
-              {onKeybindings && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-2"
-                  onClick={() => {
-                    onOpenChange(false);
-                    setTimeout(() => onKeybindings(), 300);
-                  }}
-                >
-                  <Keyboard className="h-4 w-4" />
-                  Keybindings
                 </Button>
               )}
             </div>

@@ -60,9 +60,7 @@ export function CompanyView() {
           <h1 className="truncate font-semibold text-foreground">
             {company?.name ?? 'Loading...'}
           </h1>
-          {company && (
-            <p className="truncate text-xs text-muted-foreground">{company.directory}</p>
-          )}
+          {company && <p className="truncate text-xs text-muted-foreground">{company.directory}</p>}
         </div>
         <Button
           variant="outline"
@@ -89,10 +87,7 @@ export function CompanyView() {
       {/* Chat Messages */}
       <main className="flex-1 overflow-y-auto">
         {company?.masterChatId ? (
-          <MessageList
-            messages={taskMessages}
-            isRunning={masterChat?.isRunning ?? false}
-          />
+          <MessageList messages={taskMessages} isRunning={masterChat?.isRunning ?? false} />
         ) : (
           <div className="flex h-full items-center justify-center">
             <div className="text-muted-foreground">Setting up company...</div>

@@ -38,7 +38,9 @@ export function ThinkingBlock({ thinking }: { thinking: string }) {
         {!expanded && (
           <>
             <span className="truncate text-[10px] italic text-muted-foreground/70">{summary}</span>
-            <span className="flex-shrink-0 text-[10px] text-muted-foreground">({wordCount} words)</span>
+            <span className="flex-shrink-0 text-[10px] text-muted-foreground">
+              ({wordCount} words)
+            </span>
           </>
         )}
       </Button>

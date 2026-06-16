@@ -176,8 +176,12 @@ export function RemotionVideos() {
                 key={video.id}
                 video={video}
                 onPlay={handlePlay}
-                onEdit={(chatId) => { if (chatId) navigate(`/chat/${chatId}`); }}
-                onDelete={(id) => { if (!id.startsWith('local__')) deleteMutation.mutate(id); }}
+                onEdit={(chatId) => {
+                  if (chatId) navigate(`/chat/${chatId}`);
+                }}
+                onDelete={(id) => {
+                  if (!id.startsWith('local__')) deleteMutation.mutate(id);
+                }}
               />
             ))}
           </div>

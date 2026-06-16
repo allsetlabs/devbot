@@ -71,13 +71,22 @@ async function processQueue(): Promise<void> {
         if (success) break;
         if (attempt < maxRetries) {
           const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
-          console.log(`[Scheduler] Task ${entry.task.id} failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          console.log(
+            `[Scheduler] Task ${entry.task.id} failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`
+          );
           await new Promise((resolve) => setTimeout(resolve, delay));
-          const freshTask = coreDb.select().from(scheduled_tasks).where(eq(scheduled_tasks.id, entry.task.id)).get();
+          const freshTask = coreDb
+            .select()
+            .from(scheduled_tasks)
+            .where(eq(scheduled_tasks.id, entry.task.id))
+            .get();
           if (freshTask) entry.task = freshTask;
         }
       } catch (error) {
-        console.error(`[Scheduler] Queue execution error for ${entry.task.id} (attempt ${attempt + 1}):`, error);
+        console.error(
+          `[Scheduler] Queue execution error for ${entry.task.id} (attempt ${attempt + 1}):`,
+          error
+        );
         if (attempt >= maxRetries) break;
         const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -92,7 +101,12 @@ async function processQueue(): Promise<void> {
 /**
  * Create a chat session for a scheduler run.
  */
-function createSchedulerChat(task: ScheduledTaskRow, runIndex: number, model: 'opus' | 'sonnet' | 'haiku' = 'sonnet', workingDir?: string): string | null {
+function createSchedulerChat(
+  task: ScheduledTaskRow,
+  runIndex: number,
+  model: 'opus' | 'sonnet' | 'haiku' = 'sonnet',
+  workingDir?: string
+): string | null {
   const taskName = task.name || 'Scheduler';
   const chatId = uuidv4().slice(0, 8);
   const chatName = `${taskName} #${runIndex}`;

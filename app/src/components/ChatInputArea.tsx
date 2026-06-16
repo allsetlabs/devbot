@@ -58,8 +58,6 @@ interface ChatInputAreaProps {
   onOpenModeDrawer: () => void;
   onOpenModelDrawer: () => void;
   onOpenEffort: () => void;
-  onOpenAllowedTools: () => void;
-  onOpenMaxTurns?: (currentMaxTurns: number | null) => void;
   onQueue?: () => void;
   onOcrText?: (text: string) => void;
   queuedMessages?: QueuedMessage[];
@@ -106,8 +104,6 @@ export function ChatInputArea({
   onOpenModeDrawer,
   onOpenModelDrawer,
   onOpenEffort,
-  onOpenAllowedTools,
-  onOpenMaxTurns,
   onQueue,
   onOcrText,
   queuedMessages,
@@ -137,7 +133,7 @@ export function ChatInputArea({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 text-muted-foreground transition-opacity hover:text-primary opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                className="h-6 w-6 text-muted-foreground opacity-100 transition-opacity hover:text-primary md:opacity-0 md:group-hover:opacity-100"
                 onClick={onSendAllQueued}
                 title={`Send ${queuedMessages.length} queued message${queuedMessages.length !== 1 ? 's' : ''} immediately`}
               >
@@ -152,9 +148,7 @@ export function ChatInputArea({
               className="group/chip flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-1.5 text-xs"
             >
               <Clock className="h-3 w-3 shrink-0 text-muted-foreground" />
-              <span className="min-w-0 flex-1 truncate text-secondary-foreground">
-                {qm.prompt}
-              </span>
+              <span className="min-w-0 flex-1 truncate text-secondary-foreground">{qm.prompt}</span>
               {onRemoveQueued && (
                 <Button
                   variant="ghost"
@@ -216,8 +210,6 @@ export function ChatInputArea({
         onOpenModeDrawer={onOpenModeDrawer}
         onOpenModelDrawer={onOpenModelDrawer}
         onOpenEffort={onOpenEffort}
-        onOpenAllowedTools={onOpenAllowedTools}
-        onOpenMaxTurns={onOpenMaxTurns}
       />
     </div>
   );

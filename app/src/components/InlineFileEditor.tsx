@@ -3,16 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import {
-  X,
-  Pencil,
-  Save,
-  Loader2,
-  FileText,
-  Copy,
-  Check,
-  RotateCcw,
-} from 'lucide-react';
+import { X, Pencil, Save, Loader2, FileText, Copy, Check, RotateCcw } from 'lucide-react';
 import { api } from '../lib/api';
 
 interface InlineFileEditorProps {
@@ -129,12 +120,7 @@ export function InlineFileEditor({ filePath, workingDir, onClose }: InlineFileEd
           )}
           {editing && (
             <>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={cancelEditing}
-                title="Cancel editing"
-              >
+              <Button variant="ghost" size="icon-sm" onClick={cancelEditing} title="Cancel editing">
                 <RotateCcw className="h-3.5 w-3.5" />
               </Button>
               <Button
@@ -174,7 +160,10 @@ export function InlineFileEditor({ filePath, workingDir, onClose }: InlineFileEd
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             className="w-full resize-none bg-[#282c34] p-4 font-mono text-xs leading-relaxed text-[#abb2bf] outline-none"
-            style={{ minHeight: '200px', height: `${Math.min(320, Math.max(200, editContent.split('\n').length * 18))}px` }}
+            style={{
+              minHeight: '200px',
+              height: `${Math.min(320, Math.max(200, editContent.split('\n').length * 18))}px`,
+            }}
             spellCheck={false}
           />
         ) : (

@@ -51,9 +51,13 @@ Every table MUST include:
 
 ```ts
 created_by: text('created_by').notNull().default('user');
-created_at: text('created_at').notNull().$defaultFn(() => new Date().toISOString());
+created_at: text('created_at')
+  .notNull()
+  .$defaultFn(() => new Date().toISOString());
 updated_by: text('updated_by').notNull().default('user');
-updated_at: text('updated_at').notNull().$defaultFn(() => new Date().toISOString());
+updated_at: text('updated_at')
+  .notNull()
+  .$defaultFn(() => new Date().toISOString());
 settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({});
 ```
 
@@ -74,6 +78,7 @@ settings: { model: 'sonnet', temperature: 0.7 }
 **Table naming:** All plugin tables MUST be prefixed with `{plugin_name}_` (e.g., `baby_logs_logs`, `lawn_care_plans`).
 
 **Structure:**
+
 ```
 plugins/{plugin-name}/
 ├── src/
@@ -87,6 +92,7 @@ plugins/{plugin-name}/
 ```
 
 **Router factory pattern:**
+
 ```ts
 export default function getBabyLogsRouter(db: DrizzleInstance): Router {
   const router = Router();
@@ -96,6 +102,7 @@ export default function getBabyLogsRouter(db: DrizzleInstance): Router {
 ```
 
 Plugin registration in backend `index.ts`:
+
 ```ts
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
 ```
@@ -103,6 +110,7 @@ app.use('/api/plugins/baby-logs', getBabyLogsRouter());
 ### Mutation Best Practices
 
 Always set `created_by`/`updated_by` to identify the source on insert/update:
+
 ```ts
 await db.insert(table).values({ ..., created_by: 'user', updated_by: 'user', settings: {} });
 await db.update(table).set({ updated_by: 'AI' }).where(eq(table.id, id));

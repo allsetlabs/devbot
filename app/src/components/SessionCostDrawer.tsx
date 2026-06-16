@@ -1,4 +1,12 @@
-import { Coins, ArrowDownToLine, ArrowUpFromLine, Database, Clock, Repeat, Zap } from 'lucide-react';
+import {
+  Coins,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Database,
+  Clock,
+  Repeat,
+  Zap,
+} from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
@@ -26,7 +34,11 @@ interface SessionCostDrawerProps {
 export function SessionCostDrawer({ open, onOpenChange, stats }: SessionCostDrawerProps) {
   const cacheHitRate =
     stats.inputTokens > 0
-      ? Math.round((stats.cacheReadTokens / (stats.inputTokens + stats.cacheReadTokens + stats.cacheCreationTokens)) * 100)
+      ? Math.round(
+          (stats.cacheReadTokens /
+            (stats.inputTokens + stats.cacheReadTokens + stats.cacheCreationTokens)) *
+            100
+        )
       : 0;
 
   return (
@@ -65,7 +77,9 @@ export function SessionCostDrawer({ open, onOpenChange, stats }: SessionCostDraw
           </div>
 
           {/* Token breakdown */}
-          <h3 className="mb-2 mt-5 text-xs font-semibold uppercase text-muted-foreground">Token Breakdown</h3>
+          <h3 className="mb-2 mt-5 text-xs font-semibold uppercase text-muted-foreground">
+            Token Breakdown
+          </h3>
           <div className="space-y-2">
             <BreakdownRow
               icon={<ArrowDownToLine className="h-3.5 w-3.5 text-green-500" />}
@@ -92,7 +106,9 @@ export function SessionCostDrawer({ open, onOpenChange, stats }: SessionCostDraw
           {/* Cache hit rate */}
           {stats.inputTokens > 0 && (
             <>
-              <h3 className="mb-2 mt-5 text-xs font-semibold uppercase text-muted-foreground">Cache Hit Rate</h3>
+              <h3 className="mb-2 mt-5 text-xs font-semibold uppercase text-muted-foreground">
+                Cache Hit Rate
+              </h3>
               <div className="flex items-center gap-3">
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
                   <div
@@ -123,7 +139,9 @@ export function SessionCostDrawer({ open, onOpenChange, stats }: SessionCostDraw
                         {formatTokens(turn.inputTokens + turn.outputTokens)} tok
                       </span>
                       {turn.costUsd > 0 && (
-                        <span className="font-medium text-foreground">{formatCost(turn.costUsd)}</span>
+                        <span className="font-medium text-foreground">
+                          {formatCost(turn.costUsd)}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -154,7 +172,9 @@ function StatCard({
         {icon}
         {label}
       </div>
-      <span className={`text-lg font-semibold ${highlight ? 'text-yellow-500' : 'text-foreground'}`}>
+      <span
+        className={`text-lg font-semibold ${highlight ? 'text-yellow-500' : 'text-foreground'}`}
+      >
         {value}
       </span>
     </div>

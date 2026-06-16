@@ -33,7 +33,8 @@ export function ChatWorkingDirDrawer({
         </DrawerHeader>
         <div className="px-4 pb-6">
           <p className="mb-4 text-sm text-muted-foreground">
-            Change the working directory for this chat session. Tools like Bash, Read, and Edit will operate relative to this directory.
+            Change the working directory for this chat session. Tools like Bash, Read, and Edit will
+            operate relative to this directory.
           </p>
           <WorkingDirSelector
             value={currentDir}

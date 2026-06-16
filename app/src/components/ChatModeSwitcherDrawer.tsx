@@ -41,7 +41,7 @@ export function ChatModeSwitcherDrawer({
                 <Button
                   key={mode}
                   variant="ghost"
-                  className={`h-auto flex items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'} ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
+                  className={`flex h-auto items-start justify-start gap-3 rounded-lg border p-4 text-left transition-colors ${config.borderColor} ${isCurrentMode ? `${config.bgColor} ring-2 ring-offset-1 ring-offset-background` : 'active:bg-muted/50'} ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
                   onClick={() => {
                     if (isCurrentMode) {
                       onOpenChange(false);
@@ -58,7 +58,9 @@ export function ChatModeSwitcherDrawer({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className={`truncate text-sm font-semibold ${config.color}`}>{config.label}</p>
+                      <p className={`truncate text-sm font-semibold ${config.color}`}>
+                        {config.label}
+                      </p>
                       {isCurrentMode && (
                         <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
                           Current

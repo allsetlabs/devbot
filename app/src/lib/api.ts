@@ -26,9 +26,6 @@ import type {
   Company,
   FeedbackDocument,
   FileBrowseItem,
-  McpServerConfig,
-  McpServersResponse,
-  HooksResponse,
   MemoriesResponse,
   GitStatus,
   MessageSearchResult,
@@ -151,7 +148,9 @@ export const api = {
     return fetchApi('/api/interactive-chats/types');
   },
 
-  fetchPinnedMessages: (pins: { chatId: string; messageIds: string[] }[]): Promise<{ chatId: string; chatName: string; messages: ChatMessage[] }[]> => {
+  fetchPinnedMessages: (
+    pins: { chatId: string; messageIds: string[] }[]
+  ): Promise<{ chatId: string; chatName: string; messages: ChatMessage[] }[]> => {
     return fetchApi('/api/interactive-chats/pinned-messages', {
       method: 'POST',
       body: JSON.stringify({ pins }),
@@ -175,7 +174,6 @@ export const api = {
     systemPrompt?: string;
     permissionMode?: PermissionMode;
     model?: ClaudeModel;
-    maxTurns?: number | null;
     workingDir?: string;
   }): Promise<InteractiveChat> => {
     return fetchApi('/api/interactive-chats', {
@@ -194,14 +192,22 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${id}`, { method: 'DELETE' });
   },
 
-  sendChatMessage: (chatId: string, prompt: string, branch?: string): Promise<{ success: boolean }> => {
+  sendChatMessage: (
+    chatId: string,
+    prompt: string,
+    branch?: string
+  ): Promise<{ success: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/send`, {
       method: 'POST',
       body: JSON.stringify({ prompt, branch }),
     });
   },
 
-  truncateMessagesAfter: (chatId: string, sequence: number, branch?: string): Promise<{ success: boolean }> => {
+  truncateMessagesAfter: (
+    chatId: string,
+    sequence: number,
+    branch?: string
+  ): Promise<{ success: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/truncate-after`, {
       method: 'POST',
       body: JSON.stringify({ sequence, branch }),
@@ -259,7 +265,12 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/branches`);
   },
 
-  createChatBranch: (chatId: string, fromSequence: number, branchName?: string, sourceBranch = 'main'): Promise<{ branchId: string; messagesCopied: number }> => {
+  createChatBranch: (
+    chatId: string,
+    fromSequence: number,
+    branchName?: string,
+    sourceBranch = 'main'
+  ): Promise<{ branchId: string; messagesCopied: number }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/branch`, {
       method: 'POST',
       body: JSON.stringify({ fromSequence, branchName, sourceBranch }),
@@ -318,13 +329,6 @@ export const api = {
     });
   },
 
-  changeChatMaxTurns: (id: string, maxTurns: number | null): Promise<InteractiveChat> => {
-    return fetchApi(`/api/interactive-chats/${id}/max-turns`, {
-      method: 'POST',
-      body: JSON.stringify({ maxTurns }),
-    });
-  },
-
   changeChatEffort: (id: string, effort: string | null): Promise<InteractiveChat> => {
     return fetchApi(`/api/interactive-chats/${id}/effort`, {
       method: 'POST',
@@ -335,13 +339,6 @@ export const api = {
   toggleChatFastMode: (id: string): Promise<InteractiveChat> => {
     return fetchApi(`/api/interactive-chats/${id}/fast-mode`, {
       method: 'POST',
-    });
-  },
-
-  changeChatAllowedTools: (id: string, allowedTools: string[] | null): Promise<InteractiveChat> => {
-    return fetchApi(`/api/interactive-chats/${id}/allowed-tools`, {
-      method: 'POST',
-      body: JSON.stringify({ allowedTools }),
     });
   },
 
@@ -374,7 +371,6 @@ export const api = {
     const blob = await api.exportChat(id, 'markdown');
     return blob.text();
   },
-
 
   // Event Timer (Birth Times) endpoints
   listEventTimerEntries: (): Promise<EventTimerEntry[]> => {
@@ -551,69 +547,15 @@ export const api = {
     return fetchApi(`/api/companies/${companyId}/feedback/${type}`);
   },
 
-  addCompanyFeedback: (companyId: string, type: 'user' | 'investor', prompt: string): Promise<FeedbackDocument> => {
+  addCompanyFeedback: (
+    companyId: string,
+    type: 'user' | 'investor',
+    prompt: string
+  ): Promise<FeedbackDocument> => {
     return fetchApi(`/api/companies/${companyId}/feedback/${type}`, {
       method: 'POST',
       body: JSON.stringify({ prompt }),
     });
-  },
-
-  // MCP servers endpoints
-  listMcpServers: (): Promise<McpServersResponse> => {
-    return fetchApi('/api/mcp-servers');
-  },
-
-  addMcpServer: (
-    name: string,
-    command: string,
-    args?: string[],
-    env?: Record<string, string>,
-    cwd?: string
-  ): Promise<{ success: boolean; name: string; config: McpServerConfig }> => {
-    return fetchApi('/api/mcp-servers', {
-      method: 'POST',
-      body: JSON.stringify({ name, command, args, env, cwd }),
-    });
-  },
-
-  deleteMcpServer: (name: string): Promise<{ success: boolean }> => {
-    return fetchApi(`/api/mcp-servers/${encodeURIComponent(name)}`, { method: 'DELETE' });
-  },
-
-  // Hooks endpoints
-  listHooks: (): Promise<HooksResponse> => {
-    return fetchApi('/api/hooks');
-  },
-
-  addHook: (
-    event: string,
-    matcher: string,
-    command: string
-  ): Promise<{ success: boolean }> => {
-    return fetchApi('/api/hooks', {
-      method: 'POST',
-      body: JSON.stringify({ event, matcher, command }),
-    });
-  },
-
-  deleteHook: (event: string, index: number): Promise<{ success: boolean }> => {
-    return fetchApi(`/api/hooks/${encodeURIComponent(event)}/${index}`, { method: 'DELETE' });
-  },
-
-  // Keybindings endpoints
-  listKeybindings: (): Promise<{ keybindings: Array<{ key: string; command: string; when?: string }>; path: string }> => {
-    return fetchApi('/api/keybindings');
-  },
-
-  addKeybinding: (key: string, command: string, when?: string): Promise<{ success: boolean }> => {
-    return fetchApi('/api/keybindings', {
-      method: 'POST',
-      body: JSON.stringify({ key, command, when }),
-    });
-  },
-
-  deleteKeybinding: (index: number): Promise<{ success: boolean }> => {
-    return fetchApi(`/api/keybindings/${index}`, { method: 'DELETE' });
   },
 
   // Memories endpoints
@@ -621,21 +563,33 @@ export const api = {
     return fetchApi('/api/memories');
   },
 
-  updateMemory: (project: string, filename: string, content: string): Promise<{ success: boolean }> => {
-    return fetchApi(`/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`, {
-      method: 'PUT',
-      body: JSON.stringify({ content }),
-    });
+  updateMemory: (
+    project: string,
+    filename: string,
+    content: string
+  ): Promise<{ success: boolean }> => {
+    return fetchApi(
+      `/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ content }),
+      }
+    );
   },
 
   deleteMemory: (project: string, filename: string): Promise<{ success: boolean }> => {
-    return fetchApi(`/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`, {
-      method: 'DELETE',
-    });
+    return fetchApi(
+      `/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`,
+      {
+        method: 'DELETE',
+      }
+    );
   },
 
   // CLAUDE.md endpoints
-  getClaudeMd: (dir: string): Promise<{ content: string | null; path: string; exists: boolean }> => {
+  getClaudeMd: (
+    dir: string
+  ): Promise<{ content: string | null; path: string; exists: boolean }> => {
     return fetchApi(`/api/claude-md?dir=${encodeURIComponent(dir)}`);
   },
 
@@ -680,7 +634,9 @@ export const api = {
   },
 
   // Worktree endpoints
-  listWorktrees: (dir: string): Promise<{
+  listWorktrees: (
+    dir: string
+  ): Promise<{
     isGitRepo: boolean;
     worktrees: Array<{
       path: string;

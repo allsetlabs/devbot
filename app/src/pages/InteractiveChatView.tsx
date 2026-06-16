@@ -21,17 +21,13 @@ import { MessageList } from '../components/MessageList';
 import { ChatWelcomeScreen } from '../components/ChatWelcomeScreen';
 import { ChatSearchBar } from '../components/ChatSearchBar';
 import { SettingsDrawer } from '../components/SettingsDrawer';
-import { McpServersDrawer } from '../components/McpServersDrawer';
-import { HooksDrawer } from '../components/HooksDrawer';
 import { MemoryViewerDrawer } from '../components/MemoryViewerDrawer';
 import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
 import { WorktreeDrawer } from '../components/WorktreeDrawer';
-import { KeybindingsDrawer } from '../components/KeybindingsDrawer';
 import { SessionCostDrawer } from '../components/SessionCostDrawer';
 import { DoctorDrawer } from '../components/DoctorDrawer';
 import { StatusDrawer } from '../components/StatusDrawer';
 import { PinnedMessagesDrawer } from '../components/PinnedMessagesDrawer';
-import { ToolHistoryDrawer } from '../components/ToolHistoryDrawer';
 import { EditMessageDialog } from '../components/EditMessageDialog';
 import { HelpModal } from '../components/HelpModal';
 import {
@@ -51,14 +47,12 @@ import { ChatInputArea, type AttachedFile } from '../components/ChatInputArea';
 import { ChatModeSwitcherDrawer } from '../components/ChatModeSwitcherDrawer';
 import { ChatModelSwitcherDrawer } from '../components/ChatModelSwitcherDrawer';
 import { ChatSystemPromptDrawer } from '../components/ChatSystemPromptDrawer';
-import { ChatMaxTurnsDrawer } from '../components/ChatMaxTurnsDrawer';
 import { ChatThinkingBudgetDrawer, type EffortLevel } from '../components/ChatThinkingBudgetDrawer';
 import { ChatExportDrawer, type ExportFormat } from '../components/ChatExportDrawer';
 import { ChatSlashHelpDialog } from '../components/ChatSlashHelpDialog';
 import { ChatClearConfirmDialog } from '../components/ChatClearConfirmDialog';
 import { ChatRenameDialog } from '../components/ChatRenameDialog';
 import { ChatWorkingDirDrawer } from '../components/ChatWorkingDirDrawer';
-import { ChatAllowedToolsDrawer } from '../components/ChatAllowedToolsDrawer';
 import { ChatUnsafeBanner } from '../components/ChatUnsafeBanner';
 import { InlineFileEditor } from '../components/InlineFileEditor';
 import type {
@@ -130,7 +124,9 @@ export function InteractiveChatView({
   const navigate = useNavigate();
   // UI-only state — seed input from localStorage draft
   const [input, setInput] = useState(() => (chatId ? getCachedDraft(chatId) : ''));
-  const [draftRestored, setDraftRestored] = useState(() => Boolean(chatId && getCachedDraft(chatId)));
+  const [draftRestored, setDraftRestored] = useState(() =>
+    Boolean(chatId && getCachedDraft(chatId))
+  );
   const [cursorPosition, setCursorPosition] = useState(0);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [interrupting, setInterrupting] = useState(false);
@@ -140,23 +136,16 @@ export function InteractiveChatView({
   const [modelDrawerOpen, setModelDrawerOpen] = useState(false);
   const [systemPromptOpen, setSystemPromptOpen] = useState(false);
   const [systemPromptValue, setSystemPromptValue] = useState('');
-  const [maxTurnsOpen, setMaxTurnsOpen] = useState(false);
-  const [maxTurnsValue, setMaxTurnsValue] = useState('');
   const [effortDrawerOpen, setEffortDrawerOpen] = useState(false);
-  const [allowedToolsDrawerOpen, setAllowedToolsDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [mcpServersOpen, setMcpServersOpen] = useState(false);
-  const [hooksOpen, setHooksOpen] = useState(false);
   const [memoriesOpen, setMemoriesOpen] = useState(false);
   const [doctorOpen, setDoctorOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
   const [worktreesOpen, setWorktreesOpen] = useState(false);
-  const [keybindingsOpen, setKeybindingsOpen] = useState(false);
   const [costDrawerOpen, setCostDrawerOpen] = useState(false);
   const [workingDirDrawerOpen, setWorkingDirDrawerOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
-  const [toolHistoryOpen, setToolHistoryOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMatches, setSearchMatches] = useState<number[]>([]);
@@ -168,7 +157,11 @@ export function InteractiveChatView({
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string; sequence: number } | null>(null);
+  const [editingMessage, setEditingMessage] = useState<{
+    id: string;
+    text: string;
+    sequence: number;
+  } | null>(null);
   const [hasGeneratedTitle, setHasGeneratedTitle] = useState(false);
   const [, setExporting] = useState(false);
   const [exportFormatOpen, setExportFormatOpen] = useState(false);
@@ -352,7 +345,10 @@ export function InteractiveChatView({
   // Fetch branches
   useEffect(() => {
     if (!chatId) return;
-    api.getChatBranches(chatId).then(setBranches).catch(() => {});
+    api
+      .getChatBranches(chatId)
+      .then(setBranches)
+      .catch(() => {});
   }, [chatId]);
 
   // Reset messages when switching branches
@@ -487,19 +483,19 @@ export function InteractiveChatView({
   // Queue message mutation
   const queueMutation = useCrudMutation(
     (prompt: string) => api.queueChatMessage(chatId!, prompt, currentBranch),
-    [['chat-queue', chatId]],
+    [['chat-queue', chatId]]
   );
 
   // Remove queued message mutation
   const removeQueueMutation = useCrudMutation(
     (queueId: string) => api.removeQueuedMessage(chatId!, queueId),
-    [['chat-queue', chatId]],
+    [['chat-queue', chatId]]
   );
 
   // Send all queued messages immediately
   const sendAllQueuedMutation = useCrudMutation(
     () => api.sendAllQueuedMessages(chatId!),
-    [['chat-queue', chatId]],
+    [['chat-queue', chatId]]
   );
 
   // Stop chat mutation
@@ -543,25 +539,11 @@ export function InteractiveChatView({
     { onSuccess: () => setSystemPromptOpen(false) }
   );
 
-  // Change max turns mutation
-  const maxTurnsMutation = useCrudMutation(
-    (maxTurns: number | null) => api.changeChatMaxTurns(chatId!, maxTurns),
-    [['interactive-chat', chatId]],
-    { onSuccess: () => setMaxTurnsOpen(false) }
-  );
-
   // Change effort level mutation
   const effortMutation = useCrudMutation(
     (effort: string | null) => api.changeChatEffort(chatId!, effort),
     [['interactive-chat', chatId]],
     { onSuccess: () => setEffortDrawerOpen(false) }
-  );
-
-  // Change allowed tools mutation
-  const allowedToolsMutation = useCrudMutation(
-    (tools: string[] | null) => api.changeChatAllowedTools(chatId!, tools),
-    [['interactive-chat', chatId]],
-    { onSuccess: () => setAllowedToolsDrawerOpen(false) }
   );
 
   // Change working directory mutation
@@ -674,9 +656,7 @@ export function InteractiveChatView({
   );
 
   const handleOpenFileEditor = useCallback((filePath: string) => {
-    setOpenEditorFiles((prev) =>
-      prev.includes(filePath) ? prev : [...prev, filePath]
-    );
+    setOpenEditorFiles((prev) => (prev.includes(filePath) ? prev : [...prev, filePath]));
   }, []);
 
   const handleCloseFileEditor = useCallback((filePath: string) => {
@@ -837,7 +817,16 @@ export function InteractiveChatView({
 
     queueMutation.mutate(prompt);
     toast.success('Message queued');
-  }, [input, chatId, sending, interrupting, readyFiles, queueMutation, uploadMutation, pushHistory]);
+  }, [
+    input,
+    chatId,
+    sending,
+    interrupting,
+    readyFiles,
+    queueMutation,
+    uploadMutation,
+    pushHistory,
+  ]);
 
   // Stop execution
   const handleStop = useCallback(() => {
@@ -1098,12 +1087,15 @@ export function InteractiveChatView({
   }, [chatId, isRunning, sending, messages, sendMutation]);
 
   // Edit message: open dialog to edit a user message
-  const handleEditMessage = useCallback((messageId: string, text: string) => {
-    const msg = messages.find((m) => m.id === messageId);
-    const sequence = msg?.sequence ?? -1;
-    setEditingMessage({ id: messageId, text, sequence });
-    setEditDialogOpen(true);
-  }, [messages]);
+  const handleEditMessage = useCallback(
+    (messageId: string, text: string) => {
+      const msg = messages.find((m) => m.id === messageId);
+      const sequence = msg?.sequence ?? -1;
+      setEditingMessage({ id: messageId, text, sequence });
+      setEditDialogOpen(true);
+    },
+    [messages]
+  );
 
   // Confirm edit: truncate messages after the edited one, then resend
   const handleEditConfirm = useCallback(
@@ -1156,7 +1148,17 @@ export function InteractiveChatView({
         perTurnUsage.push(usage);
       }
     }
-    return { totalTokens, totalCost, totalDuration, turnCount, inputTokens, outputTokens, cacheReadTokens, cacheCreationTokens, perTurnUsage };
+    return {
+      totalTokens,
+      totalCost,
+      totalDuration,
+      turnCount,
+      inputTokens,
+      outputTokens,
+      cacheReadTokens,
+      cacheCreationTokens,
+      perTurnUsage,
+    };
   }, [messages]);
 
   if (loading) {
@@ -1228,7 +1230,6 @@ export function InteractiveChatView({
           onToggleToolResults={handleToggleToolResults}
           pinnedIds={pinnedIds}
           onOpenPinnedMessages={() => setPinnedMessagesOpen(true)}
-          onOpenToolHistory={() => setToolHistoryOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenCostDrawer={() => setCostDrawerOpen(true)}
           onOpenRename={() => {
@@ -1388,17 +1389,6 @@ export function InteractiveChatView({
         onSave={(prompt) => systemPromptMutation.mutate(prompt)}
       />
 
-      {/* Max turns drawer */}
-      <ChatMaxTurnsDrawer
-        open={maxTurnsOpen}
-        onOpenChange={setMaxTurnsOpen}
-        maxTurnsValue={maxTurnsValue}
-        onMaxTurnsValueChange={setMaxTurnsValue}
-        hasExistingMaxTurns={!!chat?.maxTurns}
-        isPending={maxTurnsMutation.isPending}
-        onSave={(maxTurns) => maxTurnsMutation.mutate(maxTurns)}
-      />
-
       {/* Thinking budget drawer */}
       <ChatThinkingBudgetDrawer
         open={effortDrawerOpen}
@@ -1406,15 +1396,6 @@ export function InteractiveChatView({
         currentEffort={(chat?.effort as EffortLevel) ?? null}
         isPending={effortMutation.isPending}
         onSave={(effort) => effortMutation.mutate(effort)}
-      />
-
-      {/* Allowed tools drawer */}
-      <ChatAllowedToolsDrawer
-        open={allowedToolsDrawerOpen}
-        onOpenChange={setAllowedToolsDrawerOpen}
-        currentAllowedTools={chat?.allowedTools ?? null}
-        isPending={allowedToolsMutation.isPending}
-        onSave={(tools) => allowedToolsMutation.mutate(tools)}
       />
 
       {/* Settings drawer */}
@@ -1463,20 +1444,21 @@ export function InteractiveChatView({
               }
             : undefined
         }
-        onMcpServers={() => setMcpServersOpen(true)}
-        onHooks={() => setHooksOpen(true)}
         onMemories={() => setMemoriesOpen(true)}
         onClaudeMd={() => setClaudeMdOpen(true)}
         onWorktrees={() => setWorktreesOpen(true)}
-        onKeybindings={() => setKeybindingsOpen(true)}
       />
-
-      <McpServersDrawer open={mcpServersOpen} onOpenChange={setMcpServersOpen} />
-      <HooksDrawer open={hooksOpen} onOpenChange={setHooksOpen} />
       <MemoryViewerDrawer open={memoriesOpen} onOpenChange={setMemoriesOpen} />
-      <ClaudeMdDrawer open={claudeMdOpen} onOpenChange={setClaudeMdOpen} workingDirectory={chat?.workingDir ?? undefined} />
-      <WorktreeDrawer open={worktreesOpen} onOpenChange={setWorktreesOpen} workingDirectory={chat?.workingDir ?? undefined} />
-      <KeybindingsDrawer open={keybindingsOpen} onOpenChange={setKeybindingsOpen} />
+      <ClaudeMdDrawer
+        open={claudeMdOpen}
+        onOpenChange={setClaudeMdOpen}
+        workingDirectory={chat?.workingDir ?? undefined}
+      />
+      <WorktreeDrawer
+        open={worktreesOpen}
+        onOpenChange={setWorktreesOpen}
+        workingDirectory={chat?.workingDir ?? undefined}
+      />
       <DoctorDrawer open={doctorOpen} onOpenChange={setDoctorOpen} />
       <StatusDrawer
         open={statusOpen}
@@ -1487,11 +1469,14 @@ export function InteractiveChatView({
         contextLimit={200_000}
         totalCost={sessionStats.totalCost}
         workingDir={chat?.workingDir}
-        allowedTools={chat?.allowedTools}
         fastMode={chat?.fastMode}
         effort={chat?.effort}
       />
-      <SessionCostDrawer open={costDrawerOpen} onOpenChange={setCostDrawerOpen} stats={sessionStats} />
+      <SessionCostDrawer
+        open={costDrawerOpen}
+        onOpenChange={setCostDrawerOpen}
+        stats={sessionStats}
+      />
       <ChatWorkingDirDrawer
         open={workingDirDrawerOpen}
         onOpenChange={setWorkingDirDrawerOpen}
@@ -1509,20 +1494,6 @@ export function InteractiveChatView({
         onTogglePin={togglePin}
         onNavigateToMessage={(messageId) => {
           // Delay scroll to allow drawer close animation to complete
-          setTimeout(() => {
-            const renderedIdx = renderedMessages.findIndex((m) => m.id === messageId);
-            if (renderedIdx >= 0) {
-              messageListRef.current?.scrollToMessage(renderedIdx, 'start');
-            }
-          }, 400);
-        }}
-      />
-
-      <ToolHistoryDrawer
-        open={toolHistoryOpen}
-        onOpenChange={setToolHistoryOpen}
-        messages={messages}
-        onNavigateToMessage={(messageId) => {
           setTimeout(() => {
             const renderedIdx = renderedMessages.findIndex((m) => m.id === messageId);
             if (renderedIdx >= 0) {
@@ -1631,12 +1602,7 @@ export function InteractiveChatView({
         onBrowseFiles={() => setDirectoryBrowserOpen(true)}
         onOpenModeDrawer={() => setModeDrawerOpen(true)}
         onOpenModelDrawer={() => setModelDrawerOpen(true)}
-        onOpenMaxTurns={(maxTurns) => {
-          setMaxTurnsValue(maxTurns?.toString() || '');
-          setMaxTurnsOpen(true);
-        }}
         onOpenEffort={() => setEffortDrawerOpen(true)}
-        onOpenAllowedTools={() => setAllowedToolsDrawerOpen(true)}
         acceptedExtensions={ACCEPTED_EXTENSIONS}
         onQueue={handleQueue}
         onOcrText={(text) => setInput((prev) => prev + text)}

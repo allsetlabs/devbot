@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-// eslint-disable-next-line react-hooks/incompatible-library
+
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { Archive } from 'lucide-react';
 import {

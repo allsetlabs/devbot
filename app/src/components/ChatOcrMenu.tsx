@@ -8,10 +8,35 @@ import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 // File types handled as plain text (read directly, no library)
 const PLAIN_TEXT_EXTS = new Set([
-  '.txt', '.md', '.markdown', '.csv', '.json', '.xml', '.html', '.htm',
-  '.js', '.ts', '.tsx', '.jsx', '.css', '.scss', '.yaml', '.yml',
-  '.toml', '.ini', '.log', '.sh', '.py', '.rb', '.go', '.rs', '.java',
-  '.c', '.cpp', '.h', '.sql',
+  '.txt',
+  '.md',
+  '.markdown',
+  '.csv',
+  '.json',
+  '.xml',
+  '.html',
+  '.htm',
+  '.js',
+  '.ts',
+  '.tsx',
+  '.jsx',
+  '.css',
+  '.scss',
+  '.yaml',
+  '.yml',
+  '.toml',
+  '.ini',
+  '.log',
+  '.sh',
+  '.py',
+  '.rb',
+  '.go',
+  '.rs',
+  '.java',
+  '.c',
+  '.cpp',
+  '.h',
+  '.sql',
 ]);
 
 const IMAGE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.tiff', '.tif']);
@@ -56,11 +81,7 @@ async function extractText(file: File): Promise<string> {
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
-      pages.push(
-        content.items
-          .map((item) => ('str' in item ? item.str : ''))
-          .join(' ')
-      );
+      pages.push(content.items.map((item) => ('str' in item ? item.str : '')).join(' '));
     }
     return pages.join('\n');
   }
@@ -91,11 +112,35 @@ const ACCEPT = [
   'image/*',
   '.pdf',
   '.docx',
-  '.xlsx', '.xls', '.ods',
-  '.txt', '.md', '.markdown', '.csv', '.json', '.xml',
-  '.html', '.htm', '.yaml', '.yml', '.toml', '.ini',
-  '.log', '.sh', '.py', '.rb', '.go', '.rs', '.java',
-  '.js', '.ts', '.tsx', '.jsx', '.css', '.scss', '.sql',
+  '.xlsx',
+  '.xls',
+  '.ods',
+  '.txt',
+  '.md',
+  '.markdown',
+  '.csv',
+  '.json',
+  '.xml',
+  '.html',
+  '.htm',
+  '.yaml',
+  '.yml',
+  '.toml',
+  '.ini',
+  '.log',
+  '.sh',
+  '.py',
+  '.rb',
+  '.go',
+  '.rs',
+  '.java',
+  '.js',
+  '.ts',
+  '.tsx',
+  '.jsx',
+  '.css',
+  '.scss',
+  '.sql',
 ].join(',');
 
 interface ChatOcrMenuProps {
@@ -136,16 +181,14 @@ export function ChatOcrMenu({ disabled, onOcrText }: ChatOcrMenuProps) {
           inputRef.current?.click();
         }}
       >
-        {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScanLine className="h-4 w-4" />}
+        {processing ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ScanLine className="h-4 w-4" />
+        )}
       </Button>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept={ACCEPT}
-        className="hidden"
-        onChange={handleFile}
-      />
+      <input ref={inputRef} type="file" accept={ACCEPT} className="hidden" onChange={handleFile} />
     </>
   );
 }

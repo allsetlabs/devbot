@@ -1,5 +1,30 @@
 import { useState, useMemo } from 'react';
-import { ChevronDown, ChevronRight, Code, Pencil, FilePlus, ShieldCheck, ShieldOff, Bot, Loader2, Search, FileCode, Check, Copy, FolderSearch, Folder, FileJson, FileText, File, Terminal, ListTodo, CheckCircle2, XCircle, Circle, BookOpen } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Code,
+  Pencil,
+  FilePlus,
+  ShieldCheck,
+  ShieldOff,
+  Bot,
+  Loader2,
+  Search,
+  FileCode,
+  Check,
+  Copy,
+  FolderSearch,
+  Folder,
+  FileJson,
+  FileText,
+  File,
+  Terminal,
+  ListTodo,
+  CheckCircle2,
+  XCircle,
+  Circle,
+  BookOpen,
+} from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button } from '@allsetlabs/forge/components/ui/button';
@@ -56,7 +81,10 @@ function getToolPreview(toolName: string, toolInput: Record<string, unknown>): s
       return `${count} todos`;
     }
     case 'NotebookEdit': {
-      const nb = String(toolInput.notebook_path ?? '').split('/').pop() || 'notebook.ipynb';
+      const nb =
+        String(toolInput.notebook_path ?? '')
+          .split('/')
+          .pop() || 'notebook.ipynb';
       const cell = toolInput.cell_number != null ? `cell ${Number(toolInput.cell_number) + 1}` : '';
       return cell ? `${nb} — ${cell}` : nb;
     }
@@ -100,7 +128,13 @@ function DiffHunk({ oldString, newString }: { oldString: string; newString: stri
 }
 
 /** Colorized diff view for Edit tool calls, matching Claude Code CLI's diff output */
-export function EditDiffView({ toolInput, permissionMode }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode }) {
+export function EditDiffView({
+  toolInput,
+  permissionMode,
+}: {
+  toolInput: Record<string, unknown>;
+  permissionMode?: PermissionMode;
+}) {
   const [expanded, setExpanded] = useState(false);
   const filePath = (toolInput.file_path as string) || '';
   const oldString = (toolInput.old_string as string) || '';
@@ -160,7 +194,13 @@ export function EditDiffView({ toolInput, permissionMode }: { toolInput: Record<
 }
 
 /** Colorized diff view for MultiEdit tool calls with multiple edit hunks */
-export function MultiEditDiffView({ toolInput, permissionMode }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode }) {
+export function MultiEditDiffView({
+  toolInput,
+  permissionMode,
+}: {
+  toolInput: Record<string, unknown>;
+  permissionMode?: PermissionMode;
+}) {
   const [expanded, setExpanded] = useState(false);
   const filePath = (toolInput.file_path as string) || '';
   const edits = (toolInput.edits as Array<{ old_string?: string; new_string?: string }>) || [];
@@ -229,7 +269,13 @@ export function MultiEditDiffView({ toolInput, permissionMode }: { toolInput: Re
 }
 
 /** Content view for Write tool calls — shows all lines as additions */
-export function WriteContentView({ toolInput, permissionMode }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode }) {
+export function WriteContentView({
+  toolInput,
+  permissionMode,
+}: {
+  toolInput: Record<string, unknown>;
+  permissionMode?: PermissionMode;
+}) {
   const [expanded, setExpanded] = useState(false);
   const filePath = (toolInput.file_path as string) || '';
   const content = (toolInput.content as string) || '';
@@ -270,7 +316,7 @@ export function WriteContentView({ toolInput, permissionMode }: { toolInput: Rec
           <div className="max-h-80 overflow-auto font-mono text-xs">
             {content.split('\n').map((line, i) => (
               <div key={i} className="flex bg-success/10">
-                <span className="w-8 flex-shrink-0 select-none text-right pr-1 text-[11px] leading-5 text-muted-foreground/40">
+                <span className="w-8 flex-shrink-0 select-none pr-1 text-right text-[11px] leading-5 text-muted-foreground/40">
                   {i + 1}
                 </span>
                 <pre className="min-w-0 flex-1 whitespace-pre-wrap break-all px-1 leading-5 text-success">
@@ -286,7 +332,15 @@ export function WriteContentView({ toolInput, permissionMode }: { toolInput: Rec
 }
 
 /** Renders Agent (subagent) tool calls with a distinctive card showing description, type, and status */
-export function AgentSubagentView({ toolInput, permissionMode, hasResult }: { toolInput: Record<string, unknown>; permissionMode?: PermissionMode; hasResult?: boolean }) {
+export function AgentSubagentView({
+  toolInput,
+  permissionMode,
+  hasResult,
+}: {
+  toolInput: Record<string, unknown>;
+  permissionMode?: PermissionMode;
+  hasResult?: boolean;
+}) {
   const [expanded, setExpanded] = useState(false);
   const description = String(toolInput.description ?? 'Agent task');
   const prompt = String(toolInput.prompt ?? '');
@@ -471,7 +525,10 @@ export function BashResultView({
 
   const { lines, exitCode } = useMemo(() => parseBashOutput(rawText), [rawText]);
   const totalLines = lines.length;
-  const displayLines = !expanded && totalLines > BASH_COLLAPSE_THRESHOLD ? lines.slice(0, BASH_COLLAPSE_THRESHOLD) : lines;
+  const displayLines =
+    !expanded && totalLines > BASH_COLLAPSE_THRESHOLD
+      ? lines.slice(0, BASH_COLLAPSE_THRESHOLD)
+      : lines;
 
   const resolvedExitCode = exitCode !== null ? exitCode : isError ? 1 : 0;
   const isFailure = resolvedExitCode !== 0;
@@ -481,7 +538,9 @@ export function BashResultView({
     <div className="overflow-hidden rounded-lg border border-border">
       <div className="flex items-center gap-2 bg-[#1a1a2e] px-3 py-2">
         <Terminal className="h-3.5 w-3.5 flex-shrink-0 text-green-400" />
-        <span className="min-w-0 flex-1 truncate font-mono text-xs text-gray-300">{cmdPreview}</span>
+        <span className="min-w-0 flex-1 truncate font-mono text-xs text-gray-300">
+          {cmdPreview}
+        </span>
         <span
           className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
             isFailure ? 'bg-red-900/60 text-red-300' : 'bg-green-900/60 text-green-300'
@@ -491,7 +550,10 @@ export function BashResultView({
         </span>
         <Button
           variant="ghost"
-          onClick={() => { copyToClipboard(rawText); showCopied('copied'); }}
+          onClick={() => {
+            copyToClipboard(rawText);
+            showCopied('copied');
+          }}
           className="h-6 w-6 flex-shrink-0 rounded p-1 text-gray-400 hover:text-gray-200"
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -503,7 +565,7 @@ export function BashResultView({
             {displayLines.map((line, i) => (
               <div
                 key={i}
-                className={`px-3 py-0.5 leading-5 whitespace-pre-wrap break-all ${
+                className={`whitespace-pre-wrap break-all px-3 py-0.5 leading-5 ${
                   line.isStderr ? 'text-red-400' : 'text-gray-200'
                 }`}
               >
@@ -518,9 +580,14 @@ export function BashResultView({
               className="w-full rounded-none border-t border-[#2a2a3e] py-1 text-xs text-gray-400 hover:bg-[#1a1a2e] hover:text-gray-200"
             >
               {expanded ? (
-                <><ChevronDown className="mr-1 h-3 w-3 rotate-180" /> Show less</>
+                <>
+                  <ChevronDown className="mr-1 h-3 w-3 rotate-180" /> Show less
+                </>
               ) : (
-                <><ChevronDown className="mr-1 h-3 w-3" /> Show {totalLines - BASH_COLLAPSE_THRESHOLD} more lines</>
+                <>
+                  <ChevronDown className="mr-1 h-3 w-3" /> Show{' '}
+                  {totalLines - BASH_COLLAPSE_THRESHOLD} more lines
+                </>
               )}
             </Button>
           )}
@@ -620,8 +687,41 @@ const GLOB_COLLAPSE_THRESHOLD = 20;
 
 type GlobFileType = 'folder' | 'code' | 'config' | 'text' | 'style' | 'other';
 
-const CODE_EXTS = new Set(['ts', 'tsx', 'js', 'jsx', 'py', 'go', 'rs', 'rb', 'java', 'cpp', 'c', 'swift', 'kt', 'php', 'sh', 'bash', 'sql', 'graphql', 'html', 'vue', 'svelte']);
-const CONFIG_EXTS = new Set(['json', 'yaml', 'yml', 'toml', 'env', 'ini', 'cfg', 'conf', 'lock', 'xml']);
+const CODE_EXTS = new Set([
+  'ts',
+  'tsx',
+  'js',
+  'jsx',
+  'py',
+  'go',
+  'rs',
+  'rb',
+  'java',
+  'cpp',
+  'c',
+  'swift',
+  'kt',
+  'php',
+  'sh',
+  'bash',
+  'sql',
+  'graphql',
+  'html',
+  'vue',
+  'svelte',
+]);
+const CONFIG_EXTS = new Set([
+  'json',
+  'yaml',
+  'yml',
+  'toml',
+  'env',
+  'ini',
+  'cfg',
+  'conf',
+  'lock',
+  'xml',
+]);
 const TEXT_EXTS = new Set(['md', 'txt', 'rst', 'log']);
 const STYLE_EXTS = new Set(['css', 'scss', 'sass', 'less']);
 
@@ -638,12 +738,18 @@ function getGlobFileType(path: string): GlobFileType {
 function GlobFileIcon({ type }: { type: GlobFileType }) {
   const cls = 'h-3.5 w-3.5 flex-shrink-0';
   switch (type) {
-    case 'folder': return <Folder className={`${cls} text-warning`} />;
-    case 'code': return <FileCode className={`${cls} text-primary`} />;
-    case 'config': return <FileJson className={`${cls} text-success`} />;
-    case 'text': return <FileText className={`${cls} text-muted-foreground`} />;
-    case 'style': return <FileCode className={`${cls} text-purple-400`} />;
-    default: return <File className={`${cls} text-muted-foreground`} />;
+    case 'folder':
+      return <Folder className={`${cls} text-warning`} />;
+    case 'code':
+      return <FileCode className={`${cls} text-primary`} />;
+    case 'config':
+      return <FileJson className={`${cls} text-success`} />;
+    case 'text':
+      return <FileText className={`${cls} text-muted-foreground`} />;
+    case 'style':
+      return <FileCode className={`${cls} text-purple-400`} />;
+    default:
+      return <File className={`${cls} text-muted-foreground`} />;
   }
 }
 
@@ -668,11 +774,16 @@ export function GlobResultView({
         : '';
 
   const paths = useMemo(
-    () => text.split('\n').map((l) => l.trim()).filter(Boolean),
+    () =>
+      text
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean),
     [text]
   );
   const total = paths.length;
-  const displayPaths = !expanded && total > GLOB_COLLAPSE_THRESHOLD ? paths.slice(0, GLOB_COLLAPSE_THRESHOLD) : paths;
+  const displayPaths =
+    !expanded && total > GLOB_COLLAPSE_THRESHOLD ? paths.slice(0, GLOB_COLLAPSE_THRESHOLD) : paths;
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
@@ -720,7 +831,8 @@ export function GlobResultView({
                   onClick={() => setExpanded(true)}
                   className="w-full rounded-none border-t border-border py-1 text-xs text-muted-foreground hover:bg-muted/50"
                 >
-                  <ChevronDown className="mr-1 h-3 w-3" /> Show {total - GLOB_COLLAPSE_THRESHOLD} more files
+                  <ChevronDown className="mr-1 h-3 w-3" /> Show {total - GLOB_COLLAPSE_THRESHOLD}{' '}
+                  more files
                 </Button>
               )}
             </>
@@ -734,13 +846,33 @@ export function GlobResultView({
 const READ_COLLAPSE_THRESHOLD = 30;
 
 const EXT_LANGUAGE_MAP: Record<string, string> = {
-  ts: 'typescript', tsx: 'tsx', js: 'javascript', jsx: 'jsx',
-  py: 'python', json: 'json', md: 'markdown', css: 'css',
-  html: 'html', sh: 'bash', bash: 'bash', sql: 'sql',
-  yaml: 'yaml', yml: 'yaml', rs: 'rust', go: 'go',
-  rb: 'ruby', java: 'java', cpp: 'cpp', c: 'c',
-  swift: 'swift', kt: 'kotlin', php: 'php', xml: 'xml',
-  toml: 'toml', graphql: 'graphql', txt: 'text',
+  ts: 'typescript',
+  tsx: 'tsx',
+  js: 'javascript',
+  jsx: 'jsx',
+  py: 'python',
+  json: 'json',
+  md: 'markdown',
+  css: 'css',
+  html: 'html',
+  sh: 'bash',
+  bash: 'bash',
+  sql: 'sql',
+  yaml: 'yaml',
+  yml: 'yaml',
+  rs: 'rust',
+  go: 'go',
+  rb: 'ruby',
+  java: 'java',
+  cpp: 'cpp',
+  c: 'c',
+  swift: 'swift',
+  kt: 'kotlin',
+  php: 'php',
+  xml: 'xml',
+  toml: 'toml',
+  graphql: 'graphql',
+  txt: 'text',
 };
 
 function detectLanguage(filePath: string): string {
@@ -751,7 +883,10 @@ function detectLanguage(filePath: string): string {
 /** Strips the `cat -n` style line-number prefix (e.g. "   1\t") that Claude Code's Read tool prepends */
 function stripCatNPrefix(text: string): string {
   const lines = text.split('\n');
-  const hasCatN = lines.slice(0, 5).filter((l) => l.length > 0).some((l) => /^\s*\d+\t/.test(l));
+  const hasCatN = lines
+    .slice(0, 5)
+    .filter((l) => l.length > 0)
+    .some((l) => /^\s*\d+\t/.test(l));
   if (!hasCatN) return text;
   return lines.map((l) => l.replace(/^\s*\d+\t/, '')).join('\n');
 }
@@ -797,7 +932,9 @@ export function ReadResultView({
     <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
       <div className="flex items-center gap-2 px-3 py-2">
         <FileCode className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
-        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">{fileName}</span>
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">
+          {fileName}
+        </span>
         <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
           {lineCount} line{lineCount !== 1 ? 's' : ''}
         </span>
@@ -837,7 +974,8 @@ export function ReadResultView({
               </>
             ) : (
               <>
-                <ChevronDown className="mr-1 h-3 w-3" /> Show {lineCount - READ_COLLAPSE_THRESHOLD} more lines
+                <ChevronDown className="mr-1 h-3 w-3" /> Show {lineCount - READ_COLLAPSE_THRESHOLD}{' '}
+                more lines
               </>
             )}
           </Button>
@@ -920,7 +1058,9 @@ export function TodoWriteView({
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
         <ListTodo className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">TodoWrite</span>
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+          TodoWrite
+        </span>
         {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
         <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
           {summaryLabel}
@@ -974,20 +1114,24 @@ export function NotebookEditView({
   const cellType = String(toolInput.new_cell_type ?? toolInput.cell_type ?? 'code').toLowerCase();
   const newSource = String(toolInput.new_source ?? '');
 
-  const operationLabel = editMode === 'insert' ? 'Insert' : editMode === 'delete' ? 'Delete' : 'Edit';
+  const operationLabel =
+    editMode === 'insert' ? 'Insert' : editMode === 'delete' ? 'Delete' : 'Edit';
   const operationColor =
     editMode === 'insert'
       ? 'bg-success/15 text-success'
       : editMode === 'delete'
         ? 'bg-destructive/15 text-destructive'
         : 'bg-primary/15 text-primary';
-  const cellTypeColor = cellType === 'markdown' ? 'bg-warning/15 text-warning' : 'bg-muted text-muted-foreground';
+  const cellTypeColor =
+    cellType === 'markdown' ? 'bg-warning/15 text-warning' : 'bg-muted text-muted-foreground';
   const language = cellType === 'markdown' ? 'markdown' : 'python';
 
   const lines = newSource.split('\n');
   const COLLAPSE_THRESHOLD = 20;
   const displaySource =
-    !expanded && lines.length > COLLAPSE_THRESHOLD ? lines.slice(0, COLLAPSE_THRESHOLD).join('\n') : newSource;
+    !expanded && lines.length > COLLAPSE_THRESHOLD
+      ? lines.slice(0, COLLAPSE_THRESHOLD).join('\n')
+      : newSource;
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-muted/30">
@@ -1008,16 +1152,22 @@ export function NotebookEditView({
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
         <BookOpen className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
-        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">{fileName}</span>
+        <span className="min-w-0 flex-1 truncate font-mono text-sm text-foreground">
+          {fileName}
+        </span>
         {cellNumber != null && (
           <span className="flex-shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
             Cell {cellNumber}
           </span>
         )}
-        <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${operationColor}`}>
+        <span
+          className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${operationColor}`}
+        >
           {operationLabel}
         </span>
-        <span className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${cellTypeColor}`}>
+        <span
+          className={`flex-shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase ${cellTypeColor}`}
+        >
           {cellType}
         </span>
         {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
@@ -1055,7 +1205,13 @@ export function NotebookEditView({
   );
 }
 
-export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMessageContent; permissionMode?: PermissionMode }) {
+export function ToolUseMessage({
+  content,
+  permissionMode,
+}: {
+  content: ClaudeMessageContent;
+  permissionMode?: PermissionMode;
+}) {
   const [expanded, setExpanded] = useState(false);
   const toolName = content.tool_name || 'Unknown Tool';
   const toolInput = content.tool_input || {};
@@ -1104,7 +1260,9 @@ export function ToolUseMessage({ content, permissionMode }: { content: ClaudeMes
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         )}
         <Code className="h-4 w-4 text-primary" />
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{toolName}</span>
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
+          {toolName}
+        </span>
         {permissionMode && <ToolApprovalBadge mode={permissionMode} />}
       </Button>
       {preview && (

@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { ShieldCheck, ShieldAlert, ShieldOff, Square, ChevronDown, ChevronRight, Code, Bot } from 'lucide-react';
+import {
+  ShieldCheck,
+  ShieldAlert,
+  ShieldOff,
+  Square,
+  ChevronDown,
+  ChevronRight,
+  Code,
+  Bot,
+} from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { ClaudeMessageContent, PermissionMode } from '../types';
 
@@ -88,7 +97,9 @@ export function ToolApprovalInline({ content, permissionMode, onDeny }: ToolAppr
   };
 
   return (
-    <div className={`rounded-lg border ${denied ? 'border-destructive/30 bg-destructive/5' : 'border-border bg-muted/30'}`}>
+    <div
+      className={`rounded-lg border ${denied ? 'border-destructive/30 bg-destructive/5' : 'border-border bg-muted/30'}`}
+    >
       <div className="flex items-center gap-2 px-3 py-2">
         <Button
           variant="ghost"

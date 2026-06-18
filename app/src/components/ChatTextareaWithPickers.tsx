@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   Loader2,
   Send,
@@ -12,9 +12,10 @@ import {
   X,
 } from 'lucide-react';
 import { ChatOcrMenu } from './ChatOcrMenu';
-import { toast } from 'sonner';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
+import { useSpeechToText } from '../hooks/useSpeechToText';
+import { sttLearn } from '../lib/api';
 import {
   SlashCommandPicker,
   type SlashCommandPickerHandle,
@@ -26,45 +27,6 @@ import {
   type FileIntellisenseItem,
 } from '@allsetlabs/forge/components/ui/file-intellisense-picker';
 import type { AttachedFile } from './ChatInputArea';
-
-// Minimal types for Web Speech API (not in standard TS lib)
-interface SpeechRecognitionResult {
-  readonly length: number;
-  [index: number]: { transcript: string };
-  isFinal: boolean;
-}
-
-interface SpeechRecognitionResultList {
-  readonly length: number;
-  [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
-}
-
-interface SpeechRecognitionInstance extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start(): void;
-  stop(): void;
-  onstart: ((ev: Event) => void) | null;
-  onend: ((ev: Event) => void) | null;
-  onresult: ((ev: SpeechRecognitionEvent) => void) | null;
-  onerror: ((ev: Event) => void) | null;
-}
-
-type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
-
-function getSpeechRecognition(): SpeechRecognitionConstructor | undefined {
-  const w = window as Window & {
-    SpeechRecognition?: SpeechRecognitionConstructor;
-    webkitSpeechRecognition?: SpeechRecognitionConstructor;
-  };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition;
-}
 
 interface ChatTextareaWithPickersProps {
   input: string;
@@ -145,76 +107,35 @@ export function ChatTextareaWithPickers({
   const anyUploading = attachedFiles.some((f) => f.uploading);
   const isTouchDevice = navigator.maxTouchPoints > 0;
 
-  const [isListening, setIsListening] = useState(false);
-  const [interimText, setInterimText] = useState('');
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-  // Use ref to avoid stale closure in recognition callbacks
+  // Use ref to track current input without stale closures
   const inputRef = useRef(input);
   inputRef.current = input;
 
-  const startVoiceInput = useCallback(() => {
-    const SR = getSpeechRecognition();
-    if (!SR) {
-      toast.error('Voice input is not supported in this browser');
-      return;
-    }
-
-    const recognition = new SR();
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => {
-      setIsListening(false);
-      setInterimText('');
-      recognitionRef.current = null;
-    };
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = '';
-      let final = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          final += result[0].transcript;
-        } else {
-          interim += result[0].transcript;
-        }
-      }
-      setInterimText(interim);
-      if (final) {
+  const {
+    isListening,
+    isTranscribing,
+    statusText,
+    lastSttOutput,
+    toggle: toggleVoiceInput,
+    clearLastSttOutput,
+  } = useSpeechToText({
+    onTranscript: useCallback(
+      (transcript: string) => {
         const current = inputRef.current.trim();
-        onInputChange(current ? `${current} ${final.trim()}` : final.trim());
-        setInterimText('');
-      }
-    };
-    recognition.onerror = () => {
-      setIsListening(false);
-      setInterimText('');
-      recognitionRef.current = null;
-    };
+        onInputChange(current ? `${current} ${transcript}` : transcript);
+      },
+      [onInputChange]
+    ),
+  });
 
-    recognitionRef.current = recognition;
-    recognition.start();
-  }, [onInputChange]);
-
-  const stopVoiceInput = useCallback(() => {
-    recognitionRef.current?.stop();
-  }, []);
-
-  const toggleVoiceInput = useCallback(() => {
-    if (isListening) {
-      stopVoiceInput();
-    } else {
-      startVoiceInput();
+  const handleSend = useCallback(() => {
+    // Fire-and-forget learn call if STT was used and user may have corrected it
+    if (lastSttOutput !== null && lastSttOutput.trim() !== inputRef.current.trim()) {
+      sttLearn(lastSttOutput, inputRef.current).catch(() => {});
     }
-  }, [isListening, startVoiceInput, stopVoiceInput]);
-
-  useEffect(() => {
-    return () => {
-      recognitionRef.current?.stop();
-    };
-  }, []);
+    clearLastSttOutput();
+    onSend();
+  }, [lastSttOutput, clearLastSttOutput, onSend]);
 
   return (
     <>
@@ -323,11 +244,15 @@ export function ChatTextareaWithPickers({
               className="w-full resize-none border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0"
               style={{ overflow: 'auto' }}
             />
-            {/* Interim voice transcript preview */}
-            {interimText && (
+            {/* STT status preview (recording / transcribing) */}
+            {statusText && (
               <div className="border-t border-input/40 px-3 py-1 text-sm italic text-muted-foreground">
-                {interimText}
-                <span className="ml-1 animate-pulse">...</span>
+                {statusText}
+                {isTranscribing ? (
+                  <Loader2 className="ml-1 inline h-3 w-3 animate-spin" />
+                ) : (
+                  <span className="ml-1 animate-pulse">●</span>
+                )}
               </div>
             )}
             {/* Button row — always below text, never overlaps */}
@@ -367,14 +292,31 @@ export function ChatTextareaWithPickers({
                 <Button
                   variant="outline"
                   size="icon"
-                  className={`relative h-8 w-8 transition-colors ${isListening ? 'border-destructive text-destructive hover:border-destructive hover:text-destructive' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`relative h-8 w-8 transition-colors ${
+                    isListening
+                      ? 'border-destructive text-destructive hover:border-destructive hover:text-destructive'
+                      : isTranscribing
+                        ? 'border-muted-foreground text-muted-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                  }`}
                   onClick={toggleVoiceInput}
-                  title={isListening ? 'Stop voice input' : 'Voice input'}
+                  disabled={isTranscribing}
+                  title={
+                    isListening
+                      ? 'Stop recording'
+                      : isTranscribing
+                        ? 'Transcribing...'
+                        : 'Voice input (local whisper)'
+                  }
                 >
                   {isListening && (
                     <span className="absolute right-0.5 top-0.5 h-2 w-2 animate-pulse rounded-full bg-destructive" />
                   )}
-                  <Mic className="h-5 w-5" />
+                  {isTranscribing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Mic className="h-5 w-5" />
+                  )}
                 </Button>
                 {input && (
                   <Button
@@ -430,7 +372,7 @@ export function ChatTextareaWithPickers({
                   </Button>
                 )}
                 <Button
-                  onClick={onSend}
+                  onClick={handleSend}
                   disabled={
                     (!input.trim() && readyFiles.length === 0) ||
                     sending ||

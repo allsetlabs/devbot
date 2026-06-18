@@ -758,3 +758,48 @@ export async function saveOcrText(id: string, text: string): Promise<OcrDocument
 export async function deleteOcrDocument(id: string): Promise<void> {
   await fetchApi(`/api/ocr/${id}`, { method: 'DELETE' });
 }
+
+export interface SttStatusResponse {
+  available: boolean;
+  model: string | null;
+}
+
+export interface SttTranscribeResponse {
+  transcript: string;
+}
+
+export interface SttLearnResponse {
+  learned: boolean;
+  reason?: string;
+  corrections?: { wrong: string; correct: string }[];
+  summary?: string;
+}
+
+export async function sttStatus(): Promise<SttStatusResponse> {
+  return fetchApi('/api/stt/status');
+}
+
+export async function sttTranscribe(audioBlob: Blob): Promise<SttTranscribeResponse> {
+  const formData = new FormData();
+  formData.append('audio', audioBlob, 'recording.webm');
+
+  const response = await fetch(`${BACKEND_URL}/api/stt/transcribe`, {
+    method: 'POST',
+    headers: { 'X-API-Key': API_KEY },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Transcription failed' }));
+    throw new Error(error.message || `HTTP ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function sttLearn(sttOutput: string, finalMessage: string): Promise<SttLearnResponse> {
+  return fetchApi('/api/stt/learn', {
+    method: 'POST',
+    body: JSON.stringify({ sttOutput, finalMessage }),
+  });
+}

@@ -10,7 +10,7 @@ NC := \033[0m
 
 APP_PORT := 4005
 BACKEND_PORT := 3100
-DEVBOT_PROJECTS := $(CURDIR)/../devbot-projects
+DEVBOT_PROJECTS := $(CURDIR)/../../../
 
 .PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills
 

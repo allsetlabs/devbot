@@ -111,6 +111,11 @@ export function ChatTextareaWithPickers({
   const inputRef = useRef(input);
   inputRef.current = input;
 
+  // Stable refs so STT hook can call handleSend/onQueue without circular dependencies
+  const handleSendRef = useRef<() => void>(() => {});
+  const onQueueRef = useRef<(() => void) | undefined>(undefined);
+  onQueueRef.current = onQueue;
+
   const {
     isListening,
     isTranscribing,
@@ -126,6 +131,8 @@ export function ChatTextareaWithPickers({
       },
       [onInputChange]
     ),
+    onTriggerSend: useCallback(() => handleSendRef.current(), []),
+    onTriggerQueue: useCallback(() => onQueueRef.current?.(), []),
   });
 
   const handleSend = useCallback(() => {
@@ -136,6 +143,8 @@ export function ChatTextareaWithPickers({
     clearLastSttOutput();
     onSend();
   }, [lastSttOutput, clearLastSttOutput, onSend]);
+
+  handleSendRef.current = handleSend;
 
   return (
     <>
@@ -234,11 +243,15 @@ export function ChatTextareaWithPickers({
               }}
               onKeyDown={onKeyDown}
               placeholder={
-                isRunning
-                  ? 'Type to interrupt & send...'
-                  : isTouchDevice
-                    ? 'Type a message...'
-                    : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
+                isListening
+                  ? isRunning
+                    ? "Recording... say 'send' to send or 'queue' to queue"
+                    : "Recording... say 'send' to send"
+                  : isRunning
+                    ? 'Type to interrupt & send...'
+                    : isTouchDevice
+                      ? 'Type a message...'
+                      : 'Type a message... (⏎ send, ⌘⇧K clear, ⌘⏎ send)'
               }
               rows={2}
               className="w-full resize-none border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0"

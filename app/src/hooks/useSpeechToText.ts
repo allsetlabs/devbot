@@ -1,9 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { sttTranscribe, sttStatus } from '../lib/api';
 
 export interface UseSpeechToTextOptions {
   /** Called with the final accurate transcript to insert into the textarea */
   onTranscript: (transcript: string) => void;
+  /** Called after transcript is committed when the user says "send" */
+  onTriggerSend?: () => void;
+  /** Called after transcript is committed when the user says "queue" or "q" */
+  onTriggerQueue?: () => void;
 }
 
 export interface UseSpeechToTextReturn {
@@ -42,6 +47,30 @@ interface SpeechRecognitionInstance extends EventTarget {
   onerror: ((ev: Event) => void) | null;
 }
 
+type TriggerAction = 'send' | 'queue' | null;
+
+const SEND_WORDS = ['send'];
+const QUEUE_WORDS = ['queue', 'q'];
+const TRIGGER_DELAY_MS = 1000;
+
+function checkTriggerWord(text: string): { stripped: string; action: TriggerAction } {
+  const trimmed = text.trim();
+  const lower = trimmed.toLowerCase();
+  for (const word of SEND_WORDS) {
+    if (lower === word) return { stripped: '', action: 'send' };
+    if (lower.endsWith(` ${word}`)) {
+      return { stripped: trimmed.slice(0, trimmed.length - word.length).trim(), action: 'send' };
+    }
+  }
+  for (const word of QUEUE_WORDS) {
+    if (lower === word) return { stripped: '', action: 'queue' };
+    if (lower.endsWith(` ${word}`)) {
+      return { stripped: trimmed.slice(0, trimmed.length - word.length).trim(), action: 'queue' };
+    }
+  }
+  return { stripped: trimmed, action: null };
+}
+
 function getWebSpeechRecognition(): WebkitSpeechRecognitionCtor | undefined {
   const w = window as Window & {
     SpeechRecognition?: WebkitSpeechRecognitionCtor;
@@ -50,7 +79,7 @@ function getWebSpeechRecognition(): WebkitSpeechRecognitionCtor | undefined {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition;
 }
 
-export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSpeechToTextReturn {
+export function useSpeechToText({ onTranscript, onTriggerSend, onTriggerQueue }: UseSpeechToTextOptions): UseSpeechToTextReturn {
   const [isListening, setIsListening] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [statusText, setStatusText] = useState('');
@@ -59,17 +88,34 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
   const localAvailableRef = useRef<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  // Web Speech ref used in two roles:
-  //   - combined mode: live preview only (whisper does the real transcription)
-  //   - fallback mode: both preview and final transcript
   const webSpeechRef = useRef<SpeechRecognitionInstance | null>(null);
   const onTranscriptRef = useRef(onTranscript);
   onTranscriptRef.current = onTranscript;
+  const onTriggerSendRef = useRef(onTriggerSend);
+  onTriggerSendRef.current = onTriggerSend;
+  const onTriggerQueueRef = useRef(onTriggerQueue);
+  onTriggerQueueRef.current = onTriggerQueue;
+  // Pending voice action set by Web Speech, consumed in recorder.onstop
+  const pendingActionRef = useRef<TriggerAction>(null);
+  // Timeout handle for the 1-second trigger delay
+  const triggerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearTriggerTimeout = useCallback(() => {
+    if (triggerTimeoutRef.current) {
+      clearTimeout(triggerTimeoutRef.current);
+      triggerTimeoutRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     sttStatus()
       .then((s) => { localAvailableRef.current = s.available; })
       .catch(() => { localAvailableRef.current = false; });
+  }, []);
+
+  const fireTrigger = useCallback((action: TriggerAction) => {
+    if (action === 'send') onTriggerSendRef.current?.();
+    else if (action === 'queue') onTriggerQueueRef.current?.();
   }, []);
 
   // ---------------------------------------------------------------------------
@@ -81,7 +127,6 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
     if (!SR) return;
 
     const recognition = new SR();
-    // continuous=true so it keeps streaming while MediaRecorder is running
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
@@ -97,28 +142,53 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
       }
     };
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      // Build full interim + final text from all accumulated results
       let text = '';
       for (let i = 0; i < event.results.length; i++) {
         text += event.results[i][0].transcript;
       }
       const trimmed = text.trim();
+      const latest = event.results[event.results.length - 1];
 
       if (previewOnly) {
-        // Only drive the preview row — whisper will supply the accurate final text
         setStatusText(trimmed);
+        if (latest?.isFinal) {
+          const { action } = checkTriggerWord(trimmed);
+          if (action) {
+            // Cancel any previous pending trigger, start a fresh 1s delay
+            clearTriggerTimeout();
+            pendingActionRef.current = action;
+            triggerTimeoutRef.current = setTimeout(() => {
+              triggerTimeoutRef.current = null;
+              if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                mediaRecorderRef.current.stop();
+              }
+            }, TRIGGER_DELAY_MS);
+          } else {
+            // New final result with no trigger — cancel any pending trigger
+            clearTriggerTimeout();
+            pendingActionRef.current = null;
+          }
+        }
       } else {
         // Fallback path: Web Speech is the sole source
         setStatusText(trimmed);
-        // Check if the latest result is final so we can commit it
-        const latest = event.results[event.results.length - 1];
         if (latest?.isFinal) {
-          const finalText = trimmed;
-          setLastSttOutput(finalText);
-          onTranscriptRef.current(finalText);
+          const { stripped, action } = checkTriggerWord(trimmed);
+          const finalText = stripped || trimmed;
+          flushSync(() => {
+            setLastSttOutput(finalText);
+            onTranscriptRef.current(finalText);
+          });
           setStatusText('');
           setIsListening(false);
           webSpeechRef.current?.stop();
+          if (action) {
+            // 1-second delay before firing so the user can hear the confirmation
+            triggerTimeoutRef.current = setTimeout(() => {
+              triggerTimeoutRef.current = null;
+              fireTrigger(action);
+            }, TRIGGER_DELAY_MS);
+          }
         }
       }
     };
@@ -132,7 +202,7 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
 
     webSpeechRef.current = recognition;
     recognition.start();
-  }, []);
+  }, [fireTrigger, clearTriggerTimeout]);
 
   // ---------------------------------------------------------------------------
   // Combined mode: MediaRecorder (whisper) + Web Speech (preview)
@@ -167,7 +237,6 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
     recorder.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
 
-      // Stop Web Speech preview — its job is done
       webSpeechRef.current?.stop();
       webSpeechRef.current = null;
 
@@ -179,13 +248,25 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
         return;
       }
 
+      const pendingAction = pendingActionRef.current;
+      pendingActionRef.current = null;
+
       setIsTranscribing(true);
       setStatusText('Transcribing with whisper...');
       try {
         const { transcript } = await sttTranscribe(blob);
         if (transcript) {
-          setLastSttOutput(transcript);
-          onTranscriptRef.current(transcript);
+          // Strip trigger word from whisper output if present (whisper may or may not capture it)
+          const { stripped, action } = checkTriggerWord(transcript);
+          const finalAction = action ?? pendingAction;
+          const finalText = action ? (stripped || transcript) : transcript;
+          flushSync(() => {
+            setLastSttOutput(finalText);
+            onTranscriptRef.current(finalText);
+          });
+          if (finalAction) fireTrigger(finalAction);
+        } else if (pendingAction) {
+          fireTrigger(pendingAction);
         }
       } catch (err) {
         console.error('[stt] whisper failed:', err);
@@ -200,9 +281,8 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
     setIsListening(true);
     setStatusText('');
 
-    // Start Web Speech in preview-only mode for live feedback
     startWebSpeech(true);
-  }, [startWebSpeech]);
+  }, [startWebSpeech, fireTrigger]);
 
   // ---------------------------------------------------------------------------
   // Toggle
@@ -210,8 +290,9 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
 
   const toggle = useCallback(() => {
     if (isListening || isTranscribing) {
+      clearTriggerTimeout();
+      pendingActionRef.current = null;
       stopMediaRecorder();
-      // In fallback mode, stop web speech directly
       if (!mediaRecorderRef.current) {
         webSpeechRef.current?.stop();
         setIsListening(false);
@@ -225,23 +306,22 @@ export function useSpeechToText({ onTranscript }: UseSpeechToTextOptions): UseSp
     if (whisperAvailable === true) {
       startCombined();
     } else if (whisperAvailable === false) {
-      // Fallback: Web Speech only
       setIsListening(true);
       startWebSpeech(false);
     } else {
-      // Status still loading — try combined; will fall through gracefully on mic error
       startCombined();
     }
-  }, [isListening, isTranscribing, stopMediaRecorder, startCombined, startWebSpeech]);
+  }, [isListening, isTranscribing, stopMediaRecorder, startCombined, startWebSpeech, clearTriggerTimeout]);
 
   const clearLastSttOutput = useCallback(() => setLastSttOutput(null), []);
 
   useEffect(() => {
     return () => {
+      clearTriggerTimeout();
       stopMediaRecorder();
       webSpeechRef.current?.stop();
     };
-  }, [stopMediaRecorder]);
+  }, [stopMediaRecorder, clearTriggerTimeout]);
 
   return { isListening, isTranscribing, statusText, lastSttOutput, toggle, clearLastSttOutput };
 }

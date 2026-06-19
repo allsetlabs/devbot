@@ -34,6 +34,15 @@ import {
 
 const router = Router();
 
+interface CodeChange {
+  status: 'dirty' | 'committed';
+  editedAt: string;
+  committedAt?: string;
+  commitHash?: string;
+  branch?: string;
+  repoDir?: string;
+}
+
 interface InteractiveChat {
   id: string;
   name: string;
@@ -51,6 +60,7 @@ interface InteractiveChat {
   workingDir: string | null;
   fastMode: boolean;
   starred: boolean;
+  codeChanges?: CodeChange[];
 }
 
 interface ChatMessageResponse {
@@ -63,13 +73,28 @@ interface ChatMessageResponse {
   createdAt: string;
 }
 
+function readCodeChanges(workingDir: string, sessionId: string): CodeChange[] | undefined {
+  const filePath = `${workingDir}/.tmp/code_changes/${sessionId}.json`;
+  if (!fs.existsSync(filePath)) return undefined;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as CodeChange[];
+  } catch {
+    return undefined;
+  }
+}
+
 function rowToChat(row: InteractiveChatRow): InteractiveChat {
   const settings = (row.settings as Record<string, unknown>) ?? {};
+  const workingDir = typeof settings.workingDir === 'string' ? settings.workingDir : null;
+  const claudeSessionId = row.claude_session_id;
+  const codeChanges =
+    workingDir && claudeSessionId ? readCodeChanges(workingDir, claudeSessionId) : undefined;
+
   return {
     id: row.id,
     name: row.name,
     type: row.type,
-    claudeSessionId: row.claude_session_id,
+    claudeSessionId,
     status: row.status,
     permissionMode: row.permission_mode,
     model: row.model,
@@ -78,10 +103,11 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     archivedAt: row.archived_at,
-    workingDir: typeof settings.workingDir === 'string' ? settings.workingDir : null,
+    workingDir,
     effort: typeof settings.effort === 'string' ? settings.effort : null,
     fastMode: settings.fastMode === true,
     starred: settings.starred === true,
+    codeChanges,
   };
 }
 

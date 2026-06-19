@@ -178,6 +178,15 @@ export interface ClaudeContentBlock {
 export type PermissionMode = 'plan' | 'auto-accept' | 'dangerous';
 export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
 
+export type CodeChange = {
+  status: 'dirty' | 'committed';
+  editedAt: string;
+  committedAt?: string;
+  commitHash?: string;
+  branch?: string;
+  repoDir?: string;
+};
+
 export interface InteractiveChat {
   id: string;
   name: string;
@@ -195,6 +204,7 @@ export interface InteractiveChat {
   workingDir: string | null;
   fastMode: boolean;
   starred: boolean;
+  codeChanges?: CodeChange[];
 }
 
 export interface ChatMessage {

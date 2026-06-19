@@ -8,6 +8,8 @@ import {
   Copy,
   Terminal,
   MoreVertical,
+  GitBranch,
+  GitCommitHorizontal,
 } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import {
@@ -21,10 +23,17 @@ import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { formatRelativeTime } from '../lib/format';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
-import type { InteractiveChat } from '../types';
+import type { InteractiveChat, CodeChange } from '../types';
 
 const SWIPE_THRESHOLD = 80;
 const MAX_SWIPE = 100;
+
+function getGithubUrl(entry: CodeChange): string | null {
+  if (!entry.commitHash || !entry.repoDir) return null;
+  const repoName = entry.repoDir.split('/').pop();
+  if (!repoName) return null;
+  return `https://github.com/allsetlabs/${repoName}/commit/${entry.commitHash}`;
+}
 
 interface ChatListItemProps {
   chat: InteractiveChat;
@@ -36,6 +45,7 @@ interface ChatListItemProps {
   onDelete: (e: React.MouseEvent) => void;
   hasCopyCommand?: boolean;
   onCopyCommand?: () => void;
+  codeChanges?: CodeChange[];
 }
 
 export function ChatListItem({
@@ -48,7 +58,10 @@ export function ChatListItem({
   onDelete,
   hasCopyCommand = false,
   onCopyCommand,
+  codeChanges,
 }: ChatListItemProps) {
+  const hasDirty = codeChanges?.some((c) => c.status === 'dirty') ?? false;
+  const committedEntries = codeChanges?.filter((c) => c.status === 'committed') ?? [];
   const { pinnedIds } = usePinnedMessages(chat.id);
   const pinnedCount = pinnedIds.length;
 
@@ -156,6 +169,39 @@ export function ChatListItem({
               )}
             </div>
           )}
+          {hasDirty ? (
+            <div
+              className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500"
+              title="Has uncommitted code changes"
+            >
+              <GitBranch className="h-2.5 w-2.5 text-white" />
+            </div>
+          ) : committedEntries.length === 1 ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-green-500 p-0 hover:bg-green-600"
+              title={`Committed: ${committedEntries[0].commitHash ?? ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = getGithubUrl(committedEntries[0]);
+                if (url) window.open(url, '_blank');
+              }}
+            >
+              <GitCommitHorizontal className="h-2.5 w-2.5 text-white" />
+            </Button>
+          ) : committedEntries.length > 1 ? (
+            <div
+              className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-green-500"
+              title={committedEntries
+                .map((e) => e.commitHash)
+                .filter(Boolean)
+                .join('\n')}
+            >
+              <GitCommitHorizontal className="h-2.5 w-2.5 text-white" />
+            </div>
+          ) : null}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">

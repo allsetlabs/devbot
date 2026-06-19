@@ -1,16 +1,5 @@
 import { useCallback, useRef } from 'react';
-import {
-  Loader2,
-  Send,
-  Square,
-  Plus,
-  FolderOpen,
-  Pause,
-  Play,
-  Mic,
-  ArrowUp,
-  X,
-} from 'lucide-react';
+import { Loader2, Send, Square, Plus, FolderOpen, Mic, ArrowUp, X } from 'lucide-react';
 import { ChatOcrMenu } from './ChatOcrMenu';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
@@ -55,9 +44,6 @@ interface ChatTextareaWithPickersProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSend: () => void;
   onStop: () => void;
-  isPaused: boolean;
-  onPause: () => void;
-  onResume: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasteFiles?: (files: File[]) => void;
   onBrowseFiles?: () => void;
@@ -93,9 +79,6 @@ export function ChatTextareaWithPickers({
   onKeyDown,
   onSend,
   onStop,
-  isPaused,
-  onPause,
-  onResume,
   onFileInputChange,
   onPasteFiles,
   onBrowseFiles,
@@ -346,27 +329,17 @@ export function ChatTextareaWithPickers({
                   </Button>
                 )}
               </div>
-              {/* Right: pause/stop/send */}
+              {/* Right: stop/send */}
               <div className="flex items-center gap-1">
                 {isRunning && (
-                  <>
-                    <Button
-                      onClick={isPaused ? onResume : onPause}
-                      disabled={interrupting}
-                      size="icon"
-                      className={`h-8 w-8 ${isPaused ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-warning-foreground bg-warning hover:bg-warning/90'}`}
-                    >
-                      {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-                    </Button>
-                    <Button
-                      onClick={onStop}
-                      disabled={interrupting}
-                      size="icon"
-                      className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      <Square className="h-4 w-4" />
-                    </Button>
-                  </>
+                  <Button
+                    onClick={onStop}
+                    disabled={interrupting}
+                    size="icon"
+                    className="h-8 w-8 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    <Square className="h-4 w-4" />
+                  </Button>
                 )}
                 {isRunning && onQueue && (
                   <Button

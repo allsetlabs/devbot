@@ -47,9 +47,6 @@ interface ChatInputAreaProps {
   onLoadMoreFiles: () => void;
   onSend: () => void;
   onStop: () => void;
-  isPaused: boolean;
-  onPause: () => void;
-  onResume: () => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onResetNavigation: () => void;
   onFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -93,9 +90,6 @@ export function ChatInputArea({
   onLoadMoreFiles,
   onSend,
   onStop,
-  isPaused,
-  onPause,
-  onResume,
   onKeyDown,
   onResetNavigation,
   onFileInputChange,
@@ -192,9 +186,6 @@ export function ChatInputArea({
         onKeyDown={onKeyDown}
         onSend={onSend}
         onStop={onStop}
-        isPaused={isPaused}
-        onPause={onPause}
-        onResume={onResume}
         onFileInputChange={onFileInputChange}
         onPasteFiles={onPasteFiles}
         onBrowseFiles={onBrowseFiles}

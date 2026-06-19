@@ -28,7 +28,6 @@ const MAX_CONTEXT_TOKENS = 200000;
 interface ChatViewHeaderProps {
   onBack: () => void;
   isRunning: boolean;
-  isPaused: boolean;
   chat: InteractiveChat | undefined;
   messages: ChatMessageType[];
   totalTokens?: number;
@@ -48,7 +47,6 @@ interface ChatViewHeaderProps {
 export function ChatViewHeader({
   onBack,
   isRunning,
-  isPaused,
   chat,
   messages,
   totalTokens = 0,
@@ -90,9 +88,7 @@ export function ChatViewHeader({
           </Button>
           <div className="flex min-w-0 flex-col gap-0.5">
             <div className="flex items-center gap-2">
-              {isRunning && isPaused ? (
-                <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-warning" />
-              ) : isRunning ? (
+              {isRunning ? (
                 <div className="h-2.5 w-2.5 flex-shrink-0 animate-pulse rounded-full bg-primary" />
               ) : (
                 <MessageCircle className="h-5 w-5 flex-shrink-0 text-muted-foreground" />

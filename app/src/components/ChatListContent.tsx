@@ -246,7 +246,6 @@ export function ChatListContent({
                 <ChatListItem
                   chat={chat}
                   isFavorited={isFavorite(chat.id)}
-                  codeChanges={chat.codeChanges}
                   onSelect={() => onSelect(chat)}
                   onToggleFavorite={(e) => {
                     e.stopPropagation();

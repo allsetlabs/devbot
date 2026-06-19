@@ -27,14 +27,6 @@ export interface MessageSearchResult {
   timestamp: string;
 }
 
-export interface GitStatus {
-  isGitRepo: boolean;
-  branch: string | null;
-  dirtyCount: number;
-  ahead: number;
-  behind: number;
-}
-
 export interface WorkingDirectory {
   id: string;
   path: string;

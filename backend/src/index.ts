@@ -23,7 +23,6 @@ import {
   seedDefaultWorkingDirectories,
 } from './routes/working-directories.js';
 import { companiesRouter } from './routes/companies.js';
-import { gitStatusRouter } from './routes/git-status.js';
 import { memoriesRouter } from './routes/memories.js';
 import { claudeMdRouter } from './routes/claude-md.js';
 import { worktreesRouter } from './routes/worktrees.js';
@@ -202,7 +201,6 @@ app.use('/api/commands', commandsRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
-app.use('/api/git-status', gitStatusRouter);
 app.use('/api/memories', memoriesRouter);
 app.use('/api/claude-md', claudeMdRouter);
 app.use('/api/worktrees', worktreesRouter);

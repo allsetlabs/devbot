@@ -27,7 +27,6 @@ import type {
   FeedbackDocument,
   FileBrowseItem,
   MemoriesResponse,
-  GitStatus,
   MessageSearchResult,
   QueuedMessage,
   OcrDocument,
@@ -517,10 +516,6 @@ export const api = {
 
   deleteWorkingDirectory: (id: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/working-directories/${id}`, { method: 'DELETE' });
-  },
-
-  getGitStatus: (dir: string): Promise<GitStatus> => {
-    return fetchApi(`/api/git-status?dir=${encodeURIComponent(dir)}`);
   },
 
   // Companies endpoints

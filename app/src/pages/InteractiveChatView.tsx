@@ -37,7 +37,6 @@ import {
 import { type FileIntellisensePickerHandle } from '@allsetlabs/forge/components/ui/file-intellisense-picker';
 import { useFileIntellisense } from '../hooks/useFileIntellisense';
 import { useCommands } from '../hooks/useCommands';
-import { useGitStatus } from '../hooks/useGitStatus';
 import { useSettings } from '../hooks/useSettings';
 import { useDeleteChat, useArchiveChat } from '../hooks/useChat';
 import { useFavorites } from '../hooks/useFavorites';
@@ -254,8 +253,6 @@ export function InteractiveChatView({
 
   // Slash command picker — must be after chat query so workingDir is available
   const { data: commands = [] } = useCommands(chat?.workingDir);
-
-  const { data: gitStatus } = useGitStatus(chat?.workingDir);
 
   // File intellisense picker — must be after chat query so workingDir is available
   const {
@@ -1199,7 +1196,6 @@ export function InteractiveChatView({
           chat={chat}
           messages={messages}
           totalTokens={sessionStats.totalTokens}
-          gitStatus={gitStatus}
           onToggleSearch={() => {
             setSearchOpen(!searchOpen);
             if (searchOpen) setSearchQuery('');

@@ -5,7 +5,6 @@ import {
   Eye,
   EyeOff,
   FolderRoot,
-  GitBranch,
   MessageCircle,
   Pencil,
   Pin,
@@ -21,7 +20,7 @@ import {
   DropdownMenuSeparator,
 } from '@allsetlabs/forge/components/ui/dropdown-menu';
 import { MODE_CONFIG } from '../lib/mode-config';
-import type { ChatMessage as ChatMessageType, GitStatus, InteractiveChat } from '../types';
+import type { ChatMessage as ChatMessageType, InteractiveChat } from '../types';
 
 const MAX_CONTEXT_TOKENS = 200000;
 
@@ -31,7 +30,6 @@ interface ChatViewHeaderProps {
   chat: InteractiveChat | undefined;
   messages: ChatMessageType[];
   totalTokens?: number;
-  gitStatus?: GitStatus;
   onToggleSearch: () => void;
   hideToolResults: boolean;
   onToggleToolResults: () => void;
@@ -50,7 +48,6 @@ export function ChatViewHeader({
   chat,
   messages,
   totalTokens = 0,
-  gitStatus,
   onToggleSearch,
   hideToolResults,
   onToggleToolResults,
@@ -112,21 +109,6 @@ export function ChatViewHeader({
                 <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </div>
-            {gitStatus?.isGitRepo && gitStatus.branch && (
-              <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                <GitBranch className="h-3 w-3" />
-                <span className="max-w-[120px] truncate">{gitStatus.branch}</span>
-                {gitStatus.dirtyCount > 0 && (
-                  <span className="text-warning-foreground rounded bg-warning/20 px-1">
-                    {gitStatus.dirtyCount}
-                  </span>
-                )}
-                {gitStatus.ahead > 0 && <span className="text-green-500">↑{gitStatus.ahead}</span>}
-                {gitStatus.behind > 0 && (
-                  <span className="text-orange-500">↓{gitStatus.behind}</span>
-                )}
-              </div>
-            )}
           </div>
         </div>
         {/* Desktop: all icon buttons visible */}

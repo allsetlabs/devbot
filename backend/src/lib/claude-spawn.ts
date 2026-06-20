@@ -101,6 +101,8 @@ export interface ClaudeSpawnOptions {
   onComplete?: (exitCode: number | null, success: boolean) => void;
   /** Raw stdout data callback (for JSONL file backup etc.) */
   onRawChunk?: (chunk: string) => void;
+  /** Additional environment variables merged into the child process env */
+  extraEnv?: Record<string, string>;
 }
 
 export interface ClaudeSpawnResult {
@@ -161,6 +163,7 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
     onSessionId,
     onComplete,
     onRawChunk,
+    extraEnv,
   } = options;
 
   // Build the final prompt
@@ -194,7 +197,7 @@ export function spawnClaude(options: ClaudeSpawnOptions): ClaudeSpawnResult {
   // Spawn
   const proc = spawn('claude', args, {
     cwd: workDir,
-    env: { ...process.env, FORCE_COLOR: '0' },
+    env: { ...process.env, FORCE_COLOR: '0', ...extraEnv },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 

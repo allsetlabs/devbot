@@ -488,23 +488,20 @@ router.get(
   }, 'get chat')
 );
 
-// Get chat progress (reads .tmp/progress/{id}.json written by Claude)
+// Get chat progress (reads .tmp/summarize-chat/{id}.json written by summarize-chat agent)
 router.get(
   '/:id/progress',
   asyncHandler(async (req, res) => {
-    const row = await getOneById(coreDb, interactive_chats, req.params.id, 'Chat', res);
-    if (!row) return;
-    const settings = (row.settings ?? {}) as Record<string, unknown>;
-    const workingDir =
-      typeof settings.workingDir === 'string' ? settings.workingDir : DEVBOT_PROJECTS_DIR;
-    const filePath = path.join(workingDir, '.tmp', 'progress', `${req.params.id}.json`);
+    const filePath = path.join(DEVBOT_PROJECTS_DIR, '.tmp', 'summarize-chat', `${req.params.id}.json`);
     try {
       const raw = fs.readFileSync(filePath, 'utf-8');
       const parsed = JSON.parse(raw);
-      const progress = typeof parsed.progress === 'string' ? parsed.progress : null;
-      res.json({ progress });
+      res.json({
+        progress: typeof parsed.progress === 'string' ? parsed.progress : null,
+        summary: typeof parsed.summary === 'string' ? parsed.summary : null,
+      });
     } catch {
-      res.json({ progress: null });
+      res.json({ progress: null, summary: null });
     }
   }, 'get chat progress')
 );

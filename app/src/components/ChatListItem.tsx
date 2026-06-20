@@ -18,6 +18,8 @@ import {
   DropdownMenuSeparator,
 } from '@allsetlabs/forge/components/ui/dropdown-menu';
 import { usePinnedMessages } from '../hooks/usePinnedMessages';
+import { useChatProgress } from '../hooks/useChatProgress';
+import { ChatProgressBadge } from './ChatProgressBadge';
 import { formatRelativeTime } from '../lib/format';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
@@ -51,6 +53,7 @@ export function ChatListItem({
 }: ChatListItemProps) {
   const { pinnedIds } = usePinnedMessages(chat.id);
   const pinnedCount = pinnedIds.length;
+  const progress = useChatProgress(chat.id, chat.isRunning);
 
   const [swipeX, setSwipeX] = useState(0);
   const [isSnapping, setIsSnapping] = useState(false);
@@ -174,6 +177,7 @@ export function ChatListItem({
                 {MODEL_CONFIG[chat.model].shortLabel}
               </span>
             )}
+            <ChatProgressBadge progress={progress} />
           </div>
           <p className="text-xs text-muted-foreground">
             {chat.isRunning ? 'Running...' : formatRelativeTime(chat.updatedAt)}

@@ -79,7 +79,11 @@ function getWebSpeechRecognition(): WebkitSpeechRecognitionCtor | undefined {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition;
 }
 
-export function useSpeechToText({ onTranscript, onTriggerSend, onTriggerQueue }: UseSpeechToTextOptions): UseSpeechToTextReturn {
+export function useSpeechToText({
+  onTranscript,
+  onTriggerSend,
+  onTriggerQueue,
+}: UseSpeechToTextOptions): UseSpeechToTextReturn {
   const [isListening, setIsListening] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [statusText, setStatusText] = useState('');
@@ -109,8 +113,12 @@ export function useSpeechToText({ onTranscript, onTriggerSend, onTriggerQueue }:
 
   useEffect(() => {
     sttStatus()
-      .then((s) => { localAvailableRef.current = s.available; })
-      .catch(() => { localAvailableRef.current = false; });
+      .then((s) => {
+        localAvailableRef.current = s.available;
+      })
+      .catch(() => {
+        localAvailableRef.current = false;
+      });
   }, []);
 
   const fireTrigger = useCallback((action: TriggerAction) => {
@@ -122,87 +130,90 @@ export function useSpeechToText({ onTranscript, onTriggerSend, onTriggerQueue }:
   // Web Speech — live preview only (preview=true) or sole source (preview=false)
   // ---------------------------------------------------------------------------
 
-  const startWebSpeech = useCallback((previewOnly: boolean) => {
-    const SR = getWebSpeechRecognition();
-    if (!SR) return;
+  const startWebSpeech = useCallback(
+    (previewOnly: boolean) => {
+      const SR = getWebSpeechRecognition();
+      if (!SR) return;
 
-    const recognition = new SR();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
+      const recognition = new SR();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
 
-    recognition.onstart = () => {
-      if (!previewOnly) setIsListening(true);
-    };
-    recognition.onend = () => {
-      webSpeechRef.current = null;
-      if (!previewOnly) {
-        setIsListening(false);
-        setStatusText('');
-      }
-    };
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let text = '';
-      for (let i = 0; i < event.results.length; i++) {
-        text += event.results[i][0].transcript;
-      }
-      const trimmed = text.trim();
-      const latest = event.results[event.results.length - 1];
-
-      if (previewOnly) {
-        setStatusText(trimmed);
-        if (latest?.isFinal) {
-          const { action } = checkTriggerWord(trimmed);
-          if (action) {
-            // Cancel any previous pending trigger, start a fresh 1s delay
-            clearTriggerTimeout();
-            pendingActionRef.current = action;
-            triggerTimeoutRef.current = setTimeout(() => {
-              triggerTimeoutRef.current = null;
-              if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-                mediaRecorderRef.current.stop();
-              }
-            }, TRIGGER_DELAY_MS);
-          } else {
-            // New final result with no trigger — cancel any pending trigger
-            clearTriggerTimeout();
-            pendingActionRef.current = null;
-          }
-        }
-      } else {
-        // Fallback path: Web Speech is the sole source
-        setStatusText(trimmed);
-        if (latest?.isFinal) {
-          const { stripped, action } = checkTriggerWord(trimmed);
-          const finalText = stripped || trimmed;
-          flushSync(() => {
-            setLastSttOutput(finalText);
-            onTranscriptRef.current(finalText);
-          });
-          setStatusText('');
+      recognition.onstart = () => {
+        if (!previewOnly) setIsListening(true);
+      };
+      recognition.onend = () => {
+        webSpeechRef.current = null;
+        if (!previewOnly) {
           setIsListening(false);
-          webSpeechRef.current?.stop();
-          if (action) {
-            // 1-second delay before firing so the user can hear the confirmation
-            triggerTimeoutRef.current = setTimeout(() => {
-              triggerTimeoutRef.current = null;
-              fireTrigger(action);
-            }, TRIGGER_DELAY_MS);
+          setStatusText('');
+        }
+      };
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let text = '';
+        for (let i = 0; i < event.results.length; i++) {
+          text += event.results[i][0].transcript;
+        }
+        const trimmed = text.trim();
+        const latest = event.results[event.results.length - 1];
+
+        if (previewOnly) {
+          setStatusText(trimmed);
+          if (latest?.isFinal) {
+            const { action } = checkTriggerWord(trimmed);
+            if (action) {
+              // Cancel any previous pending trigger, start a fresh 1s delay
+              clearTriggerTimeout();
+              pendingActionRef.current = action;
+              triggerTimeoutRef.current = setTimeout(() => {
+                triggerTimeoutRef.current = null;
+                if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+                  mediaRecorderRef.current.stop();
+                }
+              }, TRIGGER_DELAY_MS);
+            } else {
+              // New final result with no trigger — cancel any pending trigger
+              clearTriggerTimeout();
+              pendingActionRef.current = null;
+            }
+          }
+        } else {
+          // Fallback path: Web Speech is the sole source
+          setStatusText(trimmed);
+          if (latest?.isFinal) {
+            const { stripped, action } = checkTriggerWord(trimmed);
+            const finalText = stripped || trimmed;
+            flushSync(() => {
+              setLastSttOutput(finalText);
+              onTranscriptRef.current(finalText);
+            });
+            setStatusText('');
+            setIsListening(false);
+            webSpeechRef.current?.stop();
+            if (action) {
+              // 1-second delay before firing so the user can hear the confirmation
+              triggerTimeoutRef.current = setTimeout(() => {
+                triggerTimeoutRef.current = null;
+                fireTrigger(action);
+              }, TRIGGER_DELAY_MS);
+            }
           }
         }
-      }
-    };
-    recognition.onerror = () => {
-      webSpeechRef.current = null;
-      if (!previewOnly) {
-        setIsListening(false);
-        setStatusText('');
-      }
-    };
+      };
+      recognition.onerror = () => {
+        webSpeechRef.current = null;
+        if (!previewOnly) {
+          setIsListening(false);
+          setStatusText('');
+        }
+      };
 
-    webSpeechRef.current = recognition;
-    recognition.start();
-  }, [fireTrigger, clearTriggerTimeout]);
+      webSpeechRef.current = recognition;
+      recognition.start();
+    },
+    [fireTrigger, clearTriggerTimeout]
+  );
 
   // ---------------------------------------------------------------------------
   // Combined mode: MediaRecorder (whisper) + Web Speech (preview)
@@ -259,7 +270,7 @@ export function useSpeechToText({ onTranscript, onTriggerSend, onTriggerQueue }:
           // Strip trigger word from whisper output if present (whisper may or may not capture it)
           const { stripped, action } = checkTriggerWord(transcript);
           const finalAction = action ?? pendingAction;
-          const finalText = action ? (stripped || transcript) : transcript;
+          const finalText = action ? stripped || transcript : transcript;
           flushSync(() => {
             setLastSttOutput(finalText);
             onTranscriptRef.current(finalText);
@@ -311,7 +322,14 @@ export function useSpeechToText({ onTranscript, onTriggerSend, onTriggerQueue }:
     } else {
       startCombined();
     }
-  }, [isListening, isTranscribing, stopMediaRecorder, startCombined, startWebSpeech, clearTriggerTimeout]);
+  }, [
+    isListening,
+    isTranscribing,
+    stopMediaRecorder,
+    startCombined,
+    startWebSpeech,
+    clearTriggerTimeout,
+  ]);
 
   const clearLastSttOutput = useCallback(() => setLastSttOutput(null), []);
 

@@ -229,6 +229,10 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/status`);
   },
 
+  getChatProgress: (chatId: string): Promise<{ progress: string | null }> => {
+    return fetchApi(`/api/interactive-chats/${chatId}/progress`);
+  },
+
   getChatQueue: (chatId: string): Promise<QueuedMessage[]> => {
     return fetchApi(`/api/interactive-chats/${chatId}/queue`);
   },

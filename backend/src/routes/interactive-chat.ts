@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import fs from 'fs';
+import path from 'path';
 import { eq, desc, gt, isNull, isNotNull, and, lte, inArray, sql, asc } from 'drizzle-orm';
 import {
   coreDb,
@@ -31,6 +32,7 @@ import {
   getOneById,
   requireEnum,
 } from '../lib/route-helpers.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 const router = Router();
 
@@ -484,6 +486,27 @@ router.get(
     if (!row) return;
     res.json(rowToChat(row));
   }, 'get chat')
+);
+
+// Get chat progress (reads .tmp/progress/{id}.json written by Claude)
+router.get(
+  '/:id/progress',
+  asyncHandler(async (req, res) => {
+    const row = await getOneById(coreDb, interactive_chats, req.params.id, 'Chat', res);
+    if (!row) return;
+    const settings = (row.settings ?? {}) as Record<string, unknown>;
+    const workingDir =
+      typeof settings.workingDir === 'string' ? settings.workingDir : DEVBOT_PROJECTS_DIR;
+    const filePath = path.join(workingDir, '.tmp', 'progress', `${req.params.id}.json`);
+    try {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      const progress = typeof parsed.progress === 'string' ? parsed.progress : null;
+      res.json({ progress });
+    } catch {
+      res.json({ progress: null });
+    }
+  }, 'get chat progress')
 );
 
 // Create new interactive chat
@@ -1318,5 +1341,6 @@ router.post(
     res.json({ success: true });
   }, 'send single queued message')
 );
+
 
 export { router as interactiveChatRouter };

@@ -31,6 +31,10 @@ const REMOTION_VIDEO_MARKER = 'REMOTION_VIDEO_RESULT:';
 const SYSTEM_PROMPT =
   'This is a non-interactive session. You cannot ask the user questions during execution. If you need clarification or have a question, output the question clearly and end your response. The user will respond in a follow-up message. Do not use interactive tools that require user input.';
 
+function buildProgressPrompt(chatId: string): string {
+  return `At the end of every response, update .tmp/progress/${chatId}.json with {"progress":"<value>"}. Use "question" if you ended with a question or need input, "done" if changes are committed and pushed, "PR" if a pull request was created, "failure" if something failed, or a short plain string (max one sentence) for anything else. Create the .tmp/progress/ directory if it doesn't exist.`;
+}
+
 const PLAN_MODE_PROMPT =
   'You are in PLAN MODE. You may ONLY read files and analyze code. Do NOT create, edit, delete, or modify any files. Do NOT run bash commands that change state (no writes, no installs, no git commits). Only provide analysis, plans, and suggestions. If the user asks you to make changes, explain what you would do but do not execute.';
 
@@ -227,7 +231,7 @@ export async function sendMessage(
   // Build system prompts
   const mode: PermissionMode = (chat.permission_mode as PermissionMode) || 'dangerous';
   const model: ClaudeModel = (chat.model as ClaudeModel) || 'sonnet';
-  const systemPrompts = [SYSTEM_PROMPT];
+  const systemPrompts = [SYSTEM_PROMPT, buildProgressPrompt(chatId)];
   if (mode === 'plan') systemPrompts.push(PLAN_MODE_PROMPT);
   else if (mode === 'auto-accept') systemPrompts.push(AUTO_ACCEPT_PROMPT);
   if (chat.system_prompt) systemPrompts.push(chat.system_prompt as string);

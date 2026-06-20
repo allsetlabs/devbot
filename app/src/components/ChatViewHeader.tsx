@@ -19,6 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@allsetlabs/forge/components/ui/dropdown-menu';
+import { useChatProgress } from '../hooks/useChatProgress';
+import { ChatProgressBadge } from './ChatProgressBadge';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, InteractiveChat } from '../types';
 
@@ -75,6 +77,7 @@ export function ChatViewHeader({
   const tokenPercent = Math.round((totalTokens / MAX_CONTEXT_TOKENS) * 100);
   const showContextWarning = totalTokens > 0 && tokenPercent >= 80;
   const isContextCritical = tokenPercent >= 95;
+  const progress = useChatProgress(chat?.id ?? '', isRunning);
 
   return (
     <>
@@ -100,6 +103,7 @@ export function ChatViewHeader({
                   {MODE_CONFIG[chat.permissionMode].shortLabel}
                 </span>
               )}
+              <ChatProgressBadge progress={progress} />
               <Button
                 variant="ghost"
                 size="icon"

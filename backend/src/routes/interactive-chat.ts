@@ -36,6 +36,11 @@ import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
 
 const router = Router();
 
+interface ChatSessionSummary {
+  progress: string | null;
+  summary: string | null;
+}
+
 interface InteractiveChat {
   id: string;
   name: string;
@@ -47,12 +52,59 @@ interface InteractiveChat {
   systemPrompt: string | null;
   effort: string | null;
   isRunning: boolean;
+  progress: string | null;
+  summary: string | null;
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;
   workingDir: string | null;
   fastMode: boolean;
   starred: boolean;
+}
+
+const SUMMARIZE_CHAT_DIR = path.join(DEVBOT_PROJECTS_DIR, '.tmp', 'summarize-chat');
+
+function parseSummaryFile(raw: string): ChatSessionSummary {
+  try {
+    const parsed = JSON.parse(raw) as { progress?: unknown; summary?: unknown };
+    return {
+      progress: typeof parsed.progress === 'string' ? parsed.progress : null,
+      summary: typeof parsed.summary === 'string' ? parsed.summary : null,
+    };
+  } catch {
+    return { progress: null, summary: null };
+  }
+}
+
+/** Reads .tmp/summarize-chat/{claudeSessionId}.json written by the summarize-chat agent. */
+function readSessionSummary(sessionId: string | null): ChatSessionSummary {
+  if (!sessionId) return { progress: null, summary: null };
+  try {
+    const raw = fs.readFileSync(path.join(SUMMARIZE_CHAT_DIR, `${sessionId}.json`), 'utf-8');
+    return parseSummaryFile(raw);
+  } catch {
+    return { progress: null, summary: null };
+  }
+}
+
+/** Load all summarize-chat files once for list endpoints (avoids N separate reads). */
+function loadSummarizeChatMap(): Map<string, ChatSessionSummary> {
+  const map = new Map<string, ChatSessionSummary>();
+  try {
+    for (const file of fs.readdirSync(SUMMARIZE_CHAT_DIR)) {
+      if (!file.endsWith('.json')) continue;
+      const sessionId = file.slice(0, -5);
+      try {
+        const raw = fs.readFileSync(path.join(SUMMARIZE_CHAT_DIR, file), 'utf-8');
+        map.set(sessionId, parseSummaryFile(raw));
+      } catch {
+        // skip unreadable files
+      }
+    }
+  } catch {
+    // directory may not exist yet
+  }
+  return map;
 }
 
 interface ChatMessageResponse {
@@ -65,8 +117,14 @@ interface ChatMessageResponse {
   createdAt: string;
 }
 
-function rowToChat(row: InteractiveChatRow): InteractiveChat {
+function rowToChat(
+  row: InteractiveChatRow,
+  summaryMap?: Map<string, ChatSessionSummary>
+): InteractiveChat {
   const settings = (row.settings as Record<string, unknown>) ?? {};
+  const sessionSummary = summaryMap
+    ? (summaryMap.get(row.claude_session_id ?? '') ?? { progress: null, summary: null })
+    : readSessionSummary(row.claude_session_id);
   return {
     id: row.id,
     name: row.name,
@@ -77,6 +135,8 @@ function rowToChat(row: InteractiveChatRow): InteractiveChat {
     model: row.model,
     systemPrompt: row.system_prompt,
     isRunning: row.is_executing ?? false,
+    progress: sessionSummary.progress,
+    summary: sessionSummary.summary,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     archivedAt: row.archived_at,
@@ -384,7 +444,8 @@ router.get(
       .where(and(...conditions))
       .orderBy(desc(interactive_chats.archived_at));
 
-    res.json(rows.map(rowToChat));
+    const summaryMap = loadSummarizeChatMap();
+    res.json(rows.map((row) => rowToChat(row, summaryMap)));
   }, 'list archived chats')
 );
 
@@ -403,7 +464,8 @@ router.get(
       .where(and(...conditions))
       .orderBy(desc(interactive_chats.created_at));
 
-    res.json(rows.map(rowToChat));
+    const summaryMap = loadSummarizeChatMap();
+    res.json(rows.map((row) => rowToChat(row, summaryMap)));
   }, 'list chats')
 );
 
@@ -486,24 +548,6 @@ router.get(
     if (!row) return;
     res.json(rowToChat(row));
   }, 'get chat')
-);
-
-// Get chat progress (reads .tmp/summarize-chat/{id}.json written by summarize-chat agent)
-router.get(
-  '/:id/progress',
-  asyncHandler(async (req, res) => {
-    const filePath = path.join(DEVBOT_PROJECTS_DIR, '.tmp', 'summarize-chat', `${req.params.id}.json`);
-    try {
-      const raw = fs.readFileSync(filePath, 'utf-8');
-      const parsed = JSON.parse(raw);
-      res.json({
-        progress: typeof parsed.progress === 'string' ? parsed.progress : null,
-        summary: typeof parsed.summary === 'string' ? parsed.summary : null,
-      });
-    } catch {
-      res.json({ progress: null, summary: null });
-    }
-  }, 'get chat progress')
 );
 
 // Create new interactive chat
@@ -1338,6 +1382,5 @@ router.post(
     res.json({ success: true });
   }, 'send single queued message')
 );
-
 
 export { router as interactiveChatRouter };

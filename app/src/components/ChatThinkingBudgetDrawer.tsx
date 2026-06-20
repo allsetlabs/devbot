@@ -34,14 +34,14 @@ export function ChatThinkingBudgetDrawer({
 }: ChatThinkingBudgetDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[80vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
             Thinking Effort
           </DrawerTitle>
         </DrawerHeader>
-        <div className="flex flex-col gap-3 px-4 pb-6">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6">
           <p className="text-xs text-muted-foreground">
             Controls how much reasoning Claude uses. Higher effort = deeper thinking but slower
             responses. Maps to Claude Code CLI&apos;s{' '}

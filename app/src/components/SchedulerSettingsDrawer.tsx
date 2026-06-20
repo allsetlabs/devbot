@@ -139,11 +139,11 @@ export function SchedulerSettingsDrawer({
 
   return (
     <Drawer open={open} onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle className="text-left">Scheduler Settings</DrawerTitle>
         </DrawerHeader>
-        <div className="overflow-y-auto px-4 pb-6" data-vaul-no-drag>
+        <div className="flex-1 overflow-y-auto px-4 pb-6" data-vaul-no-drag>
           {saveMutation.error && (
             <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {saveMutation.error instanceof Error ? saveMutation.error.message : 'Failed to save'}

@@ -26,11 +26,11 @@ export function ChatModeSwitcherDrawer({
 }: ChatModeSwitcherDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange} dismissible>
-      <DrawerContent className="max-h-[80vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle>Change Permission Mode</DrawerTitle>
         </DrawerHeader>
-        <div className="flex flex-col gap-3 px-4 pb-6">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6">
           {(Object.entries(MODE_CONFIG) as [PermissionMode, typeof MODE_CONFIG.plan][]).map(
             ([mode, config]) => {
               const isCurrentMode = currentPermissionMode === mode;

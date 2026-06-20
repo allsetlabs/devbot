@@ -38,7 +38,7 @@ export function EditEntryDrawer({ entry, isPending, onClose, onSave }: EditEntry
 
   return (
     <Drawer open={entry !== null} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent>
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle>
             {entry && (

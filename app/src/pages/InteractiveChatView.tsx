@@ -1137,6 +1137,23 @@ export function InteractiveChatView({
     };
   }, [messages]);
 
+  const toolResultCount = useMemo(
+    () =>
+      messages.reduce((count, message) => {
+        if (message.type === 'tool_use' || message.type === 'tool_result') return count + 1;
+        if (message.type === 'assistant' && Array.isArray(message.content?.message?.content)) {
+          return (
+            count +
+            message.content.message.content.filter(
+              (block: { type: string }) => block.type === 'tool_use' || block.type === 'tool_result'
+            ).length
+          );
+        }
+        return count;
+      }, 0),
+    [messages]
+  );
+
   if (loading) {
     return (
       <div className={`${embedded ? '' : 'safe-area-top safe-area-bottom'} flex h-full flex-col`}>
@@ -1200,18 +1217,8 @@ export function InteractiveChatView({
             setSearchOpen(!searchOpen);
             if (searchOpen) setSearchQuery('');
           }}
-          hideToolResults={hideToolResults}
-          onToggleToolResults={handleToggleToolResults}
-          pinnedIds={pinnedIds}
-          onOpenPinnedMessages={() => setPinnedMessagesOpen(true)}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenCostDrawer={() => setCostDrawerOpen(true)}
-          onOpenRename={() => {
-            setRenameValue(chat?.name || '');
-            setRenameOpen(true);
-          }}
-          onOpenWorkingDir={() => setWorkingDirDrawerOpen(true)}
-          workingDir={chat?.workingDir}
         />
       )}
 
@@ -1411,6 +1418,31 @@ export function InteractiveChatView({
         onMemories={() => setMemoriesOpen(true)}
         onClaudeMd={() => setClaudeMdOpen(true)}
         onWorktrees={() => setWorktreesOpen(true)}
+        chatActions={{
+          hideToolResults,
+          toolResultCount,
+          onToggleToolResults: handleToggleToolResults,
+          pinnedCount: pinnedIds.length,
+          onOpenPinnedMessages: () => {
+            setSettingsOpen(false);
+            setTimeout(() => setPinnedMessagesOpen(true), 300);
+          },
+          hasTokenUsage: sessionStats.totalTokens > 0,
+          onOpenCostDrawer: () => {
+            setSettingsOpen(false);
+            setTimeout(() => setCostDrawerOpen(true), 300);
+          },
+          workingDirectory: chat?.workingDir,
+          onOpenWorkingDirectory: () => {
+            setSettingsOpen(false);
+            setTimeout(() => setWorkingDirDrawerOpen(true), 300);
+          },
+          onRename: () => {
+            setRenameValue(chat?.name || '');
+            setSettingsOpen(false);
+            setTimeout(() => setRenameOpen(true), 300);
+          },
+        }}
       />
       <MemoryViewerDrawer open={memoriesOpen} onOpenChange={setMemoriesOpen} />
       <ClaudeMdDrawer

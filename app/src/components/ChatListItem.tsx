@@ -6,6 +6,7 @@ import {
   Archive,
   Trash2,
   Copy,
+  FileText,
   Terminal,
   MoreVertical,
 } from 'lucide-react';
@@ -18,8 +19,8 @@ import {
   DropdownMenuSeparator,
 } from '@allsetlabs/forge/components/ui/dropdown-menu';
 import { usePinnedMessages } from '../hooks/usePinnedMessages';
-import { useChatProgress } from '../hooks/useChatProgress';
 import { ChatProgressBadge } from './ChatProgressBadge';
+import { ChatSessionSummaryModal } from './ChatSessionSummaryModal';
 import { formatRelativeTime } from '../lib/format';
 import { MODE_CONFIG } from '../lib/mode-config';
 import { MODEL_CONFIG } from '../lib/model-config';
@@ -53,7 +54,7 @@ export function ChatListItem({
 }: ChatListItemProps) {
   const { pinnedIds } = usePinnedMessages(chat.id);
   const pinnedCount = pinnedIds.length;
-  const progress = useChatProgress(chat.id, chat.isRunning);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   const [swipeX, setSwipeX] = useState(0);
   const [isSnapping, setIsSnapping] = useState(false);
@@ -163,6 +164,7 @@ export function ChatListItem({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <p className="truncate text-sm font-medium text-foreground">{chat.name}</p>
+            <ChatProgressBadge progress={chat.progress} />
             {chat.permissionMode && chat.permissionMode !== 'dangerous' && (
               <span
                 className={`inline-flex flex-shrink-0 items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${MODE_CONFIG[chat.permissionMode].bgColor} ${MODE_CONFIG[chat.permissionMode].color}`}
@@ -177,7 +179,6 @@ export function ChatListItem({
                 {MODEL_CONFIG[chat.model].shortLabel}
               </span>
             )}
-            <ChatProgressBadge progress={progress} />
           </div>
           <p className="text-xs text-muted-foreground">
             {chat.isRunning ? 'Running...' : formatRelativeTime(chat.updatedAt)}
@@ -185,6 +186,21 @@ export function ChatListItem({
         </div>
         {/* Desktop: all actions inline */}
         <div className="hidden flex-shrink-0 items-center gap-1 lg:flex">
+          {(chat.progress || chat.summary) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-muted-foreground/20"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setSummaryOpen(true);
+              }}
+              title="View session summary"
+            >
+              <FileText className="h-4 w-4 text-foreground/60" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -272,6 +288,17 @@ export function ChatListItem({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {(chat.progress || chat.summary) && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSummaryOpen(true);
+                  }}
+                >
+                  <FileText className="h-4 w-4" />
+                  View summary
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={onToggleFavorite}>
                 <Star className={`h-4 w-4 ${isFavorited ? 'fill-primary text-primary' : ''}`} />
                 {isFavorited ? 'Remove from favorites' : 'Add to favorites'}
@@ -304,6 +331,13 @@ export function ChatListItem({
           </DropdownMenu>
         </div>
       </a>
+      <ChatSessionSummaryModal
+        open={summaryOpen}
+        onOpenChange={setSummaryOpen}
+        progress={chat.progress}
+        summary={chat.summary}
+        chatName={chat.name}
+      />
     </div>
   );
 }

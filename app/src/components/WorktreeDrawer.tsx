@@ -91,7 +91,7 @@ export function WorktreeDrawer({ open, onOpenChange, workingDirectory }: Worktre
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <FolderTree className="h-5 w-5" />
@@ -101,7 +101,7 @@ export function WorktreeDrawer({ open, onOpenChange, workingDirectory }: Worktre
             Manage isolated working directories for parallel development
           </p>
         </DrawerHeader>
-        <div className="flex flex-col gap-3 overflow-y-auto px-4 pb-6">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6">
           {error && (
             <div className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />

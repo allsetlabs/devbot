@@ -24,3 +24,7 @@ src/
 - **Xterm connection** — `XtermTerminal.tsx` attaches to a backend WebSocket on ports `7750–7799` (one per session). The backend picks the port; the app receives it from the session API.
 - **Plugin frontends** — plugin UIs live in the plugin workspace (e.g. `plugins/baby-logs/frontend`) and are imported by this app. Don't duplicate plugin pages here.
 - **Mobile clipboard + HTTPS** — the app is served over HTTPS (via mkcert certs in `../certs/`) so clipboard APIs work on mobile Chrome.
+
+### Drawer Scrolling
+
+All drawers with scrollable content use `DrawerBody` from `@allsetlabs/forge`. See the drawer component documentation in Forge for usage examples.

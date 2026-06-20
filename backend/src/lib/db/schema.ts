@@ -26,6 +26,21 @@ export const sessions = sqliteTable('sessions', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// Global application settings
+export const application_settings = sqliteTable('application_settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  created_by: text('created_by').notNull().default('system'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('system'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, unknown>>().default({}),
+});
+
 // Scheduled tasks
 export const scheduled_tasks = sqliteTable('scheduled_tasks', {
   id: text('id').primaryKey(),

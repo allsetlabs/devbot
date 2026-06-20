@@ -181,6 +181,8 @@ export interface InteractiveChat {
   systemPrompt: string | null;
   effort: string | null;
   isRunning: boolean;
+  progress: string | null;
+  summary: string | null;
   createdAt: string;
   updatedAt: string;
   archivedAt: string | null;

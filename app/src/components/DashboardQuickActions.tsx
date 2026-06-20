@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Plus, Baby, Clock, Loader2, X } from 'lucide-react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@allsetlabs/forge/components/ui/drawer';
+import { Plus, Baby, Clock, Loader2 } from 'lucide-react';
 import { chatHooks } from '../hooks/useChat';
 import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
 import type { PermissionMode, ClaudeModel } from '../types';
@@ -57,15 +63,17 @@ export function DashboardQuickActions() {
 
   return (
     <>
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
-          <div className="safe-area-bottom w-full max-w-lg rounded-t-2xl bg-background p-4 shadow-xl sm:rounded-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">New Chat</h2>
-              <Button variant="ghost" size="icon" onClick={handleClose}>
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+      <Drawer
+        open={modalOpen}
+        onOpenChange={(open) => {
+          if (!open) handleClose();
+        }}
+      >
+        <DrawerContent className="safe-area-bottom">
+          <DrawerHeader className="text-left">
+            <DrawerTitle>New Chat</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6">
             {(createChatMutation.error || validationError) && (
               <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {validationError ||
@@ -96,8 +104,8 @@ export function DashboardQuickActions() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </DrawerContent>
+      </Drawer>
       <div className="col-span-2">
         <h3 className="mb-2 text-sm font-semibold text-muted-foreground">Quick Actions</h3>
         <div className="grid grid-cols-3 gap-2">

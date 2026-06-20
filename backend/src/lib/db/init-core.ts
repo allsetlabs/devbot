@@ -22,6 +22,20 @@ export async function initializeCoreDatabase() {
   try {
     console.log('[DB] Initializing core database schema...');
 
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS application_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        created_by TEXT NOT NULL DEFAULT 'system',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'system',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
     // Create sessions table
     await runSQL(
       `

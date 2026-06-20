@@ -10,16 +10,109 @@ import {
   Brain,
   FileText,
   FolderTree,
+  Coins,
+  Eye,
+  EyeOff,
+  FolderRoot,
+  Pencil,
+  Pin,
 } from 'lucide-react';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerBody,
 } from '@allsetlabs/forge/components/ui/drawer';
 import { Checkbox } from '@allsetlabs/forge/components/ui/checkbox';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import type { DevBotSettings } from '../hooks/useSettings';
+
+interface ChatSessionSettingsActionsProps {
+  hideToolResults: boolean;
+  toolResultCount: number;
+  onToggleToolResults: () => void;
+  pinnedCount: number;
+  onOpenPinnedMessages: () => void;
+  hasTokenUsage: boolean;
+  onOpenCostDrawer: () => void;
+  workingDirectory?: string | null;
+  onOpenWorkingDirectory: () => void;
+  onRename: () => void;
+}
+
+function ChatSessionSettingsActions({
+  hideToolResults,
+  toolResultCount,
+  onToggleToolResults,
+  pinnedCount,
+  onOpenPinnedMessages,
+  hasTokenUsage,
+  onOpenCostDrawer,
+  workingDirectory,
+  onOpenWorkingDirectory,
+  onRename,
+}: ChatSessionSettingsActionsProps) {
+  return (
+    <div className="space-y-2">
+      <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        Chat controls
+      </h3>
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="justify-start gap-2"
+          onClick={onToggleToolResults}
+        >
+          {hideToolResults ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {hideToolResults ? 'Show tools' : 'Hide tools'}
+          {hideToolResults && toolResultCount > 0 && (
+            <span className="ml-auto text-xs text-muted-foreground">{toolResultCount}</span>
+          )}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="justify-start gap-2"
+          onClick={onOpenPinnedMessages}
+          disabled={pinnedCount === 0}
+        >
+          <Pin className="h-4 w-4" />
+          Pinned
+          {pinnedCount > 0 && (
+            <span className="ml-auto text-xs text-muted-foreground">{pinnedCount}</span>
+          )}
+        </Button>
+        {hasTokenUsage && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="justify-start gap-2"
+            onClick={onOpenCostDrawer}
+          >
+            <Coins className="h-4 w-4" />
+            Session cost
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="justify-start gap-2"
+          onClick={onOpenWorkingDirectory}
+          title={workingDirectory ? `Working dir: ${workingDirectory}` : 'Set working directory'}
+        >
+          <FolderRoot className="h-4 w-4" />
+          Working dir
+        </Button>
+        <Button variant="outline" size="sm" className="justify-start gap-2" onClick={onRename}>
+          <Pencil className="h-4 w-4" />
+          Rename chat
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 interface SettingsDrawerProps {
   open: boolean;
@@ -43,6 +136,7 @@ interface SettingsDrawerProps {
   onMemories?: () => void;
   onClaudeMd?: () => void;
   onWorktrees?: () => void;
+  chatActions?: ChatSessionSettingsActionsProps;
 }
 
 export function SettingsDrawer({
@@ -67,6 +161,7 @@ export function SettingsDrawer({
   onMemories,
   onClaudeMd,
   onWorktrees,
+  chatActions,
 }: SettingsDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -77,8 +172,8 @@ export function SettingsDrawer({
             Settings
           </DrawerTitle>
         </DrawerHeader>
-        <div className="space-y-4 px-4 pb-6">
-          {/* Quick Actions */}
+        <DrawerBody className="space-y-4 px-4 pb-6">
+          {/* Quick actions */}
           <div className="flex gap-2">
             {onExport && (
               <Button
@@ -127,6 +222,8 @@ export function SettingsDrawer({
               </Button>
             )}
           </div>
+
+          {chatActions && <ChatSessionSettingsActions {...chatActions} />}
 
           {/* Memories, CLAUDE.md & Worktrees */}
           {(onMemories || onClaudeMd || onWorktrees) && (
@@ -292,7 +389,7 @@ export function SettingsDrawer({
               </p>
             </div>
           )}
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

@@ -12,11 +12,11 @@ APP_PORT := 4005
 BACKEND_PORT := 3100
 DEVBOT_PROJECTS := $(CURDIR)/../../../
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-skills
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
-	@echo "  make setup      - Install ALL system dependencies (brew, git, nvm, node, tmux, claude, MCP, skills)"
+	@echo "  make setup      - Install ALL system dependencies (brew, git, nvm, node, tmux, claude, MCP, ollama, whisper.cpp)"
 	@echo "  make install    - Sync submodules and install app/backend dependencies"
 	@echo "  make start      - Start app and backend in tmux session 'devbot'"
 	@echo "  make stop       - Stop all DevBot services"
@@ -30,7 +30,8 @@ setup:
 	@$(MAKE) setup-tmux
 	@$(MAKE) setup-claude
 	@$(MAKE) setup-mcp
-	@$(MAKE) setup-skills
+	@$(MAKE) setup-ollama
+	@$(MAKE) setup-whisper-cpp
 	@echo ""
 	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
 
@@ -134,6 +135,36 @@ setup-claude:
 		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> "$$SHELL_RC"; \
 	fi
 
+setup-ollama:
+	@echo "$(BLUE)Setting up Ollama and transcript-cleaner model...$(NC)"
+	@if ! command -v ollama &> /dev/null; then \
+		echo "$(BLUE)Installing Ollama...$(NC)"; \
+		if [ "$$(uname)" = "Darwin" ]; then brew install ollama && brew services restart ollama; \
+		elif [ "$$(uname)" = "Linux" ]; then curl -fsSL https://ollama.com/install.sh | sh; \
+		else echo "$(YELLOW)Please install Ollama manually from https://ollama.com$(NC)"; exit 1; fi; \
+		echo "$(GREEN)Ollama installed!$(NC)"; \
+	else \
+		echo "$(GREEN)Ollama already installed: $$(ollama --version)$(NC)"; \
+	fi
+	@echo "$(BLUE)Pulling base model llama3.2:3b (this may take a while)...$(NC)"
+	@ollama pull llama3.2:3b
+	@echo "$(BLUE)Building transcript-cleaner model from Modelfile...$(NC)"
+	@ollama create transcript-cleaner -f Modelfile
+	@echo "$(GREEN)transcript-cleaner model ready!$(NC)"
+
+setup-whisper-cpp:
+	@echo "$(BLUE)Setting up whisper.cpp...$(NC)"
+	@if command -v whisper-cli &> /dev/null; then \
+		echo "$(GREEN)whisper.cpp already installed: $$(whisper-cli --version 2>&1 | head -1)$(NC)"; \
+	elif [ "$$(uname)" = "Darwin" ]; then \
+		brew install whisper-cpp; \
+		command -v whisper-cli &> /dev/null || { echo "$(RED)whisper-cli was not installed correctly$(NC)"; exit 1; }; \
+		echo "$(GREEN)whisper.cpp installed!$(NC)"; \
+	else \
+		echo "$(RED)Automatic whisper.cpp setup currently requires macOS/Homebrew.$(NC)"; \
+		exit 1; \
+	fi
+
 setup-mcp:
 	@echo "$(BLUE)Adding Claude MCP servers...$(NC)"
 	@export NVM_DIR="$$HOME/.nvm"; \
@@ -145,58 +176,6 @@ setup-mcp:
 	echo "$(BLUE)Adding playwright...$(NC)"; \
 	claude mcp add playwright --scope user -- npx -y @anthropic-ai/mcp-server-playwright; \
 	echo "$(GREEN)MCP servers added!$(NC)"
-
-setup-skills:
-	@echo "$(BLUE)Cleaning up legacy devbot command symlink...$(NC)"
-	@rm -f ~/.claude/commands/devbot
-	@mkdir -p ~/.claude/skills ~/.claude/commands ~/.claude/agents
-	@echo "$(BLUE)Removing stale devbot skill directories from ~/.claude/skills (now local-only)...$(NC)"
-	@for skill in devbot-backend devbot-backend-crud-patterns devbot-code-review devbot-commit devbot-css-standards devbot-page-size-guard devbot-plugin-install devbot-worker-patterns; do \
-		if [ -e ~/.claude/skills/$$skill ] && [ ! -L ~/.claude/skills/$$skill ]; then \
-			rm -rf ~/.claude/skills/$$skill; \
-			echo "  ✗ removed stale dir ~/.claude/skills/$$skill"; \
-		fi; \
-	done
-	@echo "$(BLUE)Removing stale command copies in ~/.claude/commands that are now global...$(NC)"
-	@for f in $(CURDIR)/.global/commands/*.md; do \
-		name=$$(basename "$$f"); \
-		if [ -e ~/.claude/commands/$$name ] && [ ! -L ~/.claude/commands/$$name ]; then \
-			rm -f ~/.claude/commands/$$name; \
-			echo "  ✗ removed stale file ~/.claude/commands/$$name"; \
-		fi; \
-	done
-	@echo "$(BLUE)Symlinking global skills from .global/skills to ~/.claude/skills...$(NC)"
-	@for d in $(CURDIR)/.global/skills/*/; do \
-		skill=$$(basename "$$d"); \
-		rm -f ~/.claude/skills/$$skill; \
-		ln -sf "$$d" ~/.claude/skills/$$skill; \
-		echo "  ✓ ~/.claude/skills/$$skill → $$d"; \
-	done
-	@echo "$(BLUE)Symlinking global commands from .global/commands to ~/.claude/commands...$(NC)"
-	@for f in $(CURDIR)/.global/commands/*.md; do \
-		name=$$(basename "$$f"); \
-		rm -f ~/.claude/commands/$$name; \
-		ln -sf "$$f" ~/.claude/commands/$$name; \
-		echo "  ✓ ~/.claude/commands/$$name → $$f"; \
-	done
-	@echo "$(BLUE)Symlinking global agents from .global/agents to ~/.claude/agents...$(NC)"
-	@for f in $(CURDIR)/.global/agents/*.md; do \
-		name=$$(basename "$$f"); \
-		rm -f ~/.claude/agents/$$name; \
-		ln -sf "$$f" ~/.claude/agents/$$name; \
-		echo "  ✓ ~/.claude/agents/$$name → $$f"; \
-	done
-	@echo "$(GREEN)✅ Global skills/commands/agents symlinked into ~/.claude/$(NC)"
-	@echo "$(BLUE)Installing public skills globally via npx...$(NC)"
-	@npx -y @anthropic-ai/claude-code-skills add find-skills --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-query-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-router-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-start-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add tanstack-integration-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add vercel-react-best-practices --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add vercel-react-native-skills --global 2>/dev/null || true
-	@npx -y @anthropic-ai/claude-code-skills add vercel-composition-patterns --global 2>/dev/null || true
-	@echo "$(GREEN)✅ Public skills installed globally$(NC)"
 
 install:
 	@echo "$(BLUE)📦 Installing workspace (app, backend, plugins)...$(NC)"

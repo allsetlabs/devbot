@@ -31,7 +31,6 @@ const REMOTION_VIDEO_MARKER = 'REMOTION_VIDEO_RESULT:';
 const SYSTEM_PROMPT =
   'This is a non-interactive session. You cannot ask the user questions during execution. If you need clarification or have a question, output the question clearly and end your response. The user will respond in a follow-up message. Do not use interactive tools that require user input.';
 
-
 const PLAN_MODE_PROMPT =
   'You are in PLAN MODE. You may ONLY read files and analyze code. Do NOT create, edit, delete, or modify any files. Do NOT run bash commands that change state (no writes, no installs, no git commits). Only provide analysis, plans, and suggestions. If the user asks you to make changes, explain what you would do but do not execute.';
 

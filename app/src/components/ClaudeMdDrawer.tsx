@@ -64,7 +64,7 @@ export function ClaudeMdDrawer({ open, onOpenChange, workingDirectory }: ClaudeM
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
@@ -74,7 +74,7 @@ export function ClaudeMdDrawer({ open, onOpenChange, workingDirectory }: ClaudeM
             <p className="mt-1 truncate font-mono text-xs text-muted-foreground">{filePath}</p>
           )}
         </DrawerHeader>
-        <div className="flex flex-col gap-3 px-4 pb-6">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />

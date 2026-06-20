@@ -1,28 +1,10 @@
-import {
-  ArrowLeft,
-  Coins,
-  Ellipsis,
-  Eye,
-  EyeOff,
-  FolderRoot,
-  MessageCircle,
-  Pencil,
-  Pin,
-  Search,
-  Settings,
-} from 'lucide-react';
+import { ArrowLeft, FileText, MessageCircle, Search, Settings } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@allsetlabs/forge/components/ui/dropdown-menu';
-import { useChatProgress } from '../hooks/useChatProgress';
-import { ChatProgressBadge } from './ChatProgressBadge';
+import { ChatSessionSummaryModal } from './ChatSessionSummaryModal';
 import { MODE_CONFIG } from '../lib/mode-config';
 import type { ChatMessage as ChatMessageType, InteractiveChat } from '../types';
+import { ChatProgressBadge } from './ChatProgressBadge';
 
 const MAX_CONTEXT_TOKENS = 200000;
 
@@ -33,15 +15,8 @@ interface ChatViewHeaderProps {
   messages: ChatMessageType[];
   totalTokens?: number;
   onToggleSearch: () => void;
-  hideToolResults: boolean;
-  onToggleToolResults: () => void;
-  pinnedIds: string[];
-  onOpenPinnedMessages: () => void;
   onOpenSettings: () => void;
   onOpenCostDrawer: () => void;
-  onOpenRename: () => void;
-  onOpenWorkingDir: () => void;
-  workingDir?: string | null;
 }
 
 export function ChatViewHeader({
@@ -51,33 +26,13 @@ export function ChatViewHeader({
   messages,
   totalTokens = 0,
   onToggleSearch,
-  hideToolResults,
-  onToggleToolResults,
-  pinnedIds,
-  onOpenPinnedMessages,
   onOpenSettings,
   onOpenCostDrawer,
-  onOpenRename,
-  onOpenWorkingDir,
-  workingDir,
 }: ChatViewHeaderProps) {
-  const toolResultCount = messages.reduce((count, m) => {
-    if (m.type === 'tool_use' || m.type === 'tool_result') return count + 1;
-    if (m.type === 'assistant' && Array.isArray(m.content?.message?.content)) {
-      return (
-        count +
-        m.content.message.content.filter(
-          (b: { type: string }) => b.type === 'tool_use' || b.type === 'tool_result'
-        ).length
-      );
-    }
-    return count;
-  }, 0);
-
   const tokenPercent = Math.round((totalTokens / MAX_CONTEXT_TOKENS) * 100);
   const showContextWarning = totalTokens > 0 && tokenPercent >= 80;
   const isContextCritical = tokenPercent >= 95;
-  const progress = useChatProgress(chat?.id ?? '', isRunning);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   return (
     <>
@@ -96,6 +51,7 @@ export function ChatViewHeader({
               <span className="truncate text-sm font-medium text-foreground">
                 {chat?.name || 'Chat'}
               </span>
+              <ChatProgressBadge progress={chat?.progress ?? null} />
               {chat?.permissionMode && chat.permissionMode !== 'dangerous' && (
                 <span
                   className={`inline-flex flex-shrink-0 items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${MODE_CONFIG[chat.permissionMode].bgColor} ${MODE_CONFIG[chat.permissionMode].color}`}
@@ -103,19 +59,10 @@ export function ChatViewHeader({
                   {MODE_CONFIG[chat.permissionMode].shortLabel}
                 </span>
               )}
-              <ChatProgressBadge progress={progress} />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden h-6 w-6 flex-shrink-0 lg:inline-flex"
-                onClick={onOpenRename}
-              >
-                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-              </Button>
             </div>
           </div>
         </div>
-        {/* Desktop: all icon buttons visible */}
+        {/* Desktop actions */}
         <div className="hidden flex-shrink-0 items-center gap-2 lg:flex">
           <Button
             variant="ghost"
@@ -126,63 +73,22 @@ export function ChatViewHeader({
           >
             <Search className="h-4 w-4 text-muted-foreground" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative h-7 w-7"
-            onClick={onToggleToolResults}
-            title={hideToolResults ? 'Show tool results' : 'Hide tool results'}
-          >
-            {hideToolResults ? (
-              <EyeOff className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Eye className="h-4 w-4 text-muted-foreground" />
-            )}
-            {hideToolResults && toolResultCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px] font-semibold text-muted-foreground">
-                {toolResultCount > 9 ? '9+' : toolResultCount}
-              </span>
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative h-7 w-7"
-            onClick={onOpenPinnedMessages}
-            disabled={pinnedIds.length === 0}
-          >
-            <Pin className="h-4 w-4 text-muted-foreground" />
-            {pinnedIds.length > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-                {pinnedIds.length > 9 ? '9+' : pinnedIds.length}
-              </span>
-            )}
-          </Button>
-          {totalTokens > 0 && (
+          {(chat?.progress || chat?.summary) && (
             <Button
               variant="ghost"
               size="icon"
               className="h-7 w-7"
-              onClick={onOpenCostDrawer}
-              title="Session cost summary"
+              onClick={() => setSummaryOpen(true)}
+              title="View session summary"
             >
-              <Coins className="h-4 w-4 text-muted-foreground" />
+              <FileText className="h-4 w-4 text-muted-foreground" />
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={onOpenWorkingDir}
-            title={workingDir ? `Working dir: ${workingDir}` : 'Set working directory'}
-          >
-            <FolderRoot className="h-4 w-4 text-muted-foreground" />
-          </Button>
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
             <Settings className="h-4 w-4 text-muted-foreground" />
           </Button>
         </div>
-        {/* Mobile: search + overflow menu + settings */}
+        {/* Mobile actions */}
         <div className="flex flex-shrink-0 items-center gap-1 lg:hidden">
           <Button
             variant="ghost"
@@ -193,44 +99,17 @@ export function ChatViewHeader({
           >
             <Search className="h-4 w-4 text-muted-foreground" />
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7">
-                <Ellipsis className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onToggleToolResults}>
-                {hideToolResults ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                {hideToolResults ? 'Show tool results' : 'Hide tool results'}
-                {hideToolResults && toolResultCount > 0 && (
-                  <span className="ml-auto text-xs text-muted-foreground">{toolResultCount}</span>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onOpenPinnedMessages} disabled={pinnedIds.length === 0}>
-                <Pin className="h-4 w-4" />
-                Pinned messages
-                {pinnedIds.length > 0 && (
-                  <span className="ml-auto text-xs text-muted-foreground">{pinnedIds.length}</span>
-                )}
-              </DropdownMenuItem>
-              {totalTokens > 0 && (
-                <DropdownMenuItem onClick={onOpenCostDrawer}>
-                  <Coins className="h-4 w-4" />
-                  Session cost
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={onOpenWorkingDir}>
-                <FolderRoot className="h-4 w-4" />
-                {workingDir ? 'Working directory' : 'Set working directory'}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onOpenRename}>
-                <Pencil className="h-4 w-4" />
-                Rename chat
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {(chat?.progress || chat?.summary) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setSummaryOpen(true)}
+              title="View session summary"
+            >
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onOpenSettings}>
             <Settings className="h-4 w-4 text-muted-foreground" />
           </Button>
@@ -257,6 +136,13 @@ export function ChatViewHeader({
           Context {tokenPercent}% full — consider /compact
         </div>
       )}
+      <ChatSessionSummaryModal
+        open={summaryOpen}
+        onOpenChange={setSummaryOpen}
+        progress={chat?.progress ?? null}
+        summary={chat?.summary ?? null}
+        chatName={chat?.name}
+      />
     </>
   );
 }

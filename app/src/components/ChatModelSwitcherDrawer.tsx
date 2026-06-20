@@ -27,7 +27,7 @@ export function ChatModelSwitcherDrawer({
 }: ChatModelSwitcherDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[80vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle>Change Model</DrawerTitle>
           <p className="mt-2 text-xs text-muted-foreground">
@@ -35,7 +35,7 @@ export function ChatModelSwitcherDrawer({
             (input/output).
           </p>
         </DrawerHeader>
-        <div className="flex flex-col gap-3 px-4 pb-6">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6">
           {(Object.entries(MODEL_CONFIG) as [ClaudeModel, typeof MODEL_CONFIG.opus][]).map(
             ([model, config]) => {
               const isCurrentModel = currentModel === model;

@@ -5,49 +5,133 @@ import fs from 'fs';
 import os from 'os';
 import { spawnSync } from 'child_process';
 import { asyncHandler, sendBadRequest, sendInternalError } from '../lib/route-helpers.js';
-import { spawnClaude } from '../lib/claude-spawn.js';
+import { ollamaGenerate, isOllamaAvailable, STT_CORRECTION_MODEL } from '../lib/ollama.js';
+import { DEVBOT_PROJECTS_DIR } from '../lib/env.js';
+import { coreDb } from '../lib/db/core.js';
+import { application_settings } from '../lib/db/schema.js';
+import { eq } from 'drizzle-orm';
 
 export const sttRouter = Router();
 
-const STT_LEARNING_PATH = path.join(os.homedir(), '.devbot', 'stt-learning.md');
-const WHISPER_MODEL = 'tiny';
+const DEVBOT_DIR = path.join(DEVBOT_PROJECTS_DIR, '.devbot');
+const STT_CORRECTIONS_PATH = path.join(DEVBOT_DIR, 'stt-corrections-dictionary.json');
+const STT_MODEL_SETTING_KEY = 'stt.model';
+const DEFAULT_STT_MODEL = 'tiny';
+const STT_MODELS = ['tiny', 'small.en', 'small'] as const;
+type SttModel = (typeof STT_MODELS)[number];
+type CorrectionDictionary = Record<string, string[]>;
 
 const upload = multer({
   dest: os.tmpdir(),
   limits: { fileSize: 25 * 1024 * 1024 },
 });
 
-function ensureLearningDir(): void {
-  const dir = path.dirname(STT_LEARNING_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+function ensureDevbotDir(): void {
+  if (!fs.existsSync(DEVBOT_DIR)) fs.mkdirSync(DEVBOT_DIR, { recursive: true });
 }
 
-function readLearning(): string {
+function isSttModel(value: unknown): value is SttModel {
+  return typeof value === 'string' && STT_MODELS.includes(value as SttModel);
+}
+
+function readSttModel(): SttModel {
+  const rows = coreDb
+    .select({ value: application_settings.value })
+    .from(application_settings)
+    .where(eq(application_settings.key, STT_MODEL_SETTING_KEY))
+    .limit(1)
+    .all();
+  if (isSttModel(rows[0]?.value)) return rows[0].value;
+  return DEFAULT_STT_MODEL;
+}
+
+function saveSttModel(model: SttModel): void {
+  coreDb
+    .insert(application_settings)
+    .values({ key: STT_MODEL_SETTING_KEY, value: model })
+    .onConflictDoUpdate({
+      target: application_settings.key,
+      set: { value: model, updated_by: 'user', updated_at: new Date().toISOString() },
+    })
+    .run();
+}
+
+// ---------------------------------------------------------------------------
+// stt-corrections-dictionary.json helpers
+// ---------------------------------------------------------------------------
+
+function normalizeCorrections(value: unknown): CorrectionDictionary {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+
+  const normalized: CorrectionDictionary = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (Array.isArray(entry) && entry.every((variant) => typeof variant === 'string')) {
+      normalized[key] = [...new Set(entry.map((variant) => variant.trim()).filter(Boolean))];
+    } else if (typeof entry === 'string') {
+      const correct = entry.trim();
+      const variant = key.trim();
+      if (correct && variant) normalized[correct] = [...(normalized[correct] ?? []), variant];
+    }
+  }
+  return normalized;
+}
+
+function readCorrections(): CorrectionDictionary {
   try {
-    return fs.existsSync(STT_LEARNING_PATH) ? fs.readFileSync(STT_LEARNING_PATH, 'utf8') : '';
+    if (fs.existsSync(STT_CORRECTIONS_PATH)) {
+      return normalizeCorrections(JSON.parse(fs.readFileSync(STT_CORRECTIONS_PATH, 'utf8')));
+    }
   } catch {
-    return '';
+    // return empty on parse error
   }
+  return {};
 }
 
-/** Extract vocabulary hints from learning entries to use as whisper initial_prompt */
-function buildInitialPrompt(learning: string): string {
-  const correctedPhrases: string[] = [];
-  const lines = learning.split('\n');
-  for (const line of lines) {
-    const match = line.match(/^\*\*User sent:\*\*\s*(.+)/);
-    if (match) correctedPhrases.push(match[1].trim());
-  }
-  return [...new Set(correctedPhrases)].slice(-20).join('. ');
+function saveCorrections(corrections: CorrectionDictionary): void {
+  ensureDevbotDir();
+  fs.writeFileSync(STT_CORRECTIONS_PATH, JSON.stringify(corrections, null, 2), 'utf8');
 }
 
-function isWhisperAvailable(): boolean {
+function mergeCorrections(
+  existing: CorrectionDictionary,
+  incoming: CorrectionDictionary
+): CorrectionDictionary {
+  const merged = { ...existing };
+  for (const [correct, variants] of Object.entries(incoming)) {
+    merged[correct] = [...new Set([...(merged[correct] ?? []), ...variants])];
+  }
+  return merged;
+}
+
+// ---------------------------------------------------------------------------
+// Whisper helpers
+// ---------------------------------------------------------------------------
+
+function commandSucceeds(command: string, args: string[], timeout = 5000): boolean {
   try {
-    const result = spawnSync('python3', ['-c', 'import whisper'], { timeout: 5000 });
+    const result = spawnSync(command, args, { timeout });
     return result.status === 0;
   } catch {
     return false;
   }
+}
+
+function isSttAvailable(model: SttModel): boolean {
+  return commandSucceeds('python3', [
+    '-c',
+    `import os, sys, whisper; from urllib.parse import urlparse; path=os.path.join(os.path.expanduser('~/.cache/whisper'), os.path.basename(urlparse(whisper._MODELS['${model}']).path)); sys.exit(0 if os.path.exists(path) else 1)`,
+  ]);
+}
+
+function installSttModel(model: SttModel): { ok: boolean; error?: string } {
+  const install = spawnSync(
+    'python3',
+    ['-c', `import whisper; whisper.load_model('${model}')`],
+    { timeout: 600_000, encoding: 'utf8' }
+  );
+  return install.status === 0
+    ? { ok: true }
+    : { ok: false, error: install.stderr || install.stdout };
 }
 
 function convertToWav(inputPath: string, outputPath: string): boolean {
@@ -64,21 +148,96 @@ function cleanup(...paths: string[]): void {
     try {
       if (fs.existsSync(p)) fs.unlinkSync(p);
     } catch {
-      // ignore cleanup errors
+      // ignore
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// Ollama correction pass
+// ---------------------------------------------------------------------------
+
+function buildCorrectionDictText(corrections: CorrectionDictionary): string {
+  const entries = Object.entries(corrections);
+  if (entries.length === 0) return '{}';
+  return entries.map(([correct, variants]) => `"${correct}": ${JSON.stringify(variants)}`).join('\n');
+}
+
+async function applyOllamaCorrections(
+  rawTranscript: string,
+  corrections: CorrectionDictionary
+): Promise<string> {
+  const available = await isOllamaAvailable(STT_CORRECTION_MODEL);
+  if (!available || rawTranscript.trim() === '') return rawTranscript;
+
+  const prompt = `Correction dictionary:\n${buildCorrectionDictText(corrections)}\n\nRaw transcript:\n${rawTranscript}\n\nFinal cleaned text:`;
+
+  try {
+    const corrected = await ollamaGenerate(STT_CORRECTION_MODEL, prompt, 30_000);
+    return corrected || rawTranscript;
+  } catch (err) {
+    console.error('[stt] ollama correction failed:', err);
+    return rawTranscript;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Routes
+// ---------------------------------------------------------------------------
 
 // GET /api/stt/status
 sttRouter.get(
   '/status',
   asyncHandler(async (_req, res) => {
-    const available = isWhisperAvailable();
-    res.json({ available, model: available ? WHISPER_MODEL : null });
+    const sttModel = readSttModel();
+    const sttAvailable = isSttAvailable(sttModel);
+    const ollamaAvailable = await isOllamaAvailable(STT_CORRECTION_MODEL);
+    res.json({
+      available: sttAvailable,
+      model: sttModel,
+      ollama: { available: ollamaAvailable, model: STT_CORRECTION_MODEL },
+      correctionsCount: Object.keys(readCorrections()).length,
+      dictionaryPath: STT_CORRECTIONS_PATH,
+    });
   }, 'check stt status')
 );
 
-// POST /api/stt/transcribe — receive audio blob, run local whisper, return transcript
+sttRouter.get(
+  '/model',
+  asyncHandler(async (_req, res) => {
+    const selected = readSttModel();
+    res.json({
+      selected,
+      models: STT_MODELS.map((id) => ({ id, installed: isSttAvailable(id) })),
+    });
+  }, 'get stt model')
+);
+
+sttRouter.put(
+  '/model',
+  asyncHandler(async (req, res) => {
+    const { model } = req.body as { model?: unknown };
+    if (!isSttModel(model)) return sendBadRequest(res, 'Unsupported STT model');
+    saveSttModel(model);
+    res.json({
+      selected: model,
+      models: STT_MODELS.map((id) => ({ id, installed: isSttAvailable(id) })),
+    });
+  }, 'select stt model')
+);
+
+sttRouter.post(
+  '/model/install',
+  asyncHandler(async (req, res) => {
+    const { model } = req.body as { model?: unknown };
+    if (!isSttModel(model)) return sendBadRequest(res, 'Unsupported STT model');
+    const result = installSttModel(model);
+    if (!result.ok) return sendInternalError(res, result.error, `install STT model ${model}`);
+    res.json({ installed: true, model });
+  }, 'install stt model')
+);
+
+// POST /api/stt/transcribe — receive audio blob, run whisper, apply Ollama corrections
 sttRouter.post(
   '/transcribe',
   upload.single('audio'),
@@ -94,47 +253,42 @@ sttRouter.post(
         return sendBadRequest(res, 'Failed to convert audio to WAV');
       }
 
-      const learning = readLearning();
-      const initialPrompt = buildInitialPrompt(learning);
-
-      const args = [
-        '-m',
-        'whisper',
-        wavPath,
-        '--model',
-        WHISPER_MODEL,
-        '--output_format',
-        'json',
-        '--output_dir',
-        os.tmpdir(),
-        '--verbose',
-        'False',
-        '--fp16',
-        'False',
-      ];
-      if (initialPrompt) args.push('--initial_prompt', initialPrompt);
-
-      const result = spawnSync('python3', args, { timeout: 120_000, encoding: 'utf8' });
+      const sttModel = readSttModel();
+      const result = spawnSync(
+        'python3',
+        [
+          '-m', 'whisper', wavPath,
+          '--model', sttModel,
+          '--output_format', 'json',
+          '--output_dir', os.tmpdir(),
+          '--verbose', 'False',
+          '--fp16', 'False',
+        ],
+        { timeout: 120_000, encoding: 'utf8' }
+      );
 
       if (result.status !== 0) {
         console.error('[stt] whisper error:', result.stderr);
         return sendInternalError(res, result.stderr, 'transcribe audio');
       }
 
-      let transcript = '';
+      let rawTranscript = '';
       if (fs.existsSync(jsonPath)) {
         const parsed = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-        transcript = (parsed.text ?? '').trim();
+        rawTranscript = (parsed.text ?? '').trim();
       }
 
-      res.json({ transcript });
+      const corrections = readCorrections();
+      const transcript = await applyOllamaCorrections(rawTranscript, corrections);
+
+      res.json({ transcript, rawTranscript });
     } finally {
       cleanup(req.file.path, wavPath, jsonPath);
     }
   }, 'transcribe audio')
 );
 
-// POST /api/stt/learn — compare STT output vs what user actually sent; update learning file
+// POST /api/stt/learn — compare STT output vs user edit; update stt-corrections-dictionary.json via Ollama
 sttRouter.post(
   '/learn',
   asyncHandler(async (req, res) => {
@@ -152,31 +306,28 @@ sttRouter.post(
       return;
     }
 
-    const prompt = `You are analyzing speech-to-text corrections to improve future transcriptions.
+    const ollamaAvailable = await isOllamaAvailable(STT_CORRECTION_MODEL);
+    if (!ollamaAvailable) {
+      res.json({ learned: false, reason: 'ollama_unavailable', model: STT_CORRECTION_MODEL });
+      return;
+    }
+
+    const prompt = `You are analyzing speech-to-text corrections to build a vocabulary correction dictionary.
 
 STT output: "${sttOutput}"
-User's final message: "${finalMessage}"
+User's corrected version: "${finalMessage}"
 
-Determine if the user corrected genuine speech-to-text errors (misheard words/phrases), or if they simply added more text, changed meaning, or rewrote for other reasons.
-
-Only report as corrections when the STT clearly misheard a specific word or phrase.
+Identify only genuine speech-to-text errors — words or phrases the STT misheard. Ignore cases where the user simply added more text, changed their mind, or rephrased intentionally.
 
 Respond with ONLY valid JSON (no markdown, no explanation):
 {
   "hasCorrections": boolean,
-  "corrections": [{"wrong": "word STT got wrong", "correct": "what it should have been"}],
-  "summary": "one-line description of what was corrected"
+  "replacements": {"correct phrase": ["misheard variant"]},
+  "summary": "one-line description"
 }`;
 
-    const spawnResult = spawnClaude({
-      prompt,
-      model: 'haiku',
-      returnOutput: true,
-      timeoutMs: 30_000,
-    });
-
     try {
-      const output = (await spawnResult.output) ?? '';
+      const output = await ollamaGenerate(STT_CORRECTION_MODEL, prompt, 30_000);
       const jsonMatch = output.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         res.json({ learned: false, reason: 'parse_error' });
@@ -185,46 +336,56 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 
       const analysis = JSON.parse(jsonMatch[0]) as {
         hasCorrections: boolean;
-        corrections: { wrong: string; correct: string }[];
+        replacements: CorrectionDictionary;
         summary: string;
       };
 
-      if (!analysis.hasCorrections || !analysis.corrections?.length) {
+      if (
+        !analysis.hasCorrections ||
+        !analysis.replacements ||
+        Object.keys(analysis.replacements).length === 0
+      ) {
         res.json({ learned: false, reason: 'no_corrections_identified' });
         return;
       }
 
-      ensureLearningDir();
-      const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-      const entry = [
-        `\n### ${timestamp}`,
-        `**STT output:** ${sttOutput}`,
-        `**User sent:** ${finalMessage}`,
-        `**Summary:** ${analysis.summary}`,
-        `**Corrections:**`,
-        ...analysis.corrections.map((c) => `- "${c.wrong}" → "${c.correct}"`),
-        '',
-      ].join('\n');
+      const existing = readCorrections();
+      const merged = mergeCorrections(existing, analysis.replacements);
+      saveCorrections(merged);
 
-      const existing = readLearning();
-      if (!existing) {
-        const header = [
-          '# STT User Learning',
-          '',
-          'This file is automatically maintained to improve speech-to-text accuracy.',
-          'It is referenced before every voice transcription as vocabulary hints for the whisper model.',
-          '',
-          '## Learning Entries',
-        ].join('\n');
-        fs.writeFileSync(STT_LEARNING_PATH, header + entry, 'utf8');
-      } else {
-        fs.appendFileSync(STT_LEARNING_PATH, entry, 'utf8');
-      }
-
-      res.json({ learned: true, corrections: analysis.corrections, summary: analysis.summary });
+      res.json({
+        learned: true,
+        replacements: analysis.replacements,
+        summary: analysis.summary,
+        totalCorrections: Object.keys(merged).length,
+      });
     } catch (err) {
       console.error('[stt] learn error:', err);
       res.json({ learned: false, reason: 'error' });
     }
   }, 'learn stt correction')
+);
+
+// GET /api/stt/corrections — view the current corrections dictionary
+sttRouter.get(
+  '/corrections',
+  asyncHandler(async (_req, res) => {
+    const corrections = readCorrections();
+    res.json({ corrections, count: Object.keys(corrections).length, path: STT_CORRECTIONS_PATH });
+  }, 'get stt corrections')
+);
+
+// PUT /api/stt/corrections — manually add or update correction entries
+sttRouter.put(
+  '/corrections',
+  asyncHandler(async (req, res) => {
+    const { replacements } = req.body as { replacements?: CorrectionDictionary };
+    if (!replacements || typeof replacements !== 'object') {
+      return sendBadRequest(res, 'replacements object is required');
+    }
+    const existing = readCorrections();
+    const merged = mergeCorrections(existing, normalizeCorrections(replacements));
+    saveCorrections(merged);
+    res.json({ corrections: merged, count: Object.keys(merged).length });
+  }, 'update stt corrections')
 );

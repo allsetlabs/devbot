@@ -39,12 +39,12 @@ export function PlanDetailDrawer({
 }: PlanDetailDrawerProps) {
   return (
     <Drawer open={plan !== null} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle className="text-left">{plan?.title}</DrawerTitle>
         </DrawerHeader>
         {plan && (
-          <div className="overflow-y-auto px-4 pb-6">
+          <div className="flex-1 overflow-y-auto px-4 pb-6">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLORS[plan.status] || ''}`}

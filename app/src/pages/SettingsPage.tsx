@@ -10,6 +10,7 @@ import {
   previewNotificationSound,
 } from '../lib/notification';
 import type { DevBotSettings } from '../hooks/useSettings';
+import { SttModelSettings } from '../components/SttModelSettings';
 
 const MODEL_OPTIONS = [
   { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
@@ -175,6 +176,11 @@ export function SettingsPage() {
               checked={settings.compactMode}
               onChange={() => updateSettings({ compactMode: !settings.compactMode })}
             />
+          </div>
+
+          <SectionHeader title="Speech to Text" />
+          <div className="divide-y divide-border">
+            <SttModelSettings />
           </div>
 
           <SectionHeader title="Notifications" />

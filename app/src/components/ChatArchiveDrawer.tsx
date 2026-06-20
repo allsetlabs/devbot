@@ -134,7 +134,7 @@ export function ChatArchiveDrawer({
         </DrawerTrigger>
       </div>
 
-      <DrawerContent className="flex max-h-[80vh] flex-col">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader className="flex-shrink-0">
           <DrawerTitle>Archived Chats</DrawerTitle>
         </DrawerHeader>

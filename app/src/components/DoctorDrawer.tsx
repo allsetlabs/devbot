@@ -96,7 +96,7 @@ export function DoctorDrawer({ open, onOpenChange }: DoctorDrawerProps) {
 
   return (
     <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerContent>
+      <DrawerContent className="flex flex-col">
         <DrawerHeader className="flex flex-row items-center justify-between pb-2">
           <DrawerTitle className="flex items-center gap-2">
             <Stethoscope className="h-4 w-4 text-primary" />

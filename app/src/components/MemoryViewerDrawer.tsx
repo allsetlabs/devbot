@@ -15,6 +15,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerBody,
 } from '@allsetlabs/forge/components/ui/drawer';
 import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
 import { api } from '../lib/api';
@@ -110,7 +111,7 @@ export function MemoryViewerDrawer({ open, onOpenChange }: MemoryViewerDrawerPro
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent>
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
@@ -120,7 +121,7 @@ export function MemoryViewerDrawer({ open, onOpenChange }: MemoryViewerDrawerPro
             View and manage Claude&apos;s persistent memory files
           </p>
         </DrawerHeader>
-        <div className="flex flex-col gap-3 overflow-y-auto px-4 pb-6">
+        <DrawerBody className="flex flex-col gap-3 px-4 pb-6">
           {error && (
             <div className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-xs text-destructive">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />
@@ -245,7 +246,7 @@ export function MemoryViewerDrawer({ open, onOpenChange }: MemoryViewerDrawerPro
               </div>
             ))
           )}
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

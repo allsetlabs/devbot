@@ -29,11 +29,11 @@ export function ChatSystemPromptDrawer({
 }: ChatSystemPromptDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[80vh]">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle>System Prompt</DrawerTitle>
         </DrawerHeader>
-        <div className="flex flex-col gap-3 px-4 pb-6">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6">
           <p className="text-xs text-muted-foreground">
             Custom instructions appended to every message in this chat. Similar to CLAUDE.md in
             Claude Code CLI.

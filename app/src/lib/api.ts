@@ -229,10 +229,6 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/status`);
   },
 
-  getChatProgress: (chatId: string): Promise<{ progress: string | null }> => {
-    return fetchApi(`/api/interactive-chats/${chatId}/progress`);
-  },
-
   getChatQueue: (chatId: string): Promise<QueuedMessage[]> => {
     return fetchApi(`/api/interactive-chats/${chatId}/queue`);
   },
@@ -761,21 +757,51 @@ export async function deleteOcrDocument(id: string): Promise<void> {
 export interface SttStatusResponse {
   available: boolean;
   model: string | null;
+  ollama?: { available: boolean; model: string };
+  correctionsCount?: number;
+  dictionaryPath?: string;
 }
 
 export interface SttTranscribeResponse {
   transcript: string;
+  rawTranscript?: string;
 }
 
 export interface SttLearnResponse {
   learned: boolean;
   reason?: string;
-  corrections?: { wrong: string; correct: string }[];
+  replacements?: Record<string, string[]>;
   summary?: string;
+  totalCorrections?: number;
+}
+
+export interface SttCorrectionsResponse {
+  corrections: Record<string, string[]>;
+  count: number;
+  path: string;
+}
+
+export type SttModelId = 'tiny' | 'small.en' | 'small';
+
+export interface SttModelSettingsResponse {
+  selected: SttModelId;
+  models: Array<{ id: SttModelId; installed: boolean }>;
 }
 
 export async function sttStatus(): Promise<SttStatusResponse> {
   return fetchApi('/api/stt/status');
+}
+
+export async function sttGetModel(): Promise<SttModelSettingsResponse> {
+  return fetchApi('/api/stt/model');
+}
+
+export async function sttSelectModel(model: SttModelId): Promise<SttModelSettingsResponse> {
+  return fetchApi('/api/stt/model', { method: 'PUT', body: JSON.stringify({ model }) });
+}
+
+export async function sttInstallModel(model: SttModelId): Promise<void> {
+  await fetchApi('/api/stt/model/install', { method: 'POST', body: JSON.stringify({ model }) });
 }
 
 export async function sttTranscribe(audioBlob: Blob): Promise<SttTranscribeResponse> {
@@ -800,5 +826,18 @@ export async function sttLearn(sttOutput: string, finalMessage: string): Promise
   return fetchApi('/api/stt/learn', {
     method: 'POST',
     body: JSON.stringify({ sttOutput, finalMessage }),
+  });
+}
+
+export async function sttGetCorrections(): Promise<SttCorrectionsResponse> {
+  return fetchApi('/api/stt/corrections');
+}
+
+export async function sttUpdateCorrections(
+  replacements: Record<string, string[]>
+): Promise<SttCorrectionsResponse> {
+  return fetchApi('/api/stt/corrections', {
+    method: 'PUT',
+    body: JSON.stringify({ replacements }),
   });
 }

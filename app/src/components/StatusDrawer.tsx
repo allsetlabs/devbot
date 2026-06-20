@@ -71,7 +71,7 @@ export function StatusDrawer({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent className="flex flex-col">
         <DrawerHeader className="pb-2">
           <DrawerTitle className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-primary" />

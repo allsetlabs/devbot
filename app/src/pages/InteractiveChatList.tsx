@@ -1,7 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { X } from 'lucide-react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@allsetlabs/forge/components/ui/drawer';
 import { chatHooks } from '../hooks/useChat';
 import { WorkingDirSelector, useValidateAndSaveDir } from '../components/WorkingDirSelector';
 import { useFavorites } from '../hooks/useFavorites';
@@ -279,16 +284,17 @@ export function InteractiveChatList() {
         )}
       </main>
 
-      {/* New Chat Modal */}
-      {newChatOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
-          <div className="safe-area-bottom w-full max-w-lg rounded-t-2xl bg-background p-4 shadow-xl sm:rounded-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">New Chat</h2>
-              <Button variant="ghost" size="icon" onClick={handleNewChatClose}>
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+      <Drawer
+        open={newChatOpen}
+        onOpenChange={(open) => {
+          if (!open) handleNewChatClose();
+        }}
+      >
+        <DrawerContent className="safe-area-bottom">
+          <DrawerHeader className="text-left">
+            <DrawerTitle>New Chat</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 pb-6">
             {(createMutation.error || dirValidationError) && (
               <div className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
                 {dirValidationError ||
@@ -319,8 +325,8 @@ export function InteractiveChatList() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </DrawerContent>
+      </Drawer>
 
       <ChatArchiveDrawer
         open={archiveOpen}

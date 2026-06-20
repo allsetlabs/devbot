@@ -29,7 +29,7 @@ export function ChatExportDrawer({
 }: ChatExportDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent className="flex flex-col">
         <DrawerHeader>
           <DrawerTitle>Export Format</DrawerTitle>
         </DrawerHeader>

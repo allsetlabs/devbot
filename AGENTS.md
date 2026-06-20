@@ -122,3 +122,35 @@ await db.update(table).set({ updated_by: 'AI' }).where(eq(table.id, id));
 - Databases auto-initialize on startup via `initializeCoreDatabase()`
 - No separate migration files during development
 - Foreign keys enabled: `PRAGMA foreign_keys = ON`
+
+## Frontend Coding Standards
+
+### Mobile-First Hover Handling
+
+**Problem:** Hover states don't work on mobile touch devices. Users expect click-based interactions instead.
+
+**Pattern:** Disable hover effects on mobile screens, use responsive Tailwind breakpoints.
+
+```tsx
+// BAD - hover works everywhere, confusing on mobile where hover isn't possible
+<button className="hover:bg-blue-500">Click me</button>
+
+// GOOD - hover only on desktop (md breakpoint = 768px+), click works everywhere
+<button className="md:hover:bg-blue-500 active:bg-blue-700">Click me</button>
+
+// GOOD - interactive elements should always have click handlers, not hover-only
+<span
+  className="md:hover:opacity-80 transition-opacity cursor-pointer"
+  onClick={handleClick}
+  onKeyDown={handleKeyDown}
+/>
+```
+
+**Guidelines:**
+
+- Prefix hover classes with `md:` to disable on mobile (screens < 768px)
+- Always provide a click handler (`onClick`) as the primary interaction
+- Add visual feedback on both hover (desktop) and click (mobile): use `active:` or managed state
+- Use `transition-opacity` or `transition-colors` for smooth feedback
+- Avoid `hover:` without the `md:` prefix for interactive elements
+- For touch-only interactions, use `focus:` instead of `hover:`

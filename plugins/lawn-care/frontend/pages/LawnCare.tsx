@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '@devbot/app/hooks/useCrudMutation';
@@ -80,14 +80,14 @@ function ApplicationCard({
       <Button
         variant="ghost"
         onClick={onToggle}
-        className="bg-primary/5 flex w-full items-center gap-3 px-4 py-3 text-left"
+        className="bg-primary/5 flex h-auto w-full items-center gap-4 px-4 py-4 text-left"
       >
-        <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+        <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold">
           {app.order}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-foreground font-semibold">{app.name}</p>
-          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+          <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             <span>{app.date}</span>
             <span>·</span>
             <span>${(app.applicationCost ?? 0).toFixed(2)}</span>
@@ -100,14 +100,14 @@ function ApplicationCard({
 
       {/* Collapsible details */}
       {expanded && (
-        <Fragment>
+        <div className="border-border space-y-4 border-t p-4">
           {/* Description */}
-          <div className="border-border border-t px-4 py-3">
+          <div className="bg-muted/30 rounded-lg p-4">
             <p className="text-foreground text-sm">{app.description}</p>
           </div>
 
           {/* Product & Cost */}
-          <div className="border-border border-t px-4 py-3">
+          <div className="bg-muted/30 rounded-lg p-4">
             <div className="flex items-start gap-2">
               <Sprout className="text-primary mt-0.5 h-4 w-4 shrink-0" />
               <div className="flex-1">
@@ -145,7 +145,7 @@ function ApplicationCard({
           </div>
 
           {/* How to Apply */}
-          <div className="border-border space-y-2 border-t px-4 py-3">
+          <div className="bg-muted/30 space-y-3 rounded-lg p-4">
             <div className="flex items-start gap-2">
               <Ruler className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
               <div>
@@ -185,7 +185,7 @@ function ApplicationCard({
           </div>
 
           {/* Tips, Watering, Warnings */}
-          <div className="border-border space-y-2 border-t px-4 py-3">
+          <div className="bg-muted/30 space-y-3 rounded-lg p-4">
             {app.tips && (
               <div className="flex items-start gap-2">
                 <Sun className="text-warning mt-0.5 h-4 w-4 shrink-0" />
@@ -205,7 +205,7 @@ function ApplicationCard({
               </div>
             )}
           </div>
-        </Fragment>
+        </div>
       )}
     </div>
   );

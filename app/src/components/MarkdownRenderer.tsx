@@ -1,4 +1,4 @@
-// MarkdownRenderer: renders markdown content with syntax highlighting
+// MarkdownRenderer: renders markdown content with syntax highlighting and mermaid diagrams
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -7,6 +7,7 @@ import { Check, Copy } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { copyToClipboard } from '../lib/clipboard';
 import { useTemporaryStatus } from '../hooks/useTemporaryStatus';
+import { MermaidChart } from './MermaidChart';
 
 interface MarkdownRendererProps {
   content: string;
@@ -41,6 +42,10 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           const match = /language-(\w+)/.exec(className || '');
           const codeString = String(children).replace(/\n$/, '');
           const isBlock = codeString.includes('\n') || match;
+
+          if (match?.[1] === 'mermaid') {
+            return <MermaidChart chart={codeString} />;
+          }
 
           if (isBlock) {
             return (

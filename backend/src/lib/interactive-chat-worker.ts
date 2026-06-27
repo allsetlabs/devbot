@@ -23,6 +23,11 @@ import {
   type PermissionMode,
 } from './claude-spawn.js';
 import { DEVBOT_PROJECTS_DIR } from './env.js';
+import {
+  clearSessionLimitFollowUp,
+  getSessionLimitContinuePrompt,
+  maybeScheduleSessionLimitFollowUp,
+} from './session-limit-followup.js';
 
 export type { ClaudeModel, PermissionMode };
 
@@ -181,6 +186,8 @@ export async function sendMessage(
   prompt: string,
   branchId: string = 'main'
 ): Promise<void> {
+  clearSessionLimitFollowUp(chatId, branchId);
+
   const chat = coreDb
     .select()
     .from(interactive_chats)
@@ -265,6 +272,13 @@ export async function sendMessage(
       if (messageType === 'assistant') {
         checkForRemotionVideoResult(chatId, data).catch((err) => {
           console.error(`[InteractiveChat] Remotion video check failed:`, err);
+        });
+
+        maybeScheduleSessionLimitFollowUp(chatId, branchId, data, {
+          isChatExecuting,
+          onFire: async (scheduledBranchId) => {
+            await sendMessage(chatId, getSessionLimitContinuePrompt(), scheduledBranchId);
+          },
         });
       }
     },

@@ -13,6 +13,11 @@ import { api, uploadFiles } from '../lib/api';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
 import { POLL_INTERVALS } from '../lib/constants';
+import {
+  formatCountdown,
+  getActiveSessionLimitState,
+  SESSION_LIMIT_TOAST_MESSAGE,
+} from '../lib/session-limit';
 import { SLASH_COMMANDS } from '../lib/slash-commands';
 import { VITE_DEVBOT_PROJECTS_DIR } from '../lib/env';
 import { getCachedDraft, setCachedDraft, cleanupLegacyMessageCaches } from '../lib/storage';
@@ -211,6 +216,8 @@ export function InteractiveChatView({
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
   const lastSequenceRef = useRef(0);
+  const sessionLimitToastShownRef = useRef(false);
+  const [now, setNow] = useState(() => Date.now());
 
   const messageListRef = useRef<{
     scrollToMessage: (index: number, align?: 'start' | 'center' | 'end') => void;
@@ -373,6 +380,34 @@ export function InteractiveChatView({
       fetchMessages(lastSequenceRef.current);
     }
   }, [chatId, dataUpdatedAt, fetchMessages]);
+
+  useEffect(() => {
+    sessionLimitToastShownRef.current = false;
+  }, [chatId, currentBranch]);
+
+  const sessionLimitState = useMemo(() => getActiveSessionLimitState(messages), [messages]);
+
+  useEffect(() => {
+    if (!sessionLimitState) return;
+
+    const interval = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [sessionLimitState]);
+
+  useEffect(() => {
+    if (sessionLimitState) {
+      if (!sessionLimitToastShownRef.current) {
+        sessionLimitToastShownRef.current = true;
+        toast.info(SESSION_LIMIT_TOAST_MESSAGE);
+      }
+      return;
+    }
+
+    sessionLimitToastShownRef.current = false;
+  }, [sessionLimitState]);
 
   // Auto-name chat from first user message after Claude's first response arrives
   const queryClient = useQueryClient();
@@ -1154,6 +1189,15 @@ export function InteractiveChatView({
     [messages]
   );
 
+  const sessionLimitCountdown =
+    sessionLimitState ? formatCountdown(sessionLimitState.continueAt.getTime() - now) : null;
+  const sessionLimitResumeTime = sessionLimitState
+    ? sessionLimitState.continueAt.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : null;
+
   if (loading) {
     return (
       <div className={`${embedded ? '' : 'safe-area-top safe-area-bottom'} flex h-full flex-col`}>
@@ -1269,6 +1313,24 @@ export function InteractiveChatView({
           <span className="text-[10px] text-muted-foreground">
             {branches.length} {branches.length === 1 ? 'branch' : 'branches'}
           </span>
+        </div>
+      )}
+
+      {sessionLimitState && (
+        <div className="border-b border-warning/20 bg-warning/8 px-3 py-2">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">
+                Session limit reached. Auto-continue is scheduled.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Resumes at {sessionLimitResumeTime} ({sessionLimitState.timezone})
+              </p>
+            </div>
+            <div className="rounded-md border border-warning/30 bg-background px-2 py-1 font-mono text-sm text-warning">
+              {sessionLimitCountdown}
+            </div>
+          </div>
         </div>
       )}
 

@@ -4,6 +4,7 @@ Architecture decisions for the devbot module. One file per decision, newest firs
 
 | #    | Decision                                                                                                                   | Date       |
 | ---- | -------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 0009 | [Mermaid Chart Rendering via MermaidChart Component in MarkdownRenderer](0009-mermaid-rendering-in-markdown-renderer.md)   | 2026-06-20 |
 | 0008 | [Configurable Local STT Models](0008-configurable-local-stt-models.md)                                                     | 2026-06-20 |
 | 0007 | [transcript-cleaner: Named Ollama Model with Baked-In System Prompt](0007-transcript-cleaner-modelfile-architecture.md)    | 2026-06-20 |
 | 0006 | [STT Pipeline Simplification: Drop Learning Log, Project-Local Dictionary](0006-stt-pipeline-simplification.md)            | 2026-06-20 |

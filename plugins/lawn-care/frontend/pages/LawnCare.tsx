@@ -107,7 +107,7 @@ function ApplicationCard({
           </div>
 
           {/* Product & Cost */}
-          <div className="border-border border-t px-4 py-3">
+          <div className="bg-muted/30 rounded-lg px-4 py-4">
             <div className="flex items-start gap-2">
               <Sprout className="text-primary mt-0.5 h-4 w-4 shrink-0" />
               <div className="flex-1">
@@ -145,7 +145,7 @@ function ApplicationCard({
           </div>
 
           {/* How to Apply */}
-          <div className="border-border space-y-2 border-t px-4 py-3">
+          <div className="bg-muted/30 space-y-3 rounded-lg px-4 py-4">
             <div className="flex items-start gap-2">
               <Ruler className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
               <div>
@@ -185,7 +185,7 @@ function ApplicationCard({
           </div>
 
           {/* Tips, Watering, Warnings */}
-          <div className="border-border space-y-2 border-t px-4 py-3">
+          <div className="bg-muted/30 space-y-3 rounded-lg px-4 py-4">
             {app.tips && (
               <div className="flex items-start gap-2">
                 <Sun className="text-warning mt-0.5 h-4 w-4 shrink-0" />

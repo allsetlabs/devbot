@@ -316,6 +316,7 @@ Day 2:
 - Created chats, messages, schedulers, plans tables
 - Auto-initialization on startup via `initializeCoreDatabase()`
 - Search across old chats in mobile UI
+- Future follow-up: move session-limit auto-continue from in-memory `setTimeout` to a durable jobs-based trigger persisted in SQLite and executed by the scheduler worker so it survives backend restarts. The frontend banner/countdown should stop inferring state from chat messages alone and instead check for the specific pending auto-continue job for that chat/branch; if the job exists, show the banner/countdown, and if it does not exist, do not show it.
 
 ### Phase 4: MCP Tools
 

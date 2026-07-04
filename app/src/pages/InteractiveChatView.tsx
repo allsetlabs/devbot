@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { notifyTaskComplete, notifyTaskFailed, setNotificationSettings } from '../lib/notification';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { ArrowLeft, Loader2, MessageCircle, Upload, GitBranch } from 'lucide-react';
+import { ArrowLeft, Loader2, MessageCircle, Upload } from 'lucide-react';
 import { api, uploadFiles } from '../lib/api';
 import { copyToClipboard } from '../lib/clipboard';
 import { toast } from 'sonner';
@@ -185,9 +185,6 @@ export function InteractiveChatView({
   const {
     settings,
     isLoaded: settingsLoaded,
-    toggleSound,
-    toggleHaptic,
-    toggleAutoScroll,
   } = useSettings();
 
   // Delete/archive mutations for settings drawer
@@ -206,10 +203,6 @@ export function InteractiveChatView({
       setNotificationSettings(settings);
     }
   }, [settings, settingsLoaded]);
-
-  // Branch state
-  const [currentBranch, setCurrentBranch] = useState('main');
-  const [branches, setBranches] = useState<string[]>(['main']);
 
   // Cursor-based messages (kept in useState since incremental append doesn't fit useQuery)
   // Messages fetched from backend — no localStorage cache (avoids iOS quota issues)
@@ -319,7 +312,7 @@ export function InteractiveChatView({
     async (afterSequence = 0) => {
       if (!chatId) return;
       try {
-        const newMessages = await api.getChatMessages(chatId, afterSequence, currentBranch);
+        const newMessages = await api.getChatMessages(chatId, afterSequence);
         if (newMessages.length > 0) {
           if (afterSequence === 0) {
             setMessages(newMessages);
@@ -338,25 +331,16 @@ export function InteractiveChatView({
         if (afterSequence === 0) setMessagesLoading(false);
       }
     },
-    [chatId, currentBranch]
+    [chatId]
   );
 
-  // Fetch branches
-  useEffect(() => {
-    if (!chatId) return;
-    api
-      .getChatBranches(chatId)
-      .then(setBranches)
-      .catch(() => {});
-  }, [chatId]);
-
-  // Reset messages when switching branches
+  // Initial load on mount
   useEffect(() => {
     setMessages([]);
     lastSequenceRef.current = 0;
     setMessagesLoading(true);
     fetchMessages(0);
-  }, [currentBranch]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [chatId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clean up legacy message caches that bloat localStorage on iOS
   useEffect(() => cleanupLegacyMessageCaches(), []);
@@ -383,7 +367,7 @@ export function InteractiveChatView({
 
   useEffect(() => {
     sessionLimitToastShownRef.current = false;
-  }, [chatId, currentBranch]);
+  }, [chatId]);
 
   const sessionLimitState = useMemo(() => getActiveSessionLimitState(messages), [messages]);
 
@@ -487,7 +471,7 @@ export function InteractiveChatView({
 
   // Send message mutation
   const sendMutation = useCrudMutation(
-    (prompt: string) => api.sendChatMessage(chatId!, prompt, currentBranch),
+    (prompt: string) => api.sendChatMessage(chatId!, prompt),
     [
       ['chat-status', chatId],
       ['interactive-chat', chatId],
@@ -509,7 +493,7 @@ export function InteractiveChatView({
 
   // Queue message mutation
   const queueMutation = useCrudMutation(
-    (prompt: string) => api.queueChatMessage(chatId!, prompt, currentBranch),
+    (prompt: string) => api.queueChatMessage(chatId!, prompt),
     [['chat-queue', chatId]]
   );
 
@@ -692,23 +676,6 @@ export function InteractiveChatView({
     [handleFilesUpload]
   );
   const { isDragging } = useDragAndDrop(onDropFiles);
-
-  // Branch from a message
-  const handleBranch = useCallback(
-    async (messageId: string) => {
-      if (!chatId) return;
-      const msg = messages.find((m) => m.id === messageId);
-      if (!msg) return;
-      try {
-        const result = await api.createChatBranch(chatId, msg.sequence, undefined, currentBranch);
-        setBranches((prev) => [...prev, result.branchId]);
-        setCurrentBranch(result.branchId);
-      } catch (err) {
-        console.error('Failed to create branch:', err);
-      }
-    },
-    [chatId, messages, currentBranch]
-  );
 
   // Send message
   const readyFiles = attachedFiles.filter((f) => !f.uploading && f.path);
@@ -1119,13 +1086,13 @@ export function InteractiveChatView({
         // Remove the edited message and everything after from local state
         setMessages((prev) => prev.filter((m) => m.sequence < seq));
         // Truncate on backend (includes the edited message itself)
-        await api.truncateMessagesAfter(chatId, seq - 1, currentBranch).catch(() => {});
+        await api.truncateMessagesAfter(chatId, seq - 1).catch(() => {});
       }
 
       sendMutation.mutate(editedText);
       setEditingMessage(null);
     },
-    [chatId, isRunning, sending, sendMutation, editingMessage, currentBranch]
+    [chatId, isRunning, sending, sendMutation, editingMessage]
   );
 
   // Cancel edit: close the dialog
@@ -1295,27 +1262,6 @@ export function InteractiveChatView({
         />
       )}
 
-      {/* Branch selector */}
-      {branches.length > 1 && (
-        <div className="flex items-center gap-2 border-b px-3 py-1.5">
-          <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
-          <select
-            value={currentBranch}
-            onChange={(e) => setCurrentBranch(e.target.value)}
-            className="rounded border bg-background px-2 py-0.5 text-xs text-foreground"
-          >
-            {branches.map((b) => (
-              <option key={b} value={b}>
-                {b}
-              </option>
-            ))}
-          </select>
-          <span className="text-[10px] text-muted-foreground">
-            {branches.length} {branches.length === 1 ? 'branch' : 'branches'}
-          </span>
-        </div>
-      )}
-
       {sessionLimitState && (
         <div className="border-b border-warning/20 bg-warning/8 px-3 py-2">
           <div className="flex items-center justify-between gap-3">
@@ -1352,7 +1298,6 @@ export function InteractiveChatView({
           onRetry={handleRetry}
           onRegenerate={handleRegenerate}
           onEdit={handleEditMessage}
-          onBranch={handleBranch}
           autoScroll={settings.autoScrollEnabled}
           pinnedIds={pinnedIds}
           onTogglePin={togglePin}
@@ -1435,10 +1380,6 @@ export function InteractiveChatView({
       <SettingsDrawer
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
-        settings={settings}
-        onToggleSound={toggleSound}
-        onToggleHaptic={toggleHaptic}
-        onToggleAutoScroll={toggleAutoScroll}
         onExport={() => setExportFormatOpen(true)}
         onSystemPrompt={() => {
           setSystemPromptValue(chat?.systemPrompt || '');
@@ -1447,7 +1388,6 @@ export function InteractiveChatView({
         onHelp={() => setHelpModalOpen(true)}
         hasSystemPrompt={!!chat?.systemPrompt}
         hasMessages={messages.length > 0}
-        workingDirectory={chat?.workingDir ?? VITE_DEVBOT_PROJECTS_DIR}
         hasCopyResumeCommand={!!chat?.claudeSessionId}
         onCopyResumeCommand={
           chat?.claudeSessionId

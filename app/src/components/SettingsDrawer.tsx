@@ -24,9 +24,7 @@ import {
   DrawerTitle,
   DrawerBody,
 } from '@allsetlabs/forge/components/ui/drawer';
-import { Checkbox } from '@allsetlabs/forge/components/ui/checkbox';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import type { DevBotSettings } from '../hooks/useSettings';
 
 interface ChatSessionSettingsActionsProps {
   hideToolResults: boolean;
@@ -117,16 +115,11 @@ function ChatSessionSettingsActions({
 interface SettingsDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  settings: DevBotSettings;
-  onToggleSound: () => void;
-  onToggleHaptic: () => void;
-  onToggleAutoScroll: () => void;
   onExport?: () => void;
   onSystemPrompt?: () => void;
   onHelp?: () => void;
   hasSystemPrompt?: boolean;
   hasMessages?: boolean;
-  workingDirectory?: string;
   onCopyResumeCommand?: () => void;
   hasCopyResumeCommand?: boolean;
   onArchive?: () => void;
@@ -142,16 +135,11 @@ interface SettingsDrawerProps {
 export function SettingsDrawer({
   open,
   onOpenChange,
-  settings,
-  onToggleSound,
-  onToggleHaptic,
-  onToggleAutoScroll,
   onExport,
   onSystemPrompt,
   onHelp,
   hasSystemPrompt = false,
   hasMessages = false,
-  workingDirectory,
   onCopyResumeCommand,
   hasCopyResumeCommand = false,
   onArchive,
@@ -334,61 +322,6 @@ export function SettingsDrawer({
             </div>
           )}
 
-          {/* Sound Notifications */}
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card p-3">
-            <Checkbox
-              checked={settings.soundEnabled}
-              onCheckedChange={onToggleSound}
-              aria-label="Toggle sound notifications"
-            />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">Sound Notifications</span>
-              <span className="text-xs text-muted-foreground">Play sound when tasks complete</span>
-            </div>
-          </label>
-
-          {/* Haptic Feedback */}
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card p-3">
-            <Checkbox
-              checked={settings.hapticEnabled}
-              onCheckedChange={onToggleHaptic}
-              aria-label="Toggle haptic feedback"
-            />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">Haptic Feedback</span>
-              <span className="text-xs text-muted-foreground">
-                Vibrate device when tasks complete
-              </span>
-            </div>
-          </label>
-
-          {/* Auto-scroll */}
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-card p-3">
-            <Checkbox
-              checked={settings.autoScrollEnabled}
-              onCheckedChange={onToggleAutoScroll}
-              aria-label="Toggle auto-scroll"
-            />
-            <div className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">Auto-scroll to Latest</span>
-              <span className="text-xs text-muted-foreground">
-                Automatically scroll to new messages
-              </span>
-            </div>
-          </label>
-
-          {/* Working directory */}
-          {workingDirectory && (
-            <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
-              <span className="text-xs text-muted-foreground">Working directory</span>
-              <p className="mt-0.5 truncate font-mono text-xs text-foreground">
-                {workingDirectory}
-              </p>
-            </div>
-          )}
         </DrawerBody>
       </DrawerContent>
     </Drawer>

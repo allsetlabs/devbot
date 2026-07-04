@@ -25,9 +25,9 @@ import {
 import { companiesRouter } from './routes/companies.js';
 import { memoriesRouter } from './routes/memories.js';
 import { claudeMdRouter } from './routes/claude-md.js';
-import { worktreesRouter } from './routes/worktrees.js';
 import { ocrRouter } from './routes/ocr.js';
 import { sttRouter } from './routes/stt.js';
+import { tradingRouter } from './routes/trading.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -203,9 +203,9 @@ app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
 app.use('/api/memories', memoriesRouter);
 app.use('/api/claude-md', claudeMdRouter);
-app.use('/api/worktrees', worktreesRouter);
 app.use('/api/ocr', ocrRouter);
 app.use('/api/stt', sttRouter);
+app.use('/api/trading', tradingRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

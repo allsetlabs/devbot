@@ -28,7 +28,6 @@ import { ChatSearchBar } from '../components/ChatSearchBar';
 import { SettingsDrawer } from '../components/SettingsDrawer';
 import { MemoryViewerDrawer } from '../components/MemoryViewerDrawer';
 import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
-import { WorktreeDrawer } from '../components/WorktreeDrawer';
 import { SessionCostDrawer } from '../components/SessionCostDrawer';
 import { DoctorDrawer } from '../components/DoctorDrawer';
 import { StatusDrawer } from '../components/StatusDrawer';
@@ -145,7 +144,6 @@ export function InteractiveChatView({
   const [doctorOpen, setDoctorOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
-  const [worktreesOpen, setWorktreesOpen] = useState(false);
   const [costDrawerOpen, setCostDrawerOpen] = useState(false);
   const [workingDirDrawerOpen, setWorkingDirDrawerOpen] = useState(false);
   const [pinnedMessagesOpen, setPinnedMessagesOpen] = useState(false);
@@ -1419,7 +1417,6 @@ export function InteractiveChatView({
         }
         onMemories={() => setMemoriesOpen(true)}
         onClaudeMd={() => setClaudeMdOpen(true)}
-        onWorktrees={() => setWorktreesOpen(true)}
         chatActions={{
           hideToolResults,
           toolResultCount,
@@ -1450,11 +1447,6 @@ export function InteractiveChatView({
       <ClaudeMdDrawer
         open={claudeMdOpen}
         onOpenChange={setClaudeMdOpen}
-        workingDirectory={chat?.workingDir ?? undefined}
-      />
-      <WorktreeDrawer
-        open={worktreesOpen}
-        onOpenChange={setWorktreesOpen}
         workingDirectory={chat?.workingDir ?? undefined}
       />
       <DoctorDrawer open={doctorOpen} onOpenChange={setDoctorOpen} />

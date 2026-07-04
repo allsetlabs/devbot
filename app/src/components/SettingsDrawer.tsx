@@ -9,7 +9,6 @@ import {
   Star,
   Brain,
   FileText,
-  FolderTree,
   Coins,
   Eye,
   EyeOff,
@@ -128,7 +127,6 @@ interface SettingsDrawerProps {
   onToggleFavorite?: () => void;
   onMemories?: () => void;
   onClaudeMd?: () => void;
-  onWorktrees?: () => void;
   chatActions?: ChatSessionSettingsActionsProps;
 }
 
@@ -148,7 +146,6 @@ export function SettingsDrawer({
   onToggleFavorite,
   onMemories,
   onClaudeMd,
-  onWorktrees,
   chatActions,
 }: SettingsDrawerProps) {
   return (
@@ -213,8 +210,8 @@ export function SettingsDrawer({
 
           {chatActions && <ChatSessionSettingsActions {...chatActions} />}
 
-          {/* Memories, CLAUDE.md & Worktrees */}
-          {(onMemories || onClaudeMd || onWorktrees) && (
+          {/* Memories & CLAUDE.md */}
+          {(onMemories || onClaudeMd) && (
             <div className="flex flex-wrap gap-2">
               {onMemories && (
                 <Button
@@ -242,20 +239,6 @@ export function SettingsDrawer({
                 >
                   <FileText className="h-4 w-4" />
                   CLAUDE.md
-                </Button>
-              )}
-              {onWorktrees && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-2"
-                  onClick={() => {
-                    onOpenChange(false);
-                    setTimeout(() => onWorktrees(), 300);
-                  }}
-                >
-                  <FolderTree className="h-4 w-4" />
-                  Worktrees
                 </Button>
               )}
             </div>

@@ -1,3 +1,4 @@
+import type { TradingRecord, TradingData } from '../types';
 import type {
   Session,
   CreateSessionResponse,
@@ -191,25 +192,17 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${id}`, { method: 'DELETE' });
   },
 
-  sendChatMessage: (
-    chatId: string,
-    prompt: string,
-    branch?: string
-  ): Promise<{ success: boolean }> => {
+  sendChatMessage: (chatId: string, prompt: string): Promise<{ success: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/send`, {
       method: 'POST',
-      body: JSON.stringify({ prompt, branch }),
+      body: JSON.stringify({ prompt }),
     });
   },
 
-  truncateMessagesAfter: (
-    chatId: string,
-    sequence: number,
-    branch?: string
-  ): Promise<{ success: boolean }> => {
+  truncateMessagesAfter: (chatId: string, sequence: number): Promise<{ success: boolean }> => {
     return fetchApi(`/api/interactive-chats/${chatId}/truncate-after`, {
       method: 'POST',
-      body: JSON.stringify({ sequence, branch }),
+      body: JSON.stringify({ sequence }),
     });
   },
 
@@ -233,10 +226,10 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/queue`);
   },
 
-  queueChatMessage: (chatId: string, prompt: string, branch?: string): Promise<QueuedMessage> => {
+  queueChatMessage: (chatId: string, prompt: string): Promise<QueuedMessage> => {
     return fetchApi(`/api/interactive-chats/${chatId}/queue`, {
       method: 'POST',
-      body: JSON.stringify({ prompt, branch }),
+      body: JSON.stringify({ prompt }),
     });
   },
 
@@ -252,28 +245,11 @@ export const api = {
     return fetchApi(`/api/interactive-chats/${chatId}/queue/send-all`, { method: 'POST' });
   },
 
-  getChatMessages: (chatId: string, afterSequence = 0, branch = 'main'): Promise<ChatMessage[]> => {
+  getChatMessages: (chatId: string, afterSequence = 0): Promise<ChatMessage[]> => {
     const params = new URLSearchParams();
     if (afterSequence > 0) params.set('afterSequence', String(afterSequence));
-    if (branch !== 'main') params.set('branch', branch);
     const qs = params.toString();
     return fetchApi(`/api/interactive-chats/${chatId}/messages${qs ? `?${qs}` : ''}`);
-  },
-
-  getChatBranches: (chatId: string): Promise<string[]> => {
-    return fetchApi(`/api/interactive-chats/${chatId}/branches`);
-  },
-
-  createChatBranch: (
-    chatId: string,
-    fromSequence: number,
-    branchName?: string,
-    sourceBranch = 'main'
-  ): Promise<{ branchId: string; messagesCopied: number }> => {
-    return fetchApi(`/api/interactive-chats/${chatId}/branch`, {
-      method: 'POST',
-      body: JSON.stringify({ fromSequence, branchName, sourceBranch }),
-    });
   },
 
   renameInteractiveChat: (id: string, name: string): Promise<InteractiveChat> => {
@@ -628,40 +604,41 @@ export const api = {
     });
   },
 
-  // Worktree endpoints
-  listWorktrees: (
-    dir: string
-  ): Promise<{
-    isGitRepo: boolean;
-    worktrees: Array<{
-      path: string;
-      branch: string;
-      head: string;
-      isBare: boolean;
-      isMain: boolean;
-    }>;
-  }> => {
-    return fetchApi(`/api/worktrees?dir=${encodeURIComponent(dir)}`);
-  },
+  // Trading endpoints
+  getTradingData: (): Promise<TradingData | null> => fetchApi('/api/trading/data'),
 
-  createWorktree: (
-    dir: string,
-    path: string,
-    branch: string,
-    newBranch?: boolean
-  ): Promise<{ success: boolean }> => {
-    return fetchApi('/api/worktrees', {
-      method: 'POST',
-      body: JSON.stringify({ dir, path, branch, newBranch }),
-    });
-  },
+  listTradingRecords: (): Promise<TradingRecord[]> => fetchApi('/api/trading/records'),
 
-  removeWorktree: (dir: string, path: string): Promise<{ success: boolean }> => {
-    return fetchApi('/api/worktrees', {
-      method: 'DELETE',
-      body: JSON.stringify({ dir, path }),
-    });
-  },
+  createTradingRecord: (data: {
+    symbol: string;
+    action: TradingRecord['action'];
+    quantity?: number | null;
+    priceTarget?: number | null;
+    currentPrice?: number | null;
+    conditions?: string[];
+    timing?: TradingRecord['timing'];
+    timingDescription?: string | null;
+    reason?: string | null;
+    analysisDate: string;
+  }): Promise<TradingRecord> =>
+    fetchApi('/api/trading/records', { method: 'POST', body: JSON.stringify(data) }),
+
+  updateTradingRecord: (
+    id: string,
+    data: Partial<{
+      status: TradingRecord['status'];
+      outcome: string | null;
+      tempSchedulerId: string | null;
+      conditions: string[];
+      reason: string | null;
+      quantity: number | null;
+      priceTarget: number | null;
+    }>
+  ): Promise<TradingRecord> =>
+    fetchApi(`/api/trading/records/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  deleteTradingRecord: (id: string): Promise<{ success: boolean }> =>
+    fetchApi(`/api/trading/records/${id}`, { method: 'DELETE' }),
 };
 
 export function getXtermWsUrl(port: number): string {

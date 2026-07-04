@@ -57,7 +57,7 @@ function App() {
               <Route path="/company/:companyId" element={<CompanyView />} />
               <Route path="/ocr" element={<OcrList />} />
               <Route path="/ocr/:docId" element={<OcrView />} />
-              {/* Legacy CLI routes */}
+{/* Legacy CLI routes */}
               <Route path="/cli" element={<ChatList />} />
               <Route path="/cli/:sessionId" element={<ChatView />} />
               {/* Default and catch-all redirect to chat */}

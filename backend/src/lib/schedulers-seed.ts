@@ -18,48 +18,44 @@ export async function seedSystemSchedulers(): Promise<void> {
   const superrepoDir = path.resolve(__dirname, '../../../../../');
   const updateScript = path.join(superrepoDir, 'update.sh');
 
-  const existing = await coreDb
+  const now = new Date().toISOString();
+
+  // ── Auto-Update scheduler ────────────────────────────────────────────────
+  const existingUpdate = await coreDb
     .select()
     .from(scheduled_tasks)
     .where(eq(scheduled_tasks.id, AUTO_UPDATE_TASK_ID))
     .limit(1);
 
-  if (existing.length > 0) {
-    // Update the script path in case the repo was moved, but preserve user's pause state
-    const current = existing[0];
-    const currentSettings = (current.settings as Record<string, unknown>) ?? {};
+  if (existingUpdate.length > 0) {
+    const currentSettings = (existingUpdate[0].settings as Record<string, unknown>) ?? {};
     await coreDb
       .update(scheduled_tasks)
       .set({
         prompt: buildPrompt(updateScript),
         settings: { ...currentSettings, isSystem: true, updateScript, model: 'haiku' },
         updated_by: 'system',
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       })
       .where(eq(scheduled_tasks.id, AUTO_UPDATE_TASK_ID));
-
     console.log('[Seed] System scheduler "DevBot Auto-Update" refreshed');
-    return;
+  } else {
+    await coreDb.insert(scheduled_tasks).values({
+      id: AUTO_UPDATE_TASK_ID,
+      name: 'DevBot Auto-Update',
+      prompt: buildPrompt(updateScript),
+      interval_minutes: 1440,
+      status: 'active',
+      run_count: 0,
+      max_runs: null,
+      created_by: 'system',
+      created_at: now,
+      updated_by: 'system',
+      updated_at: now,
+      settings: { isSystem: true, updateScript, model: 'haiku' },
+    });
+    console.log('[Seed] System scheduler "DevBot Auto-Update" created (runs every 24h)');
   }
-
-  // First-time creation
-  const now = new Date().toISOString();
-  await coreDb.insert(scheduled_tasks).values({
-    id: AUTO_UPDATE_TASK_ID,
-    name: 'DevBot Auto-Update',
-    prompt: buildPrompt(updateScript),
-    interval_minutes: 1440, // 24 hours
-    status: 'active',
-    run_count: 0,
-    max_runs: null,
-    created_by: 'system',
-    created_at: now,
-    updated_by: 'system',
-    updated_at: now,
-    settings: { isSystem: true, updateScript, model: 'haiku' },
-  });
-
-  console.log('[Seed] System scheduler "DevBot Auto-Update" created (runs every 24h)');
 }
 
 function buildPrompt(updateScript: string): string {

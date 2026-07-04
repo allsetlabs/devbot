@@ -148,7 +148,6 @@ export async function initializeCoreDatabase() {
       CREATE TABLE IF NOT EXISTS chat_messages (
         id TEXT PRIMARY KEY,
         chat_id TEXT NOT NULL,
-        branch_id TEXT NOT NULL DEFAULT 'main',
         sequence INTEGER NOT NULL,
         type TEXT NOT NULL CHECK(type IN ('user', 'assistant', 'tool_use', 'tool_result', 'system')),
         content TEXT NOT NULL,
@@ -157,7 +156,7 @@ export async function initializeCoreDatabase() {
         updated_by TEXT NOT NULL DEFAULT 'user',
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         settings TEXT DEFAULT '{}',
-        UNIQUE(chat_id, branch_id, sequence)
+        UNIQUE(chat_id, sequence)
       )
     `
     );
@@ -272,32 +271,36 @@ export async function initializeCoreDatabase() {
       // Column already exists
     }
 
-    // Migrate: add branch_id column and update unique constraint
+    // Migrate: drop branch_id column from chat_messages (chat branching feature removed).
+    // Only 'main' branch rows are kept; forked-branch messages are discarded.
     try {
-      coreDb.run(
-        sql.raw(`ALTER TABLE chat_messages ADD COLUMN branch_id TEXT NOT NULL DEFAULT 'main'`)
-      );
-      // Recreate table with updated unique constraint (chat_id, branch_id, sequence)
-      coreDb.run(
-        sql.raw(`CREATE TABLE IF NOT EXISTS chat_messages_new (
-        id TEXT PRIMARY KEY, chat_id TEXT NOT NULL, branch_id TEXT NOT NULL DEFAULT 'main',
-        sequence INTEGER NOT NULL,
-        type TEXT NOT NULL CHECK(type IN ('user', 'assistant', 'tool_use', 'tool_result', 'system')),
-        content TEXT NOT NULL, created_by TEXT NOT NULL DEFAULT 'user',
-        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_by TEXT NOT NULL DEFAULT 'user',
-        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, settings TEXT DEFAULT '{}',
-        UNIQUE(chat_id, branch_id, sequence)
-      )`)
-      );
-      coreDb.run(
-        sql.raw(
-          `INSERT INTO chat_messages_new SELECT id, chat_id, branch_id, sequence, type, content, created_by, created_at, updated_by, updated_at, settings FROM chat_messages`
-        )
-      );
-      coreDb.run(sql.raw(`DROP TABLE chat_messages`));
-      coreDb.run(sql.raw(`ALTER TABLE chat_messages_new RENAME TO chat_messages`));
-    } catch {
-      // Column already exists or migration already applied
+      const hasBranchId = (
+        coreDb.all(sql.raw(`PRAGMA table_info(chat_messages)`)) as Array<{ name: string }>
+      ).some((col) => col.name === 'branch_id');
+
+      if (hasBranchId) {
+        coreDb.run(
+          sql.raw(`CREATE TABLE chat_messages_new (
+          id TEXT PRIMARY KEY, chat_id TEXT NOT NULL,
+          sequence INTEGER NOT NULL,
+          type TEXT NOT NULL CHECK(type IN ('user', 'assistant', 'tool_use', 'tool_result', 'system')),
+          content TEXT NOT NULL, created_by TEXT NOT NULL DEFAULT 'user',
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_by TEXT NOT NULL DEFAULT 'user',
+          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, settings TEXT DEFAULT '{}',
+          UNIQUE(chat_id, sequence)
+        )`)
+        );
+        coreDb.run(
+          sql.raw(
+            `INSERT INTO chat_messages_new SELECT id, chat_id, sequence, type, content, created_by, created_at, updated_by, updated_at, settings FROM chat_messages WHERE branch_id = 'main'`
+          )
+        );
+        coreDb.run(sql.raw(`DROP TABLE chat_messages`));
+        coreDb.run(sql.raw(`ALTER TABLE chat_messages_new RENAME TO chat_messages`));
+        console.log('[DB] Migrated chat_messages: dropped branch_id column');
+      }
+    } catch (err) {
+      console.error('[DB] Failed to drop branch_id from chat_messages:', err);
     }
 
     // Create chat_message_queue table
@@ -306,7 +309,6 @@ export async function initializeCoreDatabase() {
       CREATE TABLE IF NOT EXISTS chat_message_queue (
         id TEXT PRIMARY KEY,
         chat_id TEXT NOT NULL,
-        branch_id TEXT NOT NULL DEFAULT 'main',
         prompt TEXT NOT NULL,
         position INTEGER NOT NULL,
         created_by TEXT NOT NULL DEFAULT 'user',
@@ -317,6 +319,14 @@ export async function initializeCoreDatabase() {
       )
     `
     );
+
+    // Migrate: drop branch_id column from chat_message_queue (chat branching feature removed)
+    try {
+      coreDb.run(sql.raw(`ALTER TABLE chat_message_queue DROP COLUMN branch_id`));
+      console.log('[DB] Migrated chat_message_queue: dropped branch_id column');
+    } catch {
+      // Column already removed or never existed
+    }
 
     // Create commands table
     await runSQL(

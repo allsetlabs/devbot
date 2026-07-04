@@ -14,7 +14,6 @@ interface MessageListProps {
   onRetry?: () => void;
   onRegenerate?: () => void;
   onEdit?: (messageId: string, text: string) => void;
-  onBranch?: (messageId: string) => void;
   autoScroll?: boolean;
   pinnedIds?: string[];
   onTogglePin?: (messageId: string) => void;
@@ -36,7 +35,6 @@ export const MessageList = forwardRef<
     onRetry,
     onRegenerate,
     onEdit,
-    onBranch,
     autoScroll = true,
     pinnedIds = [],
     onTogglePin,
@@ -210,7 +208,6 @@ export const MessageList = forwardRef<
                     ? (type) => onToggleMessageReaction(msg.id, type)
                     : undefined
                 }
-                onBranch={onBranch ? () => onBranch(msg.id) : undefined}
                 compactMode={compactMode}
                 permissionMode={permissionMode}
                 onStopChat={onStopChat}

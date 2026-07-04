@@ -1,4 +1,3 @@
-import type { TradingRecord, TradingData } from '../types';
 import type {
   Session,
   CreateSessionResponse,
@@ -604,41 +603,6 @@ export const api = {
     });
   },
 
-  // Trading endpoints
-  getTradingData: (): Promise<TradingData | null> => fetchApi('/api/trading/data'),
-
-  listTradingRecords: (): Promise<TradingRecord[]> => fetchApi('/api/trading/records'),
-
-  createTradingRecord: (data: {
-    symbol: string;
-    action: TradingRecord['action'];
-    quantity?: number | null;
-    priceTarget?: number | null;
-    currentPrice?: number | null;
-    conditions?: string[];
-    timing?: TradingRecord['timing'];
-    timingDescription?: string | null;
-    reason?: string | null;
-    analysisDate: string;
-  }): Promise<TradingRecord> =>
-    fetchApi('/api/trading/records', { method: 'POST', body: JSON.stringify(data) }),
-
-  updateTradingRecord: (
-    id: string,
-    data: Partial<{
-      status: TradingRecord['status'];
-      outcome: string | null;
-      tempSchedulerId: string | null;
-      conditions: string[];
-      reason: string | null;
-      quantity: number | null;
-      priceTarget: number | null;
-    }>
-  ): Promise<TradingRecord> =>
-    fetchApi(`/api/trading/records/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
-
-  deleteTradingRecord: (id: string): Promise<{ success: boolean }> =>
-    fetchApi(`/api/trading/records/${id}`, { method: 'DELETE' }),
 };
 
 export function getXtermWsUrl(port: number): string {

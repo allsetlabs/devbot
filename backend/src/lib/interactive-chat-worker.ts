@@ -153,11 +153,10 @@ function processQueue(chatId: string): void {
     coreDb.delete(chat_message_queue).where(eq(chat_message_queue.chat_id, chatId)).run();
 
     const combined = all.map((m) => m.prompt).join('\n\n');
-    const branch_id = all[0].branch_id;
 
     console.log(`[InteractiveChat] Processing ${all.length} queued message(s) for chat ${chatId}`);
 
-    sendMessage(chatId, combined, branch_id).catch((err) => {
+    sendMessage(chatId, combined).catch((err) => {
       console.error(`[InteractiveChat] Failed to send queued message for chat ${chatId}:`, err);
     });
   } catch (err) {
@@ -181,12 +180,8 @@ function markChatNotExecuting(chatId: string): void {
  * Send a message in an interactive chat session.
  * Uses the unified spawnClaude API.
  */
-export async function sendMessage(
-  chatId: string,
-  prompt: string,
-  branchId: string = 'main'
-): Promise<void> {
-  clearSessionLimitFollowUp(chatId, branchId);
+export async function sendMessage(chatId: string, prompt: string): Promise<void> {
+  clearSessionLimitFollowUp(chatId);
 
   const chat = coreDb
     .select()
@@ -198,11 +193,11 @@ export async function sendMessage(
     throw new Error('Chat not found');
   }
 
-  // Get current max sequence for this chat on this branch
+  // Get current max sequence for this chat
   const maxSeqRow = coreDb
     .select({ sequence: chat_messages.sequence })
     .from(chat_messages)
-    .where(and(eq(chat_messages.chat_id, chatId), eq(chat_messages.branch_id, branchId)))
+    .where(eq(chat_messages.chat_id, chatId))
     .orderBy(sql`sequence DESC`)
     .limit(1)
     .get();
@@ -216,7 +211,6 @@ export async function sendMessage(
     .values({
       id: userMessageId,
       chat_id: chatId,
-      branch_id: branchId,
       sequence: currentMaxSequence + 1,
       type: 'user',
       content: {
@@ -266,7 +260,6 @@ export async function sendMessage(
     foreignKeyValue: chatId,
     logPrefix: '[InteractiveChat]',
     skipUserMessages: true,
-    branchId: branchId,
     initialSequence: currentMaxSequence + 1,
     onMessage: (messageType, data) => {
       if (messageType === 'assistant') {
@@ -274,10 +267,10 @@ export async function sendMessage(
           console.error(`[InteractiveChat] Remotion video check failed:`, err);
         });
 
-        maybeScheduleSessionLimitFollowUp(chatId, branchId, data, {
+        maybeScheduleSessionLimitFollowUp(chatId, data, {
           isChatExecuting,
-          onFire: async (scheduledBranchId) => {
-            await sendMessage(chatId, getSessionLimitContinuePrompt(), scheduledBranchId);
+          onFire: async () => {
+            await sendMessage(chatId, getSessionLimitContinuePrompt());
           },
         });
       }

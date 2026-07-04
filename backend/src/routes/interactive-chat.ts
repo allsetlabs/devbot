@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { eq, desc, gt, isNull, isNotNull, and, lte, inArray, sql, asc } from 'drizzle-orm';
+import { eq, desc, gt, isNull, isNotNull, and, inArray, sql, asc } from 'drizzle-orm';
 import {
   coreDb,
   interactive_chats,
@@ -110,7 +110,6 @@ function loadSummarizeChatMap(): Map<string, ChatSessionSummary> {
 interface ChatMessageResponse {
   id: string;
   chatId: string;
-  branchId: string;
   sequence: number;
   type: 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
   content: Record<string, unknown>;
@@ -151,7 +150,6 @@ function rowToMessage(row: ChatMessageRow): ChatMessageResponse {
   return {
     id: row.id,
     chatId: row.chat_id,
-    branchId: row.branch_id,
     sequence: row.sequence,
     type: row.type,
     content: row.content,
@@ -673,19 +671,18 @@ router.delete(
 router.post(
   '/:id/send',
   asyncHandler(async (req, res) => {
-    const { prompt, branch } = req.body;
+    const { prompt } = req.body;
 
     if (!requireString(res, prompt, 'Prompt')) return;
 
     const chatId = req.params.id;
-    const branchId = (branch as string) || 'main';
 
     if (isChatExecuting(chatId)) {
       stopChatExecution(chatId);
       await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
-    sendMessage(chatId, prompt.trim(), branchId).catch((err) => {
+    sendMessage(chatId, prompt.trim()).catch((err) => {
       console.error(`[InteractiveChat] Error sending message for chat ${chatId}:`, err);
     });
 
@@ -697,23 +694,16 @@ router.post(
 router.post(
   '/:id/truncate-after',
   asyncHandler(async (req, res) => {
-    const { sequence, branch } = req.body;
+    const { sequence } = req.body;
     if (typeof sequence !== 'number') {
       res.status(400).json({ error: 'sequence is required (number)' });
       return;
     }
     const chatId = req.params.id;
-    const branchId = (branch as string) || 'main';
 
     const deleted = await coreDb
       .delete(chat_messages)
-      .where(
-        and(
-          eq(chat_messages.chat_id, chatId),
-          eq(chat_messages.branch_id, branchId),
-          gt(chat_messages.sequence, sequence)
-        )
-      );
+      .where(and(eq(chat_messages.chat_id, chatId), gt(chat_messages.sequence, sequence)));
 
     res.json({ success: true, deletedCount: deleted.changes ?? 0 });
   }, 'truncate messages after sequence')
@@ -765,22 +755,17 @@ router.post(
   }, 'resume chat')
 );
 
-// Get messages for a chat (optionally filtered by branch)
+// Get messages for a chat
 router.get(
   '/:id/messages',
   asyncHandler(async (req, res) => {
     const afterSequence = parseInt(req.query.afterSequence as string) || 0;
-    const branch = (req.query.branch as string) || 'main';
 
     const rows = await coreDb
       .select()
       .from(chat_messages)
       .where(
-        and(
-          eq(chat_messages.chat_id, req.params.id),
-          eq(chat_messages.branch_id, branch),
-          gt(chat_messages.sequence, afterSequence)
-        )
+        and(eq(chat_messages.chat_id, req.params.id), gt(chat_messages.sequence, afterSequence))
       )
       .orderBy(chat_messages.sequence);
 
@@ -1149,82 +1134,6 @@ router.post(
   }, 'star chat')
 );
 
-// List branches for a chat
-router.get(
-  '/:id/branches',
-  asyncHandler(async (req, res) => {
-    const rows = await coreDb
-      .select({ branch_id: chat_messages.branch_id })
-      .from(chat_messages)
-      .where(eq(chat_messages.chat_id, req.params.id))
-      .groupBy(chat_messages.branch_id)
-      .orderBy(chat_messages.branch_id);
-
-    const branches = rows.map((r) => r.branch_id);
-    res.json(branches);
-  }, 'list branches')
-);
-
-// Create a branch from a specific message sequence
-router.post(
-  '/:id/branch',
-  asyncHandler(async (req, res) => {
-    const { fromSequence, branchName } = req.body;
-    const chatId = req.params.id;
-    const sourceBranch = (req.body.sourceBranch as string) || 'main';
-
-    if (typeof fromSequence !== 'number' || fromSequence < 1) {
-      sendBadRequest(res, 'fromSequence must be a positive number');
-      return;
-    }
-
-    const name = branchName || `branch-${Date.now().toString(36)}`;
-
-    // Check branch doesn't already exist
-    const existing = await coreDb
-      .select({ branch_id: chat_messages.branch_id })
-      .from(chat_messages)
-      .where(and(eq(chat_messages.chat_id, chatId), eq(chat_messages.branch_id, name)))
-      .limit(1);
-
-    if (existing.length > 0) {
-      sendBadRequest(res, `Branch "${name}" already exists`);
-      return;
-    }
-
-    // Copy messages up to (and including) fromSequence into the new branch
-    const messagesToCopy = await coreDb
-      .select()
-      .from(chat_messages)
-      .where(
-        and(
-          eq(chat_messages.chat_id, chatId),
-          eq(chat_messages.branch_id, sourceBranch),
-          lte(chat_messages.sequence, fromSequence)
-        )
-      )
-      .orderBy(chat_messages.sequence);
-
-    for (const msg of messagesToCopy) {
-      coreDb
-        .insert(chat_messages)
-        .values({
-          id: generateId(),
-          chat_id: chatId,
-          branch_id: name,
-          sequence: msg.sequence,
-          type: msg.type,
-          content: msg.content,
-          created_by: msg.created_by,
-          updated_by: 'system',
-        })
-        .run();
-    }
-
-    res.json({ branchId: name, messagesCopied: messagesToCopy.length });
-  }, 'create branch')
-);
-
 // --- Message Queue ---
 
 // List queued messages for a chat
@@ -1241,7 +1150,6 @@ router.get(
       rows.map((r) => ({
         id: r.id,
         chatId: r.chat_id,
-        branchId: r.branch_id,
         prompt: r.prompt,
         position: r.position,
         createdAt: r.created_at,
@@ -1254,11 +1162,10 @@ router.get(
 router.post(
   '/:id/queue',
   asyncHandler(async (req, res) => {
-    const { prompt, branch } = req.body;
+    const { prompt } = req.body;
     if (!requireString(res, prompt, 'Prompt')) return;
 
     const chatId = req.params.id;
-    const branchId = (branch as string) || 'main';
 
     const maxPosRow = coreDb
       .select({ position: chat_message_queue.position })
@@ -1276,7 +1183,6 @@ router.post(
       .values({
         id,
         chat_id: chatId,
-        branch_id: branchId,
         prompt: prompt.trim(),
         position: nextPosition,
         created_by: 'user',
@@ -1287,7 +1193,6 @@ router.post(
     res.status(201).json({
       id,
       chatId,
-      branchId,
       prompt: prompt.trim(),
       position: nextPosition,
     });
@@ -1337,9 +1242,8 @@ router.post(
     }
 
     const combined = entries.map((m) => m.prompt).join('\n\n');
-    const branchId = entries[0].branch_id;
 
-    sendMessage(chatId, combined, branchId).catch((err) => {
+    sendMessage(chatId, combined).catch((err) => {
       console.error(`[InteractiveChat] Error sending all queued messages for chat ${chatId}:`, err);
     });
 
@@ -1375,7 +1279,7 @@ router.post(
       await new Promise((resolve) => setTimeout(resolve, 300));
     }
 
-    sendMessage(chatId, entry.prompt, entry.branch_id).catch((err) => {
+    sendMessage(chatId, entry.prompt).catch((err) => {
       console.error(`[InteractiveChat] Error sending queued message for chat ${chatId}:`, err);
     });
 

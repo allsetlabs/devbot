@@ -146,7 +146,6 @@ export const interactive_chats = sqliteTable('interactive_chats', {
 export const chat_messages = sqliteTable('chat_messages', {
   id: text('id').primaryKey(),
   chat_id: text('chat_id').notNull(),
-  branch_id: text('branch_id').notNull().default('main'),
   sequence: integer('sequence').notNull(),
   type: text('type', {
     enum: ['user', 'assistant', 'tool_use', 'tool_result', 'system'],
@@ -321,7 +320,6 @@ export const companies = sqliteTable('companies', {
 export const chat_message_queue = sqliteTable('chat_message_queue', {
   id: text('id').primaryKey(),
   chat_id: text('chat_id').notNull(),
-  branch_id: text('branch_id').notNull().default('main'),
   prompt: text('prompt').notNull(),
   position: integer('position').notNull(),
   created_by: text('created_by').notNull().default('user'),

@@ -194,7 +194,6 @@ export interface InteractiveChat {
 export interface ChatMessage {
   id: string;
   chatId: string;
-  branchId: string;
   sequence: number;
   type: 'user' | 'assistant' | 'tool_use' | 'tool_result' | 'system';
   content: ClaudeMessageContent;
@@ -204,7 +203,6 @@ export interface ChatMessage {
 export interface QueuedMessage {
   id: string;
   chatId: string;
-  branchId: string;
   prompt: string;
   position: number;
   createdAt: string;
@@ -365,3 +363,4 @@ export interface MemoriesResponse {
   memories: MemoryFile[];
   basePath: string;
 }
+

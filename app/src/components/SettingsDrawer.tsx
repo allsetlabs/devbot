@@ -7,7 +7,6 @@ import {
   Archive,
   Trash2,
   Star,
-  Brain,
   FileText,
   Coins,
   Eye,
@@ -125,7 +124,6 @@ interface SettingsDrawerProps {
   onDelete?: () => void;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
-  onMemories?: () => void;
   onClaudeMd?: () => void;
   chatActions?: ChatSessionSettingsActionsProps;
 }
@@ -144,7 +142,6 @@ export function SettingsDrawer({
   onDelete,
   isFavorite = false,
   onToggleFavorite,
-  onMemories,
   onClaudeMd,
   chatActions,
 }: SettingsDrawerProps) {
@@ -210,23 +207,9 @@ export function SettingsDrawer({
 
           {chatActions && <ChatSessionSettingsActions {...chatActions} />}
 
-          {/* Memories & CLAUDE.md */}
-          {(onMemories || onClaudeMd) && (
+          {/* CLAUDE.md */}
+          {onClaudeMd && (
             <div className="flex flex-wrap gap-2">
-              {onMemories && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-2"
-                  onClick={() => {
-                    onOpenChange(false);
-                    setTimeout(() => onMemories(), 300);
-                  }}
-                >
-                  <Brain className="h-4 w-4" />
-                  Memories
-                </Button>
-              )}
               {onClaudeMd && (
                 <Button
                   variant="outline"

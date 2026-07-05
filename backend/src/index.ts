@@ -23,7 +23,6 @@ import {
   seedDefaultWorkingDirectories,
 } from './routes/working-directories.js';
 import { companiesRouter } from './routes/companies.js';
-import { memoriesRouter } from './routes/memories.js';
 import { claudeMdRouter } from './routes/claude-md.js';
 import { ocrRouter } from './routes/ocr.js';
 import { sttRouter } from './routes/stt.js';
@@ -200,7 +199,6 @@ app.use('/api/commands', commandsRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/working-directories', workingDirectoriesRouter);
 app.use('/api/companies', companiesRouter);
-app.use('/api/memories', memoriesRouter);
 app.use('/api/claude-md', claudeMdRouter);
 app.use('/api/ocr', ocrRouter);
 app.use('/api/stt', sttRouter);

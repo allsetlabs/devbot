@@ -4,6 +4,7 @@ Architecture decisions for the devbot module. One file per decision, newest firs
 
 | #    | Decision                                                                                                                   | Date       |
 | ---- | -------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 0015 | [Remove Memories Route and MemoryViewerDrawer](0015-remove-memories-route.md) | 2026-07-05 |
 | 0014 | [Remove Trading Feature](0014-remove-trading-feature.md) | 2026-07-03 |
 | 0013 | [Remove Git Worktree Feature](0013-remove-git-worktree-feature.md) | 2026-07-03 |
 | 0010 | [Remove Chat Branching Feature, Discard Non-Main Branch Messages](0010-drop-chat-branching-discard-non-main-branches.md)  | 2026-06-29 |

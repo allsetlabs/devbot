@@ -26,7 +26,6 @@ import { MessageList } from '../components/MessageList';
 import { ChatWelcomeScreen } from '../components/ChatWelcomeScreen';
 import { ChatSearchBar } from '../components/ChatSearchBar';
 import { SettingsDrawer } from '../components/SettingsDrawer';
-import { MemoryViewerDrawer } from '../components/MemoryViewerDrawer';
 import { ClaudeMdDrawer } from '../components/ClaudeMdDrawer';
 import { SessionCostDrawer } from '../components/SessionCostDrawer';
 import { DoctorDrawer } from '../components/DoctorDrawer';
@@ -140,7 +139,6 @@ export function InteractiveChatView({
   const [systemPromptValue, setSystemPromptValue] = useState('');
   const [effortDrawerOpen, setEffortDrawerOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [memoriesOpen, setMemoriesOpen] = useState(false);
   const [doctorOpen, setDoctorOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const [claudeMdOpen, setClaudeMdOpen] = useState(false);
@@ -709,7 +707,6 @@ export function InteractiveChatView({
         },
         openConfig: () => navigate('/settings'),
         openCostDrawer: () => setCostDrawerOpen(true),
-        openMemoryDrawer: () => setMemoriesOpen(true),
         openDoctor: () => setDoctorOpen(true),
         openStatus: () => setStatusOpen(true),
         toggleFastMode: () => {
@@ -1415,7 +1412,6 @@ export function InteractiveChatView({
               }
             : undefined
         }
-        onMemories={() => setMemoriesOpen(true)}
         onClaudeMd={() => setClaudeMdOpen(true)}
         chatActions={{
           hideToolResults,
@@ -1443,7 +1439,6 @@ export function InteractiveChatView({
           },
         }}
       />
-      <MemoryViewerDrawer open={memoriesOpen} onOpenChange={setMemoriesOpen} />
       <ClaudeMdDrawer
         open={claudeMdOpen}
         onOpenChange={setClaudeMdOpen}

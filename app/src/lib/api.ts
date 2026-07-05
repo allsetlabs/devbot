@@ -26,7 +26,6 @@ import type {
   Company,
   FeedbackDocument,
   FileBrowseItem,
-  MemoriesResponse,
   MessageSearchResult,
   QueuedMessage,
   OcrDocument,
@@ -526,34 +525,6 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ prompt }),
     });
-  },
-
-  // Memories endpoints
-  listMemories: (): Promise<MemoriesResponse> => {
-    return fetchApi('/api/memories');
-  },
-
-  updateMemory: (
-    project: string,
-    filename: string,
-    content: string
-  ): Promise<{ success: boolean }> => {
-    return fetchApi(
-      `/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify({ content }),
-      }
-    );
-  },
-
-  deleteMemory: (project: string, filename: string): Promise<{ success: boolean }> => {
-    return fetchApi(
-      `/api/memories/${encodeURIComponent(project)}/${encodeURIComponent(filename)}`,
-      {
-        method: 'DELETE',
-      }
-    );
   },
 
   // CLAUDE.md endpoints

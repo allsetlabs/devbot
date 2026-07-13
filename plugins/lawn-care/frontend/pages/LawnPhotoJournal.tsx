@@ -11,9 +11,7 @@ import {
   DrawerTitle,
 } from '@allsetlabs/forge/components/ui/drawer';
 import {
-  Menu,
   Camera,
-  ArrowLeft,
   Loader2,
   Trash2,
   X,
@@ -24,7 +22,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { lawnCareApi, getPhotoUrl } from '../api';
-import { SlideNav } from '@devbot/app/components/SlideNav';
+import { HeaderSlot } from '@devbot/app/components/HeaderSlot';
 import type { LawnPhoto, LawnApplication } from '../types';
 
 // --- Photo Card ---
@@ -176,7 +174,6 @@ export function LawnPhotoJournal() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [navOpen, setNavOpen] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [compareSelection, setCompareSelection] = useState<string[]>([]);
   const [editingPhoto, setEditingPhoto] = useState<LawnPhoto | null>(null);
@@ -307,8 +304,6 @@ export function LawnPhotoJournal() {
 
   return (
     <div className="flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -319,18 +314,7 @@ export function LawnPhotoJournal() {
         onChange={handleFileSelect}
       />
 
-      {/* Header */}
-      <div className="safe-area-top border-border flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => navigate('/lawn-care')}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <Camera className="text-primary h-5 w-5" />
-          <h1 className="text-foreground text-lg font-semibold">Photo Journal</h1>
-        </div>
+      <HeaderSlot>
         <div className="flex items-center gap-1">
           {photos.length >= 2 && (
             <Button
@@ -359,7 +343,7 @@ export function LawnPhotoJournal() {
             </Button>
           )}
         </div>
-      </div>
+      </HeaderSlot>
 
       {/* Compare mode banner */}
       {compareMode && (
@@ -395,7 +379,7 @@ export function LawnPhotoJournal() {
             <p className="text-muted-foreground mt-2 text-center text-sm">
               Set up your lawn profile first to start tracking photos.
             </p>
-            <Button className="mt-4" onClick={() => navigate('/lawn-care')}>
+            <Button className="mt-4" onClick={() => navigate('/plugins/lawn-care')}>
               Go to Lawn Care
             </Button>
           </div>

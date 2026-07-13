@@ -2,11 +2,10 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Timer, Menu, Globe } from 'lucide-react';
+import { Timer, Globe } from 'lucide-react';
 import { api } from '../lib/api';
 import { EditEntryDrawer } from '../components/EditEntryDrawer';
 import { EventEntryItem } from '../components/EventEntryItem';
-import { useNav } from '../hooks/useNav';
 import {
   useWakeLock,
   useGeoInfo,
@@ -22,7 +21,6 @@ import {
 import type { EventTimerEntry } from '../types';
 
 export function EventsTimer() {
-  const { openNav } = useNav();
   const [editEntry, setEditEntry] = useState<EventTimerEntry | null>(null);
 
   const now = useLiveTime();
@@ -80,17 +78,7 @@ export function EventsTimer() {
   const latestEntry = entries.length > 0 ? entries[0] : null;
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={openNav}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Timer className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold text-foreground">Events Timer</h1>
-        </div>
-      </header>
-
+    <div className="safe-area-bottom flex h-full flex-col">
       {error && (
         <div className="border-b border-destructive bg-destructive/10 px-4 py-2 text-sm text-destructive">
           {error}

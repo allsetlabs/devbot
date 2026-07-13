@@ -2,17 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Textarea } from '@allsetlabs/forge/components/ui/textarea';
-import { Plus, Building2, X } from 'lucide-react';
+import { Plus, Building2, X, RefreshCw } from 'lucide-react';
 import { companyHooks } from '../hooks/useCompany';
 import { extractErrorMessage } from '../lib/format';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { EmptyState } from '../components/EmptyState';
-import { ListPageHeader } from '../components/ListPageHeader';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 
 export function CompanyList() {
   const navigate = useNavigate();
-  const { openNav } = useNav();
   const [showForm, setShowForm] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [companyIdea, setCompanyIdea] = useState('');
@@ -53,19 +51,16 @@ export function CompanyList() {
   };
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <ListPageHeader
-        icon={<Building2 className="h-6 w-6 text-primary" />}
-        title="Companies"
-        onMenuClick={openNav}
-        onRefresh={() => refetch()}
-        isRefreshing={isFetching}
-      >
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
+        <Button variant="ghost" size="icon" onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`h-5 w-5 ${isFetching ? 'animate-spin' : ''}`} />
+        </Button>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="mr-1 h-4 w-4" />
           New Company
         </Button>
-      </ListPageHeader>
+      </HeaderSlot>
 
       <ErrorBanner error={error} />
 

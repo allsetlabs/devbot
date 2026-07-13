@@ -13,7 +13,7 @@ import { useFavorites } from '../hooks/useFavorites';
 import { extractErrorMessage } from '../lib/format';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { ChatListHeader } from '../components/ChatListHeader';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 import { ChatListFilters } from '../components/ChatListFilters';
 import { ChatArchiveDrawer } from '../components/ChatArchiveDrawer';
 import { ChatListContent } from '../components/ChatListContent';
@@ -24,7 +24,6 @@ import type { InteractiveChat, PermissionMode, ClaudeModel } from '../types';
 export function InteractiveChatList() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { openNav } = useNav();
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
@@ -217,20 +216,21 @@ export function InteractiveChatList() {
   }
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <ChatListHeader
-        sortBy={sortBy}
-        sortDropdownOpen={sortDropdownOpen}
-        showFavorites={showFavorites}
-        isFetching={isFetching}
-        creating={creating}
-        onMenuOpen={openNav}
-        onSortChange={setSortBy}
-        onToggleSortDropdown={() => setSortDropdownOpen(!sortDropdownOpen)}
-        onToggleFavorites={() => setShowFavorites(!showFavorites)}
-        onRefetch={() => refetch()}
-        onCreate={handleCreate}
-      />
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
+        <ChatListHeader
+          sortBy={sortBy}
+          sortDropdownOpen={sortDropdownOpen}
+          showFavorites={showFavorites}
+          isFetching={isFetching}
+          creating={creating}
+          onSortChange={setSortBy}
+          onToggleSortDropdown={() => setSortDropdownOpen(!sortDropdownOpen)}
+          onToggleFavorites={() => setShowFavorites(!showFavorites)}
+          onRefetch={() => refetch()}
+          onCreate={handleCreate}
+        />
+      </HeaderSlot>
 
       <ChatListFilters
         searchQuery={searchQuery}

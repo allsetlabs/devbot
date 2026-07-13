@@ -29,6 +29,7 @@ import { sttRouter } from './routes/stt.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
+import getFamilyHierarchyRouter from '@devbot/plugin-family-hierarchy/backend/routes.js';
 import type { LawnProfile } from '@devbot/plugin-lawn-care/backend/schema.js';
 import { spawnClaudeStructured, getActiveSessionCount } from './lib/claude-spawn.js';
 import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
@@ -53,7 +54,7 @@ const HOST = BACKEND_HOST;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '16mb' }));
 
 // API Key authentication middleware
 app.use('/api', (req, res, next) => {
@@ -205,6 +206,7 @@ app.use('/api/stt', sttRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
+app.use('/api/plugins/family-hierarchy', getFamilyHierarchyRouter());
 app.use(
   '/api/plugins/lawn-care',
   getLawnCareRouter({

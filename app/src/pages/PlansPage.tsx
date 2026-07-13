@@ -4,11 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { chatHooks } from '../hooks/useChat';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Lightbulb, Menu, RefreshCw } from 'lucide-react';
+import { Lightbulb, RefreshCw } from 'lucide-react';
 import { api } from '../lib/api';
 import { extractErrorMessage } from '../lib/format';
 import { PlanListItem } from '../components/PlanListItem';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 import { PlanDetailDrawer } from '../components/PlanDetailDrawer';
 import type { ModulePlan } from '../types';
 
@@ -16,7 +16,6 @@ const STATUS_FILTERS = ['all', 'pending', 'in_progress', 'completed', 'dismissed
 
 export function PlansPage() {
   const navigate = useNavigate();
-  const { openNav } = useNav();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedPlan, setSelectedPlan] = useState<ModulePlan | null>(null);
 
@@ -67,19 +66,12 @@ export function PlansPage() {
   );
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={openNav}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Lightbulb className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold text-foreground">Plans</h1>
-        </div>
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
         <Button variant="ghost" size="icon" onClick={() => refetch()} disabled={isFetching}>
           <RefreshCw className={`h-5 w-5 ${isFetching ? 'animate-spin' : ''}`} />
         </Button>
-      </header>
+      </HeaderSlot>
 
       {error && (
         <div className="border-b border-destructive bg-destructive/10 px-4 py-2 text-sm text-destructive">

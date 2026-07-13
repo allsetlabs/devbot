@@ -1,6 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Menu } from 'lucide-react';
 import { api } from '../lib/api';
 import { lawnCareApi } from '@devbot/plugin-lawn-care/frontend/api';
 import { babyLogsApi } from '@devbot/plugin-baby-logs/frontend/api';
@@ -12,11 +10,8 @@ import { HealthWidget } from '../components/HealthWidget';
 import { DashboardQuickActions } from '../components/DashboardQuickActions';
 import { DashboardRecentChats } from '../components/DashboardRecentChats';
 import { DashboardActiveSchedulers } from '../components/DashboardActiveSchedulers';
-import { useNav } from '../hooks/useNav';
 
 export function Dashboard() {
-  const { openNav } = useNav();
-
   const { data: chats = [] } = useQuery({
     queryKey: ['interactive-chats'],
     queryFn: () => api.listInteractiveChats(),
@@ -52,16 +47,6 @@ export function Dashboard() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
-      <header className="safe-area-top flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={openNav}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
-        </div>
-      </header>
-
       {/* Widget Grid */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="mx-auto w-full max-w-6xl space-y-4">

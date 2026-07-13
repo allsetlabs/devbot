@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Milk, TrendingUp, Clock, Weight, Ruler, Users, LineChart } from 'lucide-react';
+import { Milk, TrendingUp, Clock, Weight, Ruler, Users, LineChart } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { babyLogsApi } from '../api';
 import { toDateKey, roundToNearest5 } from '@devbot/app/lib/format';
+import { HeaderSlot } from '@devbot/app/components/HeaderSlot';
 import type { BabyLog } from '../types';
 
 // ─── Data computation ─────────────────────────────────────────────────────────
@@ -942,20 +943,13 @@ export function BabyAnalytics() {
       : '—';
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <header className="border-border flex items-center gap-2 border-b px-4 py-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/baby-logs')}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <TrendingUp className="text-primary h-5 w-5" />
-        <h1 className="text-foreground text-xl font-bold">Analytics</h1>
-        {!loading && (
-          <span className="text-muted-foreground ml-auto text-xs">{totalDays}d of data</span>
-        )}
-        <Button variant="ghost" size="icon" onClick={() => navigate('/baby-logs/growth')}>
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
+        {!loading && <span className="text-muted-foreground text-xs">{totalDays}d of data</span>}
+        <Button variant="ghost" size="icon" onClick={() => navigate('/plugins/baby-logs/growth')}>
           <LineChart className="h-5 w-5" />
         </Button>
-      </header>
+      </HeaderSlot>
 
       {loading && (
         <div className="flex flex-1 items-center justify-center">

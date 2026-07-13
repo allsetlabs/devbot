@@ -13,7 +13,6 @@ import {
 } from '@allsetlabs/forge/components/ui/drawer';
 import {
   Baby,
-  Menu,
   Trash2,
   Milk,
   Droplets,
@@ -42,7 +41,7 @@ import {
   formatDateLabel,
   formatMsTimer,
 } from '@devbot/app/lib/format';
-import { SlideNav } from '@devbot/app/components/SlideNav';
+import { HeaderSlot } from '@devbot/app/components/HeaderSlot';
 import { BabyProfileDrawer } from '../components/BabyProfileDrawer';
 import type { ProfileFormData } from '../components/BabyProfileDrawer';
 import type { BabyLog, FeedingType, BreastSide } from '../types';
@@ -610,7 +609,6 @@ export function BabyLogs() {
     setSearchParams(next, { replace: true });
   };
 
-  const [navOpen, setNavOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
 
   // Baby profile state
@@ -1265,72 +1263,64 @@ export function BabyLogs() {
     addHeightCm.trim() !== '';
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
-      {/* Header */}
-      <header className="border-border flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Baby className="text-primary h-6 w-6" />
-          <h1 className="text-foreground text-xl font-bold">Baby Logs</h1>
-        </div>
-        <div className="flex items-center gap-1">
-          {profile && (
-            <>
-              <Button variant="ghost" size="icon" onClick={() => setProfileDrawerOpen(true)}>
-                <Settings className="h-5 w-5" />
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
+        {profile && (
+          <>
+            <Button variant="ghost" size="icon" onClick={() => setProfileDrawerOpen(true)}>
+              <Settings className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/plugins/baby-logs/analytics')}
+            >
+              <BarChart2 className="h-5 w-5" />
+            </Button>
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                disabled={logs.length === 0}
+                onClick={() => setExportOpen((v) => !v)}
+              >
+                <Download className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => navigate('/baby-logs/analytics')}>
-                <BarChart2 className="h-5 w-5" />
-              </Button>
-              <div className="relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled={logs.length === 0}
-                  onClick={() => setExportOpen((v) => !v)}
-                >
-                  <Download className="h-5 w-5" />
-                </Button>
-                {exportOpen && (
-                  <>
-                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-                    <div className="fixed inset-0 z-30" onClick={() => setExportOpen(false)} />
-                    <div className="border-border bg-card absolute right-0 top-10 z-40 min-w-40 overflow-hidden rounded-lg border shadow-lg">
-                      <Button
-                        variant="ghost"
-                        className="text-foreground hover:bg-muted/50 active:bg-muted flex w-full items-center gap-2.5 px-4 py-3 text-sm"
-                        onClick={() => {
-                          exportTableCsv(logs);
-                          setExportOpen(false);
-                        }}
-                      >
-                        <Table className="text-primary h-4 w-4" />
-                        Table (CSV)
-                      </Button>
-                      <div className="bg-border h-px" />
-                      <Button
-                        variant="ghost"
-                        className="text-foreground hover:bg-muted/50 active:bg-muted flex w-full items-center gap-2.5 px-4 py-3 text-sm"
-                        onClick={() => {
-                          exportText(logs);
-                          setExportOpen(false);
-                        }}
-                      >
-                        <FileText className="text-primary h-4 w-4" />
-                        Text
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </header>
+              {exportOpen && (
+                <>
+                  {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+                  <div className="fixed inset-0 z-30" onClick={() => setExportOpen(false)} />
+                  <div className="border-border bg-card absolute right-0 top-10 z-40 min-w-40 overflow-hidden rounded-lg border shadow-lg">
+                    <Button
+                      variant="ghost"
+                      className="text-foreground hover:bg-muted/50 active:bg-muted flex w-full items-center gap-2.5 px-4 py-3 text-sm"
+                      onClick={() => {
+                        exportTableCsv(logs);
+                        setExportOpen(false);
+                      }}
+                    >
+                      <Table className="text-primary h-4 w-4" />
+                      Table (CSV)
+                    </Button>
+                    <div className="bg-border h-px" />
+                    <Button
+                      variant="ghost"
+                      className="text-foreground hover:bg-muted/50 active:bg-muted flex w-full items-center gap-2.5 px-4 py-3 text-sm"
+                      onClick={() => {
+                        exportText(logs);
+                        setExportOpen(false);
+                      }}
+                    >
+                      <FileText className="text-primary h-4 w-4" />
+                      Text
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </HeaderSlot>
 
       {error && (
         <div className="border-destructive bg-destructive/10 text-destructive border-b px-4 py-2 text-sm">

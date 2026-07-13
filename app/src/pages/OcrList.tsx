@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ScanLine, Menu, Camera, Upload, Trash2, FileText } from 'lucide-react';
+import { ScanLine, Camera, Upload, Trash2, FileText } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { toast } from 'sonner';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 import { listOcrDocuments, uploadOcrImage, deleteOcrDocument } from '../lib/api';
 import { EmptyState } from '../components/EmptyState';
 import type { OcrDocument } from '../types';
@@ -65,7 +65,6 @@ function OcrDocItem({
 
 export function OcrList() {
   const navigate = useNavigate();
-  const { openNav } = useNav();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -106,30 +105,21 @@ export function OcrList() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={openNav}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <ScanLine className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold text-foreground">OCR</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            title="Upload image file"
-            disabled={uploading}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="h-5 w-5" />
-          </Button>
-          <Button onClick={() => cameraInputRef.current?.click()} disabled={uploading}>
-            <Camera className="mr-1 h-4 w-4" />
-            {uploading ? 'Uploading…' : 'Capture'}
-          </Button>
-        </div>
-      </header>
+      <HeaderSlot>
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Upload image file"
+          disabled={uploading}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Upload className="h-5 w-5" />
+        </Button>
+        <Button onClick={() => cameraInputRef.current?.click()} disabled={uploading}>
+          <Camera className="mr-1 h-4 w-4" />
+          {uploading ? 'Uploading…' : 'Capture'}
+        </Button>
+      </HeaderSlot>
 
       {/* Hidden file inputs */}
       <input

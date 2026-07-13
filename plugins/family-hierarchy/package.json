@@ -1,0 +1,16 @@
+{
+  "name": "@devbot/plugin-family-hierarchy",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./frontend/*": "./frontend/*",
+    "./backend/*": "./backend/*"
+  },
+  "peerDependencies": {
+    "@allsetlabs/forge": "*",
+    "express": "*",
+    "lucide-react": "*",
+    "react": "*",
+    "react-dom": "*"
+  }
+}

@@ -18,7 +18,6 @@ import {
   DropdownMenuTrigger,
 } from '@allsetlabs/forge/components/ui/dropdown-menu';
 import {
-  Menu,
   Leaf,
   Settings,
   RefreshCw,
@@ -41,7 +40,7 @@ import {
 } from 'lucide-react';
 import { lawnCareApi } from '../api';
 import { copyToClipboard } from '@devbot/app/lib/clipboard';
-import { SlideNav } from '@devbot/app/components/SlideNav';
+import { HeaderSlot } from '@devbot/app/components/HeaderSlot';
 import { WeatherDashboard } from '@devbot/app/components/WeatherDashboard';
 import type {
   LawnProfile,
@@ -215,7 +214,6 @@ export function LawnCare() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [navOpen, setNavOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Profile form state
@@ -521,20 +519,14 @@ export function LawnCare() {
 
   return (
     <div className="flex h-full flex-col">
-      <SlideNav isOpen={navOpen} onClose={() => setNavOpen(false)} />
-
-      {/* Header */}
-      <div className="safe-area-top border-border flex items-center justify-between border-b px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setNavOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Leaf className="text-primary h-5 w-5" />
-          <h1 className="text-foreground text-lg font-semibold">Lawn Care</h1>
-        </div>
-        {profile && (
+      {profile && (
+        <HeaderSlot>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/lawn-care/photos')}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/plugins/lawn-care/photos')}
+            >
               <Camera className="h-5 w-5" />
             </Button>
             <Button
@@ -572,8 +564,8 @@ export function LawnCare() {
               </>
             )}
           </div>
-        )}
-      </div>
+        </HeaderSlot>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">

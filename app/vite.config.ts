@@ -22,6 +22,10 @@ export default defineConfig(() => {
           '../plugins/baby-logs/frontend'
         ),
         '@devbot/plugin-baby-logs/backend': path.resolve(__dirname, '../plugins/baby-logs/backend'),
+        '@devbot/plugin-family-hierarchy/frontend': path.resolve(
+          __dirname,
+          '../plugins/family-hierarchy/frontend'
+        ),
         '@devbot/plugin-lawn-care/frontend': path.resolve(
           __dirname,
           '../plugins/lawn-care/frontend'

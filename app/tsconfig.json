@@ -21,6 +21,7 @@
       "@allsetlabs/forge/*": ["../../forge/src/*"],
       "@devbot/app/*": ["./src/*"],
       "@devbot/plugin-baby-logs/frontend/*": ["../plugins/baby-logs/frontend/*"],
+      "@devbot/plugin-family-hierarchy/frontend/*": ["../plugins/family-hierarchy/frontend/*"],
       "@devbot/plugin-baby-logs/backend/*": ["../plugins/baby-logs/backend/*"],
       "@devbot/plugin-lawn-care/frontend/*": ["../plugins/lawn-care/frontend/*"],
       "@devbot/plugin-lawn-care/backend/*": ["../plugins/lawn-care/backend/*"]

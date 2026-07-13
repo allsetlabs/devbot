@@ -3,14 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@allsetlabs/forge/components/ui/tabs';
-import { Menu, RefreshCw, Trash2, ArrowDown } from 'lucide-react';
+import { RefreshCw, Trash2, ArrowDown } from 'lucide-react';
 import { api } from '../lib/api';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 
 type LogSource = 'frontend' | 'backend';
 
 export function LogsPage() {
-  const { openNav } = useNav();
   const [activeTab, setActiveTab] = useState<LogSource>('backend');
   const [autoScroll, setAutoScroll] = useState(true);
   const logRef = useRef<HTMLPreElement>(null);
@@ -54,28 +53,19 @@ export function LogsPage() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="safe-area-top flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={openNav}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-foreground">Logs</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => query.refetch()}
-            disabled={query.isFetching}
-          >
-            <RefreshCw className={`h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handleClear}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <HeaderSlot>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => query.refetch()}
+          disabled={query.isFetching}
+        >
+          <RefreshCw className={`h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={handleClear}>
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </HeaderSlot>
 
       {/* Tabs */}
       <div className="border-b border-border px-4 py-2">

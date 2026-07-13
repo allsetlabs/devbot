@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Trash2, Plus, X, FolderOpen, Shield, AlertTriangle } from 'lucide-react';
+import { Trash2, Plus, X, Shield, AlertTriangle } from 'lucide-react';
 import {
   useWorkingDirectories,
   useCreateWorkingDirectory,
   useDeleteWorkingDirectory,
 } from '../hooks/useWorkingDirectories';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 
 export function WorkingDirectories() {
-  const { openNav } = useNav();
   const [addOpen, setAddOpen] = useState(false);
   const [newPath, setNewPath] = useState('');
   const [error, setError] = useState('');
@@ -38,26 +37,8 @@ export function WorkingDirectories() {
   };
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={openNav}>
-            <span className="sr-only">Menu</span>
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </Button>
-          <div className="flex items-center gap-2">
-            <FolderOpen className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-semibold text-foreground">Working Directories</h1>
-          </div>
-        </div>
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
         <Button
           variant="default"
           size="sm"
@@ -70,7 +51,7 @@ export function WorkingDirectories() {
           <Plus className="mr-1 h-4 w-4" />
           Add Directory
         </Button>
-      </header>
+      </HeaderSlot>
 
       {/* Add directory modal */}
       {addOpen && (

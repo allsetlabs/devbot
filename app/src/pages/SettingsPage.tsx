@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Settings, ChevronLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../hooks/useSettings';
 import { api } from '../lib/api';
 import {
@@ -116,7 +114,6 @@ function SectionHeader({ title }: { title: string }) {
 
 export function SettingsPage() {
   const [serverDefaultDir, setServerDefaultDir] = useState('');
-  const navigate = useNavigate();
   const { settings, updateSettings, toggleSound, toggleHaptic, toggleAutoScroll } = useSettings();
 
   useEffect(() => {
@@ -129,15 +126,7 @@ export function SettingsPage() {
   }, []);
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <header className="flex items-center gap-2 border-b border-border px-4 py-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-        <Settings className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-xl font-bold text-foreground">Settings</h1>
-      </header>
-
+    <div className="safe-area-bottom flex h-full flex-col">
       <main className="flex-1 overflow-y-auto px-4 pb-8">
         <div className="mx-auto max-w-2xl">
           <SectionHeader title="General" />

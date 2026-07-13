@@ -2,11 +2,11 @@ import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { Archive, ArrowLeft } from 'lucide-react';
-import { Button } from '@allsetlabs/forge/components/ui/button';
+import { Archive } from 'lucide-react';
 import { chatHooks } from '../hooks/useChat';
 import { useFavorites } from '../hooks/useFavorites';
 import { ArchivedChatItem } from '../components/ArchivedChatItem';
+import { HeaderSlot } from '../components/HeaderSlot';
 
 export function ArchivedChatsPage() {
   const navigate = useNavigate();
@@ -33,18 +33,12 @@ export function ArchivedChatsPage() {
   };
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <header className="flex flex-shrink-0 items-center gap-3 border-b border-border px-4 py-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/chats')} className="-ml-2">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold text-foreground">Archived Chats</h1>
-          {archivedChats.length > 0 && (
-            <span className="text-sm text-muted-foreground">({archivedChats.length})</span>
-          )}
-        </div>
-      </header>
+    <div className="safe-area-bottom flex h-full flex-col">
+      {archivedChats.length > 0 && (
+        <HeaderSlot>
+          <span className="text-sm text-muted-foreground">({archivedChats.length})</span>
+        </HeaderSlot>
+      )}
 
       {isLoading && (
         <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">

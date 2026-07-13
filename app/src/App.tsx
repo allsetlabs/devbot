@@ -1,32 +1,17 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@allsetlabs/forge/components/ui/sonner';
 import { InitializeForgeChunks } from '@allsetlabs/forge/initializeForgeChunks';
+import { routeList } from './routes';
+import { pluginRoutes } from './pluginRoutes';
 import { ChatList } from './pages/ChatList';
 import { ChatView } from './pages/ChatView';
-import { SchedulerList } from './pages/SchedulerList';
 import { SchedulerView } from './pages/SchedulerView';
-import { InteractiveChatList } from './pages/InteractiveChatList';
 import { InteractiveChatView } from './pages/InteractiveChatView';
-import { EventsTimer } from './pages/EventsTimer';
-import { PlansPage } from './pages/PlansPage';
-import { BabyLogs } from '@devbot/plugin-baby-logs/frontend/pages/BabyLogs';
-import { BabyAnalytics } from '@devbot/plugin-baby-logs/frontend/pages/BabyAnalytics';
-import { GrowthCharts } from '@devbot/plugin-baby-logs/frontend/pages/GrowthCharts';
-import { LogsPage } from './pages/LogsPage';
-import { LawnCare } from '@devbot/plugin-lawn-care/frontend/pages/LawnCare';
-import { LawnPhotoJournal } from '@devbot/plugin-lawn-care/frontend/pages/LawnPhotoJournal';
-import { RemotionVideos } from './pages/RemotionVideos';
-import { WorkingDirectories } from './pages/WorkingDirectories';
-import { CompanyList } from './pages/CompanyList';
 import { CompanyView } from './pages/CompanyView';
-import { SettingsPage } from './pages/SettingsPage';
-import { Dashboard } from './pages/Dashboard';
-import { PinnedMessagesPage } from './pages/PinnedMessagesPage';
-import { ArchivedChatsPage } from './pages/ArchivedChatsPage';
-import { OcrList } from './pages/OcrList';
 import { OcrView } from './pages/OcrView';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
+import { RouteErrorBoundary } from './components/RouteErrorBoundary';
 
 function App() {
   return (
@@ -35,31 +20,51 @@ function App() {
         <TextSelectionProvider>
           <AppLayout>
             <Routes>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/pinned" element={<PinnedMessagesPage />} />
-              <Route path="/chats" element={<InteractiveChatList />} />
-              <Route path="/archived" element={<ArchivedChatsPage />} />
-              <Route path="/chat/:chatId" element={<InteractiveChatView />} />
-              <Route path="/scheduler" element={<SchedulerList />} />
-              <Route path="/scheduler/:taskId" element={<SchedulerView />} />
-              <Route path="/events-timer" element={<EventsTimer />} />
-              <Route path="/plans" element={<PlansPage />} />
-              <Route path="/baby-logs" element={<BabyLogs />} />
-              <Route path="/baby-logs/analytics" element={<BabyAnalytics />} />
-              <Route path="/baby-logs/growth" element={<GrowthCharts />} />
-              <Route path="/lawn-care" element={<LawnCare />} />
-              <Route path="/lawn-care/photos" element={<LawnPhotoJournal />} />
-              <Route path="/videos" element={<RemotionVideos />} />
-              <Route path="/working-directories" element={<WorkingDirectories />} />
-              <Route path="/logs" element={<LogsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/companies" element={<CompanyList />} />
-              <Route path="/company/:companyId" element={<CompanyView />} />
-              <Route path="/ocr" element={<OcrList />} />
-              <Route path="/ocr/:docId" element={<OcrView />} />
-{/* Legacy CLI routes */}
-              <Route path="/cli" element={<ChatList />} />
-              <Route path="/cli/:sessionId" element={<ChatView />} />
+              {/* Top-level routes — single source of truth in routes.tsx */}
+              {routeList.map((r) => (
+                <Route
+                  key={r.path}
+                  path={r.path}
+                  element={
+                    <RouteErrorBoundary>
+                      <r.Component />
+                    </RouteErrorBoundary>
+                  }
+                />
+              ))}
+
+              {/* Detail/param routes — these own their own header */}
+              <Route path="/chat/:chatId" element={<RouteErrorBoundary><InteractiveChatView /></RouteErrorBoundary>} />
+              <Route path="/scheduler/:taskId" element={<RouteErrorBoundary><SchedulerView /></RouteErrorBoundary>} />
+              <Route path="/company/:companyId" element={<RouteErrorBoundary><CompanyView /></RouteErrorBoundary>} />
+              <Route path="/ocr/:docId" element={<RouteErrorBoundary><OcrView /></RouteErrorBoundary>} />
+
+              {/* Plugin sub-routes — single source of truth in pluginRoutes.tsx.
+                  Each is a full-page load; the shared header shows "Plugins › <name>". */}
+              {pluginRoutes.map((r) => (
+                <Route
+                  key={r.path}
+                  path={r.path}
+                  element={
+                    <RouteErrorBoundary>
+                      <r.Component />
+                    </RouteErrorBoundary>
+                  }
+                />
+              ))}
+
+              {/* Legacy direct plugin routes → redirect to the canonical /plugins/* paths */}
+              <Route path="/baby-logs" element={<Navigate to="/plugins/baby-logs" replace />} />
+              <Route path="/baby-logs/analytics" element={<Navigate to="/plugins/baby-logs/analytics" replace />} />
+              <Route path="/baby-logs/growth" element={<Navigate to="/plugins/baby-logs/growth" replace />} />
+              <Route path="/family-hierarchy" element={<Navigate to="/plugins/family-hierarchy" replace />} />
+              <Route path="/lawn-care" element={<Navigate to="/plugins/lawn-care" replace />} />
+              <Route path="/lawn-care/photos" element={<Navigate to="/plugins/lawn-care/photos" replace />} />
+
+              {/* Legacy CLI routes */}
+              <Route path="/cli" element={<RouteErrorBoundary><ChatList /></RouteErrorBoundary>} />
+              <Route path="/cli/:sessionId" element={<RouteErrorBoundary><ChatView /></RouteErrorBoundary>} />
+
               {/* Default and catch-all redirect to chat */}
               <Route path="/" element={<Navigate to="/chats" replace />} />
               <Route path="*" element={<Navigate to="/chats" replace />} />

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, TrendingUp, Weight, Ruler, CircleDot } from 'lucide-react';
+import { TrendingUp, Weight, Ruler, CircleDot } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { babyLogsApi } from '../api';
 import { PercentileChart } from '../components/PercentileChart';
@@ -152,15 +152,7 @@ export function GrowthCharts() {
   }, [logs, dob, gender]);
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <header className="border-border flex items-center gap-2 border-b px-4 py-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/baby-logs/analytics')}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <TrendingUp className="text-primary h-5 w-5" />
-        <h1 className="text-foreground text-xl font-bold">Growth Charts</h1>
-      </header>
-
+    <div className="safe-area-bottom flex h-full flex-col">
       {loading && (
         <div className="flex flex-1 items-center justify-center">
           <span className="text-muted-foreground text-sm">Loading...</span>
@@ -173,7 +165,7 @@ export function GrowthCharts() {
           <p className="text-muted-foreground text-sm">
             Create a baby profile first to see growth charts.
           </p>
-          <Button variant="outline" onClick={() => navigate('/baby-logs')}>
+          <Button variant="outline" onClick={() => navigate('/plugins/baby-logs')}>
             Go to Baby Logs
           </Button>
         </div>

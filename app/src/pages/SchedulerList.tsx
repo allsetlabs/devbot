@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCrudMutation } from '../hooks/useCrudMutation';
 import { Button } from '@allsetlabs/forge/components/ui/button';
-import { Plus, Clock } from 'lucide-react';
+import { Plus, RefreshCw, Clock } from 'lucide-react';
 import { api } from '../lib/api';
 import { extractErrorMessage } from '../lib/format';
 import { SchedulerItem } from '../components/SchedulerItem';
@@ -11,15 +11,13 @@ import { ErrorBanner } from '../components/ErrorBanner';
 import { EmptyState } from '../components/EmptyState';
 import { SchedulerForm } from '../components/SchedulerForm';
 import { SchedulerSettingsDrawer } from '../components/SchedulerSettingsDrawer';
-import { ListPageHeader } from '../components/ListPageHeader';
-import { useNav } from '../hooks/useNav';
+import { HeaderSlot } from '../components/HeaderSlot';
 import type { ScheduledTask, ClaudeModel } from '../types';
 
 export function SchedulerList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const { openNav } = useNav();
   const [settingsTask, setSettingsTask] = useState<ScheduledTask | null>(null);
   const [, setTick] = useState(0);
 
@@ -120,19 +118,16 @@ export function SchedulerList() {
   );
 
   return (
-    <div className="safe-area-top safe-area-bottom flex h-full flex-col">
-      <ListPageHeader
-        icon={<Clock className="h-6 w-6 text-primary" />}
-        title="Scheduler"
-        onMenuClick={openNav}
-        onRefresh={() => refetch()}
-        isRefreshing={isFetching}
-      >
+    <div className="safe-area-bottom flex h-full flex-col">
+      <HeaderSlot>
+        <Button variant="ghost" size="icon" onClick={() => refetch()} disabled={isFetching}>
+          <RefreshCw className={`h-5 w-5 ${isFetching ? 'animate-spin' : ''}`} />
+        </Button>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="mr-1 h-4 w-4" />
           New Task
         </Button>
-      </ListPageHeader>
+      </HeaderSlot>
 
       {/* Error Banner */}
       <ErrorBanner error={error} />

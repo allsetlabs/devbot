@@ -9,8 +9,9 @@ interface Props {
   person: Person;
   isRoot: boolean;
   selected: boolean;
-  hoverActive: boolean;
-  inLineage: boolean;
+  hovered: boolean;
+  neighbor: boolean;
+  inSelectedPath: boolean;
   expanded: boolean;
   editMode: boolean;
   onSelect: () => void;
@@ -25,8 +26,9 @@ export function PersonNode({
   person,
   isRoot,
   selected,
-  hoverActive,
-  inLineage,
+  hovered,
+  neighbor,
+  inSelectedPath,
   expanded,
   editMode,
   onSelect,
@@ -37,7 +39,6 @@ export function PersonNode({
   onDelete,
 }: Props) {
   const hasChildren = person.children.length > 0;
-  const dimmed = hoverActive && !inLineage && !selected;
 
   return (
     <div className="group relative" onMouseEnter={() => onHover(true)} onMouseLeave={() => onHover(false)}>
@@ -45,34 +46,29 @@ export function PersonNode({
         type="button"
         onClick={onSelect}
         className={cn(
-          'w-full rounded-xl border bg-card/85 px-3 py-2 text-left backdrop-blur-sm transition-all duration-150',
+          'w-full rounded-xl border border-border bg-card/85 px-3 py-2 text-center backdrop-blur-sm transition-all duration-150',
           'shadow-[0_4px_16px_-8px_rgba(0,0,0,0.7)] hover:-translate-y-0.5',
-          person.uncertain
-            ? 'border-destructive/70 shadow-[0_0_18px_-3px_hsl(var(--destructive)/0.55)]'
-            : 'border-border',
-          inLineage && !person.uncertain && 'border-primary/70',
-          selected && 'border-primary ring-2 ring-primary shadow-[0_0_24px_-4px_hsl(var(--primary)/0.7)]',
-          isRoot && !selected && 'border-primary/50',
-          dimmed && 'opacity-35'
+          // ancestor of the selected node — border only, so the lineage reads as a spine
+          inSelectedPath && 'border-primary',
+          // parent / child of the hovered node — highlighted border + faint tint
+          neighbor && !selected && 'border-primary bg-primary/10',
+          // hover — tint the background (lines stay as-is)
+          hovered && !selected && 'bg-primary/20',
+          // selected — tinted background + primary border
+          selected &&
+            'border-primary bg-primary/20 ring-2 ring-primary/60 shadow-[0_0_20px_-6px_hsl(var(--primary)/0.7)]'
         )}
       >
-        <div className="flex items-start gap-1.5">
-          <div className="min-w-0 flex-1">
-            <div
-              className={cn(
-                'truncate text-[13px] font-semibold leading-tight',
-                person.uncertain ? 'text-destructive' : 'text-card-foreground'
-              )}
-              title={person.name}
-            >
-              {person.name || '—'}
-            </div>
-            {person.translit && (
-              <div className="truncate text-[11px] leading-tight text-muted-foreground" title={person.translit}>
-                {person.translit}
-              </div>
+        <div className="flex items-center justify-center gap-1">
+          <span
+            className={cn(
+              'min-w-0 truncate text-[15px] font-semibold leading-tight',
+              person.uncertain ? 'text-destructive' : 'text-card-foreground'
             )}
-          </div>
+            title={person.name}
+          >
+            {person.name || '—'}
+          </span>
           {person.marker === 'A' && (
             <Badge variant="primary" className="shrink-0 px-1 py-0 text-[9px]">
               A
@@ -84,9 +80,14 @@ export function PersonNode({
             </Badge>
           )}
         </div>
+        {person.translit && (
+          <div className="truncate text-[12px] leading-tight text-muted-foreground" title={person.translit}>
+            {person.translit}
+          </div>
+        )}
       </button>
 
-      {/* expand / collapse toggle */}
+      {/* expand / collapse toggle — a circle straddling the node's bottom-right corner */}
       {hasChildren && (
         <button
           type="button"
@@ -95,11 +96,11 @@ export function PersonNode({
             onToggle();
           }}
           className={cn(
-            'absolute -bottom-3 left-1/2 z-10 flex h-6 min-w-6 -translate-x-1/2 items-center justify-center gap-0.5 rounded-full border border-border bg-card px-1 text-[10px] font-semibold text-muted-foreground shadow transition-colors hover:bg-accent hover:text-accent-foreground'
+            'absolute -bottom-2 -right-2 z-10 flex h-5 min-w-5 items-center justify-center gap-0.5 rounded-full border border-border bg-card px-1 text-[9px] font-semibold leading-none text-muted-foreground shadow transition-colors hover:bg-accent hover:text-accent-foreground'
           )}
           aria-label={expanded ? 'Collapse' : 'Expand'}
         >
-          {expanded ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+          {expanded ? <Minus className="h-2.5 w-2.5" /> : <Plus className="h-2.5 w-2.5" />}
           {!expanded && <span>{person.children.length}</span>}
         </button>
       )}

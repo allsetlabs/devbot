@@ -9,6 +9,17 @@ body,
   overflow: hidden;
 }
 
+/* App-wide: drop the focus outline (the blue ring that appears on click / selection).
+   Forge's base emits `#forge-app-root :is(:focus-visible) { outline… }`, so the override
+   must be scoped under #forge-app-root to beat that ID specificity. Focus is still conveyed
+   by forge's box-shadow ring utilities (the orange ring). */
+#forge-app-root :focus,
+#forge-app-root :focus-visible,
+#forge-app-root:focus,
+#forge-app-root:focus-visible {
+  outline: none !important;
+}
+
 /* Safe area handling for notched devices */
 .safe-area-top {
   padding-top: env(safe-area-inset-top);

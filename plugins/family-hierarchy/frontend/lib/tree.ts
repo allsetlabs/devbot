@@ -56,6 +56,23 @@ export function initialExpanded(people: People, rootId: string, page = 2): Set<s
   return exp;
 }
 
+/**
+ * Expand only the single lineage that walks down through children matching `names`
+ * (starting below the root). Every node on that path is expanded, so its siblings show
+ * (collapsed) at each level while the rest of the tree stays minimized.
+ */
+export function expandLineageByNames(people: People, rootId: string, names: string[]): Set<string> {
+  const expanded = new Set<string>([rootId]);
+  let cur = rootId;
+  for (const name of names) {
+    const next = people[cur]?.children.find((c) => people[c]?.name === name);
+    if (!next) break;
+    expanded.add(next);
+    cur = next;
+  }
+  return expanded;
+}
+
 export function expandAll(people: People): Set<string> {
   return new Set(Object.keys(people).filter((id) => people[id].children.length > 0));
 }

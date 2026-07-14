@@ -5,11 +5,13 @@ import {
 } from '@allsetlabs/forge/components/ui/hierarchy-graph';
 import { TooltipProvider } from '@allsetlabs/forge/components/ui/tooltip';
 import { Loader2, TriangleAlert } from 'lucide-react';
+import { HeaderSlot } from '@devbot/app/components/HeaderSlot';
 import type { FamilyTree, Person } from '../types';
 import { getFamilyTree, putFamilyTree } from '../api';
 import {
   computeVisible,
   initialExpanded,
+  expandLineageByNames,
   expandAll,
   collapseAll,
   expandNextLayer,
@@ -19,10 +21,17 @@ import {
   addChild,
   removeSubtree,
 } from '../lib/tree';
+import { measurePersonNodeWidth, NODE_MAX_WIDTH } from '../lib/measure';
+import { useGraphSettings } from '../lib/useGraphSettings';
 import { PersonNode } from '../components/PersonNode';
-import { LeftPanel } from '../components/LeftPanel';
+import { DetailPanel } from '../components/DetailPanel';
+import { InfoModal } from '../components/InfoModal';
+import { GraphDevPanel } from '../components/GraphDevPanel';
 import { GraphToolbar, type SaveState } from '../components/GraphToolbar';
 import { EditPersonModal, type EditSaveData } from '../components/EditPersonModal';
+
+// Default view: minimize everything except this 6-generation spine.
+const DEFAULT_SPINE = ['சாத்தப்பன்', 'வெள்ளையன்', 'வீரப்பன்', 'நாகப்பன்'];
 
 export function FamilyHierarchy() {
   const [tree, setTree] = useState<FamilyTree | null>(null);
@@ -31,7 +40,7 @@ export function FamilyHierarchy() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [leftView, setLeftView] = useState<'details' | 'uncertain'>('details');
+  const [infoOpen, setInfoOpen] = useState(false);
   const [modal, setModal] = useState<{ open: boolean; mode: 'edit' | 'add'; targetId: string | null }>({
     open: false,
     mode: 'edit',
@@ -41,13 +50,15 @@ export function FamilyHierarchy() {
 
   const graphRef = useRef<HierarchyGraphHandle>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { settings, update: updateSettings, reset: resetSettings } = useGraphSettings();
 
   useEffect(() => {
     getFamilyTree()
       .then((t) => {
         setTree(t);
-        setExpanded(initialExpanded(t.people, t.rootId, 2));
-        setSelectedId(t.rootId);
+        const spine = expandLineageByNames(t.people, t.rootId, DEFAULT_SPINE);
+        setExpanded(spine.size > 1 ? spine : initialExpanded(t.people, t.rootId, 2));
+        // no node selected initially — the detail panel appears only when the user clicks a node
       })
       .catch((e) => setLoadError(String(e)));
   }, []);
@@ -71,13 +82,61 @@ export function FamilyHierarchy() {
     [tree, people, rootId, expanded]
   );
 
-  const lineage = useMemo(() => {
-    if (!hoveredId || !tree) return { set: new Set<string>(), edges: new Set<string>() };
-    const path = pathToRoot(people, hoveredId);
-    return { set: new Set(path), edges: new Set(path.filter((id) => id !== rootId)) };
-  }, [hoveredId, people, rootId, tree]);
+  // The selected node's lineage drives the highlighted spine: ancestor borders + edge lines.
+  const selectedPath = useMemo(() => {
+    if (!selectedId || !tree) return { ancestors: new Set<string>(), edges: new Set<string>() };
+    const path = pathToRoot(people, selectedId); // [selected, …, root]
+    return { ancestors: new Set(path.slice(1)), edges: new Set(path.filter((id) => id !== rootId)) };
+  }, [selectedId, people, rootId, tree]);
+
+  // Hovering a node highlights its immediate neighbourhood — parent + children + their connectors.
+  const hover = useMemo(() => {
+    const neighbors = new Set<string>();
+    const edges = new Set<string>();
+    const p = hoveredId ? people[hoveredId] : null;
+    if (p) {
+      if (p.parent) {
+        neighbors.add(p.parent);
+        edges.add(hoveredId!); // edge hovered→parent is keyed by the child (hovered) id
+      }
+      for (const c of p.children) {
+        neighbors.add(c);
+        edges.add(c); // edge hovered→child is keyed by the child id
+      }
+    }
+    return { neighbors, edges };
+  }, [hoveredId, people]);
+
+  const activeEdges = useMemo(
+    () => new Set<string>([...selectedPath.edges, ...hover.edges]),
+    [selectedPath, hover]
+  );
+
+  // Root→selected order; feeds the graph's focus layout so the lineage straightens & centers.
+  const focusPath = useMemo(
+    () => (selectedId && tree ? [...pathToRoot(people, selectedId)].reverse() : undefined),
+    [selectedId, people, tree]
+  );
+
+  const nodeWidthOf = useCallback(
+    (id: string) => {
+      // horizontal layout reads best with uniform columns → fix every node to the max width
+      if (settings.direction === 'right') return NODE_MAX_WIDTH;
+      const p = people[id];
+      if (!p) return 120;
+      return measurePersonNodeWidth(p.name, p.translit, p.marker === 'A' || p.marker === 'M');
+    },
+    [people, settings.direction]
+  );
 
   const uncertainList = useMemo(() => Object.values(people).filter((p) => p.uncertain), [people]);
+
+  // Re-center on the selected node after the focus layout reflows around its lineage.
+  useEffect(() => {
+    if (!selectedId || !settings.centerOnSelect) return;
+    const raf = requestAnimationFrame(() => graphRef.current?.centerOn(selectedId));
+    return () => cancelAnimationFrame(raf);
+  }, [selectedId, settings.centerOnSelect]);
 
   const revealAndSelect = useCallback(
     (id: string) => {
@@ -89,8 +148,7 @@ export function FamilyHierarchy() {
         return next;
       });
       setSelectedId(id);
-      setLeftView('details');
-      requestAnimationFrame(() => graphRef.current?.centerOn(id));
+      setInfoOpen(false);
     },
     [tree, people]
   );
@@ -163,43 +221,27 @@ export function FamilyHierarchy() {
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="dark flex h-full min-h-0 w-full flex-col overflow-hidden bg-background text-foreground">
-        <div className="flex min-h-0 flex-1">
-          <LeftPanel
-          tree={tree}
-          selected={selected}
-          view={leftView}
+      {/* graph controls live in the shared app header */}
+      <HeaderSlot>
+        <GraphToolbar
           editMode={editMode}
-          peopleCount={Object.keys(people).length}
-          generationCount={generations(people, rootId)}
-          uncertainList={uncertainList}
-          onSetView={setLeftView}
-          onSelectPerson={revealAndSelect}
-          onEditSelected={() =>
-            selectedId && setModal({ open: true, mode: 'edit', targetId: selectedId })
-          }
+          saveState={saveState}
+          onToggleEdit={() => setEditMode((v) => !v)}
+          onExpandAll={() => setExpanded(expandAll(people))}
+          onCollapseAll={() => setExpanded(collapseAll(rootId))}
+          onExpandLayer={() => setExpanded((prev) => expandNextLayer(people, rootId, prev))}
+          onFit={() => graphRef.current?.fit()}
+          onInfo={() => setInfoOpen(true)}
         />
+      </HeaderSlot>
 
-        <div className="relative min-w-0 flex-1">
-          {/* space-y backdrop */}
+      <div className="dark flex h-full min-h-0 w-full flex-col overflow-hidden bg-background text-foreground">
+        <div className="relative min-h-0 flex-1 overflow-hidden">
+          {/* backdrop glow */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.12),transparent_60%)]" />
 
-          <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2">
-            <GraphToolbar
-              editMode={editMode}
-              saveState={saveState}
-              onToggleEdit={() => setEditMode((v) => !v)}
-              onExpandAll={() => setExpanded(expandAll(people))}
-              onCollapseAll={() => setExpanded(collapseAll(rootId))}
-              onExpandLayer={() => setExpanded((prev) => expandNextLayer(people, rootId, prev))}
-              onFit={() => graphRef.current?.fit()}
-              onZoomIn={() => graphRef.current?.zoomIn()}
-              onZoomOut={() => graphRef.current?.zoomOut()}
-            />
-          </div>
-
           {editMode && (
-            <div className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-primary/40 bg-card/80 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+            <div className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-full border border-primary/40 bg-card/80 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
               Edit mode — select a person to add a child, rename, or delete
             </div>
           )}
@@ -207,10 +249,19 @@ export function FamilyHierarchy() {
           <HierarchyGraph
             ref={graphRef}
             nodes={visible}
-            activeEdgeChildIds={lineage.edges}
+            activeEdgeChildIds={activeEdges}
+            focusPath={settings.centerOnSelect ? focusPath : undefined}
             onBackgroundClick={() => setSelectedId(null)}
-            nodeWidth={176}
-            nodeHeight={64}
+            nodeWidth={nodeWidthOf}
+            nodeHeight={54}
+            hGap={settings.treeWidth}
+            vGap={settings.treeHeight}
+            direction={settings.direction}
+            algorithm={settings.algorithm}
+            zoomable={false}
+            edgeStyle={settings.connector}
+            showGenerationBands
+            generationAxisLabel="GENERATIONS"
             renderNode={(id) => {
               const p = people[id];
               if (!p) return null;
@@ -219,14 +270,12 @@ export function FamilyHierarchy() {
                   person={p}
                   isRoot={id === rootId}
                   selected={selectedId === id}
-                  hoverActive={hoveredId !== null}
-                  inLineage={lineage.set.has(id)}
+                  hovered={hoveredId === id}
+                  neighbor={hover.neighbors.has(id)}
+                  inSelectedPath={selectedPath.ancestors.has(id)}
                   expanded={expanded.has(id)}
                   editMode={editMode}
-                  onSelect={() => {
-                    setSelectedId(id);
-                    setLeftView('details');
-                  }}
+                  onSelect={() => setSelectedId(id)}
                   onToggle={() => toggleExpand(id)}
                   onHover={(on) => setHoveredId(on ? id : null)}
                   onEdit={() => setModal({ open: true, mode: 'edit', targetId: id })}
@@ -236,8 +285,42 @@ export function FamilyHierarchy() {
               );
             }}
           />
-          </div>
+
+          {/* right-side detail panel — only when a node is selected */}
+          {selected && (
+            <div className="absolute bottom-4 right-4 top-4 z-20 w-[300px] max-w-[calc(100%-2rem)]">
+              <DetailPanel
+                people={people}
+                selected={selected}
+                editMode={editMode}
+                onClose={() => setSelectedId(null)}
+                onSelectPerson={revealAndSelect}
+                onHoverPerson={setHoveredId}
+                onEditSelected={() =>
+                  selectedId && setModal({ open: true, mode: 'edit', targetId: selectedId })
+                }
+              />
+            </div>
+          )}
+
+          {/* TEMPORARY: live layout tuning (remove once width/height gaps are confirmed) */}
+          <GraphDevPanel
+            settings={settings}
+            onChange={updateSettings}
+            onReset={resetSettings}
+            onRelayout={() => graphRef.current?.relayout()}
+          />
         </div>
+
+        <InfoModal
+          open={infoOpen}
+          tree={tree}
+          peopleCount={Object.keys(people).length}
+          generationCount={generations(people, rootId)}
+          uncertainList={uncertainList}
+          onClose={() => setInfoOpen(false)}
+          onSelectPerson={revealAndSelect}
+        />
 
         <EditPersonModal
           open={modal.open}

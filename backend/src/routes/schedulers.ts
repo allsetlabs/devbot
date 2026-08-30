@@ -6,12 +6,16 @@ import {
   task_runs,
   task_messages,
   chat_messages,
+  event_sources,
+  event_task_links,
 } from '../lib/db/core.js';
 import type {
   ScheduledTaskRow,
   TaskRunRow,
   TaskMessageRow,
   SchedulerSettings,
+  TriggerType,
+  TaskPriority,
 } from '../lib/db/types.js';
 import { isTaskExecuting, isTaskQueued, enqueueTask } from '../lib/scheduler-worker.js';
 import {
@@ -25,6 +29,7 @@ import {
   requireEnum,
 } from '../lib/route-helpers.js';
 import { generateName } from '../lib/generate-name.js';
+import { describeCronExpression } from '../lib/cron-parser.js';
 
 const router = Router();
 
@@ -33,6 +38,13 @@ export interface ScheduledTask {
   prompt: string;
   name: string | null;
   intervalMinutes: number;
+  triggerType: TriggerType;
+  cronExpression: string | null;
+  cronDescription: string | null;
+  priority: TaskPriority;
+  category: string | null;
+  parentTaskId: string | null;
+  contextFile: string | null;
   status: 'active' | 'paused' | 'deleted';
   createdAt: string;
   lastRunAt: string | null;
@@ -42,8 +54,10 @@ export interface ScheduledTask {
   isRunning: boolean;
   isQueued: boolean;
   model: string;
+  effort: string | null;
   isSystem: boolean;
   workingDir?: string;
+  tags: string[];
 }
 
 export interface TaskRun {
@@ -68,11 +82,21 @@ export interface TaskMessage {
 }
 
 function rowToTask(row: ScheduledTaskRow): ScheduledTask {
+  const settings = row.settings as SchedulerSettings | null | undefined;
+  const triggerType = (row.trigger_type || 'interval') as TriggerType;
+  const cronExpr = row.cron_expression || null;
   return {
     id: row.id,
     prompt: row.prompt,
     name: row.name,
     intervalMinutes: row.interval_minutes,
+    triggerType,
+    cronExpression: cronExpr,
+    cronDescription: cronExpr ? describeCronExpression(cronExpr) : null,
+    priority: (row.priority || 'medium') as TaskPriority,
+    category: row.category || null,
+    parentTaskId: row.parent_task_id || null,
+    contextFile: row.context_file || null,
     status: row.status,
     createdAt: row.created_at,
     lastRunAt: row.last_run_at,
@@ -81,9 +105,11 @@ function rowToTask(row: ScheduledTaskRow): ScheduledTask {
     maxRuns: row.max_runs,
     isRunning: isTaskExecuting(row.id),
     isQueued: isTaskQueued(row.id),
-    model: (row.settings as SchedulerSettings | null | undefined)?.model || 'sonnet',
-    isSystem: (row.settings as SchedulerSettings | null | undefined)?.isSystem === true,
-    workingDir: (row.settings as SchedulerSettings | null | undefined)?.workingDir,
+    model: settings?.model || 'sonnet',
+    effort: settings?.effort || null,
+    isSystem: settings?.isSystem === true,
+    workingDir: settings?.workingDir,
+    tags: settings?.tags || [],
   };
 }
 
@@ -167,13 +193,43 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req, res) => {
-    const { prompt, intervalMinutes, maxRuns, name, workingDir, model } = req.body;
+    const {
+      prompt,
+      intervalMinutes,
+      maxRuns,
+      name,
+      workingDir,
+      model,
+      effort,
+      triggerType,
+      cronExpression,
+      priority,
+      category,
+      contextFile,
+      tags,
+    } = req.body;
 
     if (!requireString(res, prompt, 'Prompt')) return;
 
-    if (!intervalMinutes || typeof intervalMinutes !== 'number' || intervalMinutes < 1) {
-      sendBadRequest(res, 'Valid interval in minutes is required');
+    const resolvedTriggerType: TriggerType = triggerType || 'interval';
+    const validTriggers: TriggerType[] = ['interval', 'cron', 'event', 'once'];
+    if (!validTriggers.includes(resolvedTriggerType)) {
+      sendBadRequest(res, `triggerType must be one of: ${validTriggers.join(', ')}`);
       return;
+    }
+
+    // Cron trigger requires a cron expression, not intervalMinutes
+    if (resolvedTriggerType === 'cron') {
+      if (!cronExpression || typeof cronExpression !== 'string') {
+        sendBadRequest(res, 'cronExpression is required for cron trigger type');
+        return;
+      }
+    } else if (resolvedTriggerType !== 'event') {
+      // Interval and once types need intervalMinutes (once uses it as a minimum rerun delay)
+      if (!intervalMinutes || typeof intervalMinutes !== 'number' || intervalMinutes < 1) {
+        sendBadRequest(res, 'Valid interval in minutes is required');
+        return;
+      }
     }
 
     if (maxRuns !== undefined && maxRuns !== null) {
@@ -183,6 +239,11 @@ router.post(
       }
     }
 
+    const validPriorities: TaskPriority[] = ['low', 'medium', 'high', 'critical'];
+    const resolvedPriority = priority && validPriorities.includes(priority) ? priority : 'medium';
+
+    const validEfforts = ['low', 'medium', 'high', 'xhigh', 'max'];
+
     const id = generateId();
     const result = await coreDb
       .insert(scheduled_tasks)
@@ -190,14 +251,21 @@ router.post(
         id,
         prompt: prompt.trim(),
         name: name && typeof name === 'string' ? name.trim() : null,
-        interval_minutes: intervalMinutes,
+        interval_minutes: intervalMinutes || 60,
+        trigger_type: resolvedTriggerType,
+        cron_expression: cronExpression && typeof cronExpression === 'string' ? cronExpression.trim() : null,
+        priority: resolvedPriority,
+        category: category && typeof category === 'string' ? category.trim() : null,
+        context_file: contextFile && typeof contextFile === 'string' ? contextFile.trim() : null,
         status: 'active',
-        max_runs: maxRuns ?? null,
+        max_runs: resolvedTriggerType === 'once' ? 1 : (maxRuns ?? null),
         settings: {
           ...(workingDir && typeof workingDir === 'string'
             ? { workingDir: workingDir.trim() }
             : {}),
           ...(model && typeof model === 'string' ? { model } : {}),
+          ...(effort && typeof effort === 'string' && validEfforts.includes(effort) ? { effort } : {}),
+          ...(tags && Array.isArray(tags) ? { tags } : {}),
         },
         created_by: 'user',
         updated_by: 'user',
@@ -231,7 +299,22 @@ router.post(
 router.put(
   '/:id',
   asyncHandler(async (req, res) => {
-    const { prompt, intervalMinutes, status, maxRuns, name, model, workingDir } = req.body;
+    const {
+      prompt,
+      intervalMinutes,
+      status,
+      maxRuns,
+      name,
+      model,
+      workingDir,
+      effort,
+      triggerType,
+      cronExpression,
+      priority,
+      category,
+      contextFile,
+      tags,
+    } = req.body;
 
     // Check if system scheduler — only allow status changes (pause/resume)
     const existing = await coreDb
@@ -311,6 +394,74 @@ router.put(
       } else {
         updates.settings = { ...currentSettings, workingDir: workingDir.trim() };
       }
+    }
+
+    // Trigger type
+    if (triggerType !== undefined) {
+      const validTriggers: TriggerType[] = ['interval', 'cron', 'event', 'once'];
+      if (!validTriggers.includes(triggerType)) {
+        sendBadRequest(res, `triggerType must be one of: ${validTriggers.join(', ')}`);
+        return;
+      }
+      updates.trigger_type = triggerType;
+    }
+
+    // Cron expression
+    if (cronExpression !== undefined) {
+      updates.cron_expression =
+        cronExpression && typeof cronExpression === 'string' ? cronExpression.trim() : null;
+    }
+
+    // Priority
+    if (priority !== undefined) {
+      const validPriorities: TaskPriority[] = ['low', 'medium', 'high', 'critical'];
+      if (!validPriorities.includes(priority)) {
+        sendBadRequest(res, `priority must be one of: ${validPriorities.join(', ')}`);
+        return;
+      }
+      updates.priority = priority;
+    }
+
+    // Category
+    if (category !== undefined) {
+      updates.category = category && typeof category === 'string' ? category.trim() : null;
+    }
+
+    // Context file
+    if (contextFile !== undefined) {
+      updates.context_file =
+        contextFile && typeof contextFile === 'string' ? contextFile.trim() : null;
+    }
+
+    // Effort level (stored in settings)
+    if (effort !== undefined) {
+      const validEfforts = ['low', 'medium', 'high', 'xhigh', 'max'];
+      if (effort !== null && !validEfforts.includes(effort)) {
+        sendBadRequest(res, `effort must be one of: ${validEfforts.join(', ')} or null`);
+        return;
+      }
+      const currentSettings =
+        (updates.settings as Record<string, unknown>) ||
+        (existing[0]?.settings as Record<string, unknown>) ||
+        {};
+      if (effort === null) {
+        const { effort: _removed, ...rest } = currentSettings as Record<string, unknown> & {
+          effort?: unknown;
+        };
+        void _removed;
+        updates.settings = rest;
+      } else {
+        updates.settings = { ...currentSettings, effort };
+      }
+    }
+
+    // Tags (stored in settings)
+    if (tags !== undefined) {
+      const currentSettings =
+        (updates.settings as Record<string, unknown>) ||
+        (existing[0]?.settings as Record<string, unknown>) ||
+        {};
+      updates.settings = { ...currentSettings, tags: Array.isArray(tags) ? tags : [] };
     }
 
     if (Object.keys(updates).length === 1 && updates.updated_by) {
@@ -502,6 +653,173 @@ router.get(
       res.json(rows.map(rowToMessage));
     }
   }, 'list messages')
+);
+
+// ============================================
+// Trigger event-based task externally (e.g., from event source worker or webhook)
+// ============================================
+router.post(
+  '/:id/trigger',
+  asyncHandler(async (req, res) => {
+    const rows = await coreDb
+      .select()
+      .from(scheduled_tasks)
+      .where(and(eq(scheduled_tasks.id, req.params.id), ne(scheduled_tasks.status, 'deleted')))
+      .limit(1);
+
+    if (!rows || rows.length === 0) {
+      sendNotFound(res, 'Task');
+      return;
+    }
+
+    const row = rows[0];
+
+    if (isTaskExecuting(row.id)) {
+      res.status(409).json({ error: 'Conflict', message: 'Task is already running' });
+      return;
+    }
+
+    if (isTaskQueued(row.id)) {
+      res.status(409).json({ error: 'Conflict', message: 'Task is already queued' });
+      return;
+    }
+
+    const triggerData = req.body.triggerData || {};
+    console.log(`[Scheduler] Task ${row.id} triggered externally`, triggerData);
+
+    enqueueTask(row).catch((err) => {
+      console.error(`[Scheduler] Trigger error for ${row.id}:`, err);
+    });
+
+    res.json({ success: true, message: 'Task triggered' });
+  }, 'trigger task')
+);
+
+// ============================================
+// Event Source CRUD
+// ============================================
+
+// List all event sources
+router.get(
+  '/event-sources',
+  asyncHandler(async (_req, res) => {
+    const rows = await coreDb
+      .select()
+      .from(event_sources)
+      .where(ne(event_sources.status, 'deleted'))
+      .orderBy(desc(event_sources.created_at));
+
+    res.json(rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      config: row.config,
+      status: row.status,
+      pollIntervalSeconds: row.poll_interval_seconds,
+      lastCheckedAt: row.last_checked_at,
+      lastTriggeredAt: row.last_triggered_at,
+      createdAt: row.created_at,
+    })));
+  }, 'list event sources')
+);
+
+// Create event source
+router.post(
+  '/event-sources',
+  asyncHandler(async (req, res) => {
+    const { name, type, config, pollIntervalSeconds } = req.body;
+
+    if (!requireString(res, name, 'Name')) return;
+    if (!requireString(res, type, 'Type')) return;
+
+    const validTypes = ['stock', 'news', 'weather', 'webhook', 'cron', 'file_watch', 'custom'] as const;
+    type EventSourceType = (typeof validTypes)[number];
+    if (!validTypes.includes(type as EventSourceType)) {
+      sendBadRequest(res, `Type must be one of: ${validTypes.join(', ')}`);
+      return;
+    }
+
+    const id = generateId();
+    const result = await coreDb
+      .insert(event_sources)
+      .values({
+        id,
+        name: name.trim(),
+        type: type as EventSourceType,
+        config: config || {},
+        poll_interval_seconds: pollIntervalSeconds || 300,
+        created_by: 'user',
+        updated_by: 'user',
+      })
+      .returning();
+
+    if (!result || result.length === 0) {
+      throw new Error('Failed to create event source');
+    }
+
+    res.status(201).json(result[0]);
+  }, 'create event source')
+);
+
+// Link event source to task
+router.post(
+  '/event-sources/:sourceId/link/:taskId',
+  asyncHandler(async (req, res) => {
+    const { sourceId, taskId } = req.params;
+    const { condition } = req.body;
+
+    const id = generateId();
+    await coreDb.insert(event_task_links).values({
+      id,
+      event_source_id: sourceId,
+      task_id: taskId,
+      condition: condition || {},
+      created_by: 'user',
+      updated_by: 'user',
+    });
+
+    res.status(201).json({ id, eventSourceId: sourceId, taskId });
+  }, 'link event source to task')
+);
+
+// Scheduler stats (for dashboard)
+router.get(
+  '/stats',
+  asyncHandler(async (_req, res) => {
+    const allTasks = await coreDb
+      .select()
+      .from(scheduled_tasks)
+      .where(ne(scheduled_tasks.status, 'deleted'));
+
+    const active = allTasks.filter((t) => t.status === 'active').length;
+    const paused = allTasks.filter((t) => t.status === 'paused').length;
+    const byTriggerType = allTasks.reduce(
+      (acc, t) => {
+        const tt = t.trigger_type || 'interval';
+        acc[tt] = (acc[tt] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+    const byPriority = allTasks.reduce(
+      (acc, t) => {
+        const p = t.priority || 'medium';
+        acc[p] = (acc[p] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+    const totalRuns = allTasks.reduce((sum, t) => sum + t.run_count, 0);
+
+    res.json({
+      total: allTasks.length,
+      active,
+      paused,
+      totalRuns,
+      byTriggerType,
+      byPriority,
+    });
+  }, 'scheduler stats')
 );
 
 export { router as schedulersRouter };

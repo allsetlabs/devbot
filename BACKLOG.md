@@ -1,0 +1,95 @@
+# DevBot Master Backlog
+
+> This file is the inter-session communication mechanism. Scheduled CEO sessions read this file to pick the next feature to implement. Each session implements ONE feature, then updates this file.
+
+## How It Works
+
+1. A system scheduler runs every 2 hours (the "CEO Scheduler")
+2. It reads this file to find the next `[ ]` item marked `NEXT`
+3. It implements that feature in a single session
+4. It marks the item `[x]` and moves `NEXT` to the next priority item
+5. It creates a DevBot chat session so the user can review the work
+
+## Active Sprint
+
+### Phase 1: Foundation (Current)
+- [x] **Enhanced Scheduler System** — Cron expressions, event triggers, effort levels, priority, inter-session communication, model selection (opus/sonnet/haiku/fable). `COMPLETED 2026-08-29`
+- [x] **Event Trigger System** — Stock price triggers (Yahoo Finance API), weather triggers (Open-Meteo API), file watch triggers (fs.stat), webhook triggers (external API), custom triggers. Event sources poll periodically and fire schedulers when conditions match. Full CRUD UI with type-specific config forms, test endpoint for dry-run evaluation, and task linking. News triggers stubbed (requires external API key). `COMPLETED 2026-08-29`
+- [ ] `NEXT` **Unified CLI Dashboard** — Show ALL CLI sessions (Claude, ChatGPT/Kimi/Cursor/VS Code Copilot) in one view. Detect active tmux/terminal sessions running any AI CLI tool. Parse their JSONL/log output formats into a unified chat view.
+- [ ] **File-Based Backend Framework** — Generic JSON file storage pattern for plugins. Auto-git-commit on changes. Human-readable. Shareable by copying the file. Replace SQLite for simple plugins.
+
+### Phase 2: Platform
+- [ ] **Google OAuth Authentication** — Replace API key auth with Google OAuth. Single user: subbiah2806@gmail.com. Protect all routes. Session cookies for web, tokens for mobile.
+- [ ] **Capacitor Mobile App** — Package the React app as an Android APK via Capacitor. Push notification support. Background services for notification listener.
+- [ ] **Electron Desktop App** — Package as a macOS desktop app. Direct local model access for faster voice. System tray with notification badges.
+- [ ] **Cloudflare Tunnel** — Replace VPN with Cloudflare Tunnel for public access. Zero-trust with Google OAuth.
+
+### Phase 3: Voice & AI
+- [ ] **Voice Mode (OpenAI-style)** — Full duplex voice conversation. Whisper small.en for STT, edge-tts for TTS. System prompt adjusts AI output for spoken delivery (no markdown). Voice activity detection.
+- [ ] **Voice Transcript Logger** — Save all voice transcripts to file. Daily scheduler reads transcripts, identifies errors, builds custom dictionary (DevBot, DGB, BOT, app-specific terms). Fine-tune Whisper or post-process with local model.
+- [ ] **Local Model Integration** — Qwen 3.5 0.8B for fast local tasks. Custom dictionary inheritance. Ollama integration for on-device inference.
+
+### Phase 4: Plugins & Apps
+- [ ] **Trip Planner Plugin** — Wanderlog-style trip planning. File-based backend. Itinerary builder, map integration, expense tracking. Shareable trip files.
+- [ ] **Baby Monitor Plugin** — RTSP camera feed + AI safety inference. Alert on unsafe positions. Local-only processing.
+- [ ] **Personal Finance Plugin** — Track expenses, investments, gold (pavan units). Robinhood portfolio integration.
+- [ ] **Health Tracker Plugin** — Family health records. Medication reminders. Appointment scheduling.
+
+### Phase 5: Intelligence
+- [ ] **Notification Service** — Mobile/desktop push notifications that SPEAK to the user via TTS. Stock alerts, scheduler completions, agent requests for human input. Wake screen + read aloud.
+- [ ] **Personal Assistant Mode** — Any running terminal can request human attention. Sends notification to mobile. User opens app, sees the chat, replies. The terminal session receives the reply and continues.
+- [ ] **Smart Scheduler** — ML-based scheduling. Learn from past run patterns. Auto-adjust intervals. Predict optimal run times. Budget-aware (track API costs per scheduler).
+- [ ] **Cross-Session Memory** — Schedulers share context via structured JSON files. Each session reads previous session's output and builds on it. Dependency graphs between tasks.
+
+## Feature Research Queue
+
+> Top features from major AI platforms to evaluate and implement:
+
+### From OpenAI (ChatGPT)
+1. Voice mode with real-time conversation — **Planned (Phase 3)**
+2. Memory across conversations — **Exists (brain skill)**
+3. Canvas/Artifacts for code editing — **Evaluate**
+4. Custom GPTs / Agents — **Partially exists (plugins)**
+5. Web browsing integration — **Exists (Chrome MCP)**
+
+### From Anthropic (Claude)
+1. Projects with custom instructions — **Exists (CLAUDE.md)**
+2. Extended thinking / chain of thought — **Exists (effort levels)**
+3. MCP tool ecosystem — **Exists**
+4. Artifacts — **Evaluate for DevBot**
+5. Team sharing — **N/A (personal app)**
+
+### From Google (Gemini)
+1. Deep Research — **Implement as scheduler task**
+2. Multimodal (image/video understanding) — **Evaluate**
+3. Google Workspace integration — **Exists (Gmail/Calendar MCP)**
+4. Real-time information — **Planned (event triggers)**
+
+### From Cursor / Windsurf
+1. Codebase-aware AI — **Exists (Claude Code)**
+2. Multi-file editing — **Exists**
+3. Background agents — **Exists (schedulers)**
+4. Tab completion — **N/A (not an IDE)**
+
+### From Others
+1. **Perplexity** — Web search + citations → Implement as search plugin
+2. **Replit** — Deploy from chat → Implement as deploy scheduler
+3. **v0.dev** — UI generation → Exists via Claude Code
+4. **Bolt.new** — Full-stack from prompt → Exists via Claude Code + schedulers
+
+## Completed Features Log
+
+| Date | Feature | Session |
+|------|---------|---------|
+| 2026-08-29 | Enhanced Scheduler System (cron, events, effort, priority, inter-session comm) | Manual |
+| 2026-08-29 | Event Trigger System (stock/weather/file_watch/webhook evaluators, CRUD UI, test endpoint) | CEO Scheduler |
+
+## Notes for Future Sessions
+
+- **Do not restart DevBot** without explicit user permission
+- **Always commit inside the devbot submodule**, never in the super repo
+- **Read AGENTS.md** before starting work
+- **One feature per session** — stay focused, complete fully, update this backlog
+- **Create a DevBot chat session** for each scheduler run so the user can review
+- **Use the `settings` JSONB column** for new optional fields to avoid schema migrations
+- **Test visually** — open the page in Chrome MCP after frontend changes

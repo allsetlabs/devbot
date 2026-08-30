@@ -80,10 +80,40 @@ export function SchedulerItem({
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-sm text-foreground">{task.name || task.prompt}</p>
+        <div className="flex items-center gap-2">
+          <p className="line-clamp-1 text-sm text-foreground">{task.name || task.prompt}</p>
+          {task.priority === 'critical' && (
+            <span className="shrink-0 rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-semibold text-destructive">
+              CRITICAL
+            </span>
+          )}
+          {task.priority === 'high' && (
+            <span className="shrink-0 rounded bg-orange-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-orange-500">
+              HIGH
+            </span>
+          )}
+        </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <span>Every {formatInterval(task.intervalMinutes)}</span>
+          {task.triggerType === 'cron' && task.cronDescription ? (
+            <span className="font-mono">{task.cronDescription}</span>
+          ) : task.triggerType === 'once' ? (
+            <span>One-time</span>
+          ) : task.triggerType === 'event' ? (
+            <span>Event-triggered</span>
+          ) : (
+            <span>Every {formatInterval(task.intervalMinutes)}</span>
+          )}
           <span>Runs: {runCountDisplay}</span>
+          {task.effort && (
+            <span className="rounded bg-muted px-1 py-0.5 text-[10px]">
+              {task.effort}
+            </span>
+          )}
+          {task.model !== 'sonnet' && (
+            <span className="rounded bg-muted px-1 py-0.5 text-[10px]">
+              {task.model}
+            </span>
+          )}
           {isCompleted && <span className="font-medium text-success">Completed</span>}
           {isRunning && !isCompleted && (
             <span className="font-medium text-primary">Running...</span>

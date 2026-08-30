@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, appendFileSync } from 'fs';
+import { existsSync, mkdirSync, appendFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { eq, sql } from 'drizzle-orm';
@@ -8,6 +8,7 @@ import { registerChatExecution, unregisterChatExecution } from './interactive-ch
 import { spawnClaude, isExecuting, stopExecution } from './claude-spawn.js';
 import { DEVBOT_PROJECTS_DIR } from './env.js';
 import type { StreamParserConfig } from './stream-parser.js';
+import { matchesCronExpression, nextCronOccurrence } from './cron-parser.js';
 
 const CHECK_INTERVAL_MS = 30000;
 const OUTPUT_DIR = '/tmp/devbot/scheduler';
@@ -99,6 +100,34 @@ async function processQueue(): Promise<void> {
 }
 
 /**
+ * Build the context-enriched prompt for a task.
+ * If the task has a context_file, prepend its contents as context.
+ */
+function buildContextualPrompt(task: ScheduledTaskRow): string {
+  let prompt = task.prompt;
+
+  // Inject context file content if specified
+  if (task.context_file && existsSync(task.context_file)) {
+    try {
+      const contextContent = readFileSync(task.context_file, 'utf-8');
+      prompt = `## Session Context\n\nThe following file contains shared context from previous sessions and the project backlog. Read it to understand your current task and priorities:\n\n---\n${contextContent}\n---\n\n## Your Task\n\n${prompt}`;
+    } catch (err) {
+      console.error(`[Scheduler] Failed to read context file ${task.context_file}:`, err);
+    }
+  }
+
+  // Inject template variables if any
+  const settings = task.settings as SchedulerSettings | null | undefined;
+  if (settings?.templateVars) {
+    for (const [key, value] of Object.entries(settings.templateVars)) {
+      prompt = prompt.replaceAll(`{{${key}}}`, value);
+    }
+  }
+
+  return prompt;
+}
+
+/**
  * Create a chat session for a scheduler run.
  */
 function createSchedulerChat(
@@ -173,8 +202,12 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
 
   const settings = task.settings as SchedulerSettings | null | undefined;
   const model: 'opus' | 'sonnet' | 'haiku' = settings?.model || 'sonnet';
+  const effort: string | undefined = settings?.effort;
   const workingDir: string = settings?.workingDir || DEVBOT_PROJECTS_DIR;
   const chatId = createSchedulerChat(task, runIndex, model, settings?.workingDir);
+
+  // Build contextual prompt (injects context_file content + template vars)
+  const contextualPrompt = buildContextualPrompt(task);
 
   try {
     coreDb
@@ -262,9 +295,18 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
         updated_at: now.toISOString(),
       };
 
-      if (task.max_runs !== null && runIndex >= task.max_runs) {
+      const triggerType = task.trigger_type || 'interval';
+
+      if (triggerType === 'once') {
+        updates.status = 'paused';
+        console.log(`[Scheduler] One-time task ${taskId} completed, pausing`);
+      } else if (task.max_runs !== null && runIndex >= task.max_runs) {
         updates.status = 'paused';
         console.log(`[Scheduler] Task ${taskId} reached max_runs (${task.max_runs}), pausing`);
+      } else if (triggerType === 'cron' && task.cron_expression) {
+        // Cron tasks: calculate next occurrence for display purposes
+        const nextRun = nextCronOccurrence(task.cron_expression, now);
+        updates.next_run_at = nextRun ? nextRun.toISOString() : null;
       } else {
         updates.next_run_at = new Date(
           now.getTime() + task.interval_minutes * 60 * 1000
@@ -284,11 +326,12 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
     };
 
     const { process: proc } = spawnClaude({
-      prompt: task.prompt,
+      prompt: contextualPrompt,
       promptSuffix: SCHEDULER_PROMPT_SUFFIX,
       systemPrompts: [SCHEDULER_SYSTEM_PROMPT],
       workDir: workingDir,
       model,
+      effort,
       chrome: true,
       timeoutMs: 30 * 60 * 1000,
       trackAs: taskId,
@@ -383,11 +426,27 @@ async function taskLoop(taskId: string): Promise<void> {
       }
 
       const now = new Date();
-      const shouldRun =
-        task.last_run_at === null || (task.next_run_at && now >= new Date(task.next_run_at));
+      const triggerType = task.trigger_type || 'interval';
+      let shouldRun = false;
+
+      if (triggerType === 'once') {
+        // One-time tasks run once then pause
+        shouldRun = task.last_run_at === null;
+      } else if (triggerType === 'cron' && task.cron_expression) {
+        // Cron-based: check if current time matches the cron expression
+        shouldRun = matchesCronExpression(task.cron_expression, now) &&
+          (task.last_run_at === null || (now.getTime() - new Date(task.last_run_at).getTime()) > 55000);
+      } else if (triggerType === 'event') {
+        // Event-based: triggered externally via API, not in this loop
+        shouldRun = false;
+      } else {
+        // Interval-based (original behavior)
+        shouldRun =
+          task.last_run_at === null || (task.next_run_at != null && now >= new Date(task.next_run_at));
+      }
 
       if (shouldRun) {
-        console.log(`[Scheduler] Queuing task ${taskId} for execution`);
+        console.log(`[Scheduler] Queuing task ${taskId} for execution (trigger: ${triggerType})`);
         await enqueueTask(task);
       }
 

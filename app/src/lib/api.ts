@@ -30,6 +30,14 @@ import type {
   QueuedMessage,
   OcrDocument,
   OcrUploadResponse,
+  UnifiedDirsResponse,
+  UnifiedSession,
+  UnifiedChatResponse,
+  EventSource,
+  CreateEventSourceRequest,
+  UpdateEventSourceRequest,
+  EventTaskLink,
+  EventSourceTestResult,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -139,6 +147,54 @@ export const api = {
   getRunMessages: (taskId: string, runId: string, afterSequence = 0): Promise<TaskMessage[]> => {
     const params = afterSequence > 0 ? `?afterSequence=${afterSequence}` : '';
     return fetchApi(`/api/schedulers/${taskId}/runs/${runId}/messages${params}`);
+  },
+
+  // Event Source endpoints
+  listEventSources: (): Promise<EventSource[]> => {
+    return fetchApi('/api/event-sources');
+  },
+
+  getEventSource: (id: string): Promise<EventSource> => {
+    return fetchApi(`/api/event-sources/${id}`);
+  },
+
+  createEventSource: (data: CreateEventSourceRequest): Promise<EventSource> => {
+    return fetchApi('/api/event-sources', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  updateEventSource: (id: string, data: UpdateEventSourceRequest): Promise<EventSource> => {
+    return fetchApi(`/api/event-sources/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteEventSource: (id: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/event-sources/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  linkTaskToEventSource: (sourceId: string, taskId: string): Promise<EventTaskLink> => {
+    return fetchApi(`/api/event-sources/${sourceId}/link-task`, {
+      method: 'POST',
+      body: JSON.stringify({ taskId }),
+    });
+  },
+
+  unlinkTaskFromEventSource: (sourceId: string, linkId: string): Promise<{ success: boolean }> => {
+    return fetchApi(`/api/event-sources/${sourceId}/link-task/${linkId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  testEventSource: (id: string): Promise<EventSourceTestResult> => {
+    return fetchApi(`/api/event-sources/${id}/test`, {
+      method: 'POST',
+    });
   },
 
   // Interactive Chat endpoints
@@ -753,3 +809,48 @@ export async function sttUpdateCorrections(
     body: JSON.stringify({ replacements }),
   });
 }
+
+export const unifiedChatApi = {
+  listDirs: (): Promise<UnifiedDirsResponse> =>
+    fetchApi('/api/unified-chat/dirs'),
+
+  listSessions: (encoded: string): Promise<UnifiedSession[]> =>
+    fetchApi(`/api/unified-chat/dirs/${encodeURIComponent(encoded)}/sessions`),
+
+  getSession: (encoded: string, sessionId: string): Promise<UnifiedChatResponse> =>
+    fetchApi(`/api/unified-chat/dirs/${encodeURIComponent(encoded)}/sessions/${sessionId}`),
+
+  getDefaultDir: (): Promise<{ defaultDir: string | null }> =>
+    fetchApi('/api/unified-chat/default-dir'),
+
+  setDefaultDir: (encoded: string | null): Promise<{ defaultDir: string | null }> =>
+    fetchApi('/api/unified-chat/default-dir', {
+      method: 'POST',
+      body: JSON.stringify({ encoded }),
+    }),
+
+  openSession: (
+    sessionId: string,
+    cwd: string,
+    name: string
+  ): Promise<{ chatId: string }> =>
+    fetchApi('/api/unified-chat/open-session', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId, cwd, name }),
+    }),
+
+  deleteSession: (encoded: string, sessionId: string): Promise<{ success: boolean }> =>
+    fetchApi(
+      `/api/unified-chat/dirs/${encodeURIComponent(encoded)}/sessions/${sessionId}`,
+      { method: 'DELETE' }
+    ),
+
+  getFavorites: (): Promise<{ sessionIds: string[] }> =>
+    fetchApi('/api/unified-chat/favorites'),
+
+  toggleFavorite: (sessionId: string): Promise<{ favorited: boolean }> =>
+    fetchApi(`/api/unified-chat/favorites/${sessionId}/toggle`, { method: 'POST' }),
+
+  searchSessions: (encoded: string, q: string): Promise<UnifiedSession[]> =>
+    fetchApi(`/api/unified-chat/dirs/${encodeURIComponent(encoded)}/search?q=${encodeURIComponent(q)}`),
+};

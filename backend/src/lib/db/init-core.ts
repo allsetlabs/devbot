@@ -382,6 +382,85 @@ export async function initializeCoreDatabase() {
     `
     );
 
+    // Create unified_favorites table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS unified_favorites (
+        session_id TEXT PRIMARY KEY,
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
+    // Create event_sources table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS event_sources (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('stock', 'news', 'weather', 'webhook', 'cron', 'file_watch', 'custom')),
+        config TEXT NOT NULL DEFAULT '{}',
+        status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'paused', 'deleted')),
+        poll_interval_seconds INTEGER NOT NULL DEFAULT 300,
+        last_checked_at TEXT,
+        last_triggered_at TEXT,
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
+    // Create event_task_links table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS event_task_links (
+        id TEXT PRIMARY KEY,
+        event_source_id TEXT NOT NULL,
+        task_id TEXT NOT NULL,
+        condition TEXT DEFAULT '{}',
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
+    // Migrate: add new scheduler columns if missing
+    const schedulerCols = (
+      coreDb.all(sql.raw(`PRAGMA table_info(scheduled_tasks)`)) as Array<{ name: string }>
+    ).map((col) => col.name);
+
+    const newSchedulerCols: Array<{ name: string; definition: string }> = [
+      { name: 'trigger_type', definition: `TEXT NOT NULL DEFAULT 'interval'` },
+      { name: 'cron_expression', definition: 'TEXT' },
+      { name: 'priority', definition: `TEXT NOT NULL DEFAULT 'medium'` },
+      { name: 'category', definition: 'TEXT' },
+      { name: 'parent_task_id', definition: 'TEXT' },
+      { name: 'context_file', definition: 'TEXT' },
+    ];
+
+    for (const col of newSchedulerCols) {
+      if (!schedulerCols.includes(col.name)) {
+        try {
+          coreDb.run(
+            sql.raw(`ALTER TABLE scheduled_tasks ADD COLUMN ${col.name} ${col.definition}`)
+          );
+          console.log(`[DB] Migrated scheduled_tasks: added ${col.name}`);
+        } catch {
+          // Column already exists
+        }
+      }
+    }
+
     console.log('[DB] Core database schema initialized successfully');
   } catch (err) {
     console.error('[DB] Failed to initialize core database:', err);

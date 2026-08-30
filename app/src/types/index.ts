@@ -1,3 +1,37 @@
+export interface UnifiedDir {
+  encoded: string;
+  displayPath: string;
+  sessionCount: number;
+}
+
+export interface UnifiedDirsResponse {
+  dirs: UnifiedDir[];
+  defaultDir: string | null;
+}
+
+export interface UnifiedSession {
+  sessionId: string;
+  preview: string;
+  createdAt: string;
+  updatedAt: string;
+  cwd: string;
+  messageCount: number;
+}
+
+export interface UnifiedMessage {
+  uuid: string;
+  type: 'user' | 'assistant';
+  text: string;
+  timestamp: string;
+}
+
+export interface UnifiedChatResponse {
+  messages: UnifiedMessage[];
+  sessionId: string;
+  cwd: string;
+  gitBranch: string;
+}
+
 export interface OcrDocument {
   id: string;
   original_name: string;
@@ -77,11 +111,22 @@ export interface DoctorResponse {
   timestamp: string;
 }
 
+export type TriggerType = 'interval' | 'cron' | 'event' | 'once';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
+export type EffortLevel = 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+
 export interface ScheduledTask {
   id: string;
   prompt: string;
   name: string | null;
   intervalMinutes: number;
+  triggerType: TriggerType;
+  cronExpression: string | null;
+  cronDescription: string | null;
+  priority: TaskPriority;
+  category: string | null;
+  parentTaskId: string | null;
+  contextFile: string | null;
   status: 'active' | 'paused' | 'deleted';
   createdAt: string;
   lastRunAt: string | null;
@@ -91,17 +136,26 @@ export interface ScheduledTask {
   isRunning: boolean;
   isQueued: boolean;
   model: ClaudeModel;
+  effort: EffortLevel | null;
   isSystem: boolean;
   workingDir?: string;
+  tags: string[];
 }
 
 export interface CreateScheduledTaskRequest {
   prompt: string;
-  intervalMinutes: number;
+  intervalMinutes?: number;
   maxRuns?: number | null;
   name?: string;
   workingDir?: string;
   model?: ClaudeModel;
+  effort?: EffortLevel;
+  triggerType?: TriggerType;
+  cronExpression?: string;
+  priority?: TaskPriority;
+  category?: string;
+  contextFile?: string;
+  tags?: string[];
 }
 
 export interface UpdateScheduledTaskRequest {
@@ -111,7 +165,14 @@ export interface UpdateScheduledTaskRequest {
   maxRuns?: number | null;
   name?: string;
   model?: ClaudeModel;
+  effort?: EffortLevel | null;
   workingDir?: string | null;
+  triggerType?: TriggerType;
+  cronExpression?: string | null;
+  priority?: TaskPriority;
+  category?: string | null;
+  contextFile?: string | null;
+  tags?: string[];
 }
 
 export interface TaskRun {
@@ -350,4 +411,47 @@ export interface FileBrowseItem {
   size?: number;
 }
 
+// Event Source types
+export type EventSourceType = 'stock' | 'news' | 'weather' | 'webhook' | 'file_watch' | 'custom';
 
+export interface EventSource {
+  id: string;
+  name: string;
+  type: EventSourceType;
+  config: Record<string, unknown>;
+  status: 'active' | 'paused';
+  pollIntervalSeconds: number;
+  lastCheckedAt: string | null;
+  lastTriggeredAt: string | null;
+  createdAt: string;
+  linkedTaskIds: string[];
+}
+
+export interface EventTaskLink {
+  id: string;
+  eventSourceId: string;
+  taskId: string;
+  condition: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface CreateEventSourceRequest {
+  name: string;
+  type: EventSourceType;
+  config: Record<string, unknown>;
+  pollIntervalSeconds?: number;
+  status?: 'active' | 'paused';
+}
+
+export interface UpdateEventSourceRequest {
+  name?: string;
+  type?: EventSourceType;
+  config?: Record<string, unknown>;
+  pollIntervalSeconds?: number;
+  status?: 'active' | 'paused';
+}
+
+export interface EventSourceTestResult {
+  triggered: boolean;
+  details: string;
+}

@@ -14,6 +14,8 @@ import {
   ScrollText,
   Settings,
   Archive,
+  Layers,
+  Zap,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -29,6 +31,8 @@ import { OcrList } from './pages/OcrList';
 import { LogsPage } from './pages/LogsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { ArchivedChatsPage } from './pages/ArchivedChatsPage';
+import { UnifiedChatPage } from './pages/UnifiedChatPage';
+import { EventSourcesPage } from './pages/EventSourcesPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -81,6 +85,12 @@ export const routes = {
     name: 'Scheduler',
     icon: <Clock className="h-5 w-5" />,
     Component: SchedulerList,
+  },
+  eventSources: {
+    path: '/event-sources',
+    name: 'Event Sources',
+    icon: <Zap className="h-5 w-5" />,
+    Component: EventSourcesPage,
   },
   eventsTimer: {
     path: '/events-timer',
@@ -135,6 +145,12 @@ export const routes = {
     name: 'Settings',
     icon: <Settings className="h-5 w-5" />,
     Component: SettingsPage,
+  },
+  unified: {
+    path: '/unified',
+    name: 'Unified Chat',
+    icon: <Layers className="h-5 w-5" />,
+    Component: UnifiedChatPage,
   },
   archived: {
     path: '/archived',

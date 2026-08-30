@@ -50,12 +50,63 @@ export type ClaudeModel = 'opus' | 'sonnet' | 'haiku';
 export interface SchedulerSettings {
   workingDir?: string;
   model?: ClaudeModel;
+  effort?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
   isSystem?: boolean;
   maxRetries?: number;
+  /** Allow this task to spawn child schedulers */
+  canSpawnSchedulers?: boolean;
+  /** Tags for grouping/filtering */
+  tags?: string[];
+  /** Prompt template variables injected at runtime */
+  templateVars?: Record<string, string>;
 }
+
+export type TriggerType = 'interval' | 'cron' | 'event' | 'once';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'critical';
 
 // Shape of the JSONB `settings` column on interactive_chats
 export interface ChatSettings {
   workingDir?: string;
   task_id?: string;
 }
+
+// Event source configuration types
+export interface StockEventConfig {
+  symbol: string;
+  condition: 'above' | 'below' | 'change_pct';
+  threshold: number;
+}
+
+export interface NewsEventConfig {
+  keywords: string[];
+  sources?: string[];
+}
+
+export interface WeatherEventConfig {
+  location: string;
+  condition: 'temp_above' | 'temp_below' | 'rain' | 'snow' | 'severe';
+  threshold?: number;
+}
+
+export interface WebhookEventConfig {
+  path: string;
+  secret?: string;
+}
+
+export interface FileWatchEventConfig {
+  watchPath: string;
+  pattern?: string;
+}
+
+export type EventSourceConfig =
+  | StockEventConfig
+  | NewsEventConfig
+  | WeatherEventConfig
+  | WebhookEventConfig
+  | FileWatchEventConfig
+  | Record<string, unknown>;
+
+export type EventSourceRow = typeof import('./schema').event_sources.$inferSelect;
+export type EventSourceInsert = typeof import('./schema').event_sources.$inferInsert;
+export type EventTaskLinkRow = typeof import('./schema').event_task_links.$inferSelect;
+export type EventTaskLinkInsert = typeof import('./schema').event_task_links.$inferInsert;

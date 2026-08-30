@@ -15,26 +15,45 @@ import {
   TooltipTrigger,
 } from '@allsetlabs/forge/components/ui/tooltip';
 import { Infinity as InfinityIcon, Loader2 } from 'lucide-react';
-import type { ScheduledTask, ClaudeModel } from '../types';
+import type {
+  ScheduledTask,
+  ClaudeModel,
+  TriggerType,
+  TaskPriority,
+  EffortLevel,
+  UpdateScheduledTaskRequest,
+} from '../types';
 import { MAX_RUNS_PRESETS, INTERVAL_OPTIONS } from '../lib/constants';
 import { ModelPicker } from './ModelPicker';
 import { WorkingDirSelector, useValidateAndSaveDir } from './WorkingDirSelector';
+
+const TRIGGER_TYPE_OPTIONS: { label: string; value: TriggerType; description: string }[] = [
+  { label: 'Interval', value: 'interval', description: 'Run at fixed intervals' },
+  { label: 'Cron', value: 'cron', description: 'Cron expression schedule' },
+  { label: 'Once', value: 'once', description: 'Run once and stop' },
+  { label: 'Event', value: 'event', description: 'Triggered by events' },
+];
+
+const PRIORITY_OPTIONS: { label: string; value: TaskPriority; color: string }[] = [
+  { label: 'Low', value: 'low', color: 'text-muted-foreground' },
+  { label: 'Medium', value: 'medium', color: 'text-foreground' },
+  { label: 'High', value: 'high', color: 'text-orange-500' },
+  { label: 'Critical', value: 'critical', color: 'text-destructive' },
+];
+
+const EFFORT_OPTIONS: { label: string; value: EffortLevel }[] = [
+  { label: 'Low', value: 'low' },
+  { label: 'Med', value: 'medium' },
+  { label: 'High', value: 'high' },
+  { label: 'XHigh', value: 'xhigh' },
+  { label: 'Max', value: 'max' },
+];
 
 interface SchedulerSettingsDrawerProps {
   task: ScheduledTask | null;
   open: boolean;
   onClose: () => void;
-  onSave: (
-    taskId: string,
-    data: {
-      prompt?: string;
-      intervalMinutes?: number;
-      maxRuns?: number | null;
-      name?: string;
-      model?: ClaudeModel;
-      workingDir?: string | null;
-    }
-  ) => Promise<void>;
+  onSave: (taskId: string, data: UpdateScheduledTaskRequest) => Promise<void>;
 }
 
 export function SchedulerSettingsDrawer({
@@ -45,23 +64,21 @@ export function SchedulerSettingsDrawer({
 }: SchedulerSettingsDrawerProps) {
   const [name, setName] = useState('');
   const [prompt, setPrompt] = useState('');
+  const [triggerType, setTriggerType] = useState<TriggerType>('interval');
+  const [cronExpression, setCronExpression] = useState('');
   const [intervalMinutes, setIntervalMinutes] = useState(60);
   const [maxRuns, setMaxRuns] = useState<number | null>(10);
   const [isInfinite, setIsInfinite] = useState(false);
   const [model, setModel] = useState<ClaudeModel>('sonnet');
+  const [effort, setEffort] = useState<EffortLevel | ''>('');
+  const [priority, setPriority] = useState<TaskPriority>('medium');
+  const [contextFile, setContextFile] = useState('');
   const [workingDir, setWorkingDir] = useState('');
 
   const validateAndSaveDir = useValidateAndSaveDir();
 
   const saveMutation = useMutation({
-    mutationFn: (updates: {
-      prompt?: string;
-      intervalMinutes?: number;
-      maxRuns?: number | null;
-      name?: string;
-      model?: ClaudeModel;
-      workingDir?: string | null;
-    }) => onSave(task!.id, updates),
+    mutationFn: (updates: UpdateScheduledTaskRequest) => onSave(task!.id, updates),
     onSuccess: () => onClose(),
   });
 
@@ -70,17 +87,16 @@ export function SchedulerSettingsDrawer({
     if (task) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(task.name ?? '');
-
       setPrompt(task.prompt);
-
+      setTriggerType(task.triggerType ?? 'interval');
+      setCronExpression(task.cronExpression ?? '');
       setIntervalMinutes(task.intervalMinutes);
-
       setMaxRuns(task.maxRuns);
-
       setIsInfinite(task.maxRuns === null);
-
       setModel(task.model);
-
+      setEffort(task.effort ?? '');
+      setPriority(task.priority ?? 'medium');
+      setContextFile(task.contextFile ?? '');
       setWorkingDir(task.workingDir ?? '');
       saveMutation.reset();
     }
@@ -99,20 +115,21 @@ export function SchedulerSettingsDrawer({
   const handleSave = async () => {
     if (!task || !prompt.trim()) return;
 
-    const updates: {
-      prompt?: string;
-      intervalMinutes?: number;
-      maxRuns?: number | null;
-      name?: string;
-      model?: ClaudeModel;
-      workingDir?: string | null;
-    } = {};
+    const updates: UpdateScheduledTaskRequest = {};
     if (name.trim() !== (task.name ?? '')) updates.name = name.trim();
     if (prompt.trim() !== task.prompt) updates.prompt = prompt.trim();
+    if (triggerType !== task.triggerType) updates.triggerType = triggerType;
+    if (cronExpression.trim() !== (task.cronExpression ?? ''))
+      updates.cronExpression = cronExpression.trim() || null;
     if (intervalMinutes !== task.intervalMinutes) updates.intervalMinutes = intervalMinutes;
     const newMaxRuns = isInfinite ? null : maxRuns;
     if (newMaxRuns !== task.maxRuns) updates.maxRuns = newMaxRuns;
     if (model !== task.model) updates.model = model;
+    const newEffort = effort || null;
+    if (newEffort !== (task.effort ?? null)) updates.effort = newEffort;
+    if (priority !== task.priority) updates.priority = priority;
+    if (contextFile.trim() !== (task.contextFile ?? ''))
+      updates.contextFile = contextFile.trim() || null;
 
     const normalizedDir = workingDir.trim() || null;
     const originalDir = task.workingDir ?? null;
@@ -132,9 +149,14 @@ export function SchedulerSettingsDrawer({
     task &&
     (name.trim() !== (task.name ?? '') ||
       prompt.trim() !== task.prompt ||
+      triggerType !== task.triggerType ||
+      cronExpression.trim() !== (task.cronExpression ?? '') ||
       intervalMinutes !== task.intervalMinutes ||
       (isInfinite ? null : maxRuns) !== task.maxRuns ||
       model !== task.model ||
+      (effort || null) !== (task.effort ?? null) ||
+      priority !== task.priority ||
+      contextFile.trim() !== (task.contextFile ?? '') ||
       (workingDir.trim() || null) !== (task.workingDir ?? null));
 
   return (
@@ -163,6 +185,149 @@ export function SchedulerSettingsDrawer({
             />
           </div>
 
+          {/* Trigger Type */}
+          <div className="mb-4">
+            <span className="mb-2 block text-sm font-medium text-foreground">Trigger Type</span>
+            <div className="grid grid-cols-4 gap-2" role="group" aria-label="Trigger type">
+              {TRIGGER_TYPE_OPTIONS.map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant="outline"
+                  type="button"
+                  disabled={task?.isSystem}
+                  onClick={() => setTriggerType(opt.value)}
+                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    triggerType === opt.value
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border text-foreground md:hover:bg-muted'
+                  }`}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {TRIGGER_TYPE_OPTIONS.find((o) => o.value === triggerType)?.description}
+            </p>
+          </div>
+
+          {/* Cron Expression (shown only for cron trigger) */}
+          {triggerType === 'cron' && (
+            <div className="mb-4">
+              <span className="mb-2 block text-sm font-medium text-foreground">
+                Cron Expression
+              </span>
+              <input
+                type="text"
+                value={cronExpression}
+                onChange={(e) => setCronExpression(e.target.value)}
+                disabled={task?.isSystem}
+                placeholder="0 */2 * * * (every 2 hours)"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Format: minute hour day-of-month month day-of-week
+              </p>
+            </div>
+          )}
+
+          {/* Interval (shown for interval and once) */}
+          {(triggerType === 'interval' || triggerType === 'once') && (
+            <div className="mb-4">
+              <span className="mb-2 block text-sm font-medium text-foreground">
+                {triggerType === 'once' ? 'Minimum delay before rerun' : 'Run every'}
+              </span>
+              <div className="grid grid-cols-4 gap-2" role="group" aria-label="Run interval">
+                {INTERVAL_OPTIONS.map((opt) => (
+                  <Button
+                    key={opt.value}
+                    variant="outline"
+                    type="button"
+                    disabled={task?.isSystem}
+                    onClick={() => setIntervalMinutes(opt.value)}
+                    className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                      intervalMinutes === opt.value
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border text-foreground md:hover:bg-muted'
+                    }`}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Max Runs (hidden for once trigger) */}
+          {triggerType !== 'once' && (
+            <div className="mb-4">
+              <span className="mb-2 block text-sm font-medium text-foreground">Maximum runs</span>
+              <div className="flex items-center gap-2" role="group" aria-label="Maximum runs">
+                <div className="grid flex-1 grid-cols-4 gap-2">
+                  {MAX_RUNS_PRESETS.map((opt) => (
+                    <Button
+                      key={opt.value}
+                      variant="outline"
+                      type="button"
+                      disabled={isInfinite || task?.isSystem}
+                      onClick={() => setMaxRuns(opt.value)}
+                      className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
+                        !isInfinite && maxRuns === opt.value
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border text-foreground md:hover:bg-muted disabled:opacity-50'
+                      }`}
+                    >
+                      {opt.label}
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  type="button"
+                  disabled={task?.isSystem}
+                  onClick={handleInfiniteToggle}
+                  className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    isInfinite
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border text-foreground md:hover:bg-muted'
+                  }`}
+                >
+                  <InfinityIcon className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {isInfinite
+                  ? 'Task will run indefinitely until paused'
+                  : maxRuns === 1
+                    ? 'Task will run once and stop'
+                    : `Task will run ${maxRuns} times and stop`}
+              </p>
+            </div>
+          )}
+
+          {/* Priority */}
+          <div className="mb-4">
+            <span className="mb-2 block text-sm font-medium text-foreground">Priority</span>
+            <div className="grid grid-cols-4 gap-2" role="group" aria-label="Priority">
+              {PRIORITY_OPTIONS.map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant="outline"
+                  type="button"
+                  disabled={task?.isSystem}
+                  onClick={() => setPriority(opt.value)}
+                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    priority === opt.value
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : `border-border ${opt.color} md:hover:bg-muted`
+                  }`}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {/* Prompt */}
           <div className="mb-4">
             <span className="mb-2 block text-sm font-medium text-foreground">Task Prompt</span>
@@ -175,77 +340,46 @@ export function SchedulerSettingsDrawer({
             />
           </div>
 
-          {/* Interval */}
-          <div className="mb-4">
-            <span className="mb-2 block text-sm font-medium text-foreground">Run every</span>
-            <div className="grid grid-cols-4 gap-2" role="group" aria-label="Run interval">
-              {INTERVAL_OPTIONS.map((opt) => (
-                <Button
-                  key={opt.value}
-                  variant="outline"
-                  type="button"
-                  disabled={task?.isSystem}
-                  onClick={() => setIntervalMinutes(opt.value)}
-                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                    intervalMinutes === opt.value
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border text-foreground hover:bg-muted'
-                  }`}
-                >
-                  {opt.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Max Runs */}
-          <div className="mb-6">
-            <span className="mb-2 block text-sm font-medium text-foreground">Maximum runs</span>
-            <div className="flex items-center gap-2" role="group" aria-label="Maximum runs">
-              <div className="grid flex-1 grid-cols-4 gap-2">
-                {MAX_RUNS_PRESETS.map((opt) => (
+          {/* Model + Effort row */}
+          <div className="mb-4 grid grid-cols-2 gap-4">
+            <ModelPicker value={model} onChange={setModel} disabled={task?.isSystem} />
+            <div>
+              <span className="mb-2 block text-sm font-medium text-foreground">Effort</span>
+              <div className="grid grid-cols-3 gap-1" role="group" aria-label="Effort level">
+                {EFFORT_OPTIONS.map((opt) => (
                   <Button
                     key={opt.value}
                     variant="outline"
                     type="button"
-                    disabled={isInfinite || task?.isSystem}
-                    onClick={() => setMaxRuns(opt.value)}
-                    className={`rounded-lg border px-2 py-2 text-xs font-medium transition-colors ${
-                      !isInfinite && maxRuns === opt.value
+                    disabled={task?.isSystem}
+                    onClick={() => setEffort(effort === opt.value ? '' : opt.value)}
+                    className={`rounded-lg border px-1 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                      effort === opt.value
                         ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border text-foreground hover:bg-muted disabled:opacity-50'
+                        : 'border-border text-foreground md:hover:bg-muted'
                     }`}
                   >
                     {opt.label}
                   </Button>
                 ))}
               </div>
-              <Button
-                variant="outline"
-                type="button"
-                disabled={task?.isSystem}
-                onClick={handleInfiniteToggle}
-                className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                  isInfinite
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border text-foreground hover:bg-muted'
-                }`}
-              >
-                <InfinityIcon className="h-3.5 w-3.5" />
-              </Button>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {isInfinite
-                ? 'Task will run indefinitely until paused'
-                : maxRuns === 1
-                  ? 'Task will run once and stop'
-                  : `Task will run ${maxRuns} times and stop`}
-            </p>
           </div>
 
-          {/* Model */}
-          <div className="mb-6">
-            <ModelPicker value={model} onChange={setModel} disabled={task?.isSystem} />
+          {/* Context File */}
+          <div className="mb-4">
+            <span className="mb-2 block text-sm font-medium text-foreground">Context File</span>
+            <input
+              type="text"
+              value={contextFile}
+              onChange={(e) => setContextFile(e.target.value)}
+              disabled={task?.isSystem}
+              placeholder="Optional — path to file injected as context"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              File contents are prepended to the prompt each run
+            </p>
           </div>
 
           {/* Working Directory */}

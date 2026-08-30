@@ -12,7 +12,11 @@ import { EmptyState } from '../components/EmptyState';
 import { SchedulerForm } from '../components/SchedulerForm';
 import { SchedulerSettingsDrawer } from '../components/SchedulerSettingsDrawer';
 import { HeaderSlot } from '../components/HeaderSlot';
-import type { ScheduledTask, ClaudeModel } from '../types';
+import type {
+  ScheduledTask,
+  CreateScheduledTaskRequest,
+  UpdateScheduledTaskRequest,
+} from '../types';
 
 export function SchedulerList() {
   const navigate = useNavigate();
@@ -39,21 +43,7 @@ export function SchedulerList() {
   });
 
   const createMutation = useCrudMutation(
-    ({
-      prompt,
-      intervalMinutes,
-      maxRuns,
-      workingDir,
-      model,
-      name,
-    }: {
-      prompt: string;
-      intervalMinutes: number;
-      maxRuns: number | null;
-      workingDir: string;
-      model: ClaudeModel;
-      name?: string;
-    }) => api.createScheduledTask({ prompt, intervalMinutes, maxRuns, workingDir, model, name }),
+    (data: CreateScheduledTaskRequest) => api.createScheduledTask(data),
     [['scheduled-tasks']]
   );
 
@@ -70,15 +60,8 @@ export function SchedulerList() {
     [['scheduled-tasks']]
   );
 
-  const handleCreateTask = async (
-    prompt: string,
-    intervalMinutes: number,
-    maxRuns: number | null,
-    workingDir: string,
-    model: ClaudeModel,
-    name?: string
-  ) => {
-    await createMutation.mutateAsync({ prompt, intervalMinutes, maxRuns, workingDir, model, name });
+  const handleCreateTask = async (data: CreateScheduledTaskRequest) => {
+    await createMutation.mutateAsync(data);
   };
 
   const handleDeleteTask = (id: string) => deleteMutation.mutate(id);
@@ -95,17 +78,7 @@ export function SchedulerList() {
 
   const handleRerun = (id: string) => rerunMutation.mutate(id);
 
-  const handleSaveSettings = async (
-    taskId: string,
-    data: {
-      prompt?: string;
-      intervalMinutes?: number;
-      maxRuns?: number | null;
-      name?: string;
-      model?: ClaudeModel;
-      workingDir?: string | null;
-    }
-  ) => {
+  const handleSaveSettings = async (taskId: string, data: UpdateScheduledTaskRequest) => {
     await api.updateScheduledTask(taskId, data);
     void queryClient.invalidateQueries({ queryKey: ['scheduled-tasks'] });
   };

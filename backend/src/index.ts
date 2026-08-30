@@ -26,6 +26,8 @@ import { companiesRouter } from './routes/companies.js';
 import { claudeMdRouter } from './routes/claude-md.js';
 import { ocrRouter } from './routes/ocr.js';
 import { sttRouter } from './routes/stt.js';
+import { unifiedChatRouter } from './routes/unified-chat.js';
+import { eventSourcesRouter } from './routes/event-sources.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -34,6 +36,7 @@ import type { LawnProfile } from '@devbot/plugin-lawn-care/backend/schema.js';
 import { spawnClaudeStructured, getActiveSessionCount } from './lib/claude-spawn.js';
 import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
+import { startEventWorker } from './lib/event-worker.js';
 
 import {
   recoverSessions,
@@ -203,6 +206,8 @@ app.use('/api/companies', companiesRouter);
 app.use('/api/claude-md', claudeMdRouter);
 app.use('/api/ocr', ocrRouter);
 app.use('/api/stt', sttRouter);
+app.use('/api/unified-chat', unifiedChatRouter);
+app.use('/api/event-sources', eventSourcesRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
@@ -325,6 +330,9 @@ const server = httpServer.listen(PORT, HOST, async () => {
   startSchedulerWorker().catch((err) => {
     console.error('Failed to start scheduler worker:', err);
   });
+
+  // Start the event source polling worker
+  startEventWorker();
 });
 
 // Graceful shutdown — required for vite-node --watch hot reload.

@@ -47,6 +47,18 @@ export const scheduled_tasks = sqliteTable('scheduled_tasks', {
   prompt: text('prompt').notNull(),
   name: text('name'),
   interval_minutes: integer('interval_minutes').notNull(),
+  trigger_type: text('trigger_type', {
+    enum: ['interval', 'cron', 'event', 'once'],
+  })
+    .notNull()
+    .default('interval'),
+  cron_expression: text('cron_expression'),
+  priority: text('priority', { enum: ['low', 'medium', 'high', 'critical'] })
+    .notNull()
+    .default('medium'),
+  category: text('category'),
+  parent_task_id: text('parent_task_id'),
+  context_file: text('context_file'),
   status: text('status', { enum: ['active', 'paused', 'deleted'] })
     .notNull()
     .default('active'),
@@ -54,6 +66,48 @@ export const scheduled_tasks = sqliteTable('scheduled_tasks', {
   next_run_at: text('next_run_at'),
   run_count: integer('run_count').notNull().default(0),
   max_runs: integer('max_runs'),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
+// Event trigger sources for event-based schedulers
+export const event_sources = sqliteTable('event_sources', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  type: text('type', {
+    enum: ['stock', 'news', 'weather', 'webhook', 'cron', 'file_watch', 'custom'],
+  }).notNull(),
+  config: text('config', { mode: 'json' }).$type<Record<string, any>>().notNull(),
+  status: text('status', { enum: ['active', 'paused', 'deleted'] })
+    .notNull()
+    .default('active'),
+  poll_interval_seconds: integer('poll_interval_seconds').notNull().default(300),
+  last_checked_at: text('last_checked_at'),
+  last_triggered_at: text('last_triggered_at'),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
+// Links event sources to scheduled tasks (many-to-many)
+export const event_task_links = sqliteTable('event_task_links', {
+  id: text('id').primaryKey(),
+  event_source_id: text('event_source_id').notNull(),
+  task_id: text('task_id').notNull(),
+  condition: text('condition', { mode: 'json' }).$type<Record<string, any>>().default({}),
   created_by: text('created_by').notNull().default('user'),
   created_at: text('created_at')
     .notNull()
@@ -322,6 +376,20 @@ export const chat_message_queue = sqliteTable('chat_message_queue', {
   chat_id: text('chat_id').notNull(),
   prompt: text('prompt').notNull(),
   position: integer('position').notNull(),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
+// Unified chat favorites (favorited Claude CLI JSONL sessions)
+export const unified_favorites = sqliteTable('unified_favorites', {
+  session_id: text('session_id').primaryKey(),
   created_by: text('created_by').notNull().default('user'),
   created_at: text('created_at')
     .notNull()

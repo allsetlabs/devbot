@@ -38,6 +38,10 @@ import type {
   UpdateEventSourceRequest,
   EventTaskLink,
   EventSourceTestResult,
+  CLIProvider,
+  ProvidersResponse,
+  AllSessionsResponse,
+  ProviderSessionDetail,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -853,4 +857,25 @@ export const unifiedChatApi = {
 
   searchSessions: (encoded: string, q: string): Promise<UnifiedSession[]> =>
     fetchApi(`/api/unified-chat/dirs/${encodeURIComponent(encoded)}/search?q=${encodeURIComponent(q)}`),
+
+  // Multi-provider CLI Dashboard endpoints
+  listProviders: (): Promise<ProvidersResponse> =>
+    fetchApi('/api/unified-chat/providers'),
+
+  listAllSessions: (provider?: CLIProvider, limit?: number, q?: string): Promise<AllSessionsResponse> => {
+    const params = new URLSearchParams();
+    if (provider) params.set('provider', provider);
+    if (limit) params.set('limit', String(limit));
+    if (q) params.set('q', q);
+    const qs = params.toString();
+    return fetchApi(`/api/unified-chat/all-sessions${qs ? `?${qs}` : ''}`);
+  },
+
+  getProviderSession: (provider: CLIProvider, sessionId: string, projectDir?: string): Promise<ProviderSessionDetail> => {
+    const params = projectDir ? `?projectDir=${encodeURIComponent(projectDir)}` : '';
+    return fetchApi(`/api/unified-chat/session/${provider}/${encodeURIComponent(sessionId)}${params}`);
+  },
+
+  refreshCache: (): Promise<{ success: boolean }> =>
+    fetchApi('/api/unified-chat/refresh-cache', { method: 'POST' }),
 };

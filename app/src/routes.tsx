@@ -14,7 +14,7 @@ import {
   ScrollText,
   Settings,
   Archive,
-  Layers,
+  Terminal,
   Zap,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
@@ -31,7 +31,7 @@ import { OcrList } from './pages/OcrList';
 import { LogsPage } from './pages/LogsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { ArchivedChatsPage } from './pages/ArchivedChatsPage';
-import { UnifiedChatPage } from './pages/UnifiedChatPage';
+import { CLIDashboard } from './pages/CLIDashboard';
 import { EventSourcesPage } from './pages/EventSourcesPage';
 
 /**
@@ -148,9 +148,9 @@ export const routes = {
   },
   unified: {
     path: '/unified',
-    name: 'Unified Chat',
-    icon: <Layers className="h-5 w-5" />,
-    Component: UnifiedChatPage,
+    name: 'CLI Dashboard',
+    icon: <Terminal className="h-5 w-5" />,
+    Component: CLIDashboard,
   },
   archived: {
     path: '/archived',

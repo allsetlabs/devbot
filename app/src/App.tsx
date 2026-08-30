@@ -9,6 +9,8 @@ import { SchedulerView } from './pages/SchedulerView';
 import { InteractiveChatView } from './pages/InteractiveChatView';
 import { CompanyView } from './pages/CompanyView';
 import { OcrView } from './pages/OcrView';
+import { UnifiedChatList } from './pages/UnifiedChatList';
+import { ProviderSessionView } from './pages/ProviderSessionView';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
 import { RouteErrorBoundary } from './components/RouteErrorBoundary';
@@ -60,6 +62,10 @@ function App() {
               <Route path="/family-hierarchy" element={<Navigate to="/plugins/family-hierarchy" replace />} />
               <Route path="/lawn-care" element={<Navigate to="/plugins/lawn-care" replace />} />
               <Route path="/lawn-care/photos" element={<Navigate to="/plugins/lawn-care/photos" replace />} />
+
+              {/* Unified Chat / CLI Dashboard detail routes */}
+              <Route path="/unified/dir/:encoded" element={<RouteErrorBoundary><UnifiedChatList /></RouteErrorBoundary>} />
+              <Route path="/unified/session/:provider/:sessionId" element={<RouteErrorBoundary><ProviderSessionView /></RouteErrorBoundary>} />
 
               {/* Legacy CLI routes */}
               <Route path="/cli" element={<RouteErrorBoundary><ChatList /></RouteErrorBoundary>} />

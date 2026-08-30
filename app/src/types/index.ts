@@ -455,3 +455,52 @@ export interface EventSourceTestResult {
   triggered: boolean;
   details: string;
 }
+
+// CLI Dashboard types
+export type CLIProvider = 'claude' | 'codex' | 'kimi' | 'cursor';
+
+export interface ProviderInfo {
+  id: CLIProvider;
+  name: string;
+  available: boolean;
+  sessionCount: number;
+  dataDir: string;
+  model?: string;
+}
+
+export interface ProvidersResponse {
+  providers: ProviderInfo[];
+}
+
+export interface ProviderSession {
+  sessionId: string;
+  provider: CLIProvider;
+  preview: string;
+  createdAt: string;
+  updatedAt: string;
+  cwd: string;
+  messageCount: number;
+  model?: string;
+  projectDir?: string;
+}
+
+export interface AllSessionsResponse {
+  sessions: ProviderSession[];
+  total: number;
+}
+
+export interface ProviderMessage {
+  uuid: string;
+  type: 'user' | 'assistant';
+  text: string;
+  timestamp: string;
+}
+
+export interface ProviderSessionDetail {
+  messages: ProviderMessage[];
+  sessionId: string;
+  provider: CLIProvider;
+  cwd: string;
+  gitBranch: string;
+  model?: string;
+}

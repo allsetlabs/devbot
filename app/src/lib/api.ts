@@ -1147,3 +1147,102 @@ export const tunnelApi = {
   stop: (): Promise<{ success: boolean; status: string }> =>
     fetchApi('/api/tunnel/stop', { method: 'POST' }),
 };
+
+// ── TTS (Text-to-Speech) ──────────────────────────────────────────────────
+
+export interface TtsVoice {
+  id: string;
+  gender: string;
+  locale: string;
+}
+
+export interface TtsStatusResponse {
+  available: boolean;
+  voice: string;
+}
+
+export interface TtsVoicesResponse {
+  voices: TtsVoice[];
+}
+
+export async function ttsStatus(): Promise<TtsStatusResponse> {
+  return fetchApi('/api/tts/status');
+}
+
+export async function ttsListVoices(): Promise<TtsVoicesResponse> {
+  return fetchApi('/api/tts/voices');
+}
+
+export async function ttsSelectVoice(voice: string): Promise<{ voice: string }> {
+  return fetchApi('/api/tts/voice', { method: 'PUT', body: JSON.stringify({ voice }) });
+}
+
+export async function ttsSynthesize(text: string, voice?: string): Promise<Blob> {
+  const response = await fetch(`${BACKEND_URL}/api/tts/synthesize`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders(),
+    },
+    body: JSON.stringify({ text, voice }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'TTS synthesis failed' }));
+    throw new Error(error.message || `HTTP ${response.status}`);
+  }
+
+  return response.blob();
+}
+
+// ── Voice Mode ────────────────────────────────────────────────────────────
+
+export interface VoiceSession {
+  id: string;
+  systemPrompt: string;
+  createdAt: string;
+  lastActiveAt: string;
+  messageCount?: number;
+}
+
+export interface VoiceMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+export interface VoiceSessionDetail extends VoiceSession {
+  messages: VoiceMessage[];
+}
+
+export interface VoiceRespondResponse {
+  text: string;
+  messageIndex: number;
+}
+
+export const voiceApi = {
+  createSession: (systemPrompt?: string): Promise<VoiceSession> =>
+    fetchApi('/api/voice/sessions', {
+      method: 'POST',
+      body: JSON.stringify({ systemPrompt }),
+    }),
+
+  deleteSession: (id: string): Promise<{ deleted: boolean }> =>
+    fetchApi(`/api/voice/sessions/${id}`, { method: 'DELETE' }),
+
+  getSession: (id: string): Promise<VoiceSessionDetail> =>
+    fetchApi(`/api/voice/sessions/${id}`),
+
+  listSessions: (): Promise<VoiceSession[]> =>
+    fetchApi('/api/voice/sessions'),
+
+  respond: (id: string, text: string, model?: string): Promise<VoiceRespondResponse> =>
+    fetchApi(`/api/voice/sessions/${id}/respond`, {
+      method: 'POST',
+      body: JSON.stringify({ text, model }),
+    }),
+
+  clearHistory: (id: string): Promise<{ cleared: boolean }> =>
+    fetchApi(`/api/voice/sessions/${id}/clear`, { method: 'POST' }),
+};

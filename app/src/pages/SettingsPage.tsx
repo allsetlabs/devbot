@@ -24,6 +24,7 @@ import {
 import type { DevBotSettings } from '../hooks/useSettings';
 import type { AuthTokenInfo } from '../types';
 import { SttModelSettings } from '../components/SttModelSettings';
+import { TtsVoiceSettings } from '../components/TtsVoiceSettings';
 import {
   LogOut,
   User,
@@ -658,6 +659,9 @@ export function SettingsPage() {
 
           <SectionHeader title="Speech to Text" />
           <div className="divide-y divide-border"><SttModelSettings /></div>
+
+          <SectionHeader title="Text to Speech" />
+          <div className="divide-y divide-border"><TtsVoiceSettings /></div>
 
           <SectionHeader title="Notifications" />
           <div className="divide-y divide-border">

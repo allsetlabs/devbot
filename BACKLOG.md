@@ -16,10 +16,10 @@
 - [x] **Enhanced Scheduler System** — Cron expressions, event triggers, effort levels, priority, inter-session communication, model selection (opus/sonnet/haiku/fable). `COMPLETED 2026-08-29`
 - [x] **Event Trigger System** — Stock price triggers (Yahoo Finance API), weather triggers (Open-Meteo API), file watch triggers (fs.stat), webhook triggers (external API), custom triggers. Event sources poll periodically and fire schedulers when conditions match. Full CRUD UI with type-specific config forms, test endpoint for dry-run evaluation, and task linking. News triggers stubbed (requires external API key). `COMPLETED 2026-08-29`
 - [x] **Unified CLI Dashboard** — Multi-provider session browser showing Claude Code, OpenAI Codex, Kimi Code, and Cursor sessions in one unified view. Provider-specific JSONL/SQLite parsers, session cache with 10s TTL, provider filter pills, search, and per-provider session viewer with color-coded UI. `COMPLETED 2026-08-30`
-- [ ] `NEXT` **File-Based Backend Framework** — Generic JSON file storage pattern for plugins. Auto-git-commit on changes. Human-readable. Shareable by copying the file. Replace SQLite for simple plugins.
+- [x] **File-Based Backend Framework** — Generic FileStore<T> class with typed CRUD, mtime-based caching, auto-git-commit. createFileStoreRouter() factory for zero-boilerplate REST endpoints. Management API at /api/file-stores. Demo bookmarks + notes stores. Frontend page with store browser, search, JSON editor for adding records. `COMPLETED 2026-08-30`
 
 ### Phase 2: Platform
-- [ ] **Google OAuth Authentication** — Replace API key auth with Google OAuth. Single user: subbiah2806@gmail.com. Protect all routes. Session cookies for web, tokens for mobile.
+- [ ] `NEXT` **Google OAuth Authentication** — Replace API key auth with Google OAuth. Single user: subbiah2806@gmail.com. Protect all routes. Session cookies for web, tokens for mobile.
 - [ ] **Capacitor Mobile App** — Package the React app as an Android APK via Capacitor. Push notification support. Background services for notification listener.
 - [ ] **Electron Desktop App** — Package as a macOS desktop app. Direct local model access for faster voice. System tray with notification badges.
 - [ ] **Cloudflare Tunnel** — Replace VPN with Cloudflare Tunnel for public access. Zero-trust with Google OAuth.
@@ -84,6 +84,7 @@
 | 2026-08-29 | Enhanced Scheduler System (cron, events, effort, priority, inter-session comm) | Manual |
 | 2026-08-29 | Event Trigger System (stock/weather/file_watch/webhook evaluators, CRUD UI, test endpoint) | CEO Scheduler |
 | 2026-08-30 | Unified CLI Dashboard (Claude/Codex/Kimi/Cursor multi-provider session browser, JSONL parsers, provider filters) | CEO Scheduler |
+| 2026-08-30 | File-Based Backend Framework (FileStore class, REST router factory, management API, bookmarks+notes demo stores, frontend browser page) | CEO Scheduler |
 
 ## Notes for Future Sessions
 

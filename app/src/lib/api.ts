@@ -42,6 +42,9 @@ import type {
   ProvidersResponse,
   AllSessionsResponse,
   ProviderSessionDetail,
+  FileStoreInfo,
+  FileStoreDetail,
+  FileStoreRecord,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
@@ -634,6 +637,53 @@ export const api = {
     });
   },
 
+  // File Store endpoints
+  listFileStores: (): Promise<FileStoreInfo[]> => fetchApi('/api/file-stores'),
+
+  getFileStore: (name: string): Promise<FileStoreDetail> =>
+    fetchApi(`/api/file-stores/${encodeURIComponent(name)}`),
+
+  listFileStoreRecords: (
+    name: string,
+    params?: { search?: string; sort?: string; order?: 'asc' | 'desc'; limit?: number; offset?: number }
+  ): Promise<FileStoreRecord[]> => {
+    const qs = new URLSearchParams();
+    if (params?.search) qs.set('search', params.search);
+    if (params?.sort) qs.set('sort', params.sort);
+    if (params?.order) qs.set('order', params.order);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    if (params?.offset) qs.set('offset', String(params.offset));
+    const q = qs.toString();
+    return fetchApi(`/api/file-stores/${encodeURIComponent(name)}/records${q ? `?${q}` : ''}`);
+  },
+
+  getFileStoreRecord: (name: string, id: string): Promise<FileStoreRecord> =>
+    fetchApi(`/api/file-stores/${encodeURIComponent(name)}/records/${id}`),
+
+  createFileStoreRecord: (name: string, data: Record<string, unknown>): Promise<FileStoreRecord> =>
+    fetchApi(`/api/file-stores/${encodeURIComponent(name)}/data`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateFileStoreRecord: (
+    name: string,
+    id: string,
+    data: Record<string, unknown>
+  ): Promise<FileStoreRecord> =>
+    fetchApi(`/api/file-stores/${encodeURIComponent(name)}/data/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  deleteFileStoreRecord: (
+    name: string,
+    id: string
+  ): Promise<{ ok: boolean; id: string }> =>
+    fetchApi(`/api/file-stores/${encodeURIComponent(name)}/data/${id}`, {
+      method: 'DELETE',
+    }),
+
 };
 
 export function getXtermWsUrl(port: number): string {
@@ -878,4 +928,47 @@ export const unifiedChatApi = {
 
   refreshCache: (): Promise<{ success: boolean }> =>
     fetchApi('/api/unified-chat/refresh-cache', { method: 'POST' }),
+};
+
+// File Stores API
+export const fileStoresApi = {
+  /** List all registered file stores with metadata. */
+  listStores: (): Promise<FileStoreInfo[]> =>
+    fetchApi('/api/file-stores'),
+
+  /** Get a store's info + all records. */
+  getStore: (name: string): Promise<FileStoreDetail> =>
+    fetchApi(`/api/file-stores/${name}`),
+
+  /** List records from a specific store with optional query params. */
+  listRecords: (name: string, params?: { search?: string; sort?: string; order?: string }): Promise<FileStoreRecord[]> => {
+    const qs = new URLSearchParams();
+    if (params?.search) qs.set('search', params.search);
+    if (params?.sort) qs.set('sort', params.sort);
+    if (params?.order) qs.set('order', params.order);
+    const q = qs.toString();
+    return fetchApi(`/api/file-stores/${name}/records${q ? `?${q}` : ''}`);
+  },
+
+  /** Get a single record from a store. */
+  getRecord: (name: string, id: string): Promise<FileStoreRecord> =>
+    fetchApi(`/api/file-stores/${name}/records/${id}`),
+
+  /** Create a record in a store's data endpoint. */
+  createRecord: (name: string, data: Record<string, unknown>): Promise<FileStoreRecord> =>
+    fetchApi(`/api/file-stores/${name}/data`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /** Update a record in a store's data endpoint. */
+  updateRecord: (name: string, id: string, data: Record<string, unknown>): Promise<FileStoreRecord> =>
+    fetchApi(`/api/file-stores/${name}/data/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  /** Delete a record from a store's data endpoint. */
+  deleteRecord: (name: string, id: string): Promise<{ ok: boolean; id: string }> =>
+    fetchApi(`/api/file-stores/${name}/data/${id}`, { method: 'DELETE' }),
 };

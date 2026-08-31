@@ -504,3 +504,27 @@ export interface ProviderSessionDetail {
   gitBranch: string;
   model?: string;
 }
+
+// File Store types
+export interface FileStoreInfo {
+  name: string;
+  filePath: string;
+  recordCount: number;
+  fileSize: number;
+  lastModified: string | null;
+  autoCommit: boolean;
+}
+
+export interface FileStoreRecord {
+  id: string;
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string;
+  settings: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface FileStoreDetail extends FileStoreInfo {
+  records: FileStoreRecord[];
+}

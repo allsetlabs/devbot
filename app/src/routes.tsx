@@ -16,6 +16,7 @@ import {
   Archive,
   Terminal,
   Zap,
+  HardDrive,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -33,6 +34,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { ArchivedChatsPage } from './pages/ArchivedChatsPage';
 import { CLIDashboard } from './pages/CLIDashboard';
 import { EventSourcesPage } from './pages/EventSourcesPage';
+import { FileStoresPage } from './pages/FileStoresPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -151,6 +153,12 @@ export const routes = {
     name: 'CLI Dashboard',
     icon: <Terminal className="h-5 w-5" />,
     Component: CLIDashboard,
+  },
+  fileStores: {
+    path: '/file-stores',
+    name: 'File Stores',
+    icon: <HardDrive className="h-5 w-5" />,
+    Component: FileStoresPage,
   },
   archived: {
     path: '/archived',

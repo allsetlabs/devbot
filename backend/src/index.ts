@@ -28,6 +28,9 @@ import { ocrRouter } from './routes/ocr.js';
 import { sttRouter } from './routes/stt.js';
 import { unifiedChatRouter } from './routes/unified-chat.js';
 import { eventSourcesRouter } from './routes/event-sources.js';
+import { fileStoresRouter } from './routes/file-stores.js';
+import { bookmarksRouter } from './lib/stores/bookmarks.js';
+import { notesRouter } from './lib/stores/notes.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -208,6 +211,9 @@ app.use('/api/ocr', ocrRouter);
 app.use('/api/stt', sttRouter);
 app.use('/api/unified-chat', unifiedChatRouter);
 app.use('/api/event-sources', eventSourcesRouter);
+app.use('/api/file-stores', fileStoresRouter);
+app.use('/api/file-stores/bookmarks/data', bookmarksRouter);
+app.use('/api/file-stores/notes/data', notesRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

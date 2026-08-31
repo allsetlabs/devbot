@@ -21,8 +21,8 @@
 ### Phase 2: Platform
 - [x] **Google OAuth Authentication** — Google OAuth2 flow with CSRF-protected state, single-user enforcement (ALLOWED_EMAIL whitelist), session cookies (30-day HttpOnly), Bearer API tokens for mobile/programmatic access, auth middleware on all /api/* routes, token CRUD API + Settings page UI for managing tokens, LoginPage with OAuth button, AuthGate wrapping all routes. Backward-compatible API key fallback and dev mode (no auth). `COMPLETED 2026-08-31`
 - [x] **Capacitor Mobile App** — Capacitor 8 setup with Android platform. Native platform utilities (status bar, splash screen, haptics, back button, app lifecycle). Mobile-aware API with configurable backend URL (Capacitor Preferences + localStorage sync). Push notification integration (FCM device token registration, foreground local notifications, notification tap navigation). Backend push service with push_tokens table, register/unregister/list/test endpoints, FCM HTTP API sending with auto-cleanup. Settings page mobile section (platform indicator, backend URL config with test, push notification toggle, registered devices list, test push button). NativeLifecycle component for Android back button and app state refetch. Makefile targets (mobile-setup/build/sync/open/run/live). `COMPLETED 2026-08-31`
-- [ ] `NEXT` **Electron Desktop App** — Package as a macOS desktop app. Direct local model access for faster voice. System tray with notification badges.
-- [ ] **Cloudflare Tunnel** — Replace VPN with Cloudflare Tunnel for public access. Zero-trust with Google OAuth.
+- [x] **Electron Desktop App** — Electron 44 macOS desktop wrapper with hidden title bar (traffic lights inset), system tray (programmatic template icon with context menu), dock badge counts, native macOS notifications, window state persistence (position/size/maximized across restarts), IPC bridge via contextBridge (badge, notifications, window controls, external URL opening), notification click → chat navigation, backend URL auto-resolution to localhost, Vite dev server support in dev mode, electron-builder config for .dmg packaging (arm64 + x64). Frontend: `isElectron` detection, Settings page desktop section (platform/version/badge test), notification.ts Electron path, env.ts runtime-configured mode. Makefile: `desktop-dev`, `desktop-build`, `desktop-package` targets. `COMPLETED 2026-08-31`
+- [ ] `NEXT` **Cloudflare Tunnel** — Replace VPN with Cloudflare Tunnel for public access. Zero-trust with Google OAuth.
 
 ### Phase 3: Voice & AI
 - [ ] **Voice Mode (OpenAI-style)** — Full duplex voice conversation. Whisper small.en for STT, edge-tts for TTS. System prompt adjusts AI output for spoken delivery (no markdown). Voice activity detection.
@@ -87,6 +87,7 @@
 | 2026-08-30 | File-Based Backend Framework (FileStore class, REST router factory, management API, bookmarks+notes demo stores, frontend browser page) | CEO Scheduler |
 | 2026-08-31 | Google OAuth Authentication (OAuth2 flow, session cookies, Bearer API tokens, auth middleware, token management UI, LoginPage, AuthGate) | CEO Scheduler |
 | 2026-08-31 | Capacitor Mobile App (Android packaging, push notifications, native platform utils, mobile-aware API, backend URL config, Makefile targets) | CEO Scheduler |
+| 2026-08-31 | Electron Desktop App (macOS wrapper, system tray, dock badges, native notifications, window state persistence, IPC bridge, electron-builder packaging, desktop Settings section) | CEO Scheduler |
 
 ## Notes for Future Sessions
 

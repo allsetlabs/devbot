@@ -1,7 +1,8 @@
 /** Task completion notification — sound + haptic + browser/native notification */
 
 import type { DevBotSettings } from '../hooks/useSettings';
-import { isNative, hapticsNotification, hapticsImpact, showLocalNotification } from './capacitor';
+import { isNative, isElectron, hapticsNotification, hapticsImpact, showLocalNotification } from './capacitor';
+import { showDesktopNotification } from './electron';
 
 let audioContext: AudioContext | null = null;
 let currentSettings: Partial<DevBotSettings> = {
@@ -171,6 +172,12 @@ function sendBrowserNotification(title: string, body: string) {
   if (isNative) {
     // Use Capacitor local notification on native
     showLocalNotification(title, body);
+    return;
+  }
+
+  if (isElectron) {
+    // Use Electron native notifications (always available, no permission needed)
+    showDesktopNotification(title, body);
     return;
   }
 

@@ -12,7 +12,7 @@ APP_PORT := 4005
 BACKEND_PORT := 3100
 DEVBOT_PROJECTS := $(CURDIR)/../../../
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp mobile-setup mobile-build mobile-sync mobile-open mobile-run mobile-live
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp mobile-setup mobile-build mobile-sync mobile-open mobile-run mobile-live desktop-dev desktop-build desktop-package
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -28,6 +28,11 @@ help:
 	@echo "  make mobile-open   - Open Android project in Android Studio"
 	@echo "  make mobile-run    - Build, sync, and run on connected Android device"
 	@echo "  make mobile-live   - Start live reload dev server for mobile"
+	@echo ""
+	@echo "$(BLUE)Desktop Commands:$(NC)"
+	@echo "  make desktop-dev     - Run Electron desktop app in dev mode (uses Vite dev server)"
+	@echo "  make desktop-build   - Build Electron main process TypeScript"
+	@echo "  make desktop-package - Package as macOS .dmg for distribution"
 
 setup:
 	@echo "$(BLUE)Starting DevBot system setup...$(NC)"
@@ -284,3 +289,31 @@ mobile-live:
 	echo "$(YELLOW)Configure capacitor.config.ts server.url to: https://$$TAILSCALE_IP:$(APP_PORT)$(NC)"; \
 	echo "$(YELLOW)Then run 'make mobile-sync' in another terminal$(NC)"; \
 	cd app && export VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR) && npx vite --port=$(APP_PORT) --host
+
+# ── Desktop (Electron) ─────────────────────────────────────────────────
+
+desktop-dev:
+	@echo "$(BLUE)🖥️  Building Electron main process...$(NC)"
+	@cd app && npx tsc -p electron/tsconfig.json
+	@echo "$(BLUE)🖥️  Starting Electron desktop app (dev mode — connects to Vite dev server)...$(NC)"
+	@echo "$(YELLOW)⚠️  Make sure 'make start' is running first (backend + Vite dev server)$(NC)"
+	@cd app && VITE_DEV_SERVER_URL=https://localhost:$(APP_PORT) BACKEND_PORT=$(BACKEND_PORT) npx electron .
+
+desktop-build:
+	@echo "$(BLUE)🖥️  Building Electron main process TypeScript...$(NC)"
+	@cd app && npx tsc -p electron/tsconfig.json
+	@echo "$(GREEN)✅ Electron build complete (app/electron-dist/)$(NC)"
+
+desktop-package:
+	@echo "$(BLUE)🖥️  Packaging DevBot desktop app for macOS...$(NC)"
+	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
+	@echo "$(BLUE)Step 1: Building web app...$(NC)"
+	@cd app && VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR) npx vite build
+	@echo "$(BLUE)Step 2: Building Electron main process...$(NC)"
+	@cd app && npx tsc -p electron/tsconfig.json
+	@echo "$(BLUE)Step 3: Packaging with electron-builder...$(NC)"
+	@cd app && npx electron-builder --mac
+	@echo ""
+	@echo "$(GREEN)✅ Desktop app packaged!$(NC)"
+	@echo "  📁 Output: app/release/"
+	@echo "  📦 Look for DevBot.dmg in the release directory"

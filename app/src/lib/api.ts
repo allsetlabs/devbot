@@ -54,19 +54,26 @@ import {
   VITE_API_KEY as API_KEY,
   VITE_BACKEND_URL,
 } from './env';
-import { isNative, getBackendUrlSync } from './capacitor';
+import { isNative, isElectron, getBackendUrlSync } from './capacitor';
 
 /**
  * Resolve the backend URL. Priority:
  * 1. Runtime-configured URL (native mobile — stored in localStorage via Capacitor Preferences)
- * 2. Build-time VITE_BACKEND_URL env var (for mobile builds with a known server)
- * 3. Construct from window.location (web mode — same host, different port)
+ * 2. Electron desktop — localhost with injected or default port
+ * 3. Build-time VITE_BACKEND_URL env var (for mobile builds with a known server)
+ * 4. Construct from window.location (web mode — same host, different port)
  */
 function resolveBackendUrl(): string {
   // Native mobile: check for runtime-configured URL
   if (isNative) {
     const stored = getBackendUrlSync();
     if (stored) return stored.replace(/\/$/, '');
+  }
+
+  // Electron desktop: backend runs locally on the same machine
+  if (isElectron) {
+    const port = window.__ELECTRON_BACKEND_PORT__ || BACKEND_PORT || '3100';
+    return `https://localhost:${port}`;
   }
 
   // Build-time override (useful for Capacitor builds with known backend)

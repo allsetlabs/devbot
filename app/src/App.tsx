@@ -19,7 +19,8 @@ import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
 import { RouteErrorBoundary } from './components/RouteErrorBoundary';
 import { usePushNotifications } from './hooks/usePushNotifications';
-import { isNative, setupBackButton, onAppStateChange } from './lib/capacitor';
+import { isNative, setupBackButton, onAppStateChange, isElectron } from './lib/capacitor';
+import { onDesktopNotificationClicked } from './lib/electron';
 
 /** Gate that renders children only when authenticated, otherwise shows login. */
 function AuthGate({ children }: { children: ReactNode }) {
@@ -68,11 +69,36 @@ function NativeLifecycle() {
   return null;
 }
 
+/** Electron desktop lifecycle: notification click navigation. */
+function ElectronLifecycle() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isElectron) return;
+
+    // Navigate when a native notification is clicked
+    const cleanup = onDesktopNotificationClicked((data) => {
+      if (data.chatId) {
+        navigate(`/chat/${data.chatId}`);
+      } else if (data.route && typeof data.route === 'string') {
+        navigate(data.route);
+      } else {
+        navigate('/chats');
+      }
+    });
+
+    return cleanup;
+  }, [navigate]);
+
+  return null;
+}
+
 function App() {
   return (
     <InitializeForgeChunks applyToBody defaultMuted>
       <AuthGate>
       <NativeLifecycle />
+      <ElectronLifecycle />
       <div className="overflow-hidden bg-background">
         <TextSelectionProvider>
           <AppLayout>

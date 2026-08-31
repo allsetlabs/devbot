@@ -20,6 +20,9 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 export const isNative = Capacitor.isNativePlatform();
 export const platform = Capacitor.getPlatform(); // 'android' | 'ios' | 'web'
 
+/** Whether the app is running inside Electron (desktop wrapper). */
+export const isElectron: boolean = !!(window as unknown as Record<string, unknown>).electronAPI;
+
 // ──────────────────────────── Backend URL management ─────────────────────────
 
 const BACKEND_URL_KEY = 'devbot-backend-url';

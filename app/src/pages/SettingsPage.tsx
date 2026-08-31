@@ -14,6 +14,12 @@ import {
   getBackendUrlSync,
   setStoredBackendUrl,
 } from '../lib/capacitor';
+import {
+  isElectron as isElectronDesktop,
+  electronPlatform,
+  getDesktopVersion,
+  setDesktopBadge,
+} from '../lib/electron';
 import type { DevBotSettings } from '../hooks/useSettings';
 import type { AuthTokenInfo } from '../types';
 import { SttModelSettings } from '../components/SttModelSettings';
@@ -31,6 +37,7 @@ import {
   Wifi,
   Bell,
   Send,
+  Monitor,
 } from 'lucide-react';
 
 const MODEL_OPTIONS = [
@@ -445,6 +452,65 @@ function PushTokenManager() {
   );
 }
 
+/** Desktop app info — shows platform, version, and badge test for Electron. */
+function DesktopInfo() {
+  const [version, setVersion] = useState('');
+
+  useEffect(() => {
+    getDesktopVersion().then(setVersion);
+  }, []);
+
+  const platformLabel =
+    electronPlatform === 'darwin'
+      ? 'macOS'
+      : electronPlatform === 'win32'
+        ? 'Windows'
+        : electronPlatform === 'linux'
+          ? 'Linux'
+          : electronPlatform ?? 'Unknown';
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 py-2">
+        <Monitor className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <p className="text-xs text-muted-foreground">
+          Running as a native desktop app with system tray and notification badges.
+        </p>
+      </div>
+      <div className="divide-y divide-border rounded-lg border border-border">
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <span className="text-sm text-muted-foreground">Platform</span>
+          <span className="text-sm font-medium text-foreground">{platformLabel}</span>
+        </div>
+        {version && (
+          <div className="flex items-center justify-between px-3 py-2.5">
+            <span className="text-sm text-muted-foreground">Version</span>
+            <span className="font-mono text-sm text-foreground">{version}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <span className="text-sm text-muted-foreground">Window Style</span>
+          <span className="text-sm text-foreground">
+            {electronPlatform === 'darwin' ? 'Hidden Title Bar' : 'Standard'}
+          </span>
+        </div>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          setDesktopBadge(3);
+          setTimeout(() => setDesktopBadge(0), 3000);
+        }}
+        className="gap-1.5"
+      >
+        <Bell className="h-3.5 w-3.5" />
+        Test Badge (3s)
+      </Button>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const [serverDefaultDir, setServerDefaultDir] = useState('');
   const { settings, updateSettings, toggleSound, toggleHaptic, toggleAutoScroll } = useSettings();
@@ -689,6 +755,14 @@ export function SettingsPage() {
             </>
           )}
 
+          {/* Desktop section — visible when running in Electron */}
+          {isElectronDesktop && (
+            <>
+              <SectionHeader title="Desktop App" />
+              <DesktopInfo />
+            </>
+          )}
+
           {/* Mobile section — always visible since push tokens can be managed from web too */}
           {isNative && (
             <>
@@ -712,7 +786,7 @@ export function SettingsPage() {
 
           <div className="py-3 text-center">
             <p className="text-xs text-muted-foreground">
-              DevBot v1.0 · {isNative ? `${platform} app` : 'Web'} · {new Date().getFullYear()}
+              DevBot v1.0 · {isElectronDesktop ? 'Desktop' : isNative ? `${platform} app` : 'Web'} · {new Date().getFullYear()}
             </p>
           </div>
         </div>

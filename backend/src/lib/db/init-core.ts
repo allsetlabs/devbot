@@ -452,6 +452,24 @@ export async function initializeCoreDatabase() {
     `
     );
 
+    // Create push_tokens table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS push_tokens (
+        id TEXT PRIMARY KEY,
+        token TEXT NOT NULL UNIQUE,
+        platform TEXT NOT NULL CHECK(platform IN ('android', 'ios', 'web')),
+        device_name TEXT NOT NULL DEFAULT 'Unknown Device',
+        last_used_at TEXT,
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
     // Create auth_tokens table
     await runSQL(
       `

@@ -14,10 +14,13 @@ export interface DevBotSettings {
   notifyOnTaskFailed: boolean;
   notifyOnNewMessage: boolean;
   browserNotificationsEnabled: boolean;
+  pushNotificationsEnabled: boolean;
   dndEnabled: boolean;
   dndStartTime: string;
   dndEndTime: string;
   notificationSound: 'chime' | 'ding' | 'pop' | 'classic' | 'silent';
+  /** Backend URL for native mobile apps (e.g. "https://192.168.1.100:3100") */
+  backendUrl: string;
 }
 
 const SETTINGS_KEY = 'devbot-settings';
@@ -35,10 +38,12 @@ const DEFAULT_SETTINGS: DevBotSettings = {
   notifyOnTaskFailed: true,
   notifyOnNewMessage: false,
   browserNotificationsEnabled: false,
+  pushNotificationsEnabled: true,
   dndEnabled: false,
   dndStartTime: '22:00',
   dndEndTime: '08:00',
   notificationSound: 'chime',
+  backendUrl: '',
 };
 
 export function useSettings() {

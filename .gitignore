@@ -8,3 +8,8 @@ package-lock.json
 certs/
 family-hierarchy-staging
 
+# Capacitor Android build artifacts (generated — regenerate with `make mobile-setup`)
+app/android/
+# Firebase config (contains sensitive keys — must be added manually)
+app/android/app/google-services.json
+

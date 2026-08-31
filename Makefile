@@ -12,7 +12,7 @@ APP_PORT := 4005
 BACKEND_PORT := 3100
 DEVBOT_PROJECTS := $(CURDIR)/../../../
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp mobile-setup mobile-build mobile-sync mobile-open mobile-run mobile-live
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -20,6 +20,14 @@ help:
 	@echo "  make install    - Sync submodules and install app/backend dependencies"
 	@echo "  make start      - Start app and backend in tmux session 'devbot'"
 	@echo "  make stop       - Stop all DevBot services"
+	@echo ""
+	@echo "$(BLUE)Mobile Commands:$(NC)"
+	@echo "  make mobile-setup  - Initialize Capacitor + add Android platform"
+	@echo "  make mobile-build  - Build web app + sync to Android"
+	@echo "  make mobile-sync   - Sync web assets to Android (fast, no rebuild)"
+	@echo "  make mobile-open   - Open Android project in Android Studio"
+	@echo "  make mobile-run    - Build, sync, and run on connected Android device"
+	@echo "  make mobile-live   - Start live reload dev server for mobile"
 
 setup:
 	@echo "$(BLUE)Starting DevBot system setup...$(NC)"
@@ -228,3 +236,51 @@ stop:
 	fi
 	@npx kill-port $(BACKEND_PORT) $(APP_PORT) 2>/dev/null || true
 	@echo "$(GREEN)✅ All DevBot services stopped$(NC)"
+
+# ── Mobile (Capacitor) ──────────────────────────────────────────────────
+
+mobile-setup:
+	@echo "$(BLUE)📱 Setting up Capacitor for Android...$(NC)"
+	@cd app && npx cap add android 2>&1 || echo "$(YELLOW)Android platform may already be added$(NC)"
+	@echo ""
+	@echo "$(GREEN)✅ Capacitor Android setup complete!$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Next steps:$(NC)"
+	@echo "  1. Copy your google-services.json to app/android/app/ (for push notifications)"
+	@echo "  2. Run 'make mobile-build' to build the web app and sync to Android"
+	@echo "  3. Run 'make mobile-open' to open in Android Studio"
+	@echo "  4. Build and run from Android Studio, or 'make mobile-run'"
+
+mobile-build:
+	@echo "$(BLUE)📱 Building web app for mobile...$(NC)"
+	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
+	@cd app && VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR) npx vite build
+	@echo "$(BLUE)📱 Syncing to Android...$(NC)"
+	@cd app && npx cap sync android
+	@echo "$(GREEN)✅ Mobile build complete!$(NC)"
+
+mobile-sync:
+	@echo "$(BLUE)📱 Syncing web assets to Android...$(NC)"
+	@cd app && npx cap sync android
+	@echo "$(GREEN)✅ Sync complete$(NC)"
+
+mobile-open:
+	@echo "$(BLUE)📱 Opening Android project in Android Studio...$(NC)"
+	@cd app && npx cap open android
+	@echo "$(GREEN)✅ Android Studio should be opening$(NC)"
+
+mobile-run:
+	@echo "$(BLUE)📱 Building and running on connected device...$(NC)"
+	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
+	@cd app && VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR) npx vite build
+	@cd app && npx cap sync android
+	@cd app && npx cap run android
+	@echo "$(GREEN)✅ App deployed to device$(NC)"
+
+mobile-live:
+	@echo "$(BLUE)📱 Starting live reload for mobile development...$(NC)"
+	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
+	@TAILSCALE_IP=$$(tailscale ip -4 2>/dev/null || hostname -I 2>/dev/null | awk '{print $$1}' || echo "localhost"); \
+	echo "$(YELLOW)Configure capacitor.config.ts server.url to: https://$$TAILSCALE_IP:$(APP_PORT)$(NC)"; \
+	echo "$(YELLOW)Then run 'make mobile-sync' in another terminal$(NC)"; \
+	cd app && export VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR) && npx vite --port=$(APP_PORT) --host

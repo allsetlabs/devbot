@@ -49,9 +49,39 @@ import type {
   AuthTokenCreateResponse,
 } from '../types';
 
-import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
+import {
+  VITE_BACKEND_PORT as BACKEND_PORT,
+  VITE_API_KEY as API_KEY,
+  VITE_BACKEND_URL,
+} from './env';
+import { isNative, getBackendUrlSync } from './capacitor';
 
-export const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+/**
+ * Resolve the backend URL. Priority:
+ * 1. Runtime-configured URL (native mobile — stored in localStorage via Capacitor Preferences)
+ * 2. Build-time VITE_BACKEND_URL env var (for mobile builds with a known server)
+ * 3. Construct from window.location (web mode — same host, different port)
+ */
+function resolveBackendUrl(): string {
+  // Native mobile: check for runtime-configured URL
+  if (isNative) {
+    const stored = getBackendUrlSync();
+    if (stored) return stored.replace(/\/$/, '');
+  }
+
+  // Build-time override (useful for Capacitor builds with known backend)
+  if (VITE_BACKEND_URL) return VITE_BACKEND_URL.replace(/\/$/, '');
+
+  // Web mode: derive from current page location
+  return `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+}
+
+export let BACKEND_URL = resolveBackendUrl();
+
+/** Re-resolve the backend URL (call after the user changes it in Settings). */
+export function refreshBackendUrl(): void {
+  BACKEND_URL = resolveBackendUrl();
+}
 
 /**
  * Build auth headers. Sends X-API-Key when available (backward compat),
@@ -705,6 +735,20 @@ export const api = {
 };
 
 export function getXtermWsUrl(port: number): string {
+  // In native mode, derive WebSocket host from the configured backend URL
+  if (isNative) {
+    const stored = getBackendUrlSync();
+    if (stored) {
+      try {
+        const url = new URL(stored);
+        const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+        return `${wsProtocol}//${url.hostname}:${port}`;
+      } catch {
+        // Fall through to default
+      }
+    }
+  }
+
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${wsProtocol}//${window.location.hostname}:${port}`;
 }
@@ -1010,4 +1054,42 @@ export const authApi = {
   /** Revoke an API token by its last-8-char ID. */
   deleteToken: (id: string): Promise<{ success: boolean }> =>
     fetchApi(`/auth/tokens/${id}`, { method: 'DELETE' }),
+};
+
+// ── Push Notification Token Management API ─────────────────────────────
+export const pushApi = {
+  /** Register a device push token with the backend. */
+  registerToken: (
+    token: string,
+    platform: string,
+    deviceName?: string
+  ): Promise<{ success: boolean; id: string }> =>
+    fetchApi('/api/push/register', {
+      method: 'POST',
+      body: JSON.stringify({ token, platform, deviceName }),
+    }),
+
+  /** Unregister a device push token. */
+  unregisterToken: (token: string): Promise<{ success: boolean }> =>
+    fetchApi('/api/push/unregister', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    }),
+
+  /** List registered push tokens. */
+  listTokens: (): Promise<Array<{
+    id: string;
+    platform: string;
+    deviceName: string;
+    createdAt: string;
+    lastUsedAt: string | null;
+  }>> =>
+    fetchApi('/api/push/tokens'),
+
+  /** Send a test push notification to all registered devices. */
+  testPush: (title: string, body: string): Promise<{ success: boolean; sent: number }> =>
+    fetchApi('/api/push/test', {
+      method: 'POST',
+      body: JSON.stringify({ title, body }),
+    }),
 };

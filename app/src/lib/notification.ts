@@ -1,6 +1,7 @@
-/** Task completion notification — sound + haptic + browser notification */
+/** Task completion notification — sound + haptic + browser/native notification */
 
 import type { DevBotSettings } from '../hooks/useSettings';
+import { isNative, hapticsNotification, hapticsImpact, showLocalNotification } from './capacitor';
 
 let audioContext: AudioContext | null = null;
 let currentSettings: Partial<DevBotSettings> = {
@@ -154,6 +155,11 @@ export function previewNotificationSound(style: SoundStyle) {
 }
 
 function vibrate(pattern: number | number[]) {
+  if (isNative) {
+    // Use native Capacitor haptics for better feedback
+    hapticsImpact('medium');
+    return;
+  }
   if (navigator.vibrate) {
     navigator.vibrate(pattern);
   }
@@ -161,6 +167,13 @@ function vibrate(pattern: number | number[]) {
 
 function sendBrowserNotification(title: string, body: string) {
   if (!currentSettings.browserNotificationsEnabled) return;
+
+  if (isNative) {
+    // Use Capacitor local notification on native
+    showLocalNotification(title, body);
+    return;
+  }
+
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
     new Notification(title, { body, icon: '/devbot-icon.png' });
@@ -185,7 +198,11 @@ export function notifyTaskComplete() {
     playSuccessSound();
   }
   if (currentSettings.hapticEnabled) {
-    vibrate([50, 30, 50]);
+    if (isNative) {
+      hapticsNotification('success');
+    } else {
+      vibrate([50, 30, 50]);
+    }
   }
   sendBrowserNotification('Task Complete', 'Your task finished successfully.');
 }
@@ -198,7 +215,11 @@ export function notifyTaskFailed() {
     playFailureSound();
   }
   if (currentSettings.hapticEnabled) {
-    vibrate([100, 50, 100, 50, 100]);
+    if (isNative) {
+      hapticsNotification('error');
+    } else {
+      vibrate([100, 50, 100, 50, 100]);
+    }
   }
   sendBrowserNotification('Task Failed', 'A task encountered an error.');
 }

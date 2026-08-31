@@ -436,6 +436,24 @@ export const auth_tokens = sqliteTable('auth_tokens', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// Push notification device tokens
+export const push_tokens = sqliteTable('push_tokens', {
+  id: text('id').primaryKey(),
+  token: text('token').notNull().unique(),
+  platform: text('platform', { enum: ['android', 'ios', 'web'] }).notNull(),
+  device_name: text('device_name').notNull().default('Unknown Device'),
+  last_used_at: text('last_used_at'),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
 // Commands (synced from .claude/)
 export const commands = sqliteTable('commands', {
   id: text('id').primaryKey(),

@@ -2,16 +2,36 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { useSettings } from '../hooks/useSettings';
 import { useAuth } from '../contexts/AuthContext';
-import { api, authApi } from '../lib/api';
+import { api, authApi, pushApi, refreshBackendUrl, BACKEND_URL } from '../lib/api';
 import {
   requestBrowserNotificationPermission,
   getBrowserNotificationPermission,
   previewNotificationSound,
 } from '../lib/notification';
+import {
+  isNative,
+  platform,
+  getBackendUrlSync,
+  setStoredBackendUrl,
+} from '../lib/capacitor';
 import type { DevBotSettings } from '../hooks/useSettings';
 import type { AuthTokenInfo } from '../types';
 import { SttModelSettings } from '../components/SttModelSettings';
-import { LogOut, User, Key, Plus, Trash2, Copy, Check, Eye, EyeOff } from 'lucide-react';
+import {
+  LogOut,
+  User,
+  Key,
+  Plus,
+  Trash2,
+  Copy,
+  Check,
+  Eye,
+  EyeOff,
+  Smartphone,
+  Wifi,
+  Bell,
+  Send,
+} from 'lucide-react';
 
 const MODEL_OPTIONS = [
   { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
@@ -278,6 +298,153 @@ function ApiTokenManager() {
   );
 }
 
+/** Mobile Backend URL configuration — for Capacitor native apps. */
+function MobileBackendConfig() {
+  const [backendUrl, setBackendUrl] = useState(getBackendUrlSync() || '');
+  const [saved, setSaved] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<'ok' | 'fail' | null>(null);
+
+  const handleSave = async () => {
+    const url = backendUrl.trim().replace(/\/$/, '');
+    if (!url) return;
+
+    await setStoredBackendUrl(url);
+    refreshBackendUrl();
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const url = backendUrl.trim().replace(/\/$/, '');
+      const res = await fetch(`${url}/health`, { method: 'GET' });
+      setTestResult(res.ok ? 'ok' : 'fail');
+    } catch {
+      setTestResult('fail');
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 py-2">
+        <Wifi className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <p className="text-xs text-muted-foreground">
+          Enter your DevBot server&apos;s URL so the mobile app can connect.
+        </p>
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="url"
+          value={backendUrl}
+          onChange={(e) => setBackendUrl(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+          placeholder="https://192.168.1.100:3100"
+          className="flex-1 rounded-md border border-border bg-background px-3 py-2 font-mono text-sm text-foreground placeholder:text-muted-foreground"
+        />
+        <Button size="sm" onClick={handleTest} disabled={testing || !backendUrl.trim()}>
+          Test
+        </Button>
+        <Button size="sm" onClick={handleSave} disabled={!backendUrl.trim()} className="gap-1">
+          {saved ? <Check className="h-3.5 w-3.5" /> : null}
+          {saved ? 'Saved' : 'Save'}
+        </Button>
+      </div>
+      {testResult && (
+        <p className={`text-xs ${testResult === 'ok' ? 'text-green-500' : 'text-destructive'}`}>
+          {testResult === 'ok' ? '✓ Connection successful' : '✗ Could not connect — check the URL and ensure DevBot is running'}
+        </p>
+      )}
+      <p className="text-xs text-muted-foreground">
+        Current: <code className="rounded bg-muted px-1">{BACKEND_URL}</code>
+      </p>
+    </div>
+  );
+}
+
+/** Push token management — shows registered devices and test button. */
+function PushTokenManager() {
+  const [tokens, setTokens] = useState<Array<{
+    id: string;
+    platform: string;
+    deviceName: string;
+    createdAt: string;
+    lastUsedAt: string | null;
+    tokenPreview: string;
+  }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+
+  const loadTokens = useCallback(async () => {
+    try {
+      const list = await pushApi.listTokens();
+      setTokens(list as typeof tokens);
+    } catch {
+      // Push API may not be available
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadTokens(); }, [loadTokens]);
+
+  const handleTestPush = async () => {
+    setSending(true);
+    try {
+      await pushApi.testPush('DevBot Test', 'Push notifications are working! 🎉');
+    } catch {
+      // Silently fail
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="py-3 text-sm text-muted-foreground">Loading devices…</div>;
+  }
+
+  return (
+    <div className="space-y-3">
+      {tokens.length === 0 ? (
+        <p className="py-2 text-xs text-muted-foreground">
+          No devices registered. Open DevBot on your phone to register for push notifications.
+        </p>
+      ) : (
+        <div className="divide-y divide-border rounded-lg border border-border">
+          {tokens.map((t) => (
+            <div key={t.id} className="flex items-center gap-3 px-3 py-2.5">
+              <Smartphone className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{t.deviceName}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t.platform} · <span className="font-mono">{t.tokenPreview}</span>
+                  {t.lastUsedAt && (
+                    <> · Last push {new Date(t.lastUsedAt).toLocaleDateString()}</>
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleTestPush}
+        disabled={sending || tokens.length === 0}
+        className="gap-1.5"
+      >
+        <Send className="h-3.5 w-3.5" />
+        {sending ? 'Sending…' : 'Send Test Push'}
+      </Button>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const [serverDefaultDir, setServerDefaultDir] = useState('');
   const { settings, updateSettings, toggleSound, toggleHaptic, toggleAutoScroll } = useSettings();
@@ -521,6 +688,33 @@ export function SettingsPage() {
               <ApiTokenManager />
             </>
           )}
+
+          {/* Mobile section — always visible since push tokens can be managed from web too */}
+          {isNative && (
+            <>
+              <SectionHeader title="Mobile Connection" />
+              <MobileBackendConfig />
+            </>
+          )}
+
+          <SectionHeader title="Push Notifications" />
+          <div className="divide-y divide-border">
+            <div className="flex items-center gap-2 py-2">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground">
+                {isNative
+                  ? 'This device will receive push notifications for task completions, failures, and new messages.'
+                  : 'Install the DevBot mobile app to receive push notifications on your phone.'}
+              </p>
+            </div>
+          </div>
+          <PushTokenManager />
+
+          <div className="py-3 text-center">
+            <p className="text-xs text-muted-foreground">
+              DevBot v1.0 · {isNative ? `${platform} app` : 'Web'} · {new Date().getFullYear()}
+            </p>
+          </div>
         </div>
       </main>
     </div>

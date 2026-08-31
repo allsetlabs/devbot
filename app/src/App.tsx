@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Toaster } from '@allsetlabs/forge/components/ui/sonner';
 import { InitializeForgeChunks } from '@allsetlabs/forge/initializeForgeChunks';
 import { useAuth } from './contexts/AuthContext';
@@ -17,6 +18,8 @@ import { ProviderSessionView } from './pages/ProviderSessionView';
 import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
 import { RouteErrorBoundary } from './components/RouteErrorBoundary';
+import { usePushNotifications } from './hooks/usePushNotifications';
+import { isNative, setupBackButton, onAppStateChange } from './lib/capacitor';
 
 /** Gate that renders children only when authenticated, otherwise shows login. */
 function AuthGate({ children }: { children: ReactNode }) {
@@ -35,10 +38,41 @@ function AuthGate({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/** Native Capacitor lifecycle: back button handler + app state refetch. */
+function NativeLifecycle() {
+  const navigate = useNavigate();
+
+  // Register push notifications (sends device token to backend)
+  usePushNotifications();
+
+  useEffect(() => {
+    if (!isNative) return;
+
+    const cleanups: Array<() => void> = [];
+
+    // Android back button: navigate browser history, or go to chats
+    setupBackButton(() => navigate('/chats')).then((c) => cleanups.push(c));
+
+    // Refetch queries when app comes to foreground
+    onAppStateChange((active) => {
+      if (active) {
+        // React Query will auto-refetch on window focus, but Capacitor
+        // doesn't always fire the focus event — trigger it manually
+        window.dispatchEvent(new Event('focus'));
+      }
+    }).then((c) => cleanups.push(c));
+
+    return () => cleanups.forEach((c) => c());
+  }, [navigate]);
+
+  return null;
+}
+
 function App() {
   return (
     <InitializeForgeChunks applyToBody defaultMuted>
       <AuthGate>
+      <NativeLifecycle />
       <div className="overflow-hidden bg-background">
         <TextSelectionProvider>
           <AppLayout>

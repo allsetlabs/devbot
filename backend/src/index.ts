@@ -32,6 +32,7 @@ import { sttRouter } from './routes/stt.js';
 import { unifiedChatRouter } from './routes/unified-chat.js';
 import { eventSourcesRouter } from './routes/event-sources.js';
 import { fileStoresRouter } from './routes/file-stores.js';
+import { pushRouter } from './routes/push.js';
 import { bookmarksRouter } from './lib/stores/bookmarks.js';
 import { notesRouter } from './lib/stores/notes.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
@@ -215,6 +216,7 @@ app.use('/api/stt', sttRouter);
 app.use('/api/unified-chat', unifiedChatRouter);
 app.use('/api/event-sources', eventSourcesRouter);
 app.use('/api/file-stores', fileStoresRouter);
+app.use('/api/push', pushRouter);
 app.use('/api/file-stores/bookmarks/data', bookmarksRouter);
 app.use('/api/file-stores/notes/data', notesRouter);
 

@@ -544,3 +544,31 @@ export interface AuthTokenCreateResponse {
   name: string;
   createdAt: string;
 }
+
+// Cloudflare Tunnel types
+export type TunnelMode = 'quick' | 'named';
+export type TunnelStatus = 'stopped' | 'starting' | 'running' | 'error';
+
+export interface TunnelState {
+  status: TunnelStatus;
+  mode: TunnelMode | null;
+  publicUrl: string | null;
+  hostname: string | null;
+  connectedAt: string | null;
+  error: string | null;
+  pid: number | null;
+  installed: boolean;
+  version: string | null;
+  metrics: {
+    connections: number;
+    uptimeSeconds: number;
+  };
+}
+
+export interface TunnelStartRequest {
+  mode?: TunnelMode;
+  token?: string;
+  hostname?: string;
+  localPort?: number;
+  localProtocol?: 'http' | 'https';
+}

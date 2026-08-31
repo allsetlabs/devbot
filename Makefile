@@ -12,7 +12,7 @@ APP_PORT := 4005
 BACKEND_PORT := 3100
 DEVBOT_PROJECTS := $(CURDIR)/../../../
 
-.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp mobile-setup mobile-build mobile-sync mobile-open mobile-run mobile-live desktop-dev desktop-build desktop-package
+.PHONY: help setup install start stop setup-brew setup-git setup-nvm setup-node setup-tmux setup-claude setup-mcp setup-ollama setup-whisper-cpp setup-cloudflared mobile-setup mobile-build mobile-sync mobile-open mobile-run mobile-live desktop-dev desktop-build desktop-package tunnel-start tunnel-stop tunnel-status
 
 help:
 	@echo "$(BLUE)DevBot Commands:$(NC)"
@@ -33,6 +33,12 @@ help:
 	@echo "  make desktop-dev     - Run Electron desktop app in dev mode (uses Vite dev server)"
 	@echo "  make desktop-build   - Build Electron main process TypeScript"
 	@echo "  make desktop-package - Package as macOS .dmg for distribution"
+	@echo ""
+	@echo "$(BLUE)Tunnel Commands:$(NC)"
+	@echo "  make setup-cloudflared - Install cloudflared CLI"
+	@echo "  make tunnel-start      - Start a quick Cloudflare Tunnel (random URL)"
+	@echo "  make tunnel-stop       - Stop the running tunnel"
+	@echo "  make tunnel-status     - Show tunnel status"
 
 setup:
 	@echo "$(BLUE)Starting DevBot system setup...$(NC)"
@@ -45,6 +51,7 @@ setup:
 	@$(MAKE) setup-mcp
 	@$(MAKE) setup-ollama
 	@$(MAKE) setup-whisper-cpp
+	@$(MAKE) setup-cloudflared
 	@echo ""
 	@echo "$(GREEN)✅ DevBot setup complete! Next: make install$(NC)"
 
@@ -175,6 +182,21 @@ setup-whisper-cpp:
 		echo "$(GREEN)whisper.cpp installed!$(NC)"; \
 	else \
 		echo "$(RED)Automatic whisper.cpp setup currently requires macOS/Homebrew.$(NC)"; \
+		exit 1; \
+	fi
+
+setup-cloudflared:
+	@echo "$(BLUE)Installing cloudflared...$(NC)"
+	@if command -v cloudflared &> /dev/null; then \
+		echo "$(GREEN)cloudflared already installed: $$(cloudflared --version 2>&1 | head -1)$(NC)"; \
+	elif [ "$$(uname)" = "Darwin" ]; then \
+		brew install cloudflared; \
+		echo "$(GREEN)cloudflared installed!$(NC)"; \
+	elif [ "$$(uname)" = "Linux" ]; then \
+		curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared && chmod +x /usr/local/bin/cloudflared; \
+		echo "$(GREEN)cloudflared installed!$(NC)"; \
+	else \
+		echo "$(RED)Please install cloudflared manually from https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/$(NC)"; \
 		exit 1; \
 	fi
 
@@ -317,3 +339,30 @@ desktop-package:
 	@echo "$(GREEN)✅ Desktop app packaged!$(NC)"
 	@echo "  📁 Output: app/release/"
 	@echo "  📦 Look for DevBot.dmg in the release directory"
+
+# ── Cloudflare Tunnel ─────────────────────────────────────────────────
+
+tunnel-start:
+	@echo "$(BLUE)🌐 Starting Cloudflare quick tunnel...$(NC)"
+	@if ! command -v cloudflared &> /dev/null; then \
+		echo "$(RED)cloudflared not installed. Run 'make setup-cloudflared' first.$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)Tunneling https://localhost:$(BACKEND_PORT) to the internet...$(NC)"
+	@cloudflared tunnel --no-autoupdate --url https://localhost:$(BACKEND_PORT)
+
+tunnel-stop:
+	@echo "$(YELLOW)Stopping cloudflared processes...$(NC)"
+	@pkill -f 'cloudflared tunnel' 2>/dev/null && echo "$(GREEN)✅ Tunnel stopped$(NC)" || echo "$(YELLOW)No tunnel running$(NC)"
+
+tunnel-status:
+	@if pgrep -f 'cloudflared tunnel' > /dev/null 2>&1; then \
+		echo "$(GREEN)✅ Cloudflare Tunnel is running (PID: $$(pgrep -f 'cloudflared tunnel' | head -1))$(NC)"; \
+	else \
+		echo "$(YELLOW)⚠️  No tunnel running$(NC)"; \
+	fi
+	@if command -v cloudflared &> /dev/null; then \
+		echo "$(BLUE)Version: $$(cloudflared --version 2>&1 | head -1)$(NC)"; \
+	else \
+		echo "$(RED)cloudflared not installed$(NC)"; \
+	fi

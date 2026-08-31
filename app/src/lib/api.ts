@@ -1100,3 +1100,50 @@ export const pushApi = {
       body: JSON.stringify({ title, body }),
     }),
 };
+
+// ── Cloudflare Tunnel API ───────────────────────────────────────────────
+
+export interface TunnelStatusResponse {
+  status: 'stopped' | 'starting' | 'running' | 'error';
+  mode: 'quick' | 'named' | null;
+  publicUrl: string | null;
+  hostname: string | null;
+  connectedAt: string | null;
+  error: string | null;
+  pid: number | null;
+  installed: boolean;
+  version: string | null;
+  metrics: {
+    connections: number;
+    uptimeSeconds: number;
+  };
+}
+
+export interface TunnelStartRequest {
+  mode?: 'quick' | 'named';
+  token?: string;
+  hostname?: string;
+  localPort?: number;
+  localProtocol?: 'http' | 'https';
+}
+
+export const tunnelApi = {
+  /** Get current tunnel status, install info, and metrics. */
+  getStatus: (): Promise<TunnelStatusResponse> =>
+    fetchApi('/api/tunnel/status'),
+
+  /** Get recent cloudflared log lines. */
+  getLogs: (limit = 100): Promise<{ logs: string[]; count: number }> =>
+    fetchApi(`/api/tunnel/logs?limit=${limit}`),
+
+  /** Start the cloudflared tunnel. */
+  start: (config?: TunnelStartRequest): Promise<TunnelStatusResponse & { success: boolean }> =>
+    fetchApi('/api/tunnel/start', {
+      method: 'POST',
+      body: JSON.stringify(config ?? { mode: 'quick' }),
+    }),
+
+  /** Stop the cloudflared tunnel. */
+  stop: (): Promise<{ success: boolean; status: string }> =>
+    fetchApi('/api/tunnel/stop', { method: 'POST' }),
+};

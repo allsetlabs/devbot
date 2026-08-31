@@ -33,6 +33,7 @@ import { unifiedChatRouter } from './routes/unified-chat.js';
 import { eventSourcesRouter } from './routes/event-sources.js';
 import { fileStoresRouter } from './routes/file-stores.js';
 import { pushRouter } from './routes/push.js';
+import { tunnelRouter, getTunnelDoctorCheck } from './routes/tunnel.js';
 import { bookmarksRouter } from './lib/stores/bookmarks.js';
 import { notesRouter } from './lib/stores/notes.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
@@ -44,6 +45,7 @@ import { spawnClaudeStructured, getActiveSessionCount } from './lib/claude-spawn
 import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
 import { startEventWorker } from './lib/event-worker.js';
+import { tunnel } from './lib/tunnel.js';
 
 import {
   recoverSessions,
@@ -88,6 +90,10 @@ app.get('/health', (_req, res) => {
     runningScheduledTasks: getRunningTasks().length,
     activeSessions: getActiveSessionCount(),
     defaultWorkingDirectory: DEVBOT_PROJECTS_DIR,
+    tunnel: {
+      status: tunnel.getState().status,
+      publicUrl: tunnel.getState().publicUrl,
+    },
   });
 });
 
@@ -172,6 +178,9 @@ app.get('/api/doctor', (_req, res) => {
     checks.diskSpace = { status: 'warn', label: 'Disk Space', value: 'Unknown' };
   }
 
+  // Cloudflare Tunnel
+  checks.tunnel = getTunnelDoctorCheck();
+
   // Memory usage
   const mem = process.memoryUsage();
   const rss = (mem.rss / 1024 / 1024).toFixed(0);
@@ -217,8 +226,10 @@ app.use('/api/unified-chat', unifiedChatRouter);
 app.use('/api/event-sources', eventSourcesRouter);
 app.use('/api/file-stores', fileStoresRouter);
 app.use('/api/push', pushRouter);
+app.use('/api/tunnel', tunnelRouter);
 app.use('/api/file-stores/bookmarks/data', bookmarksRouter);
 app.use('/api/file-stores/notes/data', notesRouter);
+app.use('/api/push', pushRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
@@ -366,6 +377,9 @@ const shutdown = () => {
     process.exit(1);
   }, 3000);
   forceExit.unref();
+
+  // Stop the cloudflared tunnel if running
+  tunnel.stop().catch(() => {});
 
   server.close(() => {
     clearTimeout(forceExit);

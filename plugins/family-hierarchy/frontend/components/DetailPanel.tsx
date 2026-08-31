@@ -1,4 +1,4 @@
-import { Pencil, ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Badge } from '@allsetlabs/forge/components/ui/badge';
 import { ScrollArea } from '@allsetlabs/forge/components/ui/scroll-area';
@@ -10,22 +10,12 @@ import { pathToRoot } from '../lib/tree';
 interface Props {
   people: Record<string, Person>;
   selected: Person;
-  editMode: boolean;
   onClose: () => void;
   onSelectPerson: (id: string) => void;
   onHoverPerson: (id: string | null) => void;
-  onEditSelected: () => void;
 }
 
-export function DetailPanel({
-  people,
-  selected,
-  editMode,
-  onClose,
-  onSelectPerson,
-  onHoverPerson,
-  onEditSelected,
-}: Props) {
+export function DetailPanel({ people, selected, onClose, onSelectPerson, onHoverPerson }: Props) {
   const lineage = pathToRoot(people, selected.id)
     .slice(1)
     .reverse()
@@ -52,11 +42,6 @@ export function DetailPanel({
           <div className="flex flex-wrap gap-1.5">
             {selected.marker === 'A' && <Badge variant="primary">A — வாலிபர் (adult)</Badge>}
             {selected.marker === 'M' && <Badge variant="secondary">M — சிறுவர் (minor)</Badge>}
-            {selected.sourcePages?.length > 0 && (
-              <Badge variant="outline">
-                {selected.sourcePages.length === 1 ? 'book page' : 'book pages'} {selected.sourcePages.join(', ')}
-              </Badge>
-            )}
           </div>
 
           {selected.uncertain && (
@@ -64,9 +49,6 @@ export function DetailPanel({
               <div className="text-xs font-medium text-destructive">Uncertain name reading</div>
               {selected.uncertainReason && (
                 <div className="mt-0.5 text-xs text-muted-foreground">{selected.uncertainReason}</div>
-              )}
-              {editMode && (
-                <div className="mt-1 text-[11px] text-muted-foreground">Use Edit to correct it or mark it as correct.</div>
               )}
             </div>
           )}
@@ -121,12 +103,6 @@ export function DetailPanel({
               ))}
             </div>
           </div>
-
-          {editMode && (
-            <Button variant="outline" size="sm" className="w-full" onClick={onEditSelected}>
-              <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit this person
-            </Button>
-          )}
         </div>
       </ScrollArea>
     </div>

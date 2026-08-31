@@ -13,6 +13,7 @@ import type { InteractiveChat } from '../types';
 type ChatRow = { type: 'header'; label: string } | { type: 'chat'; chat: InteractiveChat };
 
 const GROUP_ORDER = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'] as const;
+const GROUP_ORDER_ASC = [...GROUP_ORDER].reverse() as unknown as typeof GROUP_ORDER;
 
 function getChatDateGroup(iso: string): string {
   const d = new Date(iso);
@@ -29,7 +30,12 @@ function getChatDateGroup(iso: string): string {
   return 'Older';
 }
 
-function buildGroupedRows(chats: InteractiveChat[]): ChatRow[] {
+/** groupMode: 'date' = newest-group-first (default), 'date-asc' = oldest-group-first, 'none' = flat */
+function buildGroupedRows(chats: InteractiveChat[], groupMode: 'date' | 'date-asc' | 'none'): ChatRow[] {
+  if (groupMode === 'none') {
+    return chats.map((chat) => ({ type: 'chat', chat }));
+  }
+
   const grouped = new Map<string, InteractiveChat[]>();
   for (const chat of chats) {
     const group = getChatDateGroup(chat.updatedAt);
@@ -37,8 +43,9 @@ function buildGroupedRows(chats: InteractiveChat[]): ChatRow[] {
     grouped.get(group)!.push(chat);
   }
 
+  const order = groupMode === 'date-asc' ? GROUP_ORDER_ASC : GROUP_ORDER;
   const rows: ChatRow[] = [];
-  for (const label of GROUP_ORDER) {
+  for (const label of order) {
     const group = grouped.get(label);
     if (!group) continue;
     rows.push({ type: 'header', label });
@@ -60,12 +67,14 @@ interface ChatListContentProps {
   onSelect: (chat: InteractiveChat) => void;
   onToggleFavorite: (id: string) => void;
   onDuplicate: (id: string) => void;
-  onArchive: (id: string) => void;
+  onArchive?: (id: string) => void;
   onDelete: (id: string) => void;
   onDeleteArchived: (id: string) => void;
   onUnarchive: (id: string) => void;
   onCreate: () => void;
   onClearFilters: () => void;
+  /** Controls date-header grouping. Defaults to 'date' (newest group first). */
+  groupMode?: 'date' | 'date-asc' | 'none';
 }
 
 export function ChatListContent({
@@ -84,11 +93,12 @@ export function ChatListContent({
   onDelete,
   onCreate,
   onClearFilters,
+  groupMode = 'date',
 }: ChatListContentProps) {
   const parentRef = useRef<HTMLDivElement>(null);
   const [animateRearrange, setAnimateRearrange] = useState(false);
 
-  const rows = useMemo(() => buildGroupedRows(filteredChats), [filteredChats]);
+  const rows = useMemo(() => buildGroupedRows(filteredChats, groupMode), [filteredChats, groupMode]);
 
   useEffect(() => {
     if (parentRef.current) {
@@ -255,7 +265,7 @@ export function ChatListContent({
                     e.stopPropagation();
                     onDuplicate(chat.id);
                   }}
-                  onArchive={(e?) => {
+                  onArchive={onArchive ? (e?) => {
                     e?.stopPropagation();
                     setAnimateRearrange(true);
                     requestAnimationFrame(() => {
@@ -264,7 +274,7 @@ export function ChatListContent({
                         setTimeout(() => setAnimateRearrange(false), 280);
                       });
                     });
-                  }}
+                  } : undefined}
                   onDelete={(e) => {
                     e.stopPropagation();
                     onDelete(chat.id);

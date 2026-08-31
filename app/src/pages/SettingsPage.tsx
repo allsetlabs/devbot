@@ -1,14 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { useSettings } from '../hooks/useSettings';
-import { api } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
+import { api, authApi } from '../lib/api';
 import {
   requestBrowserNotificationPermission,
   getBrowserNotificationPermission,
   previewNotificationSound,
 } from '../lib/notification';
 import type { DevBotSettings } from '../hooks/useSettings';
+import type { AuthTokenInfo } from '../types';
 import { SttModelSettings } from '../components/SttModelSettings';
+import { LogOut, User, Key, Plus, Trash2, Copy, Check, Eye, EyeOff } from 'lucide-react';
 
 const MODEL_OPTIONS = [
   { value: 'claude-opus-4-7', label: 'Claude Opus 4.7' },
@@ -112,9 +115,173 @@ function SectionHeader({ title }: { title: string }) {
   );
 }
 
+/** API Token Management — create, list, and revoke tokens for mobile/programmatic access. */
+function ApiTokenManager() {
+  const [tokens, setTokens] = useState<AuthTokenInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [newTokenName, setNewTokenName] = useState('');
+  const [newlyCreatedToken, setNewlyCreatedToken] = useState<string | null>(null);
+  const [showToken, setShowToken] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const loadTokens = useCallback(async () => {
+    try {
+      const list = await authApi.listTokens();
+      setTokens(list);
+    } catch {
+      // Auth tokens endpoint may not be available in dev mode
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadTokens(); }, [loadTokens]);
+
+  const handleCreate = async () => {
+    if (!newTokenName.trim()) return;
+    setCreating(true);
+    try {
+      const result = await authApi.createToken(newTokenName.trim());
+      setNewlyCreatedToken(result.token);
+      setShowToken(false);
+      setCopied(false);
+      setNewTokenName('');
+      await loadTokens();
+    } catch {
+      // Silently fail
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await authApi.deleteToken(id);
+      setTokens((prev) => prev.filter((t) => t.id !== id));
+    } catch {
+      // Silently fail
+    }
+  };
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard not available
+    }
+  };
+
+  if (loading) {
+    return <div className="py-3 text-sm text-muted-foreground">Loading tokens…</div>;
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* Newly created token banner */}
+      {newlyCreatedToken && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+          <p className="text-xs font-medium text-primary">
+            Token created — copy it now. It won't be shown again.
+          </p>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 break-all rounded bg-muted px-2 py-1.5 font-mono text-xs text-foreground">
+              {showToken ? newlyCreatedToken : '•'.repeat(48)}
+            </code>
+            <button
+              type="button"
+              onClick={() => setShowToken(!showToken)}
+              className="rounded p-1.5 text-muted-foreground md:hover:text-foreground"
+              title={showToken ? 'Hide token' : 'Show token'}
+            >
+              {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCopy(newlyCreatedToken)}
+              className="rounded p-1.5 text-muted-foreground md:hover:text-foreground"
+              title="Copy token"
+            >
+              {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+            </button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs"
+            onClick={() => setNewlyCreatedToken(null)}
+          >
+            Dismiss
+          </Button>
+        </div>
+      )}
+
+      {/* Create new token */}
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={newTokenName}
+          onChange={(e) => setNewTokenName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+          placeholder="Token name (e.g. iPhone, Scheduler)"
+          className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+        />
+        <Button
+          size="sm"
+          disabled={creating || !newTokenName.trim()}
+          onClick={handleCreate}
+          className="gap-1"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Create
+        </Button>
+      </div>
+
+      {/* Token list */}
+      {tokens.length === 0 ? (
+        <p className="py-2 text-xs text-muted-foreground">
+          No API tokens. Create one for mobile or programmatic access.
+        </p>
+      ) : (
+        <div className="divide-y divide-border rounded-lg border border-border">
+          {tokens.map((t) => (
+            <div key={t.id} className="flex items-center gap-3 px-3 py-2.5">
+              <Key className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{t.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-mono">{t.tokenPreview}</span>
+                  {t.lastUsedAt && (
+                    <> · Last used {new Date(t.lastUsedAt).toLocaleDateString()}</>
+                  )}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDelete(t.id)}
+                className="rounded p-1.5 text-muted-foreground md:hover:text-destructive"
+                title="Revoke token"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <p className="text-xs text-muted-foreground">
+        Use API tokens with the <code className="rounded bg-muted px-1">Authorization: Bearer &lt;token&gt;</code> header for mobile or programmatic access.
+      </p>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const [serverDefaultDir, setServerDefaultDir] = useState('');
   const { settings, updateSettings, toggleSound, toggleHaptic, toggleAutoScroll } = useSettings();
+  const { user, logout, oauthConfigured } = useAuth();
 
   useEffect(() => {
     api
@@ -307,6 +474,53 @@ export function SettingsPage() {
             />
             <p className="mt-1 text-xs text-muted-foreground">Default path for new chat sessions</p>
           </div>
+
+          <SectionHeader title="Account" />
+          <div className="divide-y divide-border">
+            {user && (
+              <div className="flex items-center gap-3 py-3">
+                {user.picture ? (
+                  <img
+                    src={user.picture}
+                    alt=""
+                    className="h-9 w-9 rounded-full"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-medium text-foreground">
+                    {user.name}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+            )}
+            {oauthConfigured && (
+              <div className="py-3">
+                <Button
+                  variant="outline"
+                  className="w-full gap-2 text-destructive"
+                  onClick={logout}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {oauthConfigured && (
+            <>
+              <SectionHeader title="API Tokens" />
+              <ApiTokenManager />
+            </>
+          )}
         </div>
       </main>
     </div>

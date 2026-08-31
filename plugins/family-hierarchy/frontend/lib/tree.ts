@@ -45,6 +45,45 @@ export function computeVisible(people: People, rootId: string, expanded: Set<str
   return out;
 }
 
+export interface XY {
+  x: number;
+  y: number;
+}
+
+/**
+ * A simple post-order "tidy" layout used to seed the flow editor's node positions: leaves are laid
+ * out left→right, each parent is centered over its children, generations stack down the y axis.
+ * The editor lets the user drag freely from here, so this only needs to be a sensible starting frame.
+ */
+export function computeFlowPositions(
+  people: People,
+  opts: { nodeW: number; nodeH: number; hGap: number; vGap: number }
+): Map<string, XY> {
+  const { nodeW, nodeH, hGap, vGap } = opts;
+  const pos = new Map<string, XY>();
+  const seen = new Set<string>();
+  let cursor = 0;
+  const place = (id: string, depth: number): number => {
+    if (seen.has(id)) return pos.get(id)?.x ?? 0;
+    seen.add(id);
+    const kids = people[id]?.children ?? [];
+    let x: number;
+    if (kids.length === 0) {
+      x = cursor * (nodeW + hGap);
+      cursor += 1;
+    } else {
+      const xs = kids.map((k) => place(k, depth + 1));
+      x = (xs[0] + xs[xs.length - 1]) / 2;
+    }
+    pos.set(id, { x, y: depth * (nodeH + vGap) });
+    return x;
+  };
+  for (const p of Object.values(people)) {
+    if (!p.parent || !people[p.parent]) place(p.id, 0); // every root of the forest
+  }
+  return pos;
+}
+
 /** Default view: expand the branch that book `page` documents (its lineage to the root). */
 export function initialExpanded(people: People, rootId: string, page = 2): Set<string> {
   const exp = new Set<string>([rootId]);
@@ -81,15 +120,6 @@ export function collapseAll(rootId: string): Set<string> {
   return new Set([rootId]);
 }
 
-/** Expand one more layer: expand every currently-visible node that still has hidden children. */
-export function expandNextLayer(people: People, rootId: string, expanded: Set<string>): Set<string> {
-  const next = new Set(expanded);
-  for (const { id } of computeVisible(people, rootId, expanded)) {
-    if (people[id].children.length && !next.has(id)) next.add(id);
-  }
-  return next;
-}
-
 export function newId(people: People): string {
   let i = 1;
   while (people[`c${i}`]) i += 1;
@@ -110,6 +140,45 @@ export function generations(people: People, rootId: string): number {
 
 export function updatePerson(people: People, id: string, patch: Partial<Person>): People {
   return { ...people, [id]: { ...people[id], ...patch } };
+}
+
+/** Would making `childId` a child of `parentId` create a cycle (or be a self-link)? */
+export function wouldCreateCycle(people: People, parentId: string, childId: string): boolean {
+  if (parentId === childId) return true;
+  // a cycle forms iff the intended parent already lives inside the child's subtree
+  return descendantIds(people, childId).has(parentId);
+}
+
+/**
+ * Can we connect `parentId → childId` (childId becomes a child of parentId)?
+ * Disallows self-links, re-parenting the root, no-op reconnections, and any cycle
+ * (e.g. connecting a node back onto one of its own ancestors).
+ */
+export function canConnect(people: People, rootId: string, parentId: string, childId: string): boolean {
+  if (!people[parentId] || !people[childId]) return false;
+  if (childId === rootId) return false; // the root always stays the root
+  if (people[childId].parent === parentId) return false; // already connected
+  return !wouldCreateCycle(people, parentId, childId);
+}
+
+/**
+ * Re-parent `childId` under `newParentId` (pass `null` to detach it into its own root).
+ * Keeps both the old and new parent's `children` arrays consistent. Caller guards cycles
+ * via `canConnect`.
+ */
+export function reparent(people: People, childId: string, newParentId: string | null): People {
+  const child = people[childId];
+  if (!child) return people;
+  const next: People = { ...people };
+  const oldParent = child.parent;
+  if (oldParent && next[oldParent]) {
+    next[oldParent] = { ...next[oldParent], children: next[oldParent].children.filter((c) => c !== childId) };
+  }
+  if (newParentId && next[newParentId] && !next[newParentId].children.includes(childId)) {
+    next[newParentId] = { ...next[newParentId], children: [...next[newParentId].children, childId] };
+  }
+  next[childId] = { ...next[childId], parent: newParentId };
+  return next;
 }
 
 export function addChild(
@@ -138,6 +207,26 @@ export function addChild(
     [parentId]: { ...people[parentId], children: [...people[parentId].children, id] },
   };
   return { people: next, id };
+}
+
+/** Create a new, unconnected (root) node — the flow editor drops one in, then you drag to connect. */
+export function addNode(people: People): { people: People; id: string } {
+  const id = newId(people);
+  const person: Person = {
+    id,
+    name: '',
+    translit: '',
+    note: '',
+    marker: '',
+    uncertain: false,
+    uncertainReason: '',
+    parentUncertain: false,
+    parent: null,
+    children: [],
+    sourcePages: [],
+    sourceIds: [],
+  };
+  return { people: { ...people, [id]: person }, id };
 }
 
 /** Remove a node and its whole subtree; detach from its parent. */

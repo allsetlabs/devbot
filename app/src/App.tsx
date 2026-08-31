@@ -1,6 +1,9 @@
+import type { ReactNode } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@allsetlabs/forge/components/ui/sonner';
 import { InitializeForgeChunks } from '@allsetlabs/forge/initializeForgeChunks';
+import { useAuth } from './contexts/AuthContext';
+import { LoginPage } from './pages/LoginPage';
 import { routeList } from './routes';
 import { pluginRoutes } from './pluginRoutes';
 import { ChatList } from './pages/ChatList';
@@ -15,9 +18,27 @@ import { TextSelectionProvider } from './components/TextSelectionProvider';
 import { AppLayout } from './components/AppLayout';
 import { RouteErrorBoundary } from './components/RouteErrorBoundary';
 
+/** Gate that renders children only when authenticated, otherwise shows login. */
+function AuthGate({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex h-dvh items-center justify-center bg-background">
+        <div className="animate-pulse text-muted-foreground">Loading…</div>
+      </div>
+    );
+  }
+
+  if (!user) return <LoginPage />;
+
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <InitializeForgeChunks applyToBody defaultMuted>
+      <AuthGate>
       <div className="overflow-hidden bg-background">
         <TextSelectionProvider>
           <AppLayout>
@@ -78,6 +99,7 @@ function App() {
           </AppLayout>
         </TextSelectionProvider>
       </div>
+      </AuthGate>
       <Toaster position="bottom-center" />
     </InitializeForgeChunks>
   );

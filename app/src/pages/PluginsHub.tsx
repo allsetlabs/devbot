@@ -19,7 +19,7 @@ const PLUGINS: PluginCard[] = [
   {
     title: 'Family Hierarchy',
     description:
-      'Interactive family tree from a 1978 Tamil genealogy book — explore, edit, and verify 411 people across 10 generations.',
+      'Interactive family tree — explore, edit, and verify 411 people across 10 generations.',
     path: '/plugins/family-hierarchy',
     icon: <Network className="h-6 w-6" />,
   },

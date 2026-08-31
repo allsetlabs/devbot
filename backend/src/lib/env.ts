@@ -28,6 +28,14 @@ export const BACKEND_PORT = requiredInt('BACKEND_PORT');
 export const BACKEND_HOST = required('BACKEND_HOST');
 export const API_KEY: string | undefined = process.env.API_KEY;
 
+// Google OAuth (optional — if not set, falls back to API key auth)
+export const GOOGLE_CLIENT_ID: string | undefined = process.env.GOOGLE_CLIENT_ID;
+export const GOOGLE_CLIENT_SECRET: string | undefined = process.env.GOOGLE_CLIENT_SECRET;
+export const ALLOWED_EMAIL: string =
+  process.env.ALLOWED_EMAIL || 'subbiah2806@gmail.com';
+export const SESSION_SECRET: string =
+  process.env.SESSION_SECRET || API_KEY || 'devbot-dev-secret';
+
 // Database paths
 export const DB_CORE_PATH = required('DB_CORE_PATH');
 export const DB_BABY_LOGS_PATH = required('DB_BABY_LOGS_PATH');

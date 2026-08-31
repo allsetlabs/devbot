@@ -434,6 +434,41 @@ export async function initializeCoreDatabase() {
     `
     );
 
+    // Create auth_sessions table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS auth_sessions (
+        token TEXT PRIMARY KEY,
+        email TEXT NOT NULL,
+        name TEXT NOT NULL DEFAULT '',
+        picture TEXT NOT NULL DEFAULT '',
+        expires_at TEXT,
+        created_by TEXT NOT NULL DEFAULT 'oauth',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'oauth',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
+    // Create auth_tokens table
+    await runSQL(
+      `
+      CREATE TABLE IF NOT EXISTS auth_tokens (
+        token TEXT PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT 'API Token',
+        email TEXT NOT NULL,
+        last_used_at TEXT,
+        created_by TEXT NOT NULL DEFAULT 'user',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by TEXT NOT NULL DEFAULT 'user',
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        settings TEXT DEFAULT '{}'
+      )
+    `
+    );
+
     // Migrate: add new scheduler columns if missing
     const schedulerCols = (
       coreDb.all(sql.raw(`PRAGMA table_info(scheduled_tasks)`)) as Array<{ name: string }>

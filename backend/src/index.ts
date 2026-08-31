@@ -5,8 +5,11 @@ import http from 'http';
 import https from 'https';
 import { execSync } from 'child_process';
 import fs from 'fs';
+import cookieParser from 'cookie-parser';
 import { loadDevCert } from './lib/https-cert.js';
 import { initializeCoreDatabase } from './lib/db/init-core.js';
+import { authRouter } from './routes/auth.js';
+import { requireAuth } from './lib/auth/middleware.js';
 import { sessionsRouter } from './routes/sessions.js';
 import { uploadRouter } from './routes/upload.js';
 import { schedulersRouter } from './routes/schedulers.js';
@@ -53,26 +56,26 @@ delete process.env.CLAUDECODE;
 
 const app = express();
 
-import { BACKEND_PORT, BACKEND_HOST, API_KEY, DEVBOT_PROJECTS_DIR } from './lib/env.js';
+import { BACKEND_PORT, BACKEND_HOST, API_KEY, DEVBOT_PROJECTS_DIR, GOOGLE_CLIENT_ID } from './lib/env.js';
 
 const PORT = BACKEND_PORT;
 const HOST = BACKEND_HOST;
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: '16mb' }));
+app.use(cookieParser());
 
-// API Key authentication middleware
-app.use('/api', (req, res, next) => {
-  const providedKey = req.headers['x-api-key'] || req.query.key;
+// Auth routes (no auth required — handles login, callback, status)
+app.use('/auth', authRouter);
 
-  if (API_KEY && providedKey !== API_KEY) {
-    res.status(401).json({ error: 'Unauthorized', message: 'Invalid API key' });
-    return;
-  }
-
-  next();
-});
+// Authentication middleware for all /api routes
+app.use('/api', requireAuth);
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -312,8 +315,12 @@ const scheme = devCert ? 'https' : 'http';
 const server = httpServer.listen(PORT, HOST, async () => {
   console.log(`DevBot backend running at ${scheme}://${HOST}:${PORT}`);
   console.log(`Health check: ${scheme}://${HOST}:${PORT}/health`);
-  if (!API_KEY) {
-    console.warn('Warning: No API_KEY set. API authentication is disabled.');
+  if (GOOGLE_CLIENT_ID) {
+    console.log('Auth: Google OAuth enabled');
+  } else if (API_KEY) {
+    console.log('Auth: API key mode (set GOOGLE_CLIENT_ID to enable OAuth)');
+  } else {
+    console.warn('Warning: No auth configured. API authentication is disabled.');
   }
 
   // Initialize databases

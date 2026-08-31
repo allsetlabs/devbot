@@ -197,7 +197,7 @@ start:
 	@# Compute dynamic values (passed as env vars, not written to .env)
 	$(eval NEW_API_KEY := $(shell openssl rand -hex 32))
 	$(eval WORK_DIR := $(or $(realpath $(DEVBOT_PROJECTS)),$(abspath $(DEVBOT_PROJECTS))))
-	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) DEVBOT_PROJECTS_DIR=$(WORK_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR))
+	$(eval DYNAMIC_ENV := API_KEY=$(NEW_API_KEY) VITE_API_KEY=$(NEW_API_KEY) SESSION_SECRET=$(NEW_API_KEY) DEVBOT_PROJECTS_DIR=$(WORK_DIR) BACKEND_PORT=$(BACKEND_PORT) BACKEND_HOST=0.0.0.0 VITE_BACKEND_PORT=$(BACKEND_PORT) VITE_DEVBOT_PROJECTS_DIR=$(WORK_DIR))
 	@echo "$(GREEN)Dynamic env: API_KEY=<generated>, DEVBOT_PROJECTS_DIR=$(WORK_DIR)$(NC)"
 	@tmux new-session -d -s devbot -n backend -c $(CURDIR)
 	@tmux send-keys -t devbot:backend 'set -a && source .env && set +a && export $(DYNAMIC_ENV) && cd backend && npm rebuild && npm run dev 2>&1 | tee ../logs/backend.log' C-m

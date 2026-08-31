@@ -45,18 +45,33 @@ import type {
   FileStoreInfo,
   FileStoreDetail,
   FileStoreRecord,
+  AuthTokenInfo,
+  AuthTokenCreateResponse,
 } from '../types';
 
 import { VITE_BACKEND_PORT as BACKEND_PORT, VITE_API_KEY as API_KEY } from './env';
 
-const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+export const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+
+/**
+ * Build auth headers. Sends X-API-Key when available (backward compat),
+ * and always includes credentials: 'include' for session cookies.
+ */
+function authHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {};
+  if (API_KEY) {
+    headers['X-API-Key'] = API_KEY;
+  }
+  return headers;
+}
 
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${BACKEND_URL}${endpoint}`, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'X-API-Key': API_KEY,
+      ...authHeaders(),
       ...options.headers,
     },
   });
@@ -392,7 +407,8 @@ export const api = {
     const response = await fetch(
       `${BACKEND_URL}/api/interactive-chats/${id}/export?format=${format}`,
       {
-        headers: { 'X-API-Key': API_KEY },
+        credentials: 'include',
+        headers: authHeaders(),
       }
     );
     if (!response.ok) {
@@ -493,7 +509,9 @@ export const api = {
   },
 
   getRemotionVideoStreamUrl: (id: string): string => {
-    return `${BACKEND_URL}/api/remotion-videos/${id}/stream?key=${encodeURIComponent(API_KEY)}`;
+    // Cookie auth handles this automatically; API key is a fallback for direct links
+    const keyParam = API_KEY ? `?key=${encodeURIComponent(API_KEY)}` : '';
+    return `${BACKEND_URL}/api/remotion-videos/${id}/stream${keyParam}`;
   },
 
   // Commands endpoints
@@ -720,9 +738,8 @@ export async function uploadFiles(files: File[], chatId?: string): Promise<Uploa
 
   const response = await fetch(`${BACKEND_URL}/api/upload`, {
     method: 'POST',
-    headers: {
-      'X-API-Key': API_KEY,
-    },
+    credentials: 'include',
+    headers: authHeaders(),
     body: formData,
   });
 
@@ -753,7 +770,8 @@ export async function uploadOcrImage(file: File): Promise<OcrUploadResponse> {
 
   const response = await fetch(`${BACKEND_URL}/api/ocr/upload`, {
     method: 'POST',
-    headers: { 'X-API-Key': API_KEY },
+    credentials: 'include',
+    headers: authHeaders(),
     body: formData,
   });
 
@@ -832,7 +850,8 @@ export async function sttTranscribe(audioBlob: Blob): Promise<SttTranscribeRespo
 
   const response = await fetch(`${BACKEND_URL}/api/stt/transcribe`, {
     method: 'POST',
-    headers: { 'X-API-Key': API_KEY },
+    credentials: 'include',
+    headers: authHeaders(),
     body: formData,
   });
 
@@ -971,4 +990,24 @@ export const fileStoresApi = {
   /** Delete a record from a store's data endpoint. */
   deleteRecord: (name: string, id: string): Promise<{ ok: boolean; id: string }> =>
     fetchApi(`/api/file-stores/${name}/data/${id}`, { method: 'DELETE' }),
+};
+
+// ── Auth Token Management API ────────────────────────────────────────
+// Auth routes are mounted at /auth/* (outside /api/*), so we use BACKEND_URL directly.
+
+export const authApi = {
+  /** List all API tokens (masked). */
+  listTokens: (): Promise<AuthTokenInfo[]> =>
+    fetchApi('/auth/tokens'),
+
+  /** Create a new API token. Returns the full token (shown only once). */
+  createToken: (name: string): Promise<AuthTokenCreateResponse> =>
+    fetchApi('/auth/tokens', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }),
+
+  /** Revoke an API token by its last-8-char ID. */
+  deleteToken: (id: string): Promise<{ success: boolean }> =>
+    fetchApi(`/auth/tokens/${id}`, { method: 'DELETE' }),
 };

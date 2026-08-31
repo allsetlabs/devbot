@@ -528,3 +528,19 @@ export interface FileStoreRecord {
 export interface FileStoreDetail extends FileStoreInfo {
   records: FileStoreRecord[];
 }
+
+// Auth tokens (for mobile/programmatic access)
+export interface AuthTokenInfo {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  tokenPreview: string;
+}
+
+export interface AuthTokenCreateResponse {
+  token: string;
+  name: string;
+  createdAt: string;
+}

@@ -75,9 +75,14 @@ export function ChatListHeader({
       <Button variant="ghost" size="icon" onClick={onRefetch} disabled={isFetching}>
         <RefreshCw className={`h-5 w-5 ${isFetching ? 'animate-spin' : ''}`} />
       </Button>
-      <Button onClick={onCreate} disabled={creating}>
-        <Plus className="mr-1 h-4 w-4" />
-        {creating ? 'Creating...' : 'New Chat'}
+      <Button
+        variant="ghost"
+        size="icon"
+        title={creating ? 'Creating...' : 'New Chat'}
+        onClick={onCreate}
+        disabled={creating}
+      >
+        <Plus className={`h-5 w-5 ${creating ? 'animate-spin' : ''}`} />
       </Button>
     </>
   );

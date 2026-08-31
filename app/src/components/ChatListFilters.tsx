@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Search, X, MessageSquare, MessagesSquare } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Input } from '@allsetlabs/forge/components/ui/input';
@@ -13,6 +14,8 @@ interface ChatListFiltersProps {
   onTypeChange: (value: string | null) => void;
   onSearchModeChange: (mode: 'chats' | 'messages') => void;
   onToggleRunning: () => void;
+  /** Optional controls rendered inline after the search input (e.g. sort, favorites). */
+  extraControls?: ReactNode;
 }
 
 export function ChatListFilters({
@@ -26,6 +29,7 @@ export function ChatListFilters({
   onTypeChange,
   onSearchModeChange,
   onToggleRunning,
+  extraControls,
 }: ChatListFiltersProps) {
   return (
     <>
@@ -63,6 +67,7 @@ export function ChatListFilters({
               <MessageSquare className="h-4 w-4" />
             )}
           </Button>
+          {extraControls}
         </div>
       </div>
 

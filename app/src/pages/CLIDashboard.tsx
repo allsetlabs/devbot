@@ -17,54 +17,12 @@ import { Input } from '@allsetlabs/forge/components/ui/input';
 import { unifiedChatApi } from '../lib/api';
 import { HeaderSlot } from '../components/HeaderSlot';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { ProviderIcon, ProviderBadge, PROVIDER_META } from '../components/ProviderIcon';
 import { extractErrorMessage, formatRelativeTime } from '../lib/format';
 import type {
   CLIProvider,
   ProviderSession,
 } from '../types';
-
-// ─── Provider metadata ─────────────────────────────────────────────
-
-const PROVIDER_META: Record<
-  CLIProvider,
-  { label: string; color: string; bgColor: string; icon: string }
-> = {
-  claude: {
-    label: 'Claude',
-    color: 'text-orange-700 dark:text-orange-400',
-    bgColor: 'bg-orange-100 dark:bg-orange-900/30',
-    icon: '🟠',
-  },
-  codex: {
-    label: 'Codex',
-    color: 'text-green-700 dark:text-green-400',
-    bgColor: 'bg-green-100 dark:bg-green-900/30',
-    icon: '🟢',
-  },
-  kimi: {
-    label: 'Kimi',
-    color: 'text-blue-700 dark:text-blue-400',
-    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-    icon: '🔵',
-  },
-  cursor: {
-    label: 'Cursor',
-    color: 'text-purple-700 dark:text-purple-400',
-    bgColor: 'bg-purple-100 dark:bg-purple-900/30',
-    icon: '🟣',
-  },
-};
-
-function ProviderBadge({ provider }: { provider: CLIProvider }) {
-  const meta = PROVIDER_META[provider];
-  return (
-    <span
-      className={`inline-flex flex-shrink-0 items-center rounded px-1.5 py-0.5 text-[10px] font-medium ${meta.bgColor} ${meta.color}`}
-    >
-      {meta.label}
-    </span>
-  );
-}
 
 // ─── Sort ───────────────────────────────────────────────────────────
 
@@ -218,7 +176,7 @@ export function CLIDashboard() {
                       setProviderFilter(providerFilter === p.id ? undefined : p.id)
                     }
                   >
-                    <span className="text-sm">{meta.icon}</span>
+                    <ProviderIcon provider={p.id} size={18} />
                     <div>
                       <p className="text-xs font-medium">{meta.label}</p>
                       <p className="text-[10px] text-muted-foreground">
@@ -361,7 +319,7 @@ function SessionRow({
       <div
         className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${meta.bgColor}`}
       >
-        <span className="text-base">{meta.icon}</span>
+        <ProviderIcon provider={session.provider} size={22} />
       </div>
 
       {/* Content */}

@@ -23,7 +23,7 @@ export function Header() {
   const { openNav, isDocked } = useNav();
   const slotRef = useHeaderSlotRef();
 
-  const route = findRoute(pathname);
+  const route = findRoute(pathname) ?? (pathname.startsWith('/unified/dir/') ? findRoute('/unified') : undefined);
   const plugin = findPluginRoute(pathname);
 
   if (!route && !plugin) return null;

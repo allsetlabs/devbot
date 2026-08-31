@@ -5,11 +5,13 @@ import type {
 } from '@allsetlabs/forge/components/ui/hierarchy-graph';
 
 /**
- * TEMPORARY dev tuning for the graph layout, persisted to localStorage so values survive
- * reloads while we dial in the spacing. Remove this (and the GraphDevPanel) once the tree
- * width / height gaps are confirmed and baked into the page defaults.
+ * User's preferred graph layout, persisted to localStorage. Restored on first render (the
+ * `useState` initialiser below runs before the graph mounts) so the tree comes up in the
+ * layout the user last chose. The LayoutPanel edits these live.
  */
 export type ConnectorStyle = 'elbow' | 'smooth';
+export type Renderer = 'hierarchy' | 'flow'; // read-only view engine: the tuned hierarchy graph, or ReactFlow
+export type Language = 'ta' | 'en'; // which single name a node shows in the read-only view (Tamil / English)
 
 export interface GraphSettings {
   treeWidth: number; // horizontal gap between nodes (hGap)
@@ -18,17 +20,23 @@ export interface GraphSettings {
   algorithm: HierarchyAlgorithm;
   connector: ConnectorStyle;
   centerOnSelect: boolean; // on node select, straighten + center the lineage (vs. just highlight)
+  renderer: Renderer; // opt into the ReactFlow read-only view from the Layout panel
+  language: Language; // read-only view shows one name per node; header toggles it (edit mode always shows both)
 }
 
-const KEY = 'family-hierarchy:graph-settings';
+// Bumped to v3 when the renderer + language toggles landed: discards stale values so the new
+// fields fall back to their defaults, then persists from there.
+const KEY = 'family-hierarchy:graph-settings:v3';
 
 export const DEFAULT_SETTINGS: GraphSettings = {
-  treeWidth: 16,
-  treeHeight: 22,
+  treeWidth: 15,
+  treeHeight: 20,
   direction: 'down',
-  algorithm: 'tidy',
+  algorithm: 'elk-left',
   connector: 'elbow',
   centerOnSelect: true,
+  renderer: 'hierarchy',
+  language: 'ta',
 };
 
 export function useGraphSettings() {

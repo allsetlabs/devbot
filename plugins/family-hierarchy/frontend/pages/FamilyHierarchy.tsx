@@ -6,7 +6,7 @@ import {
 import { TooltipProvider } from '@allsetlabs/forge/components/ui/tooltip';
 import { Loader2, TriangleAlert } from 'lucide-react';
 import { HeaderSlot } from '@devbot/app/components/HeaderSlot';
-import type { FamilyTree, Person } from '../types';
+import type { FamilyTree } from '../types';
 import { getFamilyTree, putFamilyTree } from '../api';
 import {
   computeVisible,
@@ -14,21 +14,23 @@ import {
   expandLineageByNames,
   expandAll,
   collapseAll,
-  expandNextLayer,
   generations,
   pathToRoot,
   updatePerson,
-  addChild,
   removeSubtree,
+  reparent,
+  canConnect,
+  addNode,
 } from '../lib/tree';
 import { measurePersonNodeWidth, NODE_MAX_WIDTH } from '../lib/measure';
 import { useGraphSettings } from '../lib/useGraphSettings';
 import { PersonNode } from '../components/PersonNode';
 import { DetailPanel } from '../components/DetailPanel';
 import { InfoModal } from '../components/InfoModal';
-import { GraphDevPanel } from '../components/GraphDevPanel';
-import { GraphToolbar, type SaveState } from '../components/GraphToolbar';
-import { EditPersonModal, type EditSaveData } from '../components/EditPersonModal';
+import { LayoutPanel } from '../components/LayoutPanel';
+import { GraphToolbar } from '../components/GraphToolbar';
+import { FamilyFlowEditor } from '../components/FamilyFlowEditor';
+import { FamilyFlowView, type FamilyFlowViewHandle } from '../components/FamilyFlowView';
 
 // Default view: minimize everything except this 6-generation spine.
 const DEFAULT_SPINE = ['சாத்தப்பன்', 'வெள்ளையன்', 'வீரப்பன்', 'நாகப்பன்'];
@@ -40,17 +42,16 @@ export function FamilyHierarchy() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [editSnapshot, setEditSnapshot] = useState<FamilyTree | null>(null); // tree at edit-entry, for Cancel
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [infoOpen, setInfoOpen] = useState(false);
-  const [modal, setModal] = useState<{ open: boolean; mode: 'edit' | 'add'; targetId: string | null }>({
-    open: false,
-    mode: 'edit',
-    targetId: null,
-  });
-  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [layoutOpen, setLayoutOpen] = useState(false);
 
   const graphRef = useRef<HierarchyGraphHandle>(null);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flowViewRef = useRef<FamilyFlowViewHandle>(null);
   const { settings, update: updateSettings, reset: resetSettings } = useGraphSettings();
+  const flowView = settings.renderer === 'flow';
 
   useEffect(() => {
     getFamilyTree()
@@ -58,20 +59,8 @@ export function FamilyHierarchy() {
         setTree(t);
         const spine = expandLineageByNames(t.people, t.rootId, DEFAULT_SPINE);
         setExpanded(spine.size > 1 ? spine : initialExpanded(t.people, t.rootId, 2));
-        // no node selected initially — the detail panel appears only when the user clicks a node
       })
       .catch((e) => setLoadError(String(e)));
-  }, []);
-
-  const persist = useCallback((next: FamilyTree) => {
-    setTree(next);
-    setSaveState('saving');
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      putFamilyTree(next)
-        .then(() => setSaveState('saved'))
-        .catch(() => setSaveState('error'));
-    }, 600);
   }, []);
 
   const people = tree?.people ?? {};
@@ -89,30 +78,29 @@ export function FamilyHierarchy() {
     return { ancestors: new Set(path.slice(1)), edges: new Set(path.filter((id) => id !== rootId)) };
   }, [selectedId, people, rootId, tree]);
 
-  // Hovering a node highlights its immediate neighbourhood — parent + children + their connectors.
+  // Hovering a node highlights its direct children AND its whole ancestor chain up to the root,
+  // with every connector along that path.
   const hover = useMemo(() => {
     const neighbors = new Set<string>();
     const edges = new Set<string>();
     const p = hoveredId ? people[hoveredId] : null;
     if (p) {
-      if (p.parent) {
-        neighbors.add(p.parent);
-        edges.add(hoveredId!); // edge hovered→parent is keyed by the child (hovered) id
-      }
       for (const c of p.children) {
         neighbors.add(c);
         edges.add(c); // edge hovered→child is keyed by the child id
       }
+      const path = pathToRoot(people, p.id); // [hovered, parent, …, root]
+      for (const id of path.slice(1)) neighbors.add(id); // ancestors (not the hovered node itself)
+      for (const id of path) if (id !== rootId) edges.add(id); // each node's edge to its parent
     }
     return { neighbors, edges };
-  }, [hoveredId, people]);
+  }, [hoveredId, people, rootId]);
 
   const activeEdges = useMemo(
     () => new Set<string>([...selectedPath.edges, ...hover.edges]),
     [selectedPath, hover]
   );
 
-  // Root→selected order; feeds the graph's focus layout so the lineage straightens & centers.
   const focusPath = useMemo(
     () => (selectedId && tree ? [...pathToRoot(people, selectedId)].reverse() : undefined),
     [selectedId, people, tree]
@@ -120,13 +108,14 @@ export function FamilyHierarchy() {
 
   const nodeWidthOf = useCallback(
     (id: string) => {
-      // horizontal layout reads best with uniform columns → fix every node to the max width
-      if (settings.direction === 'right') return NODE_MAX_WIDTH;
+      if (settings.direction === 'right') return NODE_MAX_WIDTH; // uniform columns read best horizontally
       const p = people[id];
       if (!p) return 120;
-      return measurePersonNodeWidth(p.name, p.translit, p.marker === 'A' || p.marker === 'M');
+      // Nodes show one name now, so measure just the active language's text.
+      const text = settings.language === 'ta' ? p.name : p.translit;
+      return measurePersonNodeWidth(text, '', p.marker === 'A' || p.marker === 'M');
     },
-    [people, settings.direction]
+    [people, settings.direction, settings.language]
   );
 
   const uncertainList = useMemo(() => Object.values(people).filter((p) => p.uncertain), [people]);
@@ -143,8 +132,7 @@ export function FamilyHierarchy() {
       if (!tree) return;
       setExpanded((prev) => {
         const next = new Set(prev);
-        // expand all ancestors so the node is visible
-        for (const a of pathToRoot(people, id).slice(1)) next.add(a);
+        for (const a of pathToRoot(people, id).slice(1)) next.add(a); // expand ancestors so it's visible
         return next;
       });
       setSelectedId(id);
@@ -162,41 +150,69 @@ export function FamilyHierarchy() {
     });
   }, []);
 
-  const handleSaveModal = useCallback(
-    (data: EditSaveData) => {
-      if (!tree || !modal.targetId) return;
-      if (modal.mode === 'edit') {
-        const p = people[modal.targetId];
-        const patch: Partial<Person> = { name: data.name, translit: data.translit, note: data.note };
-        if (p.uncertain && data.markCorrect) {
-          patch.uncertain = false;
-          patch.uncertainReason = '';
-        }
-        persist({ ...tree, people: updatePerson(people, modal.targetId, patch) });
-      } else {
-        const { people: np, id } = addChild(people, modal.targetId, {
-          name: data.name,
-          translit: data.translit,
-          note: data.note,
-        });
-        persist({ ...tree, people: np });
-        setExpanded((prev) => new Set(prev).add(modal.targetId!));
-        setSelectedId(id);
-      }
-      setModal({ open: false, mode: 'edit', targetId: null });
-    },
-    [tree, modal, people, persist]
-  );
+  // ---- edit mode: enter / save-all / cancel ----
 
-  const handleDelete = useCallback(
-    (id: string) => {
-      if (!tree || id === rootId) return;
-      const parent = people[id].parent;
-      persist({ ...tree, people: removeSubtree(people, id) });
-      setSelectedId(parent ?? rootId);
-    },
-    [tree, people, rootId, persist]
-  );
+  const enterEdit = useCallback(() => {
+    setEditSnapshot(tree);
+    setEditMode(true);
+    setSelectedId(null);
+    setInfoOpen(false);
+    setLayoutOpen(false);
+    setSaveError(null);
+  }, [tree]);
+
+  const cancelEdit = useCallback(() => {
+    if (editSnapshot) setTree(editSnapshot); // discard every staged change
+    setEditSnapshot(null);
+    setEditMode(false);
+    setSaveError(null);
+  }, [editSnapshot]);
+
+  const saveEdit = useCallback(() => {
+    if (!tree) return;
+    setSaving(true);
+    setSaveError(null);
+    putFamilyTree(tree)
+      .then(() => {
+        setEditSnapshot(null);
+        setEditMode(false);
+      })
+      .catch((e) => setSaveError(String(e)))
+      .finally(() => setSaving(false));
+  }, [tree]);
+
+  // ---- edit mode: structural mutations (staged locally; committed on Save) ----
+
+  const onChangeName = useCallback((id: string, name: string) => {
+    setTree((t) => (t ? { ...t, people: updatePerson(t.people, id, { name }) } : t));
+  }, []);
+
+  const onChangeTranslit = useCallback((id: string, translit: string) => {
+    setTree((t) => (t ? { ...t, people: updatePerson(t.people, id, { translit }) } : t));
+  }, []);
+
+  const onConnectNodes = useCallback((parentId: string, childId: string) => {
+    setTree((t) =>
+      t && canConnect(t.people, t.rootId, parentId, childId)
+        ? { ...t, people: reparent(t.people, childId, parentId) }
+        : t
+    );
+  }, []);
+
+  const onDisconnect = useCallback((childId: string) => {
+    setTree((t) => (t && childId !== t.rootId ? { ...t, people: reparent(t.people, childId, null) } : t));
+  }, []);
+
+  const onDeleteNode = useCallback((id: string) => {
+    setTree((t) => (t && id !== t.rootId ? { ...t, people: removeSubtree(t.people, id) } : t));
+  }, []);
+
+  const onAddNode = useCallback((): string | null => {
+    if (!tree) return null;
+    const { people: np, id } = addNode(tree.people);
+    setTree({ ...tree, people: np });
+    return id;
+  }, [tree]);
 
   if (loadError) {
     return (
@@ -225,91 +241,132 @@ export function FamilyHierarchy() {
       <HeaderSlot>
         <GraphToolbar
           editMode={editMode}
-          saveState={saveState}
-          onToggleEdit={() => setEditMode((v) => !v)}
+          saving={saving}
+          layoutOpen={layoutOpen}
+          language={settings.language}
+          onEnterEdit={enterEdit}
+          onSaveEdit={saveEdit}
+          onCancelEdit={cancelEdit}
           onExpandAll={() => setExpanded(expandAll(people))}
           onCollapseAll={() => setExpanded(collapseAll(rootId))}
-          onExpandLayer={() => setExpanded((prev) => expandNextLayer(people, rootId, prev))}
-          onFit={() => graphRef.current?.fit()}
+          onFit={() => (flowView ? flowViewRef.current?.fit() : graphRef.current?.fit())}
+          onToggleLayout={() => setLayoutOpen((v) => !v)}
+          onToggleLanguage={() => updateSettings('language', settings.language === 'ta' ? 'en' : 'ta')}
           onInfo={() => setInfoOpen(true)}
         />
       </HeaderSlot>
 
       <div className="dark flex h-full min-h-0 w-full flex-col overflow-hidden bg-background text-foreground">
         <div className="relative min-h-0 flex-1 overflow-hidden">
-          {/* backdrop glow */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.12),transparent_60%)]" />
-
-          {editMode && (
-            <div className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-full border border-primary/40 bg-card/80 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              Edit mode — select a person to add a child, rename, or delete
-            </div>
-          )}
-
-          <HierarchyGraph
-            ref={graphRef}
-            nodes={visible}
-            activeEdgeChildIds={activeEdges}
-            focusPath={settings.centerOnSelect ? focusPath : undefined}
-            onBackgroundClick={() => setSelectedId(null)}
-            nodeWidth={nodeWidthOf}
-            nodeHeight={54}
-            hGap={settings.treeWidth}
-            vGap={settings.treeHeight}
-            direction={settings.direction}
-            algorithm={settings.algorithm}
-            zoomable={false}
-            edgeStyle={settings.connector}
-            showGenerationBands
-            generationAxisLabel="GENERATIONS"
-            renderNode={(id) => {
-              const p = people[id];
-              if (!p) return null;
-              return (
-                <PersonNode
-                  person={p}
-                  isRoot={id === rootId}
-                  selected={selectedId === id}
-                  hovered={hoveredId === id}
-                  neighbor={hover.neighbors.has(id)}
-                  inSelectedPath={selectedPath.ancestors.has(id)}
-                  expanded={expanded.has(id)}
-                  editMode={editMode}
-                  onSelect={() => setSelectedId(id)}
-                  onToggle={() => toggleExpand(id)}
-                  onHover={(on) => setHoveredId(on ? id : null)}
-                  onEdit={() => setModal({ open: true, mode: 'edit', targetId: id })}
-                  onAdd={() => setModal({ open: true, mode: 'add', targetId: id })}
-                  onDelete={() => handleDelete(id)}
-                />
-              );
-            }}
-          />
-
-          {/* right-side detail panel — only when a node is selected */}
-          {selected && (
-            <div className="absolute bottom-4 right-4 top-4 z-20 w-[300px] max-w-[calc(100%-2rem)]">
-              <DetailPanel
+          {editMode ? (
+            <>
+              <FamilyFlowEditor
                 people={people}
-                selected={selected}
-                editMode={editMode}
-                onClose={() => setSelectedId(null)}
-                onSelectPerson={revealAndSelect}
-                onHoverPerson={setHoveredId}
-                onEditSelected={() =>
-                  selectedId && setModal({ open: true, mode: 'edit', targetId: selectedId })
-                }
+                rootId={rootId}
+                onConnectNodes={onConnectNodes}
+                onDisconnect={onDisconnect}
+                onChangeName={onChangeName}
+                onChangeTranslit={onChangeTranslit}
+                onDeleteNode={onDeleteNode}
+                onAddNode={onAddNode}
               />
-            </div>
-          )}
+              {saveError && (
+                <div className="absolute bottom-4 left-1/2 z-30 -translate-x-1/2 rounded-full border border-destructive/50 bg-card/90 px-3 py-1 text-xs text-destructive backdrop-blur">
+                  Save failed — {saveError}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* backdrop glow */}
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,hsl(var(--primary)/0.12),transparent_60%)]" />
 
-          {/* TEMPORARY: live layout tuning (remove once width/height gaps are confirmed) */}
-          <GraphDevPanel
-            settings={settings}
-            onChange={updateSettings}
-            onReset={resetSettings}
-            onRelayout={() => graphRef.current?.relayout()}
-          />
+              {flowView ? (
+                <FamilyFlowView
+                  ref={flowViewRef}
+                  people={people}
+                  rootId={rootId}
+                  visible={visible}
+                  expanded={expanded}
+                  language={settings.language}
+                  direction={settings.direction}
+                  algorithm={settings.algorithm}
+                  connector={settings.connector}
+                  hGap={settings.treeWidth}
+                  vGap={settings.treeHeight}
+                  centerOnSelect={settings.centerOnSelect}
+                  selectedId={selectedId}
+                  hoveredId={hoveredId}
+                  selectedAncestors={selectedPath.ancestors}
+                  hoverNeighbors={hover.neighbors}
+                  activeEdges={activeEdges}
+                  onSelect={setSelectedId}
+                  onToggle={toggleExpand}
+                  onHover={setHoveredId}
+                  onBackgroundClick={() => setSelectedId(null)}
+                />
+              ) : (
+                <HierarchyGraph
+                  ref={graphRef}
+                  nodes={visible}
+                  activeEdgeChildIds={activeEdges}
+                  focusPath={settings.centerOnSelect ? focusPath : undefined}
+                  onBackgroundClick={() => setSelectedId(null)}
+                  nodeWidth={nodeWidthOf}
+                  nodeHeight={54}
+                  hGap={settings.treeWidth}
+                  vGap={settings.treeHeight}
+                  direction={settings.direction}
+                  algorithm={settings.algorithm}
+                  zoomable={false}
+                  edgeStyle={settings.connector}
+                  showGenerationBands
+                  generationAxisLabel="GENERATIONS"
+                  renderNode={(id) => {
+                    const p = people[id];
+                    if (!p) return null;
+                    return (
+                      <PersonNode
+                        person={p}
+                        language={settings.language}
+                        selected={selectedId === id}
+                        hovered={hoveredId === id}
+                        neighbor={hover.neighbors.has(id)}
+                        inSelectedPath={selectedPath.ancestors.has(id)}
+                        expanded={expanded.has(id)}
+                        onSelect={() => setSelectedId(id)}
+                        onToggle={() => toggleExpand(id)}
+                        onHover={(on) => setHoveredId(on ? id : null)}
+                      />
+                    );
+                  }}
+                />
+              )}
+
+              {/* right-side detail panel — only when a node is selected */}
+              {selected && (
+                <div className="absolute bottom-4 right-4 top-4 z-20 w-[300px] max-w-[calc(100%-2rem)]">
+                  <DetailPanel
+                    people={people}
+                    selected={selected}
+                    onClose={() => setSelectedId(null)}
+                    onSelectPerson={revealAndSelect}
+                    onHoverPerson={setHoveredId}
+                  />
+                </div>
+              )}
+
+              {layoutOpen && (
+                <LayoutPanel
+                  settings={settings}
+                  onChange={updateSettings}
+                  onReset={resetSettings}
+                  onRelayout={() => (flowView ? flowViewRef.current?.relayout() : graphRef.current?.relayout())}
+                  onClose={() => setLayoutOpen(false)}
+                />
+              )}
+            </>
+          )}
         </div>
 
         <InfoModal
@@ -320,14 +377,6 @@ export function FamilyHierarchy() {
           uncertainList={uncertainList}
           onClose={() => setInfoOpen(false)}
           onSelectPerson={revealAndSelect}
-        />
-
-        <EditPersonModal
-          open={modal.open}
-          mode={modal.mode}
-          person={modal.targetId ? people[modal.targetId] : null}
-          onClose={() => setModal({ open: false, mode: 'edit', targetId: null })}
-          onSave={handleSaveModal}
         />
       </div>
     </TooltipProvider>

@@ -35,7 +35,7 @@ interface ChatListItemProps {
   onSelect: () => void;
   onToggleFavorite: (e: React.MouseEvent) => void;
   onDuplicate: (e: React.MouseEvent) => void;
-  onArchive: (e?: React.MouseEvent) => void;
+  onArchive?: (e?: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
   hasCopyCommand?: boolean;
   onCopyCommand?: () => void;
@@ -96,7 +96,7 @@ export function ChatListItem({
     if (!isHorizontalSwipe.current) return;
     if (swipeX >= SWIPE_THRESHOLD) {
       setIsExiting(true);
-      setTimeout(() => onArchive(), 220);
+      setTimeout(() => onArchive?.(), 220);
     } else {
       setIsSnapping(true);
       setSwipeX(0);
@@ -111,7 +111,7 @@ export function ChatListItem({
 
   return (
     <div className="relative overflow-hidden">
-      {showBackdrop && (
+      {showBackdrop && onArchive && (
         <div
           className={`absolute inset-0 flex items-center justify-end gap-1 pr-6 transition-colors ${pastThreshold ? 'bg-primary' : 'bg-primary/70'}`}
           aria-hidden="true"
@@ -134,10 +134,10 @@ export function ChatListItem({
             onSelect();
           }
         }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
+        onTouchStart={onArchive ? handleTouchStart : undefined}
+        onTouchMove={onArchive ? handleTouchMove : undefined}
+        onTouchEnd={onArchive ? handleTouchEnd : undefined}
+        onTouchCancel={onArchive ? handleTouchEnd : undefined}
       >
         <div className="relative flex-shrink-0">
           {chat.isRunning ? (
@@ -244,19 +244,21 @@ export function ChatListItem({
           >
             <Copy className="h-4 w-4 text-foreground/60" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 hover:bg-muted-foreground/20"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onArchive(e);
-            }}
-            title="Archive"
-          >
-            <Archive className="h-4 w-4 text-foreground/60" />
-          </Button>
+          {onArchive && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-muted-foreground/20"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onArchive(e);
+              }}
+              title="Archive"
+            >
+              <Archive className="h-4 w-4 text-foreground/60" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -319,10 +321,12 @@ export function ChatListItem({
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onArchive}>
-                <Archive className="h-4 w-4" />
-                Archive
-              </DropdownMenuItem>
+              {onArchive && (
+                <DropdownMenuItem onClick={onArchive}>
+                  <Archive className="h-4 w-4" />
+                  Archive
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={onDelete} className="text-destructive">
                 <Trash2 className="h-4 w-4" />
                 Delete

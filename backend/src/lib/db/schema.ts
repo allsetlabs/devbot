@@ -401,6 +401,41 @@ export const unified_favorites = sqliteTable('unified_favorites', {
   settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
 });
 
+// Auth sessions (cookie-based web sessions from Google OAuth)
+export const auth_sessions = sqliteTable('auth_sessions', {
+  token: text('token').primaryKey(),
+  email: text('email').notNull(),
+  name: text('name').notNull().default(''),
+  picture: text('picture').notNull().default(''),
+  expires_at: text('expires_at'),
+  created_by: text('created_by').notNull().default('oauth'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('oauth'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
+// Auth tokens (API tokens for programmatic/mobile access)
+export const auth_tokens = sqliteTable('auth_tokens', {
+  token: text('token').primaryKey(),
+  name: text('name').notNull().default('API Token'),
+  email: text('email').notNull(),
+  last_used_at: text('last_used_at'),
+  created_by: text('created_by').notNull().default('user'),
+  created_at: text('created_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  updated_by: text('updated_by').notNull().default('user'),
+  updated_at: text('updated_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  settings: text('settings', { mode: 'json' }).$type<Record<string, any>>().default({}),
+});
+
 // Commands (synced from .claude/)
 export const commands = sqliteTable('commands', {
   id: text('id').primaryKey(),

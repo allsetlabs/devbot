@@ -1,29 +1,31 @@
 import {
   ChevronsDownUp,
   ChevronsUpDown,
-  Layers,
   Maximize,
   Pencil,
   Check,
+  X,
   Loader2,
-  TriangleAlert,
-  Save,
+  LayoutDashboard,
   Info,
 } from 'lucide-react';
 import { Button } from '@allsetlabs/forge/components/ui/button';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@allsetlabs/forge/components/ui/tooltip';
-import { cn } from '@allsetlabs/forge/lib/utils';
-
-export type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+import type { Language } from '../lib/useGraphSettings';
 
 interface Props {
   editMode: boolean;
-  saveState: SaveState;
-  onToggleEdit: () => void;
+  saving: boolean;
+  layoutOpen: boolean;
+  language: Language;
+  onEnterEdit: () => void;
+  onSaveEdit: () => void;
+  onCancelEdit: () => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
-  onExpandLayer: () => void;
   onFit: () => void;
+  onToggleLayout: () => void;
+  onToggleLanguage: () => void;
   onInfo: () => void;
 }
 
@@ -32,16 +34,24 @@ function TBtn({
   onClick,
   children,
   active,
+  disabled,
 }: {
   label: string;
   onClick: () => void;
   children: React.ReactNode;
   active?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant={active ? 'default' : 'ghost'} size="icon" onClick={onClick} aria-label={label}>
+        <Button
+          variant={active ? 'default' : 'ghost'}
+          size="icon"
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={label}
+        >
           {children}
         </Button>
       </TooltipTrigger>
@@ -52,33 +62,62 @@ function TBtn({
 
 export function GraphToolbar({
   editMode,
-  saveState,
-  onToggleEdit,
+  saving,
+  layoutOpen,
+  language,
+  onEnterEdit,
+  onSaveEdit,
+  onCancelEdit,
   onExpandAll,
   onCollapseAll,
-  onExpandLayer,
   onFit,
+  onToggleLayout,
+  onToggleLanguage,
   onInfo,
 }: Props) {
+  // Edit mode is a free-form flow canvas with its own controls — the header only needs save / cancel.
+  if (editMode) {
+    return (
+      <div className="flex items-center gap-1">
+        <TBtn label="Save all changes" active onClick={onSaveEdit} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+        </TBtn>
+        <TBtn label="Cancel — discard changes" onClick={onCancelEdit} disabled={saving}>
+          <X className="h-4 w-4" />
+        </TBtn>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-1">
-      <div className={cn('mr-1 flex items-center gap-1 px-1 text-xs', saveStateColor(saveState))} title="Save status">
-        {saveState === 'saving' && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-        {saveState === 'saved' && <Check className="h-3.5 w-3.5" />}
-        {saveState === 'error' && <TriangleAlert className="h-3.5 w-3.5" />}
-        {saveState === 'idle' && <Save className="h-3.5 w-3.5" />}
-        <span className="hidden sm:inline">{saveStateLabel(saveState)}</span>
-      </div>
-      <div className="mx-0.5 h-6 w-px bg-border" />
-      <TBtn label={editMode ? 'Exit edit mode' : 'Edit mode (add / remove / rename)'} active={editMode} onClick={onToggleEdit}>
+      <TBtn label="Edit — rename, connect, add, delete" onClick={onEnterEdit}>
         <Pencil className="h-4 w-4" />
       </TBtn>
+
       <div className="mx-0.5 h-6 w-px bg-border" />
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleLanguage}
+            aria-label={language === 'ta' ? 'Language: Tamil — switch to English' : 'Language: English — switch to Tamil'}
+            className="text-sm font-semibold"
+          >
+            {language === 'ta' ? 'த' : 'A'}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent className="dark">
+          {language === 'ta' ? 'Tamil names — switch to English' : 'English names — switch to Tamil'}
+        </TooltipContent>
+      </Tooltip>
+
+      <div className="mx-0.5 h-6 w-px bg-border" />
+
       <TBtn label="Expand all" onClick={onExpandAll}>
         <ChevronsUpDown className="h-4 w-4" />
-      </TBtn>
-      <TBtn label="Expand one more layer" onClick={onExpandLayer}>
-        <Layers className="h-4 w-4" />
       </TBtn>
       <TBtn label="Collapse all" onClick={onCollapseAll}>
         <ChevronsDownUp className="h-4 w-4" />
@@ -86,20 +125,15 @@ export function GraphToolbar({
       <TBtn label="Fit to screen" onClick={onFit}>
         <Maximize className="h-4 w-4" />
       </TBtn>
+
       <div className="mx-0.5 h-6 w-px bg-border" />
+
+      <TBtn label={layoutOpen ? 'Close layout panel' : 'Layout'} active={layoutOpen} onClick={onToggleLayout}>
+        <LayoutDashboard className="h-4 w-4" />
+      </TBtn>
       <TBtn label="About · stats · uncertain names" onClick={onInfo}>
         <Info className="h-4 w-4" />
       </TBtn>
     </div>
   );
-}
-
-function saveStateColor(s: SaveState): string {
-  if (s === 'saved') return 'text-success';
-  if (s === 'error') return 'text-destructive';
-  if (s === 'saving') return 'text-primary';
-  return 'text-muted-foreground';
-}
-function saveStateLabel(s: SaveState): string {
-  return s === 'saving' ? 'Saving…' : s === 'saved' ? 'Saved' : s === 'error' ? 'Save failed' : 'Saved';
 }

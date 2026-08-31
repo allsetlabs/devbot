@@ -1228,7 +1228,7 @@ export const voiceApi = {
       body: JSON.stringify({ systemPrompt }),
     }),
 
-  deleteSession: (id: string): Promise<{ deleted: boolean }> =>
+  endSession: (id: string): Promise<{ deleted: boolean }> =>
     fetchApi(`/api/voice/sessions/${id}`, { method: 'DELETE' }),
 
   getSession: (id: string): Promise<VoiceSessionDetail> =>

@@ -517,7 +517,7 @@ export function useVoiceMode(options: UseVoiceModeOptions = {}): UseVoiceModeRet
     const sid = sessionIdRef.current;
     if (sid) {
       try {
-        await voiceApi.deleteSession(sid);
+        await voiceApi.endSession(sid);
       } catch (err) {
         console.error('[voice] session end failed:', err);
       }
@@ -564,7 +564,7 @@ export function useVoiceMode(options: UseVoiceModeOptions = {}): UseVoiceModeRet
       // End session on unmount (fire and forget)
       const sid = sessionIdRef.current;
       if (sid) {
-        voiceApi.deleteSession(sid).catch(() => {});
+        voiceApi.endSession(sid).catch(() => {});
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

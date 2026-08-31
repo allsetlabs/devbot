@@ -1,9 +1,10 @@
 /**
- * Push Notification Routes
+ * Push notification routes.
  *
- * Manages device push token registration for native mobile apps (Capacitor).
- * Tokens are stored in the core DB and used to send push notifications
- * when events occur (task completion, new messages, etc.).
+ * POST /register    — register a device push token
+ * POST /unregister  — remove a device push token
+ * GET  /tokens      — list registered tokens (masked)
+ * POST /test        — send a test push notification to all devices
  */
 
 import { Router } from 'express';
@@ -16,12 +17,8 @@ import {
 
 export const pushRouter = Router();
 
-/**
- * POST /api/push/register
- * Register a device push token.
- * Body: { token: string, platform: 'android' | 'ios' | 'web', deviceName?: string }
- */
-pushRouter.post('/register', (req, res) => {
+// Register a device push token
+pushRouter.post('/register', async (req, res) => {
   try {
     const { token, platform, deviceName } = req.body;
 
@@ -29,25 +26,22 @@ pushRouter.post('/register', (req, res) => {
       res.status(400).json({ error: 'Missing or invalid token' });
       return;
     }
+
     if (!platform || !['android', 'ios', 'web'].includes(platform)) {
-      res.status(400).json({ error: 'Missing or invalid platform (android, ios, web)' });
+      res.status(400).json({ error: 'Platform must be android, ios, or web' });
       return;
     }
 
-    const record = registerPushToken(token, platform, deviceName || 'Unknown Device');
-    res.json({ success: true, id: record.id });
+    await registerPushToken(token, platform, deviceName);
+    res.json({ success: true });
   } catch (err) {
     console.error('[Push] Register error:', err);
     res.status(500).json({ error: 'Failed to register push token' });
   }
 });
 
-/**
- * POST /api/push/unregister
- * Unregister a device push token.
- * Body: { token: string }
- */
-pushRouter.post('/unregister', (req, res) => {
+// Unregister a device push token
+pushRouter.post('/unregister', async (req, res) => {
   try {
     const { token } = req.body;
 
@@ -56,56 +50,44 @@ pushRouter.post('/unregister', (req, res) => {
       return;
     }
 
-    const removed = unregisterPushToken(token);
-    res.json({ success: removed });
+    const removed = await unregisterPushToken(token);
+    res.json({ success: true, removed });
   } catch (err) {
     console.error('[Push] Unregister error:', err);
     res.status(500).json({ error: 'Failed to unregister push token' });
   }
 });
 
-/**
- * GET /api/push/tokens
- * List all registered push tokens (for admin/settings UI).
- */
-pushRouter.get('/tokens', (_req, res) => {
+// List registered tokens (masked for security)
+pushRouter.get('/tokens', async (_req, res) => {
   try {
-    const tokens = listPushTokens();
-    res.json(
-      tokens.map((t) => ({
-        id: t.id,
-        platform: t.platform,
-        deviceName: t.deviceName,
-        createdAt: t.createdAt,
-        lastUsedAt: t.lastUsedAt,
-        // Don't expose the full token — show only a preview
-        tokenPreview: t.token.slice(0, 12) + '...' + t.token.slice(-8),
-      }))
-    );
+    const tokens = await listPushTokens();
+    const masked = tokens.map((t) => ({
+      id: t.id,
+      tokenPreview: `${t.token.slice(0, 8)}...${t.token.slice(-4)}`,
+      platform: t.platform,
+      deviceName: t.device_name,
+      lastUsedAt: t.last_used_at,
+      createdAt: t.created_at,
+    }));
+    res.json(masked);
   } catch (err) {
     console.error('[Push] List tokens error:', err);
     res.status(500).json({ error: 'Failed to list push tokens' });
   }
 });
 
-/**
- * POST /api/push/test
- * Send a test push notification to all registered devices.
- * Body: { title: string, body: string }
- */
-pushRouter.post('/test', async (req, res) => {
+// Send a test push notification
+pushRouter.post('/test', async (_req, res) => {
   try {
-    const { title, body } = req.body;
-
-    if (!title || !body) {
-      res.status(400).json({ error: 'Missing title or body' });
-      return;
-    }
-
-    const sent = await sendPushNotification({ title, body });
-    res.json({ success: true, sent });
+    await sendPushNotification(
+      'DevBot Test 🔔',
+      'Push notifications are working!',
+      { type: 'test' }
+    );
+    res.json({ success: true, message: 'Test notification sent' });
   } catch (err) {
-    console.error('[Push] Test notification error:', err);
+    console.error('[Push] Test send error:', err);
     res.status(500).json({ error: 'Failed to send test notification' });
   }
 });

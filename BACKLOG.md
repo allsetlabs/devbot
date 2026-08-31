@@ -19,8 +19,8 @@
 - [x] **File-Based Backend Framework** — Generic FileStore<T> class with typed CRUD, mtime-based caching, auto-git-commit. createFileStoreRouter() factory for zero-boilerplate REST endpoints. Management API at /api/file-stores. Demo bookmarks + notes stores. Frontend page with store browser, search, JSON editor for adding records. `COMPLETED 2026-08-30`
 
 ### Phase 2: Platform
-- [ ] `NEXT` **Google OAuth Authentication** — Replace API key auth with Google OAuth. Single user: subbiah2806@gmail.com. Protect all routes. Session cookies for web, tokens for mobile.
-- [ ] **Capacitor Mobile App** — Package the React app as an Android APK via Capacitor. Push notification support. Background services for notification listener.
+- [x] **Google OAuth Authentication** — Google OAuth2 flow with CSRF-protected state, single-user enforcement (ALLOWED_EMAIL whitelist), session cookies (30-day HttpOnly), Bearer API tokens for mobile/programmatic access, auth middleware on all /api/* routes, token CRUD API + Settings page UI for managing tokens, LoginPage with OAuth button, AuthGate wrapping all routes. Backward-compatible API key fallback and dev mode (no auth). `COMPLETED 2026-08-31`
+- [ ] `NEXT` **Capacitor Mobile App** — Package the React app as an Android APK via Capacitor. Push notification support. Background services for notification listener.
 - [ ] **Electron Desktop App** — Package as a macOS desktop app. Direct local model access for faster voice. System tray with notification badges.
 - [ ] **Cloudflare Tunnel** — Replace VPN with Cloudflare Tunnel for public access. Zero-trust with Google OAuth.
 
@@ -85,6 +85,7 @@
 | 2026-08-29 | Event Trigger System (stock/weather/file_watch/webhook evaluators, CRUD UI, test endpoint) | CEO Scheduler |
 | 2026-08-30 | Unified CLI Dashboard (Claude/Codex/Kimi/Cursor multi-provider session browser, JSONL parsers, provider filters) | CEO Scheduler |
 | 2026-08-30 | File-Based Backend Framework (FileStore class, REST router factory, management API, bookmarks+notes demo stores, frontend browser page) | CEO Scheduler |
+| 2026-08-31 | Google OAuth Authentication (OAuth2 flow, session cookies, Bearer API tokens, auth middleware, token management UI, LoginPage, AuthGate) | CEO Scheduler |
 
 ## Notes for Future Sessions
 

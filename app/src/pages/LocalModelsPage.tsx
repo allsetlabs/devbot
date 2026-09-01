@@ -54,7 +54,7 @@ function StatusBadge({ running }: { running: boolean }) {
 }
 
 function CategoryBadge({ category }: { category: RecommendedModel['category'] }) {
-  const config = {
+  const config: Record<RecommendedModel['category'], { icon: typeof Zap; label: string; color: string }> = {
     fast: { icon: Zap, label: 'Fast', color: 'text-yellow-600 bg-yellow-500/10 dark:text-yellow-400' },
     balanced: {
       icon: Scale,

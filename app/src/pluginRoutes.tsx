@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
-import { Baby, Leaf, Network, Map } from 'lucide-react';
+import { Baby, Leaf, Network, Map, Camera } from 'lucide-react';
 import { BabyLogs } from '@devbot/plugin-baby-logs/frontend/pages/BabyLogs';
 import { BabyAnalytics } from '@devbot/plugin-baby-logs/frontend/pages/BabyAnalytics';
 import { GrowthCharts } from '@devbot/plugin-baby-logs/frontend/pages/GrowthCharts';
@@ -8,6 +8,7 @@ import { LawnPhotoJournal } from '@devbot/plugin-lawn-care/frontend/pages/LawnPh
 import { FamilyHierarchy } from '@devbot/plugin-family-hierarchy/frontend/pages/FamilyHierarchy';
 import { TripPlanner } from '@devbot/plugin-trip-planner/frontend/pages/TripPlanner';
 import { TripDetailPage } from '@devbot/plugin-trip-planner/frontend/pages/TripDetailPage';
+import { BabyMonitor } from '@devbot/plugin-baby-monitor/frontend/pages/BabyMonitor';
 
 /**
  * Registry of every plugin sub-route, namespaced under `/plugins`. This is the plugin
@@ -77,6 +78,12 @@ export const pluginRoutes: PluginRoute[] = [
     name: 'Trip Details',
     icon: <Map className="h-5 w-5" />,
     Component: TripDetailPage,
+  },
+  {
+    path: '/plugins/baby-monitor',
+    name: 'Baby Monitor',
+    icon: <Camera className="h-5 w-5" />,
+    Component: BabyMonitor,
   },
 ];
 

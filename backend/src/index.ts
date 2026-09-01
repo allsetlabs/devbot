@@ -46,6 +46,7 @@ import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
 import getFamilyHierarchyRouter from '@devbot/plugin-family-hierarchy/backend/routes.js';
 import { getTripPlannerRouter } from '@devbot/plugin-trip-planner/backend/store.js';
+import { getBabyMonitorRouter } from '@devbot/plugin-baby-monitor/backend/store.js';
 import type { LawnProfile } from '@devbot/plugin-lawn-care/backend/schema.js';
 import { spawnClaudeStructured, getActiveSessionCount } from './lib/claude-spawn.js';
 import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
@@ -64,7 +65,7 @@ delete process.env.CLAUDECODE;
 
 const app = express();
 
-import { BACKEND_PORT, BACKEND_HOST, API_KEY, DEVBOT_PROJECTS_DIR, GOOGLE_CLIENT_ID } from './lib/env.js';
+import { BACKEND_PORT, BACKEND_HOST, API_KEY, DEVBOT_PROJECTS_DIR, GOOGLE_CLIENT_ID, DISABLE_AUTH } from './lib/env.js';
 
 const PORT = BACKEND_PORT;
 const HOST = BACKEND_HOST;
@@ -256,6 +257,7 @@ app.use('/api/local-models', localModelsRouter);
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());
 app.use('/api/plugins/family-hierarchy', getFamilyHierarchyRouter());
 app.use('/api/plugins/trip-planner', getTripPlannerRouter());
+app.use('/api/plugins/baby-monitor', getBabyMonitorRouter());
 app.use(
   '/api/plugins/lawn-care',
   getLawnCareRouter({
@@ -350,7 +352,9 @@ const scheme = devCert ? 'https' : 'http';
 const server = httpServer.listen(PORT, HOST, async () => {
   console.log(`DevBot backend running at ${scheme}://${HOST}:${PORT}`);
   console.log(`Health check: ${scheme}://${HOST}:${PORT}/health`);
-  if (GOOGLE_CLIENT_ID) {
+  if (DISABLE_AUTH) {
+    console.warn('Auth: DISABLED via DISABLE_AUTH=true — all requests run as dev user (dev only)');
+  } else if (GOOGLE_CLIENT_ID) {
     console.log('Auth: Google OAuth enabled');
   } else if (API_KEY) {
     console.log('Auth: API key mode (set GOOGLE_CLIENT_ID to enable OAuth)');

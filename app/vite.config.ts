@@ -39,6 +39,14 @@ export default defineConfig(() => {
           __dirname,
           '../plugins/trip-planner/backend'
         ),
+        '@devbot/plugin-baby-monitor/frontend': path.resolve(
+          __dirname,
+          '../plugins/baby-monitor/frontend'
+        ),
+        '@devbot/plugin-baby-monitor/backend': path.resolve(
+          __dirname,
+          '../plugins/baby-monitor/backend'
+        ),
       },
       dedupe: ['react', 'react-dom'],
     },

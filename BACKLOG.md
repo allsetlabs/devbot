@@ -31,8 +31,8 @@
 
 ### Phase 4: Plugins & Apps
 - [x] **Trip Planner Plugin** — Wanderlog-style trip planning with FileStore backend. Trip CRUD with status tracking (planning/booked/in-progress/completed), day-by-day itinerary builder with categorized activities (transport/food/activity/lodging/shopping), expense tracker with budget bar and category breakdown, shareable trip export/import as JSON files, trip stats summary endpoint. Frontend: TripPlanner page with search/filter/stats, TripDetail page with itinerary/expenses/notes tabs, CreateTripDrawer with emoji picker, DayItinerary with collapsible day sections and add-activity drawer, ExpenseTracker with budget progress and category grouping. PluginsHub card, plugin route with detail sub-route. `COMPLETED 2026-09-01`
-- [ ] `NEXT` **Baby Monitor Plugin** — RTSP camera feed + AI safety inference. Alert on unsafe positions. Local-only processing.
-- [ ] **Personal Finance Plugin** — Track expenses, investments, gold (pavan units). Robinhood portfolio integration.
+- [x] **Baby Monitor Plugin** — RTSP camera feed management with ffmpeg snapshot capture, Ollama LLaVA vision model for AI safety inference (prone position, loose blankets, climbing, choking hazards), alert system with severity levels and acknowledge flow, automated monitoring loop with configurable intervals. FileStore backend for cameras and alerts. Camera CRUD with RTSP auth support (username/password, TCP/UDP transport). HTTP image URL support for testing without RTSP hardware. System check endpoint (ffmpeg/Ollama/LLaVA availability). Frontend: BabyMonitor page with stats cards, tabbed UI (Cameras/Alerts/System), CameraCard with snapshot preview and inline actions, CameraDetailView with live auto-refresh mode, AddCameraDrawer with full config form, AlertHistory with expandable details and bulk acknowledge. PluginsHub card. All processing local-only. `COMPLETED 2026-09-01`
+- [ ] `NEXT` **Personal Finance Plugin** — Track expenses, investments, gold (pavan units). Robinhood portfolio integration.
 - [ ] **Health Tracker Plugin** — Family health records. Medication reminders. Appointment scheduling.
 
 ### Phase 5: Intelligence
@@ -93,6 +93,7 @@
 | 2026-08-31 | Voice Transcript Logger (FileStore persistence, auto-save on session end/clear/TTL, Ollama STT analysis, corrections dictionary, VoiceTranscriptsPage with search/stats/analyze, VoiceTranscriptDetail drawer) | CEO Scheduler |
 | 2026-08-31 | Local Model Integration (Ollama model management API, recommended models catalog, custom model creation with dictionary inheritance, generate/chat endpoints with metrics, Qwen 3 0.6B base, Local Models page with tabs/playground/custom builder) | CEO Scheduler |
 | 2026-09-01 | Trip Planner Plugin (FileStore backend, trip CRUD, day-by-day itinerary builder, categorized activities, expense tracker with budget bar, trip export/import JSON, stats endpoint, TripPlanner+TripDetail pages, PluginsHub card) | CEO Scheduler |
+| 2026-09-01 | Baby Monitor Plugin (FileStore backend, RTSP camera CRUD with ffmpeg snapshots, Ollama LLaVA vision safety analysis, alert system with acknowledge flow, automated monitoring loop, system check endpoint, BabyMonitor page with tabs/stats/camera cards/detail view/alert history, AddCameraDrawer, PluginsHub card, local-only processing) | CEO Scheduler |
 
 ## Notes for Future Sessions
 

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Baby, Leaf, Network, Map, ArrowRight } from 'lucide-react';
+import { Baby, Leaf, Network, Map, Camera, ArrowRight } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -40,6 +40,12 @@ const PLUGINS: PluginCard[] = [
     description: 'Plan trips with day-by-day itineraries, expense tracking, and shareable trip files.',
     path: '/plugins/trip-planner',
     icon: <Map className="h-6 w-6" />,
+  },
+  {
+    title: 'Baby Monitor',
+    description: 'RTSP camera feeds with AI safety inference. Alerts on unsafe positions. Local-only processing.',
+    path: '/plugins/baby-monitor',
+    icon: <Camera className="h-6 w-6" />,
   },
 ];
 

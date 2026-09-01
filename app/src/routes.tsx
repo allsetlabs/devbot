@@ -19,6 +19,7 @@ import {
   HardDrive,
   Mic,
   FileAudio,
+  Cpu,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -39,6 +40,7 @@ import { EventSourcesPage } from './pages/EventSourcesPage';
 import { FileStoresPage } from './pages/FileStoresPage';
 import { VoiceModePage } from './pages/VoiceModePage';
 import { VoiceTranscriptsPage } from './pages/VoiceTranscriptsPage';
+import { LocalModelsPage } from './pages/LocalModelsPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -157,6 +159,12 @@ export const routes = {
     name: 'Transcripts',
     icon: <FileAudio className="h-5 w-5" />,
     Component: VoiceTranscriptsPage,
+  },
+  localModels: {
+    path: '/local-models',
+    name: 'Local Models',
+    icon: <Cpu className="h-5 w-5" />,
+    Component: LocalModelsPage,
   },
   settings: {
     path: '/settings',

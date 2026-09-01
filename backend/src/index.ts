@@ -40,6 +40,7 @@ import { bookmarksRouter } from './lib/stores/bookmarks.js';
 import { notesRouter } from './lib/stores/notes.js';
 import { voiceTranscriptsRouter } from './lib/stores/voice-transcripts.js';
 import { voiceTranscriptAnalysisRouter } from './routes/voice-transcripts.js';
+import { localModelsRouter } from './routes/local-models.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -50,7 +51,6 @@ import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
 import { startSchedulerWorker, getRunningTasks } from './lib/scheduler-worker.js';
 import { startEventWorker } from './lib/event-worker.js';
 import { tunnel } from './lib/tunnel.js';
-
 import {
   recoverSessions,
   recoverInteractiveChats,
@@ -102,7 +102,7 @@ app.get('/health', (_req, res) => {
 });
 
 // Doctor — comprehensive backend diagnostics
-app.get('/api/doctor', (_req, res) => {
+app.get('/api/doctor', async (_req, res) => {
   const checks: Record<
     string,
     { status: 'pass' | 'warn' | 'fail'; label: string; value?: string; detail?: string }
@@ -185,6 +185,18 @@ app.get('/api/doctor', (_req, res) => {
   // Cloudflare Tunnel
   checks.tunnel = getTunnelDoctorCheck();
 
+  // Ollama (best-effort sync check via cached state; async detail comes from /api/local-models/status)
+  try {
+    const ollamaResp = await fetch(`${process.env.OLLAMA_HOST ?? 'http://localhost:11434'}/`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    checks.ollama = ollamaResp.ok
+      ? { status: 'pass', label: 'Ollama', value: 'Running', detail: 'Local model inference available' }
+      : { status: 'warn', label: 'Ollama', value: 'Unreachable', detail: 'Run `ollama serve` for local models' };
+  } catch {
+    checks.ollama = { status: 'warn', label: 'Ollama', value: 'Not running', detail: 'Run `ollama serve` for local models' };
+  }
+
   // Memory usage
   const mem = process.memoryUsage();
   const rss = (mem.rss / 1024 / 1024).toFixed(0);
@@ -237,6 +249,7 @@ app.use('/api/file-stores/bookmarks/data', bookmarksRouter);
 app.use('/api/file-stores/notes/data', notesRouter);
 app.use('/api/file-stores/voice-transcripts/data', voiceTranscriptsRouter);
 app.use('/api/voice-transcripts', voiceTranscriptAnalysisRouter);
+app.use('/api/local-models', localModelsRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

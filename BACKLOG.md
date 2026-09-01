@@ -27,10 +27,10 @@
 ### Phase 3: Voice & AI
 - [x] **Voice Mode (OpenAI-style)** — Full duplex voice conversation. Whisper STT via existing /api/stt/transcribe, edge-tts for TTS (/api/tts/* routes with voice selection, MP3 streaming, settings persistence). Voice conversation sessions via Anthropic API direct (/api/voice/* routes with in-memory session management, voice-optimized system prompt). Full-screen mobile-first UI with animated state orb (idle/listening/transcribing/thinking/speaking), scrollable conversation transcript, mic/clear/end-call controls. useVoiceMode hook orchestrating full conversation loop (record → STT → AI → TTS → play). Voice Activity Detection (VAD) via AudioContext/AnalyserNode. Web Speech API live transcript preview. TTS voice selector in Settings page. `COMPLETED 2026-08-31`
 - [x] **Voice Transcript Logger** — VoiceTranscriptsStore (FileStore) persists every voice session's messages, raw STT, duration, and analysis state. Auto-save on session end/clear/TTL cleanup. Analysis router with Ollama-powered STT error detection, corrections dictionary CRUD, app-specific term seeding. VoiceTranscriptsPage with search, stats cards, expandable transcript cards with STT diff annotations, analyze button. VoiceTranscriptDetail drawer. voiceTranscriptsApi client. `COMPLETED 2026-08-31`
-- [ ] `NEXT` **Local Model Integration** — Qwen 3.5 0.8B for fast local tasks. Custom dictionary inheritance. Ollama integration for on-device inference.
+- [x] **Local Model Integration** — Ollama model management API (list/pull/delete/show), recommended models catalog (Qwen 3 0.6B/1.7B/4B, Llama 3.2, Gemma 3, Phi 4), custom model creation with Modelfile generation and STT dictionary inheritance, generate and chat completion endpoints with performance metrics (tok/s, latency), Modelfile updated to Qwen 3 0.6B base. Frontend: Local Models page with tabbed UI (Models/Playground/Custom), Ollama connection status, model cards with pull/delete, recommended models with category badges (fast/balanced/capable), inference playground with system prompt and temperature controls, custom model builder with dictionary inheritance toggle. `COMPLETED 2026-08-31`
 
 ### Phase 4: Plugins & Apps
-- [ ] **Trip Planner Plugin** — Wanderlog-style trip planning. File-based backend. Itinerary builder, map integration, expense tracking. Shareable trip files.
+- [ ] `NEXT` **Trip Planner Plugin** — Wanderlog-style trip planning. File-based backend. Itinerary builder, map integration, expense tracking. Shareable trip files.
 - [ ] **Baby Monitor Plugin** — RTSP camera feed + AI safety inference. Alert on unsafe positions. Local-only processing.
 - [ ] **Personal Finance Plugin** — Track expenses, investments, gold (pavan units). Robinhood portfolio integration.
 - [ ] **Health Tracker Plugin** — Family health records. Medication reminders. Appointment scheduling.
@@ -91,6 +91,7 @@
 | 2026-08-31 | Cloudflare Tunnel (CloudflareTunnel process manager, quick+named modes, REST API, TunnelManager Settings UI, Makefile targets, health/doctor integration, zero-trust Cloudflare Access) | CEO Scheduler |
 | 2026-08-31 | Voice Mode (edge-tts TTS with voice selection, Anthropic API voice sessions, full-screen voice UI with animated orb, useVoiceMode hook with VAD, conversation loop STT→AI→TTS→play, TTS settings) | CEO Scheduler |
 | 2026-08-31 | Voice Transcript Logger (FileStore persistence, auto-save on session end/clear/TTL, Ollama STT analysis, corrections dictionary, VoiceTranscriptsPage with search/stats/analyze, VoiceTranscriptDetail drawer) | CEO Scheduler |
+| 2026-08-31 | Local Model Integration (Ollama model management API, recommended models catalog, custom model creation with dictionary inheritance, generate/chat endpoints with metrics, Qwen 3 0.6B base, Local Models page with tabs/playground/custom builder) | CEO Scheduler |
 
 ## Notes for Future Sessions
 

@@ -1,11 +1,13 @@
 import type { ComponentType, ReactNode } from 'react';
-import { Baby, Leaf, Network } from 'lucide-react';
+import { Baby, Leaf, Network, Map } from 'lucide-react';
 import { BabyLogs } from '@devbot/plugin-baby-logs/frontend/pages/BabyLogs';
 import { BabyAnalytics } from '@devbot/plugin-baby-logs/frontend/pages/BabyAnalytics';
 import { GrowthCharts } from '@devbot/plugin-baby-logs/frontend/pages/GrowthCharts';
 import { LawnCare } from '@devbot/plugin-lawn-care/frontend/pages/LawnCare';
 import { LawnPhotoJournal } from '@devbot/plugin-lawn-care/frontend/pages/LawnPhotoJournal';
 import { FamilyHierarchy } from '@devbot/plugin-family-hierarchy/frontend/pages/FamilyHierarchy';
+import { TripPlanner } from '@devbot/plugin-trip-planner/frontend/pages/TripPlanner';
+import { TripDetailPage } from '@devbot/plugin-trip-planner/frontend/pages/TripDetailPage';
 
 /**
  * Registry of every plugin sub-route, namespaced under `/plugins`. This is the plugin
@@ -63,6 +65,18 @@ export const pluginRoutes: PluginRoute[] = [
     name: 'Family Hierarchy',
     icon: <Network className="h-5 w-5" />,
     Component: FamilyHierarchy,
+  },
+  {
+    path: '/plugins/trip-planner',
+    name: 'Trip Planner',
+    icon: <Map className="h-5 w-5" />,
+    Component: TripPlanner,
+  },
+  {
+    path: '/plugins/trip-planner/:tripId',
+    name: 'Trip Details',
+    icon: <Map className="h-5 w-5" />,
+    Component: TripDetailPage,
   },
 ];
 

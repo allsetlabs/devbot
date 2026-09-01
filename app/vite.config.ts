@@ -31,6 +31,14 @@ export default defineConfig(() => {
           '../plugins/lawn-care/frontend'
         ),
         '@devbot/plugin-lawn-care/backend': path.resolve(__dirname, '../plugins/lawn-care/backend'),
+        '@devbot/plugin-trip-planner/frontend': path.resolve(
+          __dirname,
+          '../plugins/trip-planner/frontend'
+        ),
+        '@devbot/plugin-trip-planner/backend': path.resolve(
+          __dirname,
+          '../plugins/trip-planner/backend'
+        ),
       },
       dedupe: ['react', 'react-dom'],
     },

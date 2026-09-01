@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Baby, Leaf, Network, ArrowRight } from 'lucide-react';
+import { Baby, Leaf, Network, Map, ArrowRight } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -34,6 +34,12 @@ const PLUGINS: PluginCard[] = [
     description: 'Lawn profiles, AI-generated treatment plans, weather-aware guidance, and progress photos.',
     path: '/plugins/lawn-care',
     icon: <Leaf className="h-6 w-6" />,
+  },
+  {
+    title: 'Trip Planner',
+    description: 'Plan trips with day-by-day itineraries, expense tracking, and shareable trip files.',
+    path: '/plugins/trip-planner',
+    icon: <Map className="h-6 w-6" />,
   },
 ];
 

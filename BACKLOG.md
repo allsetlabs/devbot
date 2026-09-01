@@ -30,8 +30,8 @@
 - [x] **Local Model Integration** — Ollama model management API (list/pull/delete/show), recommended models catalog (Qwen 3 0.6B/1.7B/4B, Llama 3.2, Gemma 3, Phi 4), custom model creation with Modelfile generation and STT dictionary inheritance, generate and chat completion endpoints with performance metrics (tok/s, latency), Modelfile updated to Qwen 3 0.6B base. Frontend: Local Models page with tabbed UI (Models/Playground/Custom), Ollama connection status, model cards with pull/delete, recommended models with category badges (fast/balanced/capable), inference playground with system prompt and temperature controls, custom model builder with dictionary inheritance toggle. `COMPLETED 2026-08-31`
 
 ### Phase 4: Plugins & Apps
-- [ ] `NEXT` **Trip Planner Plugin** — Wanderlog-style trip planning. File-based backend. Itinerary builder, map integration, expense tracking. Shareable trip files.
-- [ ] **Baby Monitor Plugin** — RTSP camera feed + AI safety inference. Alert on unsafe positions. Local-only processing.
+- [x] **Trip Planner Plugin** — Wanderlog-style trip planning with FileStore backend. Trip CRUD with status tracking (planning/booked/in-progress/completed), day-by-day itinerary builder with categorized activities (transport/food/activity/lodging/shopping), expense tracker with budget bar and category breakdown, shareable trip export/import as JSON files, trip stats summary endpoint. Frontend: TripPlanner page with search/filter/stats, TripDetail page with itinerary/expenses/notes tabs, CreateTripDrawer with emoji picker, DayItinerary with collapsible day sections and add-activity drawer, ExpenseTracker with budget progress and category grouping. PluginsHub card, plugin route with detail sub-route. `COMPLETED 2026-09-01`
+- [ ] `NEXT` **Baby Monitor Plugin** — RTSP camera feed + AI safety inference. Alert on unsafe positions. Local-only processing.
 - [ ] **Personal Finance Plugin** — Track expenses, investments, gold (pavan units). Robinhood portfolio integration.
 - [ ] **Health Tracker Plugin** — Family health records. Medication reminders. Appointment scheduling.
 
@@ -92,6 +92,7 @@
 | 2026-08-31 | Voice Mode (edge-tts TTS with voice selection, Anthropic API voice sessions, full-screen voice UI with animated orb, useVoiceMode hook with VAD, conversation loop STT→AI→TTS→play, TTS settings) | CEO Scheduler |
 | 2026-08-31 | Voice Transcript Logger (FileStore persistence, auto-save on session end/clear/TTL, Ollama STT analysis, corrections dictionary, VoiceTranscriptsPage with search/stats/analyze, VoiceTranscriptDetail drawer) | CEO Scheduler |
 | 2026-08-31 | Local Model Integration (Ollama model management API, recommended models catalog, custom model creation with dictionary inheritance, generate/chat endpoints with metrics, Qwen 3 0.6B base, Local Models page with tabs/playground/custom builder) | CEO Scheduler |
+| 2026-09-01 | Trip Planner Plugin (FileStore backend, trip CRUD, day-by-day itinerary builder, categorized activities, expense tracker with budget bar, trip export/import JSON, stats endpoint, TripPlanner+TripDetail pages, PluginsHub card) | CEO Scheduler |
 
 ## Notes for Future Sessions
 

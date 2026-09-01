@@ -13,6 +13,7 @@
     "@devbot/plugin-baby-logs": "*",
     "@devbot/plugin-family-hierarchy": "*",
     "@devbot/plugin-lawn-care": "*",
+    "@devbot/plugin-trip-planner": "*",
     "better-sqlite3": "12.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "2.8.5",

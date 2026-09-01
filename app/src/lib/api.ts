@@ -94,7 +94,7 @@ export function refreshBackendUrl(): void {
  * Build auth headers. Sends X-API-Key when available (backward compat),
  * and always includes credentials: 'include' for session cookies.
  */
-function authHeaders(): Record<string, string> {
+export function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
   if (API_KEY) {
     headers['X-API-Key'] = API_KEY;

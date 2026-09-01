@@ -18,6 +18,7 @@ import {
   Zap,
   HardDrive,
   Mic,
+  FileAudio,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -37,6 +38,7 @@ import { CLIDashboard } from './pages/CLIDashboard';
 import { EventSourcesPage } from './pages/EventSourcesPage';
 import { FileStoresPage } from './pages/FileStoresPage';
 import { VoiceModePage } from './pages/VoiceModePage';
+import { VoiceTranscriptsPage } from './pages/VoiceTranscriptsPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -149,6 +151,12 @@ export const routes = {
     name: 'Voice',
     icon: <Mic className="h-5 w-5" />,
     Component: VoiceModePage,
+  },
+  voiceTranscripts: {
+    path: '/voice-transcripts',
+    name: 'Transcripts',
+    icon: <FileAudio className="h-5 w-5" />,
+    Component: VoiceTranscriptsPage,
   },
   settings: {
     path: '/settings',

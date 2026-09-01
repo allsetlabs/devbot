@@ -310,7 +310,7 @@ export function useVoiceMode(options: UseVoiceModeOptions = {}): UseVoiceModeRet
         setState('transcribing');
         setError(null);
 
-        const { transcript } = await sttTranscribe(blob);
+        const { transcript, rawTranscript } = await sttTranscribe(blob);
 
         if (!transcript || !transcript.trim()) {
           setState('idle');
@@ -329,10 +329,10 @@ export function useVoiceMode(options: UseVoiceModeOptions = {}): UseVoiceModeRet
         };
         setMessages((prev) => [...prev, userMessage]);
 
-        // Step 2: Send to voice AI for response
+        // Step 2: Send to voice AI for response (include rawTranscript for logging)
         setState('thinking');
 
-        const response = await voiceApi.respond(currentSessionId, transcript, model);
+        const response = await voiceApi.respond(currentSessionId, transcript, model, rawTranscript);
 
         if (!mountedRef.current) return;
 

@@ -1,5 +1,9 @@
 import { Router } from 'express';
 import { asyncHandler, sendBadRequest, sendInternalError, generateId } from '../lib/route-helpers.js';
+import {
+  voiceTranscriptsStore,
+  type VoiceTranscriptMessage,
+} from '../lib/stores/voice-transcripts.js';
 
 export const voiceRouter = Router();
 
@@ -10,6 +14,8 @@ export const voiceRouter = Router();
 interface VoiceMessage {
   role: 'user' | 'assistant';
   content: string;
+  /** Raw STT output before corrections (user messages only) */
+  rawStt?: string;
   timestamp: string;
 }
 
@@ -46,16 +52,58 @@ function resolveModel(shortName?: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Transcript persistence helper
+// ---------------------------------------------------------------------------
+
+async function saveTranscript(session: VoiceSession): Promise<void> {
+  if (session.messages.length === 0) return;
+
+  const startTime = new Date(session.createdAt).getTime();
+  const endTime = new Date(session.lastActiveAt).getTime();
+  const durationSeconds = Math.max(0, Math.round((endTime - startTime) / 1000));
+
+  const transcriptMessages: VoiceTranscriptMessage[] = session.messages.map((m) => ({
+    role: m.role,
+    content: m.content,
+    ...(m.rawStt ? { rawStt: m.rawStt } : {}),
+    timestamp: m.timestamp,
+  }));
+
+  try {
+    await voiceTranscriptsStore.create({
+      sessionId: session.id,
+      messages: transcriptMessages,
+      messageCount: session.messages.length,
+      durationSeconds,
+      sessionStartedAt: session.createdAt,
+      sessionEndedAt: session.lastActiveAt,
+      analyzed: false,
+      analysisSummary: '',
+      created_by: 'voice',
+      updated_by: 'voice',
+      settings: {},
+    } as Parameters<typeof voiceTranscriptsStore.create>[0]);
+    console.log(
+      `[voice] Saved transcript for session ${session.id} (${session.messages.length} messages, ${durationSeconds}s)`
+    );
+  } catch (err) {
+    console.error(`[voice] Failed to save transcript for session ${session.id}:`, err);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Session cleanup — remove sessions older than 1 hour, every 5 minutes
+// Save transcripts before cleanup.
 // ---------------------------------------------------------------------------
 
 const SESSION_TTL_MS = 60 * 60 * 1000; // 1 hour
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
-setInterval(() => {
+setInterval(async () => {
   const now = Date.now();
   for (const [id, session] of sessions) {
     if (now - new Date(session.lastActiveAt).getTime() > SESSION_TTL_MS) {
+      await saveTranscript(session);
       sessions.delete(id);
     }
   }
@@ -110,15 +158,20 @@ voiceRouter.get(
   }, 'get voice session')
 );
 
-// DELETE /api/voice/sessions/:id — end a voice session
+// DELETE /api/voice/sessions/:id — end a voice session (saves transcript)
 voiceRouter.delete(
   '/sessions/:id',
   asyncHandler(async (req, res) => {
-    const existed = sessions.delete(req.params.id);
-    if (!existed) {
+    const session = sessions.get(req.params.id);
+    if (!session) {
       res.status(404).json({ error: 'Not found', message: 'Voice session not found' });
       return;
     }
+
+    // Save transcript before deleting
+    await saveTranscript(session);
+    sessions.delete(req.params.id);
+
     res.json({ deleted: true });
   }, 'delete voice session')
 );
@@ -133,7 +186,7 @@ voiceRouter.post(
       return;
     }
 
-    const { text, model } = req.body as { text?: string; model?: string };
+    const { text, rawStt, model } = req.body as { text?: string; rawStt?: string; model?: string };
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
       return sendBadRequest(res, 'text is required');
     }
@@ -194,8 +247,13 @@ voiceRouter.post(
 
       const now = new Date().toISOString();
 
-      // Add user message to history
-      session.messages.push({ role: 'user', content: text.trim(), timestamp: now });
+      // Add user message to history (preserve rawStt for transcript logging)
+      session.messages.push({
+        role: 'user',
+        content: text.trim(),
+        ...(rawStt && rawStt !== text.trim() ? { rawStt } : {}),
+        timestamp: now,
+      });
 
       // Add assistant response to history
       session.messages.push({ role: 'assistant', content: assistantText, timestamp: now });
@@ -218,6 +276,10 @@ voiceRouter.post(
       res.status(404).json({ error: 'Not found', message: 'Voice session not found' });
       return;
     }
+
+    // Save transcript before clearing (don't lose the conversation)
+    await saveTranscript(session);
+
     session.messages = [];
     session.lastActiveAt = new Date().toISOString();
     res.json({ cleared: true });

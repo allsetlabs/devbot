@@ -1237,12 +1237,83 @@ export const voiceApi = {
   listSessions: (): Promise<VoiceSession[]> =>
     fetchApi('/api/voice/sessions'),
 
-  respond: (id: string, text: string, model?: string): Promise<VoiceRespondResponse> =>
+  respond: (id: string, text: string, model?: string, rawStt?: string): Promise<VoiceRespondResponse> =>
     fetchApi(`/api/voice/sessions/${id}/respond`, {
       method: 'POST',
-      body: JSON.stringify({ text, model }),
+      body: JSON.stringify({ text, model, ...(rawStt && rawStt !== text ? { rawStt } : {}) }),
     }),
 
   clearHistory: (id: string): Promise<{ cleared: boolean }> =>
     fetchApi(`/api/voice/sessions/${id}/clear`, { method: 'POST' }),
+};
+
+// ── Voice Transcripts ─────────────────────────────────────────────────────
+
+export interface VoiceTranscriptMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  rawStt?: string;
+  timestamp: string;
+}
+
+export interface VoiceTranscript {
+  id: string;
+  sessionId: string;
+  messages: VoiceTranscriptMessage[];
+  messageCount: number;
+  durationSeconds: number;
+  sessionStartedAt: string;
+  sessionEndedAt: string;
+  analyzed: boolean;
+  analysisSummary?: string;
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string;
+  settings: Record<string, unknown>;
+}
+
+export interface VoiceTranscriptStats {
+  totalSessions: number;
+  totalMessages: number;
+  totalDurationSeconds: number;
+  totalDurationFormatted: string;
+  analyzedCount: number;
+  unanalyzedCount: number;
+  sttDiffCount: number;
+  dictionaryEntries: number;
+}
+
+export interface VoiceTranscriptAnalyzeResult {
+  analyzed: number;
+  newCorrections: Record<string, string[]>;
+  summary: string;
+  totalDictionaryEntries: number;
+}
+
+export const voiceTranscriptsApi = {
+  list: (params?: { search?: string; sort?: string; order?: string; limit?: number }): Promise<VoiceTranscript[]> => {
+    const qs = new URLSearchParams();
+    if (params?.search) qs.set('search', params.search);
+    if (params?.sort) qs.set('sort', params.sort);
+    if (params?.order) qs.set('order', params.order);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const query = qs.toString();
+    return fetchApi(`/api/file-stores/voice-transcripts/data${query ? `?${query}` : ''}`);
+  },
+
+  get: (id: string): Promise<VoiceTranscript> =>
+    fetchApi(`/api/file-stores/voice-transcripts/data/${id}`),
+
+  delete: (id: string): Promise<{ ok: boolean }> =>
+    fetchApi(`/api/file-stores/voice-transcripts/data/${id}`, { method: 'DELETE' }),
+
+  stats: (): Promise<VoiceTranscriptStats> =>
+    fetchApi('/api/voice-transcripts/stats'),
+
+  analyze: (): Promise<VoiceTranscriptAnalyzeResult> =>
+    fetchApi('/api/voice-transcripts/analyze', { method: 'POST' }),
+
+  analyzeAll: (): Promise<VoiceTranscriptAnalyzeResult> =>
+    fetchApi('/api/voice-transcripts/analyze-all', { method: 'POST' }),
 };

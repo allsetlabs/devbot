@@ -38,6 +38,8 @@ import { pushRouter } from './routes/push.js';
 import { tunnelRouter, getTunnelDoctorCheck } from './routes/tunnel.js';
 import { bookmarksRouter } from './lib/stores/bookmarks.js';
 import { notesRouter } from './lib/stores/notes.js';
+import { voiceTranscriptsRouter } from './lib/stores/voice-transcripts.js';
+import { voiceTranscriptAnalysisRouter } from './routes/voice-transcripts.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -233,7 +235,8 @@ app.use('/api/push', pushRouter);
 app.use('/api/tunnel', tunnelRouter);
 app.use('/api/file-stores/bookmarks/data', bookmarksRouter);
 app.use('/api/file-stores/notes/data', notesRouter);
-app.use('/api/push', pushRouter);
+app.use('/api/file-stores/voice-transcripts/data', voiceTranscriptsRouter);
+app.use('/api/voice-transcripts', voiceTranscriptAnalysisRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

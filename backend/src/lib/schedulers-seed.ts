@@ -137,6 +137,8 @@ function buildCeoPrompt(backlogPath: string, devbotDir: string): string {
     `## Instructions\n\n` +
     `1. Read the backlog file at: ${backlogPath}\n` +
     `2. Find the item marked with \`NEXT\`\n` +
+    `   - NEVER pick an item marked \`DO NOT IMPLEMENT\` — the user reverted it on purpose. ` +
+    `Skip it, leave its marker exactly as-is, and never move \`NEXT\` onto it.\n` +
     `3. Implement that ONE feature completely (backend + frontend if applicable)\n` +
     `4. Test your changes (run lint, type-check)\n` +
     `5. Commit your changes with a descriptive message\n` +
@@ -151,6 +153,13 @@ function buildCeoPrompt(backlogPath: string, devbotDir: string): string {
     `- Use the \`settings\` JSONB column for new optional fields to avoid schema migrations when possible\n` +
     `- Create a DevBot interactive chat for this session so the user can review your work\n` +
     `- Do NOT restart DevBot\n` +
+    `- NEVER re-implement a feature marked \`DO NOT IMPLEMENT\` in the backlog, even if its code is missing. ` +
+    `Absent code is intentional — it was reverted. Do not recreate it.\n` +
+    `- NEVER revert, reset, stash, or checkout away changes you did not make yourself. The user and other agents ` +
+    `edit this repo concurrently; discarding their work is destructive. Never run git checkout/reset on files you did not author.\n` +
+    `- When adding a new plugin: add it to backend/package.json AND run \`npm install\` from the repo root to create ` +
+    `the workspace symlink BEFORE importing it in backend/src/index.ts. Importing an unlinked plugin crashes the ` +
+    `backend with ERR_MODULE_NOT_FOUND and takes the whole app down. Verify the backend starts afterward.\n` +
     `- If you get stuck, document what went wrong in the backlog under the feature entry and move NEXT to a different item\n`
   );
 }

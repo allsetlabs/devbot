@@ -55,14 +55,6 @@ export default defineConfig(() => {
           __dirname,
           '../plugins/personal-finance/backend'
         ),
-        '@devbot/plugin-health-tracker/frontend': path.resolve(
-          __dirname,
-          '../plugins/health-tracker/frontend'
-        ),
-        '@devbot/plugin-health-tracker/backend': path.resolve(
-          __dirname,
-          '../plugins/health-tracker/backend'
-        ),
       },
       dedupe: ['react', 'react-dom'],
     },

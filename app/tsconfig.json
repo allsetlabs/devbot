@@ -30,9 +30,7 @@
       "@devbot/plugin-baby-monitor/frontend/*": ["../plugins/baby-monitor/frontend/*"],
       "@devbot/plugin-baby-monitor/backend/*": ["../plugins/baby-monitor/backend/*"],
       "@devbot/plugin-personal-finance/frontend/*": ["../plugins/personal-finance/frontend/*"],
-      "@devbot/plugin-personal-finance/backend/*": ["../plugins/personal-finance/backend/*"],
-      "@devbot/plugin-health-tracker/frontend/*": ["../plugins/health-tracker/frontend/*"],
-      "@devbot/plugin-health-tracker/backend/*": ["../plugins/health-tracker/backend/*"]
+      "@devbot/plugin-personal-finance/backend/*": ["../plugins/personal-finance/backend/*"]
     }
   },
   "include": ["src"],

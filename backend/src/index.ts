@@ -41,6 +41,7 @@ import { notesRouter } from './lib/stores/notes.js';
 import { voiceTranscriptsRouter } from './lib/stores/voice-transcripts.js';
 import { voiceTranscriptAnalysisRouter } from './routes/voice-transcripts.js';
 import { localModelsRouter } from './routes/local-models.js';
+import { notificationsRouter } from './routes/notifications.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -253,6 +254,7 @@ app.use('/api/file-stores/notes/data', notesRouter);
 app.use('/api/file-stores/voice-transcripts/data', voiceTranscriptsRouter);
 app.use('/api/voice-transcripts', voiceTranscriptAnalysisRouter);
 app.use('/api/local-models', localModelsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { coreDb, event_sources, event_task_links, scheduled_tasks } from './db/core.js';
 import type { EventSourceRow } from './db/types.js';
+import { notifyEventTriggered } from './notification-service.js';
 
 // ============================================
 // Helpers
@@ -407,6 +408,11 @@ async function tick(): Promise<void> {
       console.log(
         `[EventWorker] Event triggered: ${source.name} (${source.type}) — ${result.details}`
       );
+
+      // Send notification (push + TTS)
+      notifyEventTriggered(source.name, source.type, result.details).catch((err) => {
+        console.error('[EventWorker] Failed to send event notification:', err);
+      });
 
       // Update last_triggered_at
       await coreDb

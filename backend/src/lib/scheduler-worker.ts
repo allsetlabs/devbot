@@ -9,6 +9,7 @@ import { spawnClaude, isExecuting, stopExecution } from './claude-spawn.js';
 import { DEVBOT_PROJECTS_DIR } from './env.js';
 import type { StreamParserConfig } from './stream-parser.js';
 import { matchesCronExpression, nextCronOccurrence } from './cron-parser.js';
+import { notifySchedulerComplete, notifySchedulerFailed } from './notification-service.js';
 
 const CHECK_INTERVAL_MS = 30000;
 const OUTPUT_DIR = '/tmp/devbot/scheduler';
@@ -322,6 +323,19 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
       console.log(
         `[Scheduler] Task ${taskId} run #${runIndex} ${success ? 'completed' : 'failed'}`
       );
+
+      // Send notification (push + TTS)
+      const taskName = task.name || `Task ${taskId}`;
+      if (success) {
+        notifySchedulerComplete(taskName, taskId, chatId ?? undefined).catch((err) => {
+          console.error('[Scheduler] Failed to send completion notification:', err);
+        });
+      } else {
+        notifySchedulerFailed(taskName, taskId, errorMessage, chatId ?? undefined).catch((err) => {
+          console.error('[Scheduler] Failed to send failure notification:', err);
+        });
+      }
+
       resolve(success);
     };
 

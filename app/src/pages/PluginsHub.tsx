@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Baby, Leaf, Network, Map, Camera, ArrowRight } from 'lucide-react';
+import { Baby, Leaf, Network, Map, Camera, Wallet, ArrowRight } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -46,6 +46,12 @@ const PLUGINS: PluginCard[] = [
     description: 'RTSP camera feeds with AI safety inference. Alerts on unsafe positions. Local-only processing.',
     path: '/plugins/baby-monitor',
     icon: <Camera className="h-6 w-6" />,
+  },
+  {
+    title: 'Personal Finance',
+    description: 'Track expenses, investments, and gold holdings. Portfolio tracking with Robinhood integration.',
+    path: '/plugins/personal-finance',
+    icon: <Wallet className="h-6 w-6" />,
   },
 ];
 

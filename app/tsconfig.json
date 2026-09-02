@@ -28,7 +28,9 @@
       "@devbot/plugin-trip-planner/frontend/*": ["../plugins/trip-planner/frontend/*"],
       "@devbot/plugin-trip-planner/backend/*": ["../plugins/trip-planner/backend/*"],
       "@devbot/plugin-baby-monitor/frontend/*": ["../plugins/baby-monitor/frontend/*"],
-      "@devbot/plugin-baby-monitor/backend/*": ["../plugins/baby-monitor/backend/*"]
+      "@devbot/plugin-baby-monitor/backend/*": ["../plugins/baby-monitor/backend/*"],
+      "@devbot/plugin-personal-finance/frontend/*": ["../plugins/personal-finance/frontend/*"],
+      "@devbot/plugin-personal-finance/backend/*": ["../plugins/personal-finance/backend/*"]
     }
   },
   "include": ["src"],

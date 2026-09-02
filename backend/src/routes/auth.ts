@@ -21,6 +21,7 @@ import {
   verifyOAuthState,
   requireAuth,
   parseCookie,
+  DEV_USER,
 } from '../lib/auth/middleware.js';
 import { asyncHandler } from '../lib/route-helpers.js';
 import {
@@ -29,6 +30,7 @@ import {
   ALLOWED_EMAIL,
   BACKEND_PORT,
   API_KEY,
+  DISABLE_AUTH,
 } from '../lib/env.js';
 
 export const authRouter = Router();
@@ -42,6 +44,20 @@ export const authRouter = Router();
 authRouter.get(
   '/status',
   asyncHandler(async (req, res) => {
+    // 0. Kill switch — auth disabled, report the dev user as authenticated
+    if (DISABLE_AUTH) {
+      res.json({
+        authenticated: true,
+        authDisabled: true,
+        user: {
+          email: DEV_USER.email,
+          name: DEV_USER.name,
+          picture: DEV_USER.picture,
+        },
+      });
+      return;
+    }
+
     // 1. Check session cookie
     const sessionToken = parseCookie(
       req.headers.cookie ?? '',

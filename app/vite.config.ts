@@ -47,6 +47,14 @@ export default defineConfig(() => {
           __dirname,
           '../plugins/baby-monitor/backend'
         ),
+        '@devbot/plugin-personal-finance/frontend': path.resolve(
+          __dirname,
+          '../plugins/personal-finance/frontend'
+        ),
+        '@devbot/plugin-personal-finance/backend': path.resolve(
+          __dirname,
+          '../plugins/personal-finance/backend'
+        ),
       },
       dedupe: ['react', 'react-dom'],
     },

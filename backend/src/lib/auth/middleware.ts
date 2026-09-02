@@ -15,14 +15,22 @@ import type { Request, Response, NextFunction } from 'express';
 import { coreDb } from '../db/core.js';
 import { auth_sessions, auth_tokens } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
-import { API_KEY, SESSION_SECRET, GOOGLE_CLIENT_ID } from '../env.js';
+import { API_KEY, SESSION_SECRET, GOOGLE_CLIENT_ID, DISABLE_AUTH } from '../env.js';
 
 export interface AuthUser {
   email: string;
   name: string;
   picture: string;
-  authMethod: 'session' | 'token' | 'api_key';
+  authMethod: 'session' | 'token' | 'api_key' | 'disabled';
 }
+
+/** The synthetic user every request runs as while DISABLE_AUTH is set. */
+export const DEV_USER: AuthUser = {
+  email: 'dev',
+  name: 'Dev Mode',
+  picture: '',
+  authMethod: 'disabled',
+};
 
 /** Generate a cryptographically random session token. */
 export function generateSessionToken(): string {
@@ -133,6 +141,7 @@ function getApiTokenByValue(token: string) {
 /**
  * Authentication middleware.
  *
+ * When DISABLE_AUTH is set: bypassed entirely, every request is the dev user.
  * When OAuth is configured: checks session cookie → Bearer token → API key.
  * When OAuth is NOT configured: checks API key only (current behavior).
  * When neither is configured: auth disabled (dev mode).
@@ -142,6 +151,13 @@ export function requireAuth(
   res: Response,
   next: NextFunction
 ): void {
+  // Kill switch — auth disabled entirely, run as the dev user
+  if (DISABLE_AUTH) {
+    (req as Request & { user: AuthUser }).user = DEV_USER;
+    next();
+    return;
+  }
+
   // If Google OAuth is not configured, fall back to API key auth
   if (!GOOGLE_CLIENT_ID) {
     if (API_KEY) {

@@ -28,6 +28,11 @@ export const BACKEND_PORT = requiredInt('BACKEND_PORT');
 export const BACKEND_HOST = required('BACKEND_HOST');
 export const API_KEY: string | undefined = process.env.API_KEY;
 
+// Auth kill switch (dev only) — when true, every request bypasses the auth
+// check entirely and runs as a dev user. Set in .env; never enable when
+// DevBot is exposed outside localhost / the tunnel.
+export const DISABLE_AUTH: boolean = process.env.DISABLE_AUTH === 'true';
+
 // Google OAuth (optional — if not set, falls back to API key auth)
 export const GOOGLE_CLIENT_ID: string | undefined = process.env.GOOGLE_CLIENT_ID;
 export const GOOGLE_CLIENT_SECRET: string | undefined = process.env.GOOGLE_CLIENT_SECRET;

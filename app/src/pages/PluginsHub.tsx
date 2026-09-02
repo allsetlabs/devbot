@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Baby, Leaf, Network, Map, Camera, Wallet, ArrowRight } from 'lucide-react';
+import { Baby, Leaf, Network, Map, Camera, Wallet, HeartPulse, ArrowRight } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -52,6 +52,12 @@ const PLUGINS: PluginCard[] = [
     description: 'Track expenses, investments, and gold holdings. Portfolio tracking with Robinhood integration.',
     path: '/plugins/personal-finance',
     icon: <Wallet className="h-6 w-6" />,
+  },
+  {
+    title: 'Health Tracker',
+    description: 'Family health records, medication reminders, and appointment scheduling for the whole family.',
+    path: '/plugins/health-tracker',
+    icon: <HeartPulse className="h-6 w-6" />,
   },
 ];
 

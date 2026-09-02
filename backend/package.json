@@ -15,6 +15,7 @@
     "@devbot/plugin-lawn-care": "*",
     "@devbot/plugin-trip-planner": "*",
     "@devbot/plugin-personal-finance": "*",
+    "@devbot/plugin-health-tracker": "*",
     "better-sqlite3": "12.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "2.8.5",

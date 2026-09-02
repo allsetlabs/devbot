@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
-import { Baby, Leaf, Network, Map, Camera, Wallet } from 'lucide-react';
+import { Baby, Leaf, Network, Map, Camera, Wallet, HeartPulse } from 'lucide-react';
 import { BabyLogs } from '@devbot/plugin-baby-logs/frontend/pages/BabyLogs';
 import { BabyAnalytics } from '@devbot/plugin-baby-logs/frontend/pages/BabyAnalytics';
 import { GrowthCharts } from '@devbot/plugin-baby-logs/frontend/pages/GrowthCharts';
@@ -10,6 +10,7 @@ import { TripPlanner } from '@devbot/plugin-trip-planner/frontend/pages/TripPlan
 import { TripDetailPage } from '@devbot/plugin-trip-planner/frontend/pages/TripDetailPage';
 import { BabyMonitor } from '@devbot/plugin-baby-monitor/frontend/pages/BabyMonitor';
 import { PersonalFinance } from '@devbot/plugin-personal-finance/frontend/pages/PersonalFinance';
+import { HealthTracker } from '@devbot/plugin-health-tracker/frontend/pages/HealthTracker';
 
 /**
  * Registry of every plugin sub-route, namespaced under `/plugins`. This is the plugin
@@ -91,6 +92,12 @@ export const pluginRoutes: PluginRoute[] = [
     name: 'Personal Finance',
     icon: <Wallet className="h-5 w-5" />,
     Component: PersonalFinance,
+  },
+  {
+    path: '/plugins/health-tracker',
+    name: 'Health Tracker',
+    icon: <HeartPulse className="h-5 w-5" />,
+    Component: HealthTracker,
   },
 ];
 

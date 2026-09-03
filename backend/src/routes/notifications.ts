@@ -31,7 +31,7 @@ import { asyncHandler, sendBadRequest, sendNotFound } from '../lib/route-helpers
 
 export const notificationsRouter = Router();
 
-const VALID_CATEGORIES: NotificationCategory[] = ['scheduler', 'event', 'chat', 'system', 'reminder', 'custom'];
+const VALID_CATEGORIES: NotificationCategory[] = ['scheduler', 'event', 'chat', 'assist', 'system', 'reminder', 'custom'];
 const VALID_PRIORITIES: NotificationPriority[] = ['low', 'normal', 'high', 'urgent'];
 
 // ─── List notifications ─────────────────────────────────────────────────

@@ -30,6 +30,7 @@ import {
   Settings,
   Loader2,
   ChevronDown,
+  HandHelping,
 } from 'lucide-react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────
@@ -38,6 +39,7 @@ const CATEGORY_CONFIG: Record<NotificationCategory, { label: string; icon: typeo
   scheduler: { label: 'Scheduler', icon: Clock, color: 'text-blue-500' },
   event: { label: 'Event', icon: Zap, color: 'text-amber-500' },
   chat: { label: 'Chat', icon: MessageCircle, color: 'text-green-500' },
+  assist: { label: 'Assist', icon: HandHelping, color: 'text-orange-500' },
   system: { label: 'System', icon: AlertTriangle, color: 'text-red-500' },
   reminder: { label: 'Reminder', icon: Bell, color: 'text-purple-500' },
   custom: { label: 'Custom', icon: Bell, color: 'text-muted-foreground' },
@@ -207,6 +209,7 @@ function NotificationSettingsPanel({
           </div>
           <input
             type="checkbox"
+            aria-label="TTS enabled"
             checked={settings.ttsEnabled}
             onChange={(e) => onUpdate({ ttsEnabled: e.target.checked })}
             className="h-4 w-4 rounded"
@@ -222,6 +225,7 @@ function NotificationSettingsPanel({
           </div>
           <input
             type="checkbox"
+            aria-label="Do Not Disturb"
             checked={settings.dndEnabled}
             onChange={(e) => onUpdate({ dndEnabled: e.target.checked })}
             className="h-4 w-4 rounded"
@@ -464,6 +468,7 @@ export function NotificationsPage() {
     { value: 'scheduler', label: 'Scheduler' },
     { value: 'event', label: 'Event' },
     { value: 'chat', label: 'Chat' },
+    { value: 'assist', label: 'Assist' },
     { value: 'system', label: 'System' },
     { value: 'reminder', label: 'Reminder' },
     { value: 'custom', label: 'Custom' },

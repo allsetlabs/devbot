@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+#
+# devbot-ask — Request human input from any terminal.
+#
+# Usage:
+#   devbot-ask "What color scheme should I use?"
+#   devbot-ask -c "Working on the dashboard" "Should I add a dark mode toggle?"
+#   devbot-ask --source scheduler --source-id task-123 "Which API to use?"
+#   echo "question" | devbot-ask
+#   devbot-ask --timeout 60 "Quick question"
+#
+# The script sends the question to DevBot, then long-polls until the user
+# replies from the mobile app (or the request times out / is cancelled).
+# The reply is printed to stdout so callers can capture it:
+#
+#   REPLY=$(devbot-ask "Should I proceed?")
+#
+
+set -euo pipefail
+
+# ─── Config ──────────────────────────────────────────────────────────────
+
+DEVBOT_URL="${DEVBOT_URL:-https://localhost:3100}"
+DEVBOT_API_KEY="${DEVBOT_API_KEY:-}"
+POLL_TIMEOUT="${DEVBOT_POLL_TIMEOUT:-30}"   # seconds per long-poll cycle
+MAX_WAIT="${DEVBOT_MAX_WAIT:-300}"          # max total wait (5 min default)
+
+# ─── Parse args ──────────────────────────────────────────────────────────
+
+CONTEXT=""
+SOURCE="terminal"
+SOURCE_ID=""
+SOURCE_LABEL=""
+TTL_SECONDS=0
+QUESTION=""
+
+usage() {
+  cat <<EOF
+Usage: devbot-ask [OPTIONS] "Your question"
+
+Options:
+  -c, --context TEXT      Additional context about what you're working on
+  -s, --source TYPE       Source type: terminal|scheduler|chat|plugin|system (default: terminal)
+  --source-id ID          Identifier for the source (e.g. chat ID, task ID)
+  --source-label LABEL    Human-friendly label for the source
+  --ttl SECONDS           Auto-expire the request after N seconds (0 = never)
+  --timeout SECONDS       Max total wait time (default: ${MAX_WAIT}s)
+  --poll-timeout SECONDS  Per-cycle long-poll timeout (default: ${POLL_TIMEOUT}s)
+  -q, --quiet             Don't print status messages to stderr
+  -h, --help              Show this help
+
+Environment:
+  DEVBOT_URL              Backend URL (default: https://localhost:3100)
+  DEVBOT_API_KEY          API key for authentication
+  DEVBOT_POLL_TIMEOUT     Per-cycle long-poll timeout in seconds (default: 30)
+  DEVBOT_MAX_WAIT         Max total wait time in seconds (default: 300)
+
+Examples:
+  devbot-ask "Should I use React or Vue?"
+  devbot-ask -c "Building the settings page" "Dark mode or light mode default?"
+  REPLY=\$(devbot-ask "Proceed with deploy?")
+  echo "Multi-line question" | devbot-ask
+EOF
+  exit 0
+}
+
+QUIET=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -c|--context)    CONTEXT="$2"; shift 2 ;;
+    -s|--source)     SOURCE="$2"; shift 2 ;;
+    --source-id)     SOURCE_ID="$2"; shift 2 ;;
+    --source-label)  SOURCE_LABEL="$2"; shift 2 ;;
+    --ttl)           TTL_SECONDS="$2"; shift 2 ;;
+    --timeout)       MAX_WAIT="$2"; shift 2 ;;
+    --poll-timeout)  POLL_TIMEOUT="$2"; shift 2 ;;
+    -q|--quiet)      QUIET=true; shift ;;
+    -h|--help)       usage ;;
+    -*)              echo "Unknown option: $1" >&2; exit 1 ;;
+    *)               QUESTION="$1"; shift ;;
+  esac
+done
+
+# Read from stdin if no question provided
+if [[ -z "$QUESTION" ]]; then
+  if [[ -t 0 ]]; then
+    echo "Error: No question provided. Use: devbot-ask \"Your question\"" >&2
+    exit 1
+  fi
+  QUESTION=$(cat)
+fi
+
+if [[ -z "$QUESTION" ]]; then
+  echo "Error: Empty question" >&2
+  exit 1
+fi
+
+# ─── Helpers ─────────────────────────────────────────────────────────────
+
+log() {
+  if [[ "$QUIET" != "true" ]]; then
+    echo "$@" >&2
+  fi
+}
+
+# Build curl auth args
+CURL_AUTH=()
+if [[ -n "$DEVBOT_API_KEY" ]]; then
+  CURL_AUTH=(-H "X-API-Key: ${DEVBOT_API_KEY}")
+fi
+
+# curl wrapper that handles self-signed certs
+do_curl() {
+  curl -sSf -k \
+    -H "Content-Type: application/json" \
+    "${CURL_AUTH[@]}" \
+    "$@"
+}
+
+# ─── Step 1: Create the assist request ───────────────────────────────────
+
+PAYLOAD=$(jq -n \
+  --arg question "$QUESTION" \
+  --arg context "$CONTEXT" \
+  --arg source "$SOURCE" \
+  --arg sourceId "$SOURCE_ID" \
+  --arg sourceLabel "$SOURCE_LABEL" \
+  --argjson ttlSeconds "$TTL_SECONDS" \
+  '{
+    question: $question,
+    source: $source,
+    ttlSeconds: $ttlSeconds
+  }
+  + (if $context != "" then { context: $context } else {} end)
+  + (if $sourceId != "" then { sourceId: $sourceId } else {} end)
+  + (if $sourceLabel != "" then { sourceLabel: $sourceLabel } else {} end)'
+)
+
+RESPONSE=$(do_curl -X POST "${DEVBOT_URL}/api/assist/request" -d "$PAYLOAD" 2>&1) || {
+  echo "Error: Failed to create assist request" >&2
+  echo "$RESPONSE" >&2
+  exit 1
+}
+
+REQUEST_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
+if [[ -z "$REQUEST_ID" ]]; then
+  echo "Error: No request ID in response" >&2
+  echo "$RESPONSE" >&2
+  exit 1
+fi
+
+log "📨 Request sent (${REQUEST_ID}). Waiting for reply..."
+log "   Question: ${QUESTION:0:80}$([ ${#QUESTION} -gt 80 ] && echo '…')"
+
+# ─── Step 2: Long-poll for reply ─────────────────────────────────────────
+
+POLL_TIMEOUT_MS=$((POLL_TIMEOUT * 1000))
+ELAPSED=0
+
+while [[ $ELAPSED -lt $MAX_WAIT ]]; do
+  WAIT_RESPONSE=$(do_curl \
+    "${DEVBOT_URL}/api/assist/${REQUEST_ID}/wait?timeout=${POLL_TIMEOUT_MS}" \
+    2>&1) || {
+    log "⚠️  Poll failed, retrying in 5s..."
+    sleep 5
+    ELAPSED=$((ELAPSED + 5))
+    continue
+  }
+
+  STATUS=$(echo "$WAIT_RESPONSE" | jq -r '.status // "unknown"')
+  REPLY=$(echo "$WAIT_RESPONSE" | jq -r '.reply // empty')
+
+  case "$STATUS" in
+    replied)
+      log "✅ Reply received!"
+      echo "$REPLY"
+      exit 0
+      ;;
+    cancelled)
+      log "❌ Request was cancelled"
+      exit 2
+      ;;
+    expired)
+      log "⏰ Request expired"
+      exit 3
+      ;;
+    pending)
+      ELAPSED=$((ELAPSED + POLL_TIMEOUT))
+      REMAINING=$((MAX_WAIT - ELAPSED))
+      if [[ $REMAINING -gt 0 ]]; then
+        log "⏳ Still waiting... (${REMAINING}s remaining)"
+      fi
+      ;;
+    *)
+      log "⚠️  Unknown status: ${STATUS}"
+      ELAPSED=$((ELAPSED + POLL_TIMEOUT))
+      ;;
+  esac
+done
+
+log "⏰ Timed out after ${MAX_WAIT}s with no reply"
+exit 4

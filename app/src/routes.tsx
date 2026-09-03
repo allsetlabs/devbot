@@ -21,6 +21,7 @@ import {
   FileAudio,
   Cpu,
   Bell,
+  HandHelping,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -43,6 +44,7 @@ import { VoiceModePage } from './pages/VoiceModePage';
 import { VoiceTranscriptsPage } from './pages/VoiceTranscriptsPage';
 import { LocalModelsPage } from './pages/LocalModelsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
+import { AssistPage } from './pages/AssistPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -173,6 +175,12 @@ export const routes = {
     name: 'Notifications',
     icon: <Bell className="h-5 w-5" />,
     Component: NotificationsPage,
+  },
+  assist: {
+    path: '/assist',
+    name: 'Assist',
+    icon: <HandHelping className="h-5 w-5" />,
+    Component: AssistPage,
   },
   settings: {
     path: '/settings',

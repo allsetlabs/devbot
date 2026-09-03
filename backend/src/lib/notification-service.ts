@@ -26,6 +26,7 @@ export type NotificationCategory =
   | 'scheduler'     // Scheduler task completed / failed
   | 'event'         // Event trigger fired (stock alert, weather, file change)
   | 'chat'          // Agent requesting human input / new message
+  | 'assist'        // Personal Assistant Mode — terminal requesting human attention
   | 'system'        // System alerts (disk space, tunnel status, health)
   | 'reminder'      // User-set reminders
   | 'custom';       // Anything else
@@ -391,6 +392,22 @@ export async function notifyAgentNeedsInput(chatName: string, chatId: string, qu
   });
 }
 
+/** Notify that an assist request needs human attention. */
+export async function notifyAssistRequest(requestId: string, question: string, source: string, sourceLabel?: string): Promise<NotificationRecord> {
+  const label = sourceLabel || source;
+  return sendNotification({
+    title: `🆘 ${label} needs your input`,
+    body: question.length > 120 ? question.slice(0, 120) + '…' : question,
+    category: 'assist',
+    priority: 'high',
+    speak: true,
+    ttsText: `Attention needed. ${label} is asking: ${question.slice(0, 100)}`,
+    actionUrl: '/assist',
+    metadata: { assistRequestId: requestId, source, sourceLabel },
+    source: 'assist',
+  });
+}
+
 /** Send a system alert notification. */
 export async function notifySystem(title: string, body: string, priority: NotificationPriority = 'normal'): Promise<NotificationRecord> {
   return sendNotification({
@@ -415,11 +432,11 @@ export async function markNotificationRead(id: string): Promise<NotificationReco
 
 /** Mark all notifications as read. */
 export async function markAllRead(): Promise<number> {
-  const unread = await notificationStore.list({ filter: { read: false } as Partial<NotificationRecord> });
+  const unread = await notificationStore.list({ filter: { read: false } });
   let count = 0;
   for (const n of unread) {
     try {
-      await notificationStore.update(n.id, { read: true } as Partial<NotificationRecord>);
+      await notificationStore.update(n.id, { read: true });
       count++;
     } catch { /* skip */ }
   }

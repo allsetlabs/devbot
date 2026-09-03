@@ -22,6 +22,7 @@ import {
   Cpu,
   Bell,
   HandHelping,
+  BrainCircuit,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -45,6 +46,7 @@ import { VoiceTranscriptsPage } from './pages/VoiceTranscriptsPage';
 import { LocalModelsPage } from './pages/LocalModelsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { AssistPage } from './pages/AssistPage';
+import { SmartSchedulerPage } from './pages/SmartSchedulerPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -97,6 +99,12 @@ export const routes = {
     name: 'Scheduler',
     icon: <Clock className="h-5 w-5" />,
     Component: SchedulerList,
+  },
+  smartScheduler: {
+    path: '/smart-scheduler',
+    name: 'Smart Scheduler',
+    icon: <BrainCircuit className="h-5 w-5" />,
+    Component: SmartSchedulerPage,
   },
   eventSources: {
     path: '/event-sources',

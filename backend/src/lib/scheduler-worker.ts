@@ -10,6 +10,7 @@ import { DEVBOT_PROJECTS_DIR } from './env.js';
 import type { StreamParserConfig } from './stream-parser.js';
 import { matchesCronExpression, nextCronOccurrence } from './cron-parser.js';
 import { notifySchedulerComplete, notifySchedulerFailed } from './notification-service.js';
+import { recordRunMetric, evaluateAutoAdjust } from './smart-scheduler.js';
 
 const CHECK_INTERVAL_MS = 30000;
 const OUTPUT_DIR = '/tmp/devbot/scheduler';
@@ -199,6 +200,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
   const runId = uuidv4().slice(0, 12);
   const outputFile = join(outputDir, `${runIndex}.jsonl`);
 
+  const runStartedAt = new Date().toISOString();
   console.log(`[Scheduler] Starting task ${taskId} run #${runIndex}`);
 
   const settings = task.settings as SchedulerSettings | null | undefined;
@@ -323,6 +325,26 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
       console.log(
         `[Scheduler] Task ${taskId} run #${runIndex} ${success ? 'completed' : 'failed'}`
       );
+
+      // Record run metrics for Smart Scheduler analytics
+      const completedAt = new Date().toISOString();
+      recordRunMetric(
+        taskId,
+        runId,
+        runIndex,
+        model,
+        runStartedAt,
+        completedAt,
+        success ? 'completed' : 'failed',
+        errorMessage
+      ).catch((err) => {
+        console.error('[Scheduler] Failed to record run metric:', err);
+      });
+
+      // Evaluate auto-adjust after each run
+      evaluateAutoAdjust(taskId).catch((err) => {
+        console.error('[Scheduler] Failed to evaluate auto-adjust:', err);
+      });
 
       // Send notification (push + TTS)
       const taskName = task.name || `Task ${taskId}`;

@@ -43,6 +43,7 @@ import { voiceTranscriptAnalysisRouter } from './routes/voice-transcripts.js';
 import { localModelsRouter } from './routes/local-models.js';
 import { notificationsRouter } from './routes/notifications.js';
 import { assistRouter } from './routes/assist.js';
+import { smartSchedulerRouter } from './routes/smart-scheduler.js';
 import { seedSystemSchedulers } from './lib/schedulers-seed.js';
 import { getBabyLogsRouter } from '@devbot/plugin-baby-logs/backend/routes.js';
 import { getLawnCareRouter } from '@devbot/plugin-lawn-care/backend/routes.js';
@@ -257,6 +258,7 @@ app.use('/api/voice-transcripts', voiceTranscriptAnalysisRouter);
 app.use('/api/local-models', localModelsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/assist', assistRouter);
+app.use('/api/smart-scheduler', smartSchedulerRouter);
 
 // Plugin routes
 app.use('/api/plugins/baby-logs', getBabyLogsRouter());

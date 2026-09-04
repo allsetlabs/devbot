@@ -46,6 +46,11 @@
 - [ ] **Canvas / Artifacts** — In-app code editing with AI assistance. Artifact viewer for structured outputs (code, documents, diagrams). Integrated with interactive chats for iterative editing.
 - [ ] **Multimodal Understanding** — Image and video analysis via Ollama vision models. Upload photos for analysis, integrate with baby monitor for richer inference, OCR improvements.
 
+### Phase 6: Research & Automation
+- [ ] `NEXT` **Deep Research Plugin** — Long-running research agent that takes a topic, searches the web (via Chrome MCP or WebSearch), compiles findings with citations, and produces a structured report. Inspired by Gemini Deep Research. FileStore-backed research sessions with status tracking (queued/researching/compiling/completed/failed). Multiple search strategies (breadth-first for overview, depth-first for deep dive). Source credibility scoring. Markdown report generation with inline citations. Scheduler-compatible for automated research runs. Frontend: ResearchPage with topic input, active/completed research cards, report viewer with citation links.
+- [ ] **Deploy Scheduler** — One-click deploy from chat. Scheduler task type that runs deploy scripts, tracks deploy history, rollback support. Inspired by Replit deploy-from-chat.
+- [ ] **Search Plugin** — Web search with citations. Perplexity-style search that returns structured answers with source URLs. Uses Chrome MCP or WebSearch for queries, Ollama/Claude for synthesis.
+
 ## Feature Research Queue
 
 > Top features from major AI platforms to evaluate and implement:

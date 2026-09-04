@@ -14,6 +14,7 @@
     "@devbot/plugin-family-hierarchy": "*",
     "@devbot/plugin-lawn-care": "*",
     "@devbot/plugin-trip-planner": "*",
+    "@devbot/plugin-deep-research": "*",
     "@devbot/plugin-personal-finance": "*",
     "better-sqlite3": "12.8.0",
     "cookie-parser": "^1.4.7",

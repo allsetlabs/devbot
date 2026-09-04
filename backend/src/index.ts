@@ -52,6 +52,7 @@ import getFamilyHierarchyRouter from '@devbot/plugin-family-hierarchy/backend/ro
 import { getTripPlannerRouter } from '@devbot/plugin-trip-planner/backend/store.js';
 import { getBabyMonitorRouter } from '@devbot/plugin-baby-monitor/backend/store.js';
 import { getPersonalFinanceRouter } from '@devbot/plugin-personal-finance/backend/store.js';
+import { getDeepResearchRouter } from '@devbot/plugin-deep-research/backend/store.js';
 import type { LawnProfile } from '@devbot/plugin-lawn-care/backend/schema.js';
 import { spawnClaudeStructured, getActiveSessionCount } from './lib/claude-spawn.js';
 import type { LawnPlanData } from '@devbot/plugin-lawn-care/backend/types.js';
@@ -268,6 +269,7 @@ app.use('/api/plugins/family-hierarchy', getFamilyHierarchyRouter());
 app.use('/api/plugins/trip-planner', getTripPlannerRouter());
 app.use('/api/plugins/baby-monitor', getBabyMonitorRouter());
 app.use('/api/plugins/personal-finance', getPersonalFinanceRouter());
+app.use('/api/plugins/deep-research', getDeepResearchRouter());
 app.use(
   '/api/plugins/lawn-care',
   getLawnCareRouter({

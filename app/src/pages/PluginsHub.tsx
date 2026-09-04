@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Baby, Leaf, Network, Map, Camera, Wallet, ArrowRight } from 'lucide-react';
+import { Baby, Leaf, Network, Map, Camera, Wallet, Search, ArrowRight } from 'lucide-react';
 import {
   Card,
   CardHeader,
@@ -52,6 +52,12 @@ const PLUGINS: PluginCard[] = [
     description: 'Track expenses, investments, and gold holdings. Portfolio tracking with Robinhood integration.',
     path: '/plugins/personal-finance',
     icon: <Wallet className="h-6 w-6" />,
+  },
+  {
+    title: 'Deep Research',
+    description: 'AI-powered research agent. Enter a topic, get a comprehensive report with citations from web sources.',
+    path: '/plugins/deep-research',
+    icon: <Search className="h-6 w-6" />,
   },
 ];
 

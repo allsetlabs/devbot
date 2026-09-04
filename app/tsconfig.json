@@ -30,7 +30,9 @@
       "@devbot/plugin-baby-monitor/frontend/*": ["../plugins/baby-monitor/frontend/*"],
       "@devbot/plugin-baby-monitor/backend/*": ["../plugins/baby-monitor/backend/*"],
       "@devbot/plugin-personal-finance/frontend/*": ["../plugins/personal-finance/frontend/*"],
-      "@devbot/plugin-personal-finance/backend/*": ["../plugins/personal-finance/backend/*"]
+      "@devbot/plugin-personal-finance/backend/*": ["../plugins/personal-finance/backend/*"],
+      "@devbot/plugin-deep-research/frontend/*": ["../plugins/deep-research/frontend/*"],
+      "@devbot/plugin-deep-research/backend/*": ["../plugins/deep-research/backend/*"]
     }
   },
   "include": ["src"],

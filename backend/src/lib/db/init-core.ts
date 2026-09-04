@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { coreDb } from './core.js';
+import { seedEventSources } from '../seed-event-sources.js';
 
 /**
  * Helper to run raw SQL with Drizzle (better-sqlite3 is synchronous)
@@ -515,6 +516,9 @@ export async function initializeCoreDatabase() {
     }
 
     console.log('[DB] Core database schema initialized successfully');
+
+    // Seed default event sources (idempotent — skips existing names)
+    await seedEventSources();
   } catch (err) {
     console.error('[DB] Failed to initialize core database:', err);
     throw err;

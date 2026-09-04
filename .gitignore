@@ -21,3 +21,4 @@ app/android/app/google-services.json
 app/electron-dist/
 app/release/
 
+.claude/worktrees/

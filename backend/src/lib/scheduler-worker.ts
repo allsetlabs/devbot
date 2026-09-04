@@ -11,6 +11,7 @@ import type { StreamParserConfig } from './stream-parser.js';
 import { matchesCronExpression, nextCronOccurrence } from './cron-parser.js';
 import { notifySchedulerComplete, notifySchedulerFailed } from './notification-service.js';
 import { recordRunMetric, evaluateAutoAdjust } from './smart-scheduler.js';
+import { buildCrossSessionContext, saveSessionMemory, extractMemoryFromOutput } from './session-memory.js';
 
 const CHECK_INTERVAL_MS = 30000;
 const OUTPUT_DIR = '/tmp/devbot/scheduler';
@@ -103,9 +104,9 @@ async function processQueue(): Promise<void> {
 
 /**
  * Build the context-enriched prompt for a task.
- * If the task has a context_file, prepend its contents as context.
+ * Injects cross-session memory context and context_file content.
  */
-function buildContextualPrompt(task: ScheduledTaskRow): string {
+async function buildContextualPrompt(task: ScheduledTaskRow): Promise<string> {
   let prompt = task.prompt;
 
   // Inject context file content if specified
@@ -116,6 +117,17 @@ function buildContextualPrompt(task: ScheduledTaskRow): string {
     } catch (err) {
       console.error(`[Scheduler] Failed to read context file ${task.context_file}:`, err);
     }
+  }
+
+  // Inject cross-session memory context (own history + dependency outputs)
+  try {
+    const memoryContext = await buildCrossSessionContext(task.id);
+    if (memoryContext) {
+      prompt = `${memoryContext}\n\n${prompt}`;
+      console.log(`[Scheduler] Injected cross-session memory context for task ${task.id}`);
+    }
+  } catch (err) {
+    console.error(`[Scheduler] Failed to build cross-session context for ${task.id}:`, err);
   }
 
   // Inject template variables if any
@@ -209,8 +221,8 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
   const workingDir: string = settings?.workingDir || DEVBOT_PROJECTS_DIR;
   const chatId = createSchedulerChat(task, runIndex, model, settings?.workingDir);
 
-  // Build contextual prompt (injects context_file content + template vars)
-  const contextualPrompt = buildContextualPrompt(task);
+  // Build contextual prompt (injects cross-session memory + context_file + template vars)
+  const contextualPrompt = await buildContextualPrompt(task);
 
   try {
     coreDb
@@ -233,6 +245,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
 
   return new Promise((resolve) => {
     let completed = false;
+    const outputChunks: string[] = [];
 
     const persist: StreamParserConfig & { initialSequence: number } = chatId
       ? {
@@ -346,6 +359,47 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
         console.error('[Scheduler] Failed to evaluate auto-adjust:', err);
       });
 
+      // Save cross-session memory for future runs
+      const durationSeconds = Math.round(
+        (new Date(completedAt).getTime() - new Date(runStartedAt).getTime()) / 1000
+      );
+      const rawOutput = outputChunks.join('');
+      // Extract text content from JSONL stream chunks for memory extraction
+      let outputText = '';
+      for (const line of rawOutput.split('\n')) {
+        if (!line.trim()) continue;
+        try {
+          const evt = JSON.parse(line);
+          if (evt.type === 'assistant' && evt.message?.content) {
+            for (const block of evt.message.content) {
+              if (block.type === 'text' && block.text) {
+                outputText += block.text + '\n';
+              }
+            }
+          }
+        } catch {
+          // Not valid JSON, skip
+        }
+      }
+      if (outputText.length > 0) {
+        const extracted = extractMemoryFromOutput(outputText);
+        saveSessionMemory({
+          task_id: taskId,
+          task_name: task.name,
+          run_id: runId,
+          run_index: runIndex,
+          summary: extracted.summary,
+          key_findings: extracted.key_findings,
+          output_data: extracted.output_data,
+          tags: extracted.tags,
+          run_status: success ? 'completed' : 'failed',
+          duration_seconds: durationSeconds,
+          model,
+        }).catch((err) => {
+          console.error('[Scheduler] Failed to save session memory:', err);
+        });
+      }
+
       // Send notification (push + TTS)
       const taskName = task.name || `Task ${taskId}`;
       if (success) {
@@ -375,6 +429,7 @@ async function executeTask(task: ScheduledTaskRow): Promise<boolean> {
       onRawChunk: (chunk) => {
         try {
           appendFileSync(outputFile, chunk);
+          outputChunks.push(chunk);
         } catch (err) {
           console.error(`[Scheduler] Failed to write to output file:`, err);
         }

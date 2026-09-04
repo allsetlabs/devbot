@@ -23,6 +23,7 @@ import {
   Bell,
   HandHelping,
   BrainCircuit,
+  Brain,
 } from 'lucide-react';
 import { Dashboard } from './pages/Dashboard';
 import { InteractiveChatList } from './pages/InteractiveChatList';
@@ -47,6 +48,7 @@ import { LocalModelsPage } from './pages/LocalModelsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { AssistPage } from './pages/AssistPage';
 import { SmartSchedulerPage } from './pages/SmartSchedulerPage';
+import { CrossSessionMemoryPage } from './pages/CrossSessionMemoryPage';
 
 /**
  * Single source of truth for top-level app routes. Drives, all from one object:
@@ -189,6 +191,12 @@ export const routes = {
     name: 'Assist',
     icon: <HandHelping className="h-5 w-5" />,
     Component: AssistPage,
+  },
+  sessionMemory: {
+    path: '/session-memory',
+    name: 'Session Memory',
+    icon: <Brain className="h-5 w-5" />,
+    Component: CrossSessionMemoryPage,
   },
   settings: {
     path: '/settings',

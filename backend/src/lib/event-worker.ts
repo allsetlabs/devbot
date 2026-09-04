@@ -205,6 +205,11 @@ const evaluators: Record<string, EventEvaluator> = {
         triggered = SEVERE_CODES.has(weatherCode);
         details = `${location}: weather_code=${weatherCode}, severe=${triggered ? 'yes' : 'no'}`;
         break;
+      case 'daily_update':
+        // Always trigger — pushes current conditions as a periodic update
+        triggered = true;
+        details = `${location}: ${tempF}F, weather_code=${weatherCode}, precip=${precipitation}mm`;
+        break;
       default:
         details = `Unknown weather condition: ${condition}`;
     }
@@ -285,17 +290,66 @@ const evaluators: Record<string, EventEvaluator> = {
   },
 
   // ------------------------------------------
-  // News — stub (requires external API key)
+  // News — Google News RSS (free, no API key)
+  // Config: { query: string, maxAgeDays?: number }
   // ------------------------------------------
-  news: async (config, _source) => {
-    const keywords = config.keywords as string[] | undefined;
-    console.log(
-      `[EventWorker] News evaluator: requires external API key setup. Keywords: ${keywords?.join(', ') ?? 'none'}`
-    );
+  news: async (config, source) => {
+    const query = config.query as string | undefined;
+    const maxAgeDays = (config.maxAgeDays as number | undefined) ?? 1;
+
+    if (!query) {
+      return { triggered: false, details: 'Missing required config: query' };
+    }
+
+    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+    const res = await fetchWithTimeout(rssUrl);
+    if (!res.ok) {
+      return { triggered: false, details: `Google News RSS error: ${res.status} ${res.statusText}` };
+    }
+
+    const xml = await res.text();
+
+    // Parse RSS items (handles both CDATA and plain text titles)
+    const items: Array<{ title: string; guid: string; pubDate: string }> = [];
+    for (const match of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+      const itemXml = match[1];
+      const title =
+        itemXml.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] ??
+        itemXml.match(/<title>(.*?)<\/title>/)?.[1] ??
+        '';
+      const guid = itemXml.match(/<guid[^>]*>(.*?)<\/guid>/)?.[1] ?? '';
+      const pubDate = itemXml.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? '';
+      if (guid) items.push({ title: title.trim(), guid, pubDate });
+    }
+
+    // Track seen GUIDs in settings to detect new articles
+    const settings = (source.settings ?? {}) as Record<string, unknown>;
+    const seenGuids = new Set<string>((settings.seenGuids as string[] | undefined) ?? []);
+
+    const cutoff = new Date(Date.now() - maxAgeDays * 24 * 60 * 60 * 1000);
+    const newItems = items.filter((item) => {
+      if (seenGuids.has(item.guid)) return false;
+      const pub = new Date(item.pubDate);
+      return !isNaN(pub.getTime()) && pub >= cutoff;
+    });
+
+    // Persist up to 200 most-recent GUIDs to avoid unbounded growth
+    const allGuids = [...items.map((i) => i.guid), ...Array.from(seenGuids)].slice(0, 200);
+    await updateSourceSettings(source.id, { seenGuids: allGuids });
+
+    if (newItems.length === 0) {
+      console.log(`[EventWorker] News "${query}": no new articles`);
+      return { triggered: false, details: `No new articles for "${query}"` };
+    }
+
+    const headlines = newItems
+      .slice(0, 3)
+      .map((i) => i.title)
+      .join(' | ');
+    console.log(`[EventWorker] News "${query}": ${newItems.length} new article(s)`);
     return {
-      triggered: false,
-      details:
-        'News evaluator requires an external API key (e.g. NewsAPI). Not yet configured.',
+      triggered: true,
+      details: `${newItems.length} new article(s) for "${query}": ${headlines}`,
     };
   },
 

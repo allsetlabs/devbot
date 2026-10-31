@@ -22,3 +22,6 @@ app/electron-dist/
 app/release/
 
 .claude/worktrees/
+
+# Leftover dependency-only directory; not a configured submodule.
+/reusables/

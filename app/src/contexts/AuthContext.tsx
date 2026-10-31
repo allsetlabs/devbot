@@ -12,7 +12,7 @@ import {
   useCallback,
 } from 'react';
 import type { ReactNode } from 'react';
-import { BACKEND_URL } from '../lib/api';
+import { BACKEND_URL, authHeaders } from '../lib/api';
 
 export interface AuthUser {
   email: string;
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [oauthConfigured, setOauthConfigured] = useState(false);
 
   useEffect(() => {
-    fetch(`${BACKEND_URL}/auth/status`, { credentials: 'include' })
+    fetch(`${BACKEND_URL}/auth/status`, { credentials: 'include', headers: authHeaders() })
       .then((r) => r.json())
       .then(
         (data: {
